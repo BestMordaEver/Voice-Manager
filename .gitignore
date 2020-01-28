@@ -1,1 +1,4 @@
-*.json*.txt*.logconfig.lua
+*.json
+*.txt
+*.log
+config.lua
