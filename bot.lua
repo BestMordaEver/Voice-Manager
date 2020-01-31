@@ -52,7 +52,7 @@ servers = setmetatable({
 		if file then
 			logger:log(4, "Found servers save file, reading...")
 			for line in file:read("*all"):gmatch("(.-)\n") do
-				local _,_, serverID = line:find("(%d+)")
+				local serverID = line:match("%d+")
 				if client:getGuild(serverID) then
 					serverCount = serverCount + 1
 					self[serverID] = {}
@@ -81,7 +81,7 @@ servers = setmetatable({
 		if file then
 			logger:log(4, "Found channels save file, reading...")
 			for line in file:read("*all"):gmatch("(.-)\n") do
-				local _,_, serverID = line:find("(%d+)")
+				local serverID = line:match("%d+")
 				if client:getGuild(serverID) then
 					serverCount = serverCount + 1
 					if not self[serverID] then self[serverID] = {} end
@@ -195,7 +195,7 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 	[commands.register] = function (message)
 		message.channel:broadcastTyping()
 		logger:log(4, "Register action invoked")
-		local _,_, id = message.content:find(commands.register.."%s*(%d+)")
+		local id = message.content:match(commands.register.."%s*(%d+)")
 		if id and message.guild.voiceChannels:find(function(voiceChannel) if id == voiceChannel.id then return true end end) then
 			servers[message.guild.id][id] = 0
 			servers:saveServers()
@@ -212,7 +212,7 @@ Example: `@Voice Manager register 123456789123456780`]])
 	[commands.unregister] = function (message)
 		message.channel:broadcastTyping()
 		logger:log(4, "Unregister action invoked")
-		local _,_, id = message.content:find(commands.unregister.."%s*(%d+)")
+		local id = message.content:match(commands.unregister.."%s*(%d+)")
 		if id and servers[message.guild.id][id] then
 			servers[message.guild.id][id] = nil
 			servers:saveServers()
@@ -254,7 +254,7 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 	[commands.verbose] = function (message)
 		if message.author.id ~= "188731184501620736" then return end
 		logger:log(4, "Verbose switch action invoked")
-		local _,_, status = message.content:find(commands.verbose.."%s*(%a+)")
+		local status = message.content:match(commands.verbose.."%s*(%a+)")
 		if status == "true" or status == "on" or status == "enable" then
 			verboseGuilds = true
 			logger:log(3, "Set guild updates to verbose")
@@ -267,7 +267,7 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 	[commands.execute] = function (message)
 		if message.author.id ~= "188731184501620736" then return end
 		logger:log(4, "Execute action invoked")
-		local _,_, codeblock = message.content:find("execute(.*)")
+		local codeblock = message.content:match("execute(.*)")
 		
 		sandbox.print = function(content)
 			message:reply(tostring(content))
@@ -298,7 +298,7 @@ client:on('messageCreate', function (message)
 
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
-	local _, _, command = message.content:find("%s(%a+)")
+	local command = message.content:match("%s(%a+)")
 	if not command then command = "" end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then logger:log(1, "Couldn't process the message, %s", msg) end
@@ -320,7 +320,7 @@ end)
 
 client:on('voiceChannelJoin', function (member, channel)
 	if not servers[channel.guild.id] then servers[channel.guild.id] = {}; return end
-	if servers[channel.guild.id][channel.id] == 0 then		-- main lobby
+	if servers[channel.guild.id][channel.id] == 0 then
 		logger:log(4, "%s joined lobby %s", member.user.id, channel.id)
 		local category = channel.category or channel.guild
 		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s Lobby")
