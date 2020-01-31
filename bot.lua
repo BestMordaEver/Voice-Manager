@@ -2,6 +2,7 @@ local discordia = require "../deps/discordia/init.lua"
 local config = require "./config.lua"
 
 local client = discordia.Client {routeDelay = 100}
+local DBL = discordia.DBLAPI(config.dbltoken, client)
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
@@ -13,6 +14,7 @@ local servers
 local sandbox = setmetatable({ }, { __index = _G })
 
 local commands = {
+	help = "help",
 	register = "register",		-- bot is bound to channel, from which everybody is then thrown around
 	unregister = "unregister",
 	list = "list",				-- display bound channels
@@ -292,30 +294,29 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 
 client:on('messageCreate', function (message)
 	if message.channel.type ~= channelType.text or
-		not message.member:hasPermission(permission.administrator) or										-- only admins can use bot
+		not message.member:hasPermission(permission.manageChannels) or										-- only admins can use bot
 		not message.mentionedUsers:find(function(user) if user == client.user then return true end end) 	-- check for mention
 	then return end
 
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
 	local command = message.content:match("%s(%a+)")
-	if not command then command = "" end
+	if not command or command == "help" then command = "" end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then logger:log(1, "Couldn't process the message, %s", msg) end
 end)
 
 client:on('guildCreate', function (guild)
 	servers[guild.id] = {}
-	print(guild.id,"added")
 	if verboseGuilds then client:getUser("188731184501620736"):send(guild.name.." added me!\n"..(guild.vanityCode or "No invite link available...")) end
 	servers:saveServers()
+	--print(pcall(function() DBL:postStats() end))
 end)
 
 client:on('guildDelete', function (guild)
 	servers[guild.id] = nil
-	print(guild.id,"deleted")
 	if verboseGuilds then client:getUser("188731184501620736"):send(guild.name.." removed me!\n"..(guild.vanityCode or "No invite link available...")) end
-	servers:saveServers()
+	--print(pcall(function() DBL:postStats() end))
 end)
 
 client:on('voiceChannelJoin', function (member, channel)
@@ -346,6 +347,7 @@ end)
 
 client:on('ready', function()
 	servers:load()
+	--print(pcall(function() DBL:postStats() end))
 	clock:start()
 	client:getUser("188731184501620736"):send("I'm listening")
 end)
