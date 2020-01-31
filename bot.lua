@@ -1,7 +1,7 @@
 local discordia = require "../deps/discordia/init.lua"
 local config = require "./config.lua"
 
-local client = discordia.Client()
+local client = discordia.Client {routeDelay = 100}
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
@@ -118,8 +118,8 @@ servers = setmetatable({
 					for channelID, type in pairs(server) do
 						if pingChannel(serverID, channelID) then
 							if type == 0 then
-								channelCount = channelCount + 1
 								file:write(" ",channelID)
+								channelCount = channelCount + 1
 							end
 						end
 					end
@@ -323,10 +323,11 @@ client:on('voiceChannelJoin', function (member, channel)
 	if servers[channel.guild.id][channel.id] == 0 then		-- main lobby
 		logger:log(4, "%s joined lobby %s", member.user.id, channel.id)
 		local category = channel.category or channel.guild
-		local newChannel = category:createVoiceChannel(member.user.name.."'s Lobby")
+		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s Lobby")
 		member:setVoiceChannel(newChannel.id)
 		logger:log(4, "Created new channel %s", newChannel.id)
 		servers[channel.guild.id][newChannel.id] = 1
+		newChannel:setUserLimit(channel.userLimit)
 	end
 end)
 
