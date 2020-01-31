@@ -15,10 +15,10 @@ local sandbox = setmetatable({ }, { __index = _G })
 
 local commands = {
 	help = "help",
-	register = "register",		-- bot is bound to channel, from which everybody is then thrown around
+	register = "register",
 	unregister = "unregister",
-	list = "list",				-- display bound channels
-	shutdown = "shutdown",		-- only I can use
+	list = "list",
+	shutdown = "shutdown",
 	verbose = "verbose",
 	execute = "execute"
 }
@@ -293,9 +293,9 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 }
 
 client:on('messageCreate', function (message)
-	if message.channel.type ~= channelType.text or
-		not message.member:hasPermission(permission.manageChannels) or										-- only admins can use bot
-		not message.mentionedUsers:find(function(user) if user == client.user then return true end end) 	-- check for mention
+	if message.channel.type ~= channelType.text or message.author.bot or
+		not message.member:hasPermission(permission.manageChannels) or
+		not message.mentionedUsers:find(function(user) if user == client.user then return true end end)
 	then return end
 
 	logger:log(4, "Message received, processing...")
