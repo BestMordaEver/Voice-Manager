@@ -191,7 +191,8 @@ local actions = {
 Write commands after the mention, for example - `@Voice Manager register 123456789123456780`
 **================**
 `register [voice_chat_id]` - registers a voice chat, which will be used as a lobby
-`unregister [voice_chat_id]` - unregisters a voice chat]])
+`unregister [voice_chat_id]` - unregisters a voice chat
+`list` - lists all registered lobbies and how many new channels exist]])
 	end,
 
 	[commands.register] = function (message)
