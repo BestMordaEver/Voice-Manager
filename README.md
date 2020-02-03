@@ -11,3 +11,11 @@ List of available commands:
 - register channelID - registers voice channel as a lobby
 - unregister channelID - unregister lobby
 - list - shows all lobbies and their IDs, also shows how many new channels exist
+
+<a href="https://discordbotlist.com/bots/601347755046076427">
+	<img 
+		width="380" 
+		height="140" 
+		src="https://discordbotlist.com/bots/601347755046076427/widget" 
+		alt="Voice Manager stats on Discord Bot List">
+</a>
