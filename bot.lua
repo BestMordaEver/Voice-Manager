@@ -168,7 +168,7 @@ servers = setmetatable({
 	end}
 })
 
-local shutdown = function ()
+local function shutdown()
 	logger:log(3, "Starting the shutdown")
 	local status, msg = pcall(function()
 		clock:stop()
@@ -180,9 +180,25 @@ local shutdown = function ()
 	if not status then process:kill() end
 end
 
-local function code(str)
+local function code (str)
     return string.format('```\n%s```', str)
 end
+
+local statservers = setmetatable({
+	discordbotlist = {
+		fn = function (self, guilds, people, channels)
+			local res, body = https.request("POST","https://discordbotlist.com/api/bots/601347755046076427/stats",
+			{{"Authorization", "Bot 524a707a1ecb0e93ac0d129e1537c78deee6d9bdade22fd82c9f1ea8bacc4618"},{"Content-Type", "application/json"},{"Accept", "application/json"}},
+			json.encode({guilds = guilds, users = people, voice_connections = channels}))
+			if res.code ~= 204 then 
+				logger:log(2, "Couldn't send stats to discordbotlist.com - %s", body)
+			end
+			self.res = res
+		end
+	}
+},{__call = function (self, ...)
+	for _, serv in pairs(self) do coroutine.wrap(serv.fn)(serv,...) end
+end})
 
 local actions = {
 	[commands.help] = function (message)
@@ -381,12 +397,7 @@ clock:on('min', function()
 	end
 	client:setGame({name = people == 0 and "the sound of silence" or (people.." people on "..channels.." channels"), type = 2})
 	
-	local res, body = https.request("post","discordbotlist.com/api/bots/601347755046076427/stats",
-		{{"Authorization", "Bot 524a707a1ecb0e93ac0d129e1537c78deee6d9bdade22fd82c9f1ea8bacc4618"},{"Content-Type", "application/json"},{"Accept", "application/json"}},
-		json.encode({guilds = #client.guilds, users = people, voice_connections = channels}),10000)
-	if res.code ~= 204 then 
-		logger:log(2, "Couldn't send stats to discordbotlist.com - %s", body)
-	end
+	statservers(#client.guilds, people, channels)
 end)
 
 client:run('Bot '..config.discordToken)
