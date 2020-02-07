@@ -317,10 +317,12 @@ client:on('messageCreate', function (message)
 		return
 	end
 
-	if message.channel.type ~= channelType.text or message.author.bot or
-		not message.member:hasPermission(permission.manageChannels) or
-		not message.mentionedUsers:find(function(user) if user == client.user then return true end end)
-	then return end
+	if not message.content:find(client.user.mentionString) or message.channel.type ~= channelType.text or message.author.bot then return end
+	if not message.member:hasPermission(permission.manageChannels) then
+		logger:log(4, "Mention in vain")
+		message:reply('You need to have "Manage Channels" permission to use this bot')
+		return
+	end
 
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
