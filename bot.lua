@@ -307,18 +307,15 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 }
 
 client:on('messageCreate', function (message)
-	if message.channel.type == channelType.private and message.author ~= client.user then
-		logger:log(4, "Private message received, processing...")
-		if message.author.id ~= "188731184501620736" then
-			client:getUser("188731184501620736"):send(message.author.id.."\n"..message.content)
-		else
-			local command = message.content:match("(%a+)%s")
-			actions[command](message)
-		end
+	if message.channel.type ~= channelType.text then
+		message:reply("This bot can only be used in servers. Mention the bot within the server to get the help message.")
 		return
 	end
 	
-	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.channel.type ~= channelType.text or message.author.bot then return end
+	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.author.bot then 
+		return 
+	end
+	
 	if not message.member:hasPermission(permission.manageChannels) then
 		logger:log(4, "Mention in vain")
 		message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
@@ -327,6 +324,7 @@ client:on('messageCreate', function (message)
 
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
+	
 	local command = message.content:match("%s(%a+)")
 	if not command then command = commands.help end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
@@ -374,9 +372,8 @@ end)
 
 client:on('ready', function()
 	servers:load()
-	--print(pcall(function() DBL:postStats() end))
 	clock:start()
-	client:getUser("188731184501620736"):send("I'm listening")
+	client:getChannel("672852248900010014"):send("I'm listening")
 end)
 
 clock:on('min', function()
