@@ -71,9 +71,9 @@ servers = setmetatable({
 				end
 			end
 			file:close()
-			logger:log(4, "Done with servers save file, found %s servers and %s bound channels", serverCount, channelCount)
+			logger:log(4, "Done with servers save file, found "..serverCount.." servers and "..channelCount.." bound channels")
 		else
-			logger:log(1, "Couldn't open the servers file, %s", err)
+			logger:log(1, "Couldn't open the servers file, "..err)
 		end
 		serversMutex:unlock()
 		
@@ -102,7 +102,7 @@ servers = setmetatable({
 			file:close()
 			logger:log(4, "Done with channels save file, found %s servers and %s new channels", serverCount, channelCount)
 		else
-			logger:log(1, "Couldn't open the channels file, %s", err)
+			logger:log(1, "Couldn't open the channels file, "..err)
 		end
 		channelsMutex:unlock()
 	end,
@@ -130,9 +130,9 @@ servers = setmetatable({
 				end
 			end
 			file:close()
-			logger:log(4, "Done with servers save file, wrote %s servers and %s bound channels", serverCount, channelCount)
+			logger:log(4, "Done with servers save file, wrote "..serverCount.." servers and "..channelCount.." bound channels")
 		else
-			logger:log(1, "Couldn't open the servers file, %s", err)
+			logger:log(1, "Couldn't open the servers file, "..err)
 		end
 		serversMutex:unlock()
 	end,
@@ -160,9 +160,9 @@ servers = setmetatable({
 				end
 			end
 			file:close()
-			logger:log(4, "Done with channels save file, wrote %s servers and %s new channels", serverCount, channelCount)
+			logger:log(4, "Done with channels save file, wrote "..serverCount.." servers and "..channelCount.." new channels")
 		else
-			logger:log(1, "Couldn't open the channels file, %s", err)
+			logger:log(1, "Couldn't open the channels file, "..err)
 		end
 		channelsMutex:unlock()
 	end}
@@ -174,14 +174,14 @@ local function shutdown()
 		clock:stop()
 		client:stop()
 	end)
-	logger:log(3, (status and "Shutdown successfull, saving data..." or "Couldn't shutdown gracefully, %s"), msg)
+	logger:log(3, (status and "Shutdown successfull, saving data..." or ("Couldn't shutdown gracefully, "..msg)))
 	servers:saveServers()
 	servers:saveChannels()
 	if not status then process:kill() end
 end
 
 local function code (str)
-    return string.format('```\n%s```', str)
+    return '```\n'..str..'```'
 end
 
 local statservers = setmetatable({
@@ -191,7 +191,7 @@ local statservers = setmetatable({
 			{{"Authorization", "Bot 524a707a1ecb0e93ac0d129e1537c78deee6d9bdade22fd82c9f1ea8bacc4618"},{"Content-Type", "application/json"},{"Accept", "application/json"}},
 			json.encode({guilds = guilds, users = people, voice_connections = channels}))
 			if res.code ~= 204 then 
-				logger:log(2, "Couldn't send stats to discordbotlist.com - %s", body)
+				logger:log(2, "Couldn't send stats to discordbotlist.com - "..body)
 			end
 			self.res = res
 		end
@@ -294,13 +294,13 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 
 		local fn, syntaxError = load(codeblock, 'DiscordBot', 't', sandbox)
 		if not fn then 
-			logger:log(1, "Couldn't load chunk, %s", syntaxError)
+			logger:log(1, "Couldn't load chunk, "..syntaxError)
 			return message:reply(code(syntaxError))
 		end
 
 		local success, runtimeError = pcall(fn)
 		if not success then
-			logger:log(1, "Runtime error, %s", runtimeErrorError)
+			logger:log(1, "Runtime error, "..runtimeErrorError)
 			return message:reply(code(runtimeError))
 		end
 	end
@@ -329,7 +329,7 @@ client:on('messageCreate', function (message)
 	local command = message.content:match("%s(%a+)")
 	if not command then command = commands.help end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
-	if not res then logger:log(1, "Couldn't process the message, %s", msg) end
+	if not res then logger:log(1, "Couldn't process the message, "..msg) end
 end)
 
 client:on('guildCreate', function (guild)
@@ -348,11 +348,11 @@ end)
 client:on('voiceChannelJoin', function (member, channel)
 	if not servers[channel.guild.id] then servers[channel.guild.id] = {}; return end
 	if servers[channel.guild.id][channel.id] == 0 then
-		logger:log(4, "%s joined lobby %s", member.user.id, channel.id)
+		logger:log(4, member.user.id.." joined lobby "..channel.id)
 		local category = channel.category or channel.guild
 		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s Lobby")
 		member:setVoiceChannel(newChannel.id)
-		logger:log(4, "Created new channel %s", newChannel.id)
+		logger:log(4, "Created new channel "..newChannel.id)
 		servers[channel.guild.id][newChannel.id] = 1
 		newChannel:setUserLimit(channel.userLimit)
 	end
@@ -363,11 +363,11 @@ client:on('voiceChannelLeave', function (member, channel)
 	if servers[channel.guild.id][channel.id] == 1 and #channel.connectedMembers == 0 then
 		servers[channel.guild.id][channel.id] = nil
 		channel:delete()
-		logger:log(4, "Deleted %s", channel.id)
+		logger:log(4, "Deleted "..channel.id)
 	end
 end)
 
-client:on('channelDelete', function(channel)
+client:on('channelDelete', function (channel)
 	pingChannel(channel.guild.id, channel.id)
 end)
 
