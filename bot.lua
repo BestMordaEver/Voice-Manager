@@ -316,11 +316,11 @@ client:on('messageCreate', function (message)
 		end
 		return
 	end
-
-	if not message.content:find(client.user.mentionString) or message.channel.type ~= channelType.text or message.author.bot then return end
+	
+	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.channel.type ~= channelType.text or message.author.bot then return end
 	if not message.member:hasPermission(permission.manageChannels) then
 		logger:log(4, "Mention in vain")
-		message:reply('You need to have "Manage Channels" permission to use this bot')
+		message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
 		return
 	end
 
