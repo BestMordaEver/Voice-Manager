@@ -312,7 +312,8 @@ client:on('messageCreate', function (message)
 		if message.author.id ~= "188731184501620736" then
 			client:getUser("188731184501620736"):send(message.author.id.."\n"..message.content)
 		else
-			actions[commands.execute](message)
+			local command = message.content:match("(%a+)%s")
+			actions[command](message)
 		end
 		return
 	end
