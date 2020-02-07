@@ -324,6 +324,9 @@ client:on('messageCreate', function (message)
 
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
+	if not message.guild.me:getPermissions(message.channel):has(permission.manageChannels, permission.moveMembers) then
+		message:reply('This bot needs "Manage Channels" and "Move Members" permissions to function!')
+	end
 	
 	local command = message.content:match("%s(%a+)")
 	if not command then command = commands.help end
