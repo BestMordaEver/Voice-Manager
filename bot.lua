@@ -1,8 +1,9 @@
 local discordia = require "../deps/discordia/init.lua"
 local config = require "./config.lua"
+local https = require "coro-http"
+local json = require "json"
 
-local client = discordia.Client {routeDelay = 100}
-local DBL = discordia.DBLAPI(config.dbltoken, client)
+local client = discordia.Client {routeDelay = 300}
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
@@ -184,15 +185,13 @@ local function code(str)
 end
 
 local actions = {
-	[""] = function (message)
+	[commands.help] = function (message)
 		message.channel:broadcastTyping()
 		logger:log(4, "Help action invoked")
-		message:reply([[Ping this bot to get help message
-Write commands after the mention, for example - `@Voice Manager register 123456789123456780`
-**================**
-`register [voice_chat_id]` - registers a voice chat, which will be used as a lobby
-`unregister [voice_chat_id]` - unregisters a voice chat
-`list` - lists all registered lobbies and how many new channels exist]])
+		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n**================**\n`"..
+			commands.register.." [voice_chat_id]` - registers a voice chat, which will be used as a lobby\n`"..
+			commands.unregister.." [voice_chat_id]` - unregisters a voice chat\n`"..
+			commands.list.."` - lists all registered lobbies and how many new channels exist")
 	end,
 
 	[commands.register] = function (message)
@@ -207,7 +206,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		else
 			logger:log(4, "Bad registration input")
 			message:reply([[You have to specify a valid voice channel id
-**================**
 Example: `@Voice Manager register 123456789123456780`]])
 		end
 	end,
@@ -224,7 +222,6 @@ Example: `@Voice Manager register 123456789123456780`]])
 		else
 			logger:log(4, "Bad unregistration input")
 			message:reply([[You have to specify a valid voice channel id
-**================**
 Example: `@Voice Manager unregister 123456789123456780`]])
 		end
 	end,
@@ -294,6 +291,16 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 }
 
 client:on('messageCreate', function (message)
+	if message.channel.type == channelType.private and message.author ~= client.user then
+		logger:log(4, "Private message received, processing...")
+		if message.author.id ~= "188731184501620736" then
+			client:getUser("188731184501620736"):send(message.author.id.."\n"..message.content)
+		else
+			actions[commands.execute](message)
+		end
+		return
+	end
+
 	if message.channel.type ~= channelType.text or message.author.bot or
 		not message.member:hasPermission(permission.manageChannels) or
 		not message.mentionedUsers:find(function(user) if user == client.user then return true end end)
@@ -302,7 +309,7 @@ client:on('messageCreate', function (message)
 	logger:log(4, "Message received, processing...")
 	if not servers[message.guild.id] then servers[message.guild.id] = {} end
 	local command = message.content:match("%s(%a+)")
-	if not command or command == "help" then command = "" end
+	if not command then command = commands.help end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then logger:log(1, "Couldn't process the message, %s", msg) end
 end)
@@ -373,6 +380,13 @@ clock:on('min', function()
 		end
 	end
 	client:setGame({name = people == 0 and "the sound of silence" or (people.." people on "..channels.." channels"), type = 2})
+	
+	local res, body = https.request("post","discordbotlist.com/api/bots/601347755046076427/stats",
+		{{"Authorization", "Bot 524a707a1ecb0e93ac0d129e1537c78deee6d9bdade22fd82c9f1ea8bacc4618"},{"Content-Type", "application/json"},{"Accept", "application/json"}},
+		json.encode({guilds = #client.guilds, users = people, voice_connections = channels}),10000)
+	if res.code ~= 204 then 
+		logger:log(2, "Couldn't send stats to discordbotlist.com - %s", body)
+	end
 end)
 
-client:run('Bot '..config.token)
+client:run('Bot '..config.discordToken)
