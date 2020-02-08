@@ -307,7 +307,7 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 }
 
 client:on('messageCreate', function (message)
-	if message.channel.type ~= channelType.text then
+	if message.channel.type ~= channelType.text and not message.author.bot then
 		message:reply("This bot can only be used in servers. Mention the bot within the server to get the help message.")
 		return
 	end
