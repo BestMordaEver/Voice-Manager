@@ -171,20 +171,49 @@ local function code (str)
 end
 
 local statservers = setmetatable({
-	discordbotlist = {
-		fn = function (self, guilds, people, channels)
-			local res, body = https.request("POST","https://discordbotlist.com/api/bots/601347755046076427/stats",
-			{{"Authorization", "Bot 524a707a1ecb0e93ac0d129e1537c78deee6d9bdade22fd82c9f1ea8bacc4618"},{"Content-Type", "application/json"},{"Accept", "application/json"}},
-			json.encode({guilds = guilds, users = people, voice_connections = channels}))
-			if res.code ~= 204 then 
-				logger:log(2, "Couldn't send stats to discordbotlist.com - "..body)
-			end
-			self.res = res
-		end
+	["discordbotlist.com"] = {
+		endpoint = "https://discordbotlist.com/api/bots/601347755046076427/stats",
+		body = "guilds"
+	},
+	
+	["top.gg"] = {
+		endpoint = "https://top.gg/api/bots/601347755046076427/stats",
+		body = "server_count"
+	},
+	
+	["botsfordiscord.com"] = {
+		endpoint = "https://botsfordiscord.com/api/bot/601347755046076427",
+		body = "server_count"
+	},
+	
+	["discord.boats"] = {
+		endpoint = "https://discord.boats/api/bot/601347755046076427",
+		body = "server_count"
+	},
+	
+	--["bots.ondiscord.xyz"] = {
+	--	endpoint = "https://bots.ondiscord.xyz/bot-api/bots/601347755046076427/guilds",
+	--	body = "guildCount"
+	--},
+	
+	["discord.bots.gg"] = {
+		endpoint = "https://discord.bots.gg/api/v1/bots/601347755046076427/stats",
+		body = "guildCount"
 	}
-},{__call = function (self, ...)
-	for _, serv in pairs(self) do coroutine.wrap(serv.fn)(serv,...) end
-end})
+},{
+	__call = function (self, guilds)
+		for name, server in pairs(self) do 
+			coroutine.wrap(function (name, server, guilds)
+				local res, body = https.request("POST",server.endpoint,
+					{{"Authorization", config.tokens[name]},{"Content-Type", "application/json"},{"Accept", "application/json"}},
+					json.encode({[server.body] = guilds}))
+				if res.code ~= 204 and res.code ~= 200 then 
+					logger:log(2, "Couldn't send stats to "..name.." - "..body)
+				end
+			end)(name, server, guilds)
+		end 
+	end
+})
 
 local actions = {
 	[commands.help] = function (message)
@@ -372,4 +401,4 @@ clock:on('min', function()
 	statservers(#client.guilds, people, channels)
 end)
 
-client:run('Bot '..config.discordToken)
+client:run('Bot '..config.token)
