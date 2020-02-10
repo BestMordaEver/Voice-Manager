@@ -9,10 +9,7 @@ local logger = discordia.Logger(4, '%F %T')
 local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
-local verboseGuilds = true
 local servers
-
-local sandbox = setmetatable({ }, { __index = _G })
 
 local commands = {
 	help = "help",
@@ -20,8 +17,7 @@ local commands = {
 	unregister = "unregister",
 	list = "list",
 	shutdown = "shutdown",
-	verbose = "verbose",
-	execute = "execute"
+	stats = "stats"
 }
 
 local pingServer = function (serverID)
@@ -45,140 +41,130 @@ end
 
 servers = setmetatable({
 	-- serverID = {channelID = 0 (if main lobby) or 1 (if new lobby)}
-},{__index = {
-	load = function (self)		-- used only upon startup
-		for _, guild in pairs(client.guilds) do self[guild.id] = {} end
-		serversMutex:lock()
-		logger:log(3, "Loading servers file")
-		local serverCount, channelCount = 0,0
-		local file, err = io.open(config.saveServers,"r")
-		if file then
-			logger:log(4, "Found servers save file, reading...")
-			for line in file:read("*all"):gmatch("(.-)\n") do
-				local serverID = line:match("%d+")
-				if client:getGuild(serverID) then
-					serverCount = serverCount + 1
-					self[serverID] = {}
-					local server = self[serverID]
-					for channelID in line:gmatch("%s(%d+)") do
-						if client:getChannel(channelID) then
-							channelCount = channelCount + 1
-							server[channelID] = 0
+},{
+	__index = {
+		load = function (self)		-- used only upon startup
+			for _, guild in pairs(client.guilds) do self[guild.id] = {} end
+			serversMutex:lock()
+			logger:log(3, "Loading servers file")
+			local serverCount, channelCount = 0,0
+			local file, err = io.open(config.saveServers,"r")
+			if file then
+				logger:log(4, "Found servers save file, reading...")
+				for line in file:read("*all"):gmatch("(.-)\n") do
+					local serverID = line:match("%d+")
+					if client:getGuild(serverID) then
+						serverCount = serverCount + 1
+						self[serverID] = {}
+						local server = self[serverID]
+						for channelID in line:gmatch("%s(%d+)") do
+							if client:getChannel(channelID) then
+								channelCount = channelCount + 1
+								server[channelID] = 0
+							end
 						end
+					else
+						logger:log(2, "No servers info found")
 					end
-				else
-					logger:log(2, "No servers info found")
 				end
+				file:close()
+				logger:log(4, "Done with servers save file, found "..serverCount.." servers and "..channelCount.." bound channels")
+			else
+				logger:log(1, "Couldn't open the servers file, "..err)
 			end
-			file:close()
-			logger:log(4, "Done with servers save file, found "..serverCount.." servers and "..channelCount.." bound channels")
-		else
-			logger:log(1, "Couldn't open the servers file, "..err)
-		end
-		serversMutex:unlock()
+			serversMutex:unlock()
+			
+			serverCount, channelCount = 0,0
+			channelsMutex:lock()
+			logger:log(3, "Loading channels file")
+			file, err = io.open(config.saveChannels,"r")
+			if file then
+				logger:log(4, "Found channels save file, reading...")
+				for line in file:read("*all"):gmatch("(.-)\n") do
+					local serverID = line:match("%d+")
+					if client:getGuild(serverID) then
+						serverCount = serverCount + 1
+						if not self[serverID] then self[serverID] = {} end
+						local server = self[serverID]
+						for channelID in line:gmatch("%s(%d+)") do
+							if client:getChannel(channelID) then
+								channelCount = channelCount + 1
+								server[channelID] = 1
+							end
+						end
+					else
+						logger:log(2, "No channels info found")
+					end
+				end
+				file:close()
+				logger:log(4, "Done with channels save file, found %s servers and %s new channels", serverCount, channelCount)
+			else
+				logger:log(1, "Couldn't open the channels file, "..err)
+			end
+			channelsMutex:unlock()
+		end,
+
+		saveServers = function (self)
+			local serverCount, channelCount = 0,0
+			serversMutex:lock()
+			logger:log(3, "Updating servers file")
+			local file, err = io.open(config.saveServers,"w")
+			if file then
+				logger:log(4, "Found servers save file, writing...")
+				for serverID, server in pairs(self) do
+					if pingServer(serverID) then
+						serverCount = serverCount + 1
+						file:write(serverID)
+						for channelID, type in pairs(server) do
+							if pingChannel(serverID, channelID) then
+								if type == 0 then
+									file:write(" ",channelID)
+									channelCount = channelCount + 1
+								end
+							end
+						end
+						file:write("\n")
+					end
+				end
+				file:close()
+				logger:log(4, "Done with servers save file, wrote "..serverCount.." servers and "..channelCount.." bound channels")
+			else
+				logger:log(1, "Couldn't open the servers file, "..err)
+			end
+			serversMutex:unlock()
+		end,
 		
-		serverCount, channelCount = 0,0
-		channelsMutex:lock()
-		logger:log(3, "Loading channels file")
-		file, err = io.open(config.saveChannels,"r")
-		if file then
-			logger:log(4, "Found channels save file, reading...")
-			for line in file:read("*all"):gmatch("(.-)\n") do
-				local serverID = line:match("%d+")
-				if client:getGuild(serverID) then
-					serverCount = serverCount + 1
-					if not self[serverID] then self[serverID] = {} end
-					local server = self[serverID]
-					for channelID in line:gmatch("%s(%d+)") do
-						if client:getChannel(channelID) then
-							channelCount = channelCount + 1
-							server[channelID] = 1
-						end
-					end
-				else
-					logger:log(2, "No channels info found")
-				end
-			end
-			file:close()
-			logger:log(4, "Done with channels save file, found %s servers and %s new channels", serverCount, channelCount)
-		else
-			logger:log(1, "Couldn't open the channels file, "..err)
-		end
-		channelsMutex:unlock()
-	end,
-
-	saveServers = function (self)
-		local serverCount, channelCount = 0,0
-		serversMutex:lock()
-		logger:log(3, "Updating servers file")
-		local file, err = io.open(config.saveServers,"w")
-		if file then
-			logger:log(4, "Found servers save file, writing...")
-			for serverID, server in pairs(self) do
-				if pingServer(serverID) then
-					serverCount = serverCount + 1
-					file:write(serverID)
-					for channelID, type in pairs(server) do
-						if pingChannel(serverID, channelID) then
-							if type == 0 then
-								file:write(" ",channelID)
-								channelCount = channelCount + 1
+		saveChannels = function (self)
+			local serverCount, channelCount = 0,0
+			channelsMutex:lock()
+			logger:log(3, "Updating channels file")
+			local file, err = io.open(config.saveChannels,"w")
+			if file then
+				logger:log(4, "Found channels save file, writing...")
+				for serverID, server in pairs(self) do
+					if pingServer(serverID) then
+						serverCount = serverCount + 1
+						file:write(serverID)
+						for channelID, type in pairs(server) do
+							if pingChannel(serverID, channelID) then
+								if type == 1 then 
+									file:write(" ",channelID) 
+									channelCount = channelCount + 1
+								end
 							end
 						end
+						file:write("\n")
 					end
-					file:write("\n")
 				end
+				file:close()
+				logger:log(4, "Done with channels save file, wrote "..serverCount.." servers and "..channelCount.." new channels")
+			else
+				logger:log(1, "Couldn't open the channels file, "..err)
 			end
-			file:close()
-			logger:log(4, "Done with servers save file, wrote "..serverCount.." servers and "..channelCount.." bound channels")
-		else
-			logger:log(1, "Couldn't open the servers file, "..err)
+			channelsMutex:unlock()
 		end
-		serversMutex:unlock()
-	end,
-	
-	saveChannels = function (self)
-		local serverCount, channelCount = 0,0
-		channelsMutex:lock()
-		logger:log(3, "Updating channels file")
-		local file, err = io.open(config.saveChannels,"w")
-		if file then
-			logger:log(4, "Found channels save file, writing...")
-			for serverID, server in pairs(self) do
-				if pingServer(serverID) then
-					serverCount = serverCount + 1
-					file:write(serverID)
-					for channelID, type in pairs(server) do
-						if pingChannel(serverID, channelID) then
-							if type == 1 then 
-								file:write(" ",channelID) 
-								channelCount = channelCount + 1
-							end
-						end
-					end
-					file:write("\n")
-				end
-			end
-			file:close()
-			logger:log(4, "Done with channels save file, wrote "..serverCount.." servers and "..channelCount.." new channels")
-		else
-			logger:log(1, "Couldn't open the channels file, "..err)
-		end
-		channelsMutex:unlock()
-	end}
+	}
 })
-
-local function shutdown()
-	logger:log(3, "Starting the shutdown")
-	local status, msg = pcall(function()
-		clock:stop()
-		client:stop()
-	end)
-	logger:log(3, (status and "Shutdown successfull, saving data..." or ("Couldn't shutdown gracefully, "..msg)))
-	servers:saveServers()
-	servers:saveChannels()
-	if not status then process:kill() end
-end
 
 local function code (str)
     return '```\n'..str..'```'
@@ -263,46 +249,28 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 	[commands.shutdown] = function (message)
 		if message.author.id ~= "188731184501620736" then return end
 		logger:log(4, "Shutdown action invoked")
+		client:setGame({name = "the maintenance", type = 3})
 		message:reply("Shutting down gracefully")
-		shutdown()
+		local status, msg = pcall(function()
+			clock:stop()
+			client:stop()
+		end)
+		logger:log(3, (status and "Shutdown successfull, saving data..." or ("Couldn't shutdown gracefully, "..msg)))
+		servers:saveServers()
+		servers:saveChannels()
+		if not status then process:kill() end
 	end,
 	
-	[commands.verbose] = function (message)
+	[commands.stats] = function (message)
 		if message.author.id ~= "188731184501620736" then return end
-		logger:log(4, "Verbose switch action invoked")
-		local status = message.content:match(commands.verbose.."%s*(%a+)")
-		if status == "true" or status == "on" or status == "enable" then
-			verboseGuilds = true
-			logger:log(3, "Set guild updates to verbose")
-		elseif status == "false" or status == "off" or status == "disable" then
-			verboseGuilds = false
-			logger:log(3, "Set guild updates to silent")
-		else logger:log(4, "Bad verbose switch input") end
-	end,
-	
-	[commands.execute] = function (message)
-		if message.author.id ~= "188731184501620736" then return end
-		logger:log(4, "Execute action invoked")
-		local codeblock = message.content:match("execute(.*)")
-		
-		sandbox.print = function(content)
-			message:reply(tostring(content))
+		logger:log(4, "Stats action invoked")
+		local channels = 0
+		for _, server in pairs(servers) do
+			for _, type in pairs(server) do
+				if type == 0 then channels = channels + 1 end
+			end
 		end
-		
-		sandbox.client = client
-		sandbox.servers = servers
-
-		local fn, syntaxError = load(codeblock, 'DiscordBot', 't', sandbox)
-		if not fn then 
-			logger:log(1, "Couldn't load chunk, "..syntaxError)
-			return message:reply(code(syntaxError))
-		end
-
-		local success, runtimeError = pcall(fn)
-		if not success then
-			logger:log(1, "Runtime error, "..runtimeErrorError)
-			return message:reply(code(runtimeError))
-		end
+		message:reply("I'm currently on **`"..#client.guilds.. "`** servers serving **`"..channels.."`** lobbies")
 	end
 }
 
@@ -336,15 +304,14 @@ end)
 
 client:on('guildCreate', function (guild)
 	servers[guild.id] = {}
-	if verboseGuilds then client:getUser("188731184501620736"):send(guild.name.." added me!\n"..(guild.vanityCode or "No invite link available...")) end
+	client:getChannel("676432067566895111"):send(guild.name.." added me!\n")
 	servers:saveServers()
-	--print(pcall(function() DBL:postStats() end))
 end)
 
 client:on('guildDelete', function (guild)
 	servers[guild.id] = nil
-	if verboseGuilds then client:getUser("188731184501620736"):send(guild.name.." removed me!\n"..(guild.vanityCode or "No invite link available...")) end
-	--print(pcall(function() DBL:postStats() end))
+	client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
+	servers:saveServers()
 end)
 
 client:on('voiceChannelJoin', function (member, channel)
@@ -375,8 +342,10 @@ end)
 
 client:on('ready', function()
 	servers:load()
+	servers:saveServers()
+	servers:saveChannels()
 	clock:start()
-	client:getChannel("672852248900010014"):send("I'm listening")
+	client:getChannel("676432067566895111"):send("I'm listening")
 end)
 
 clock:on('min', function()
