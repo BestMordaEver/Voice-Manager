@@ -349,6 +349,9 @@ client:on('voiceChannelJoin', function (member, channel)
 		logger:log(4, "Created new channel "..newChannel.id)
 		servers[channel.guild.id][newChannel.id] = 1
 		newChannel:setUserLimit(channel.userLimit)
+		if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
+			newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+		end
 	end
 end)
 
@@ -393,7 +396,7 @@ clock:on('min', function()
 			end
 		end
 	end
-	client:setGame({name = people == 0 and "the sound of silence" or (people.." "..(people == 1 and "person" or "people").." on "..channels.." channel"..(channels == 1 and "" or "s")), type = 2})
+	client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")), type = 2})
 	client:getChannel("676791988518912020"):getLastMessage():delete()
 	client:getChannel("676791988518912020"):send("beep boop beep")
 	statservers(#client.guilds, people, channels)

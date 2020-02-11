@@ -1,3 +1,5 @@
+[Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-set-up-Voice-Manager) | [Support and news Discord server](https://discord.gg/tqj6jvT)
+
 Voice Manager is a simplistic bot, that allows your users to create new voice channels on demand!
 
 Assign a lobby and everybody entering this lobby will be placed in a newly created channel. Once everybody leaves this new channel - it gets deleted.
