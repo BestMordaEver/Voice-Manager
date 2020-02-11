@@ -357,6 +357,7 @@ client:on('voiceChannelJoin', function (member, channel)
 end)
 
 client:on('voiceChannelLeave', function (member, channel)
+	if not channel then return end
 	if not servers[channel.guild.id] then servers[channel.guild.id] = {}; return end
 	if servers[channel.guild.id][channel.id] == 1 and #channel.connectedMembers == 0 then
 		servers[channel.guild.id][channel.id] = nil
