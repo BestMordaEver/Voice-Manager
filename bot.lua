@@ -10,6 +10,7 @@ local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
 local servers
+local stats = {servers = 0, lobbies = 0, channels = 0, people = 0}
 
 local commands = {
 	help = "help",
@@ -17,12 +18,15 @@ local commands = {
 	unregister = "unregister",
 	list = "list",
 	shutdown = "shutdown",
-	stats = "stats"
+	stats = "stats",
+	support = "support"
 }
 
 local pingServer = function (serverID)
 	if client:getGuild(serverID) then 
-		if not servers[serverID] then servers[serverID] = {} end
+		if not servers[serverID] then
+			servers[serverID] = {}
+		end
 		return true
 	elseif servers[serverID] then
 		servers[serverID] = nil
@@ -69,6 +73,8 @@ servers = setmetatable({
 				end
 				file:close()
 				logger:log(4, "Done with servers save file, found "..serverCount.." servers and "..channelCount.." bound channels")
+				stats.servers = serverCount
+				stats.lobbies = channelCount
 			else
 				logger:log(1, "Couldn't open the servers file, "..err)
 			end
@@ -80,6 +86,7 @@ servers = setmetatable({
 			file, err = io.open(config.saveChannels,"r")
 			if file then
 				logger:log(4, "Found channels save file, reading...")
+				stats.people = 0
 				for line in file:read("*all"):gmatch("(.-)\n") do
 					local serverID = line:match("%d+")
 					if client:getGuild(serverID) then
@@ -87,8 +94,10 @@ servers = setmetatable({
 						if not self[serverID] then self[serverID] = {} end
 						local server = self[serverID]
 						for channelID in line:gmatch("%s(%d+)") do
-							if client:getChannel(channelID) then
+							local channel = client:getChannel(channelID)
+							if channel then
 								channelCount = channelCount + 1
+								stats.people = stats.people + #channel.connectedMembers
 								server[channelID] = 1
 							end
 						end
@@ -97,7 +106,9 @@ servers = setmetatable({
 					end
 				end
 				file:close()
-				logger:log(4, "Done with channels save file, found %s servers and %s new channels", serverCount, channelCount)
+				logger:log(4, "Done with channels save file, found "..serverCount.." servers and "..channelCount.." new channels")
+				stats.servers = serverCount
+				stats.channels = channelCount
 			else
 				logger:log(1, "Couldn't open the channels file, "..err)
 			end
@@ -128,6 +139,8 @@ servers = setmetatable({
 				end
 				file:close()
 				logger:log(4, "Done with servers save file, wrote "..serverCount.." servers and "..channelCount.." bound channels")
+				stats.servers = serverCount
+				stats.channels = channelCount
 			else
 				logger:log(1, "Couldn't open the servers file, "..err)
 			end
@@ -141,6 +154,7 @@ servers = setmetatable({
 			local file, err = io.open(config.saveChannels,"w")
 			if file then
 				logger:log(4, "Found channels save file, writing...")
+				stats.people = 0
 				for serverID, server in pairs(self) do
 					if pingServer(serverID) then
 						serverCount = serverCount + 1
@@ -148,7 +162,8 @@ servers = setmetatable({
 						for channelID, type in pairs(server) do
 							if pingChannel(serverID, channelID) then
 								if type == 1 then 
-									file:write(" ",channelID) 
+									file:write(" ",channelID)
+									stats.people = stats.people + #channel.connectedMembers
 									channelCount = channelCount + 1
 								end
 							end
@@ -158,6 +173,8 @@ servers = setmetatable({
 				end
 				file:close()
 				logger:log(4, "Done with channels save file, wrote "..serverCount.." servers and "..channelCount.." new channels")
+				stats.servers = serverCount
+				stats.channels = channelCount
 			else
 				logger:log(1, "Couldn't open the channels file, "..err)
 			end
@@ -197,32 +214,38 @@ local statservers = setmetatable({
 		body = "guildCount"
 	}
 },{
-	__call = function (self, guilds)
+	__call = function (self)
 		for name, server in pairs(self) do 
-			coroutine.wrap(function (name, server, guilds)
+			coroutine.wrap(function (name, server)
 				local res, body = https.request("POST",server.endpoint,
 					{{"Authorization", config.tokens[name]},{"Content-Type", "application/json"},{"Accept", "application/json"}},
-					json.encode({[server.body] = guilds}))
+					json.encode({[server.body] = stats.servers}))
 				if res.code ~= 204 and res.code ~= 200 then 
 					logger:log(2, "Couldn't send stats to "..name.." - "..body)
 				end
-			end)(name, server, guilds)
+			end)(name, server)
 		end 
 	end
 })
 
 local actions = {
 	[commands.help] = function (message)
-		message.channel:broadcastTyping()
 		logger:log(4, "Help action invoked")
-		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n**================**\n`"..
+		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n`"..
 			commands.register.." [voice_chat_id]` - registers a voice chat, which will be used as a lobby\n`"..
-			commands.unregister.." [voice_chat_id]` - unregisters a voice chat\n`"..
-			commands.list.."` - lists all registered lobbies and how many new channels exist")
+			commands.unregister.." [voice_chat_id]` - unregisters a voice chat\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
+			commands.list.."` - lists all registered lobbies and how many new channels exist\n`"..
+			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
+			commands.support.."` - sends an invite to support Discord server")
 	end,
 
 	[commands.register] = function (message)
-		message.channel:broadcastTyping()
+		if not message.member:hasPermission(permission.manageChannels) then
+			logger:log(4, "Mention in vain")
+			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
+			return
+		end
+		
 		logger:log(4, "Register action invoked")
 		local id = message.content:match(commands.register.."%s*(%d+)")
 		if id and message.guild.voiceChannels:find(function(voiceChannel) if id == voiceChannel.id then return true end end) then
@@ -230,6 +253,7 @@ local actions = {
 			servers:saveServers()
 			message.channel:send("Channel `"..client:getChannel(id).name.."` is now registered as a lobby")
 			logger:log(4, "Registered successfully")
+			stats.lobbies = stats.lobbies + 1
 		else
 			logger:log(4, "Bad registration input")
 			message:reply([[You have to specify a valid voice channel id
@@ -238,7 +262,12 @@ Example: `@Voice Manager register 123456789123456780`]])
 	end,
 
 	[commands.unregister] = function (message)
-		message.channel:broadcastTyping()
+		if not message.member:hasPermission(permission.manageChannels) then
+			logger:log(4, "Mention in vain")
+			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
+			return
+		end
+	
 		logger:log(4, "Unregister action invoked")
 		local id = message.content:match(commands.unregister.."%s*(%d+)")
 		if id and servers[message.guild.id][id] then
@@ -246,6 +275,7 @@ Example: `@Voice Manager register 123456789123456780`]])
 			servers:saveServers()
 			message.channel:send("Channel `"..client:getChannel(id).name.."` was unregistered")
 			logger:log(4, "Unregistered successfully")
+			stats.lobbies = stats.lobbies - 1
 		else
 			logger:log(4, "Bad unregistration input")
 			message:reply([[You have to specify a valid voice channel id
@@ -254,7 +284,6 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 	end,
 	
 	[commands.list] = function (message)
-		message.channel:broadcastTyping()
 		logger:log(4, "List action invoked")
 		local str = "Registered lobbies on this server:\n"
 		local channels = 0
@@ -287,15 +316,19 @@ Example: `@Voice Manager unregister 123456789123456780`]])
 	end,
 	
 	[commands.stats] = function (message)
-		if message.author.id ~= "188731184501620736" then return end
+		local t = os.clock()
+		message.channel:broadcastTyping()
+		t = os.clock() - t
 		logger:log(4, "Stats action invoked")
-		local channels = 0
-		for _, server in pairs(servers) do
-			for _, type in pairs(server) do
-				if type == 0 then channels = channels + 1 end
-			end
-		end
-		message:reply("I'm currently on **`"..#client.guilds.. "`** servers serving **`"..channels.."`** lobbies")
+		message:reply("I'm currently on **`"..
+			stats.servers..(stats.servers == 1 and "`** server serving **`" or "`** servers serving **`")..
+			stats.lobbies..(stats.lobbies == 1 and "`** lobby\nThere " or "`** lobbies\nThere ")..
+			(stats.channels == 1 and "is **`" or "are **`")..stats.channels..(stats.channels == 1 and "`** new channel with " or "`** new channels with **`")..
+			stats.people..(stats.people == 1 and "`** person" or "`** people").."\nPing is **`"..t.."ms`**")
+	end,
+	
+	[commands.support] = function (message)
+		message:reply("https://discord.gg/tqj6jvT")
 	end
 }
 
@@ -307,12 +340,6 @@ client:on('messageCreate', function (message)
 	
 	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.author.bot then 
 		return 
-	end
-	
-	if not message.member:hasPermission(permission.manageChannels) then
-		logger:log(4, "Mention in vain")
-		message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
-		return
 	end
 
 	logger:log(4, "Message received, processing...")
@@ -397,9 +424,11 @@ clock:on('min', function()
 		end
 	end
 	client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")), type = 2})
+	stats.channels = channels
+	stats.people = people
 	client:getChannel("676791988518912020"):getLastMessage():delete()
 	client:getChannel("676791988518912020"):send("beep boop beep")
-	statservers(#client.guilds, people, channels)
+	statservers()
 end)
 
 client:run('Bot '..config.token)
