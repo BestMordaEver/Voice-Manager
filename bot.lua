@@ -166,10 +166,6 @@ servers = setmetatable({
 	}
 })
 
-local function code (str)
-    return '```\n'..str..'```'
-end
-
 local statservers = setmetatable({
 	["discordbotlist.com"] = {
 		endpoint = "https://discordbotlist.com/api/bots/601347755046076427/stats",
