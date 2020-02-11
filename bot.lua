@@ -344,7 +344,7 @@ client:on('voiceChannelJoin', function (member, channel)
 	if servers[channel.guild.id][channel.id] == 0 then
 		logger:log(4, member.user.id.." joined lobby "..channel.id)
 		local category = channel.category or channel.guild
-		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s Lobby")
+		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s channel")
 		member:setVoiceChannel(newChannel.id)
 		logger:log(4, "Created new channel "..newChannel.id)
 		servers[channel.guild.id][newChannel.id] = 1
@@ -393,8 +393,9 @@ clock:on('min', function()
 			end
 		end
 	end
-	client:setGame({name = people == 0 and "the sound of silence" or (people.." people on "..channels.." channels"), type = 2})
-	
+	client:setGame({name = people == 0 and "the sound of silence" or (people.." "..(people == 1 and "person" or "people").." on "..channels.." channel"..(channels == 1 and "" or "s")), type = 2})
+	client:getChannel("676791988518912020"):getLastMessage():delete()
+	client:getChannel("676791988518912020"):send("beep boop beep")
 	statservers(#client.guilds, people, channels)
 end)
 
