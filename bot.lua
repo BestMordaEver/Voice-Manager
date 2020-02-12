@@ -160,12 +160,10 @@ servers = setmetatable({
 						serverCount = serverCount + 1
 						file:write(serverID)
 						for channelID, type in pairs(server) do
-							if pingChannel(serverID, channelID) then
-								if type == 1 then 
-									file:write(" ",channelID)
-									stats.people = stats.people + #channel.connectedMembers
-									channelCount = channelCount + 1
-								end
+							if pingChannel(serverID, channelID) and type == 1 then
+								file:write(" ",channelID)
+								stats.people = stats.people + #client:getChannel(channelID).connectedMembers
+								channelCount = channelCount + 1
 							end
 						end
 						file:write("\n")
