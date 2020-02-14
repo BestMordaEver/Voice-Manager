@@ -19,7 +19,8 @@ local commands = {
 	list = "list",
 	shutdown = "shutdown",
 	stats = "stats",
-	support = "support"
+	support = "support",
+	id = "id"
 }
 
 local pingServer = function (serverID)
@@ -230,8 +231,9 @@ local actions = {
 	[commands.help] = function (message)
 		logger:log(4, "Help action invoked")
 		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n`"..
-			commands.register.." [voice_chat_id]` - registers a voice chat, which will be used as a lobby\n`"..
-			commands.unregister.." [voice_chat_id]` - unregisters a voice chat\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
+			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat, which will be used as a lobby\n`"..
+			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters a voice chat\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
+			commands.id.." 
 			commands.list.."` - lists all registered lobbies and how many new channels exist\n`"..
 			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
 			commands.support.."` - sends an invite to support Discord server")
@@ -240,45 +242,94 @@ local actions = {
 	[commands.register] = function (message)
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
-			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
+			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to do this')
 			return
 		end
 		
 		logger:log(4, "Register action invoked")
-		local id = message.content:match(commands.register.."%s*(%d+)")
-		if id and message.guild.voiceChannels:find(function(voiceChannel) if id == voiceChannel.id then return true end end) then
-			servers[message.guild.id][id] = 0
-			servers:saveServers()
-			message.channel:send("Channel `"..client:getChannel(id).name.."` is now registered as a lobby")
-			logger:log(4, "Registered successfully")
-			stats.lobbies = stats.lobbies + 1
-		else
-			logger:log(4, "Bad registration input")
-			message:reply([[You have to specify a valid voice channel id
-Example: `@Voice Manager register 123456789123456780`]])
+		local id = message.content:match(commands.register.."%s*(.*)")
+		
+		if not tonumber(id) then 
+			local channels = message.guild:toArray("position", function (channel) return channel.name == id end)
+			if #channels == 0 then
+				logger:log(4, "Bad registration input")
+				message:reply("Couldn't find a channel by name")
+				return
+			elseif #channels == 1 then
+				id = channels[1].id
+			elseif #channels < 11 then
+				local msg = "There are several channels with this name"
+				for _, channel in ipairs(channels) do 
+					msg = msg.."\n`"..channel.name.."` "..(channel.category and ("in `"..channel.category.name.."` ") or "").."-> `"..channel.id.."`"
+				end
+				logger:log(4, "Ambiguous registration input")
+				message:reply(msg)
+				return
+			else
+				logger:log(4, "Ambiguous registration input")
+				message:reply("There are more than 10 channels with this name, use command 'id' if you want me to print their ids")
+				return
+			end
 		end
+		
+		if not id or not message.guild.voiceChannels:find(function(voiceChannel) if id == voiceChannel.id then return true end end) then 
+			logger:log(4, "Bad registration input")
+			message:reply([[You have to specify a valid voice channel id or name
+Example: `@Voice Manager register 123456789123456780`]])
+			return
+		end
+		
+		servers[message.guild.id][id] = 0
+		servers:saveServers()
+		message.channel:send("Channel `"..client:getChannel(id).name.."` is now registered as a lobby")
+		logger:log(4, "Registered "..id.." successfully")
+		stats.lobbies = stats.lobbies + 1
 	end,
 
 	[commands.unregister] = function (message)
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
-			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to use this bot')
+			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to do this')
 			return
 		end
 	
 		logger:log(4, "Unregister action invoked")
 		local id = message.content:match(commands.unregister.."%s*(%d+)")
-		if id and servers[message.guild.id][id] then
-			servers[message.guild.id][id] = nil
-			servers:saveServers()
-			message.channel:send("Channel `"..client:getChannel(id).name.."` was unregistered")
-			logger:log(4, "Unregistered successfully")
-			stats.lobbies = stats.lobbies - 1
-		else
+		
+		if not tonumber(id) then 
+			local channels = message.guild:toArray("position", function (channel) return channel.name == id end)
+			if #channels == 0 then
+				logger:log(4, "Bad unregistration input")
+				message:reply("Couldn't find a channel by name")
+				return
+			elseif #channels == 1 then
+				id = channels[1].id
+			elseif #channels < 11 then
+				local msg = "There are several channels with this name"
+				for _, channel in ipairs(channels) do 
+					msg = msg.."\n`"..channel.name.."` "..(channel.category and ("in `"..channel.category.name.."` ") or "").."-> `"..channel.id.."`"
+				end
+				logger:log(4, "Ambiguous unregistration input")
+				message:reply(msg)
+				return
+			else
+				logger:log(4, "Ambiguous unregistration input")
+				message:reply("There are more than 10 channels with this name, use command 'id' if you want me to print their ids")
+				return
+			end
+		end
+		
+		if not id or not servers[message.guild.id][id] then
 			logger:log(4, "Bad unregistration input")
 			message:reply([[You have to specify a valid voice channel id
 Example: `@Voice Manager unregister 123456789123456780`]])
 		end
+		
+		servers[message.guild.id][id] = nil
+		servers:saveServers()
+		message.channel:send("Channel `"..client:getChannel(id).name.."` was unregistered")
+		logger:log(4, "Unregistered "..message.channel.id.." successfully")
+		stats.lobbies = stats.lobbies - 1
 	end,
 	
 	[commands.list] = function (message)
