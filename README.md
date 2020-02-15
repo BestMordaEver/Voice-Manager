@@ -10,9 +10,12 @@ The bot will keep new channels in the same category as the lobby and will enable
 
 List of available commands:
 - help (or empty mention) - shows help message
-- register channelID - registers voice channel as a lobby
-- unregister channelID - unregister lobby
-- list - shows all lobbies and their IDs, also shows how many new channels exist
+- register \[voice_chat_id OR voice_chat_name\] - registers a voice chat that will be used as a lobby
+- unregister \[voice_chat_id OR voice_chat_name\] - unregisters an existing lobby
+- id \[voice_chat_name OR category_name\] - use this to learn ids of voice channels by name or category
+- list - lists all registered lobbies and how many new channels exist
+- stats - take a sneak peek on bot's performance!
+- support - sends an invite to support Discord server
 
 <a href="https://discordbotlist.com/bots/601347755046076427">
 	<img 
