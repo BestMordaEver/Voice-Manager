@@ -233,8 +233,8 @@ actions = {
 		logger:log(4, "Help action invoked")
 		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n`"..
 			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby\n`"..
-			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
-			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n`"..
+			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby\n`"..
+			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
 			commands.list.."` - lists all registered lobbies and how many new channels exist\n`"..
 			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
 			commands.support.."` - sends an invite to support Discord server")
@@ -247,7 +247,7 @@ actions = {
 			return
 		end
 		
-		logger:log(4, command.."action invoked")
+		logger:log(4, command.." action invoked")
 		local id = message.content:match(command.."%s+(.-)$")
 		
 		if not tonumber(id) and type(id) == "string" then
@@ -271,10 +271,13 @@ actions = {
 			message:reply("You have to specify a valid voice channel id or name\nExample: `@Voice Manager "..command.." 123456789123456780`")
 			return
 		end
+		
+		return id
 	end,
 
 	[commands.register] = function (message)
-		actions.regFilter(message, commands.register)
+		local id = actions.regFilter(message, commands.register)
+		if not id then return end
 		
 		servers[message.guild.id][id] = 0
 		servers:saveServers()
@@ -284,7 +287,8 @@ actions = {
 	end,
 
 	[commands.unregister] = function (message)
-		actions.regFilter(message, commands.unregister)
+		local id = actions.regFilter(message, commands.unregister)
+		if not id then return end
 		
 		servers[message.guild.id][id] = nil
 		servers:saveServers()
@@ -331,6 +335,9 @@ actions = {
 			end
 		end
 		
+		if #msg > 2000 then
+			msg = msg:sub(1,1800).."\nPhew, I can't display more than that! Try to narrow down the list with the channel name, like ```@Voice Manager id channel_name```Also, consider turning the developer mode on, it's quite useful!"
+		end
 		message:reply(msg)
 	end,
 	
@@ -452,7 +459,7 @@ client:on('ready', function()
 	servers:saveServers()
 	servers:saveChannels()
 	clock:start()
-	--client:getChannel("676432067566895111"):send("I'm listening")
+	client:getChannel("676432067566895111"):send("I'm listening")
 end)
 
 clock:on('min', function()
@@ -477,6 +484,9 @@ clock:on('min', function()
 	client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")), type = 2})
 	stats.channels = channels
 	stats.people = people
+	client:getChannel("676791988518912020"):getLastMessage():delete()
+	client:getChannel("676791988518912020"):send("beep boop beep")
+	statservers()
 end)
 
 client:run('Bot '..config.token)
