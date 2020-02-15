@@ -234,12 +234,12 @@ actions = {
 		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n`"..
 			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby\n`"..
 			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby\n`"..
-			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n**^^ You need a 'Manage Channels permission to use those commands! ^^**\n`"..
+			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n**:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**\n`"..
 			commands.list.."` - lists all registered lobbies and how many new channels exist\n`"..
 			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
 			commands.support.."` - sends an invite to support Discord server")
 	end,
-
+	
 	regFilter = function (message, command)
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
