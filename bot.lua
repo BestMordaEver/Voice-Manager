@@ -370,7 +370,7 @@ actions = {
 		logger:log(3, (status and "Shutdown successfull, saving data..." or ("Couldn't shutdown gracefully, "..msg)))
 		servers:saveServers()
 		servers:saveChannels()
-		if not status then process:kill() end
+		process:exit()
 	end,
 	
 	[commands.stats] = function (message)
@@ -488,5 +488,16 @@ clock:on('min', function()
 	client:getChannel("676791988518912020"):send("beep boop beep")
 	statservers()
 end)
+
+client:on('shutdown', actions[commands.shutdown])
+
+local sd = function () client:emit("shutdown") end -- ensures graceful shutdown
+
+process.stdin:on('data', function (data)
+	if data:match("shutdown") then sd() end
+end)
+
+process:on('sigterm', sd)
+process:on('sigint', sd)
 
 client:run('Bot '..config.token)
