@@ -359,10 +359,12 @@ actions = {
 	end,
 	
 	[commands.shutdown] = function (message)
-		if message.author.id ~= "188731184501620736" then return end
-		logger:log(4, "Shutdown action invoked")
+		if message then
+			if message.author.id ~= "188731184501620736" then return end
+			message:reply("Shutting down gracefully")
+			logger:log(4, "Shutdown action invoked")
+		end
 		client:setGame({name = "the maintenance", type = 3})
-		message:reply("Shutting down gracefully")
 		local status, msg = pcall(function()
 			clock:stop()
 			client:stop()
