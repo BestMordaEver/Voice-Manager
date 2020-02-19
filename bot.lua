@@ -495,10 +495,6 @@ client:on('shutdown', actions[commands.shutdown])
 
 local sd = function () client:emit("shutdown") end -- ensures graceful shutdown
 
-process.stdin:on('data', function (data)
-	if data:match("shutdown") then sd() end
-end)
-
 process:on('sigterm', sd)
 process:on('sigint', sd)
 
