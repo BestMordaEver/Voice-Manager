@@ -383,7 +383,7 @@ actions = {
 		message:reply("I'm currently on **`"..
 			stats.servers..(stats.servers == 1 and "`** server serving **`" or "`** servers serving **`")..
 			stats.lobbies..(stats.lobbies == 1 and "`** lobby\nThere " or "`** lobbies\nThere ")..
-			(stats.channels == 1 and "is **`" or "are **`")..stats.channels..(stats.channels == 1 and "`** new channel with " or "`** new channels with **`")..
+			(stats.channels == 1 and "is **`" or "are **`")..stats.channels..(stats.channels == 1 and "`** new channel with **`" or "`** new channels with **`")..
 			stats.people..(stats.people == 1 and "`** person" or "`** people").."\nPing is **`"..t.."ms`**")
 	end,
 	
