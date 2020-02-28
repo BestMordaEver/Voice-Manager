@@ -89,11 +89,11 @@ servers = setmetatable({
 			if self[serverID] and self[serverID][lobbyID] == 0 then 
 				self[serverID][lobbyID] = nil
 				stats.lobbies = stats.lobbies - 1
-				logger:log(4, "MEMORY: Deleted lobby "..lobbyID.." in "..serverID)
+				logger:log(4, "MEMORY: Deleted lobby "..lobbyID..(serverID and (" in "..serverID) or ""))
 			end
 			if conn:exec("SELECT * FROM lobbies WHERE id = "..lobbyID) then
 				local res = pcall(function() conn:exec("DELETE FROM lobbies WHERE id = "..lobbyID) end)
-				if res then logger:log(4, "DATABASE: Deleted lobby "..lobbyID.." in "..serverID) end
+				if res then logger:log(4, "DATABASE: Deleted lobby "..lobbyID..(serverID and (" in "..serverID) or "")) end
 			end
 		end,
 		
@@ -101,11 +101,11 @@ servers = setmetatable({
 			if self[serverID] and self[serverID][channelID] == 1 then
 				self[serverID][channelID] = nil
 				stats.channels = stats.channels - 1
-				logger:log(4, "MEMORY: Deleted channel "..channelID.." in "..serverID)
+				logger:log(4, "MEMORY: Deleted channel "..channelID..(serverID and (" in "..serverID) or ""))
 			end
 			if conn:exec("SELECT * FROM channels WHERE id = "..channelID) then
 				local res = pcall(function() conn:exec("DELETE FROM channels WHERE id = "..channelID) end)
-				if res then logger:log(4, "DATABASE: Deleted channel "..channelID.." in "..serverID) end
+				if res then logger:log(4, "DATABASE: Deleted channel "..channelID..(serverID and (" in "..serverID) or "")) end
 			end
 		end,
 		
