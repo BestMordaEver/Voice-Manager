@@ -1,16 +1,23 @@
-local discordia = require "../deps/discordia/init.lua"
+local discordia = require "discordia"
 local config = require "./config.lua"
 local https = require "coro-http"
 local json = require "json"
+local conn = require "sqlite3".open("data.db")
 
 local client = discordia.Client {routeDelay = 300}
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
-local serversMutex, channelsMutex = discordia.Mutex(), discordia.Mutex()
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
 local servers
 local stats = {servers = 0, lobbies = 0, channels = 0, people = 0}
+
+local function safeEvent (name, fn)
+	return name, function (...)
+		local success, err = pcall(fn, ...)
+		if not success then logger:log(1, "Error on "..name..": "..err) end
+	end
+end
 
 local commands = {
 	help = "help",
@@ -23,161 +30,146 @@ local commands = {
 	id = "id"
 }
 
-local pingServer = function (serverID)
-	if client:getGuild(serverID) then 
-		if not servers[serverID] then
-			servers[serverID] = {}
-		end
-		return true
-	elseif servers[serverID] then
-		servers[serverID] = nil
-	end
-end
-
-local pingChannel = function (serverID, channelID)
-	if pingServer(serverID) then
-		if client:getChannel(channelID) then
-			return true
-		elseif servers[serverID][channelID] then
-			servers[serverID][channelID] = nil
-		end
-	end
-end
-
 servers = setmetatable({
-	-- serverID = {channelID = 0 (if main lobby) or 1 (if new lobby)}
+	-- serverID = {channelID = 0 (if lobby) or 1 (if new channel)}
 },{
 	__index = {
-		load = function (self)		-- used only upon startup
-			for _, guild in pairs(client.guilds) do self[guild.id] = {} end
-			serversMutex:lock()
-			logger:log(3, "Loading servers file")
-			local serverCount, channelCount = 0,0
-			local file, err = io.open(config.saveServers,"r")
-			if file then
-				logger:log(4, "Found servers save file, reading...")
-				for line in file:read("*all"):gmatch("(.-)\n") do
-					local serverID = line:match("%d+")
-					if client:getGuild(serverID) then
-						serverCount = serverCount + 1
-						self[serverID] = {}
-						local server = self[serverID]
-						for channelID in line:gmatch("%s(%d+)") do
-							if client:getChannel(channelID) then
-								channelCount = channelCount + 1
-								server[channelID] = 0
-							end
-						end
-					else
-						logger:log(2, "No servers info found")
-					end
-				end
-				file:close()
-				logger:log(4, "Done with servers save file, found "..serverCount.." servers and "..channelCount.." bound channels")
-				stats.servers = serverCount
-				stats.lobbies = channelCount
-			else
-				logger:log(1, "Couldn't open the servers file, "..err)
+		addServer = function (self, serverID)
+			if not self[serverID] then 
+				self[serverID] = {}
+				stats.servers = stats.servers + 1
+				logger:log(4, "MEMORY: Added server "..serverID)
 			end
-			serversMutex:unlock()
-			
-			serverCount, channelCount = 0,0
-			channelsMutex:lock()
-			logger:log(3, "Loading channels file")
-			file, err = io.open(config.saveChannels,"r")
-			if file then
-				logger:log(4, "Found channels save file, reading...")
-				stats.people = 0
-				for line in file:read("*all"):gmatch("(.-)\n") do
-					local serverID = line:match("%d+")
-					if client:getGuild(serverID) then
-						serverCount = serverCount + 1
-						if not self[serverID] then self[serverID] = {} end
-						local server = self[serverID]
-						for channelID in line:gmatch("%s(%d+)") do
-							local channel = client:getChannel(channelID)
-							if channel then
-								channelCount = channelCount + 1
-								stats.people = stats.people + #channel.connectedMembers
-								server[channelID] = 1
-							end
-						end
-					else
-						logger:log(2, "No channels info found")
-					end
-				end
-				file:close()
-				logger:log(4, "Done with channels save file, found "..serverCount.." servers and "..channelCount.." new channels")
-				stats.servers = serverCount
-				stats.channels = channelCount
-			else
-				logger:log(1, "Couldn't open the channels file, "..err)
+			if not conn:exec("SELECT * FROM servers WHERE id = "..serverID) then
+				local res = pcall(function() conn:exec("INSERT INTO servers VALUES("..serverID..")") end)
+				if res then logger:log(4, "DATABASE: Added server "..serverID) end
 			end
-			channelsMutex:unlock()
-		end,
-
-		saveServers = function (self)
-			local serverCount, channelCount = 0,0
-			serversMutex:lock()
-			logger:log(3, "Updating servers file")
-			local file, err = io.open(config.saveServers,"w")
-			if file then
-				logger:log(4, "Found servers save file, writing...")
-				for serverID, server in pairs(self) do
-					if pingServer(serverID) then
-						serverCount = serverCount + 1
-						file:write(serverID)
-						for channelID, type in pairs(server) do
-							if pingChannel(serverID, channelID) then
-								if type == 0 then
-									file:write(" ",channelID)
-									channelCount = channelCount + 1
-								end
-							end
-						end
-						file:write("\n")
-					end
-				end
-				file:close()
-				logger:log(4, "Done with servers save file, wrote "..serverCount.." servers and "..channelCount.." bound channels")
-				stats.servers = serverCount
-				stats.channels = channelCount
-			else
-				logger:log(1, "Couldn't open the servers file, "..err)
-			end
-			serversMutex:unlock()
 		end,
 		
-		saveChannels = function (self)
-			local serverCount, channelCount = 0,0
-			channelsMutex:lock()
-			logger:log(3, "Updating channels file")
-			local file, err = io.open(config.saveChannels,"w")
-			if file then
-				logger:log(4, "Found channels save file, writing...")
-				stats.people = 0
-				for serverID, server in pairs(self) do
-					if pingServer(serverID) then
-						serverCount = serverCount + 1
-						file:write(serverID)
-						for channelID, type in pairs(server) do
-							if pingChannel(serverID, channelID) and type == 1 then
-								file:write(" ",channelID)
-								stats.people = stats.people + #client:getChannel(channelID).connectedMembers
-								channelCount = channelCount + 1
-							end
-						end
-						file:write("\n")
-					end
-				end
-				file:close()
-				logger:log(4, "Done with channels save file, wrote "..serverCount.." servers and "..channelCount.." new channels")
-				stats.servers = serverCount
-				stats.channels = channelCount
-			else
-				logger:log(1, "Couldn't open the channels file, "..err)
+		addLobby = function (self, serverID, lobbyID)
+			self:addServer(serverID)
+			if self[serverID][lobbyID] == 1 then self:deleteChannel(serverID, lobbyID) end	-- I swear to god, there will be one crackhead
+			if self[serverID][lobbyID] ~= 0 then 
+				self[serverID][lobbyID] = 0
+				stats.lobbies = stats.lobbies + 1
+				logger:log(4, "MEMORY: Added lobby "..lobbyID.." in "..serverID)
 			end
-			channelsMutex:unlock()
+			if not conn:exec("SELECT * FROM lobbies WHERE id = "..lobbyID) then
+				local res = pcall(function() conn:exec("INSERT INTO lobbies VALUES("..lobbyID..","..serverID..")") end)
+				if res then logger:log(4, "DATABASE: Added lobby "..lobbyID.." in "..serverID) end
+			end
+		end,
+		
+		addChannel = function (self, serverID, channelID)
+			self:addServer(serverID)
+			if self[serverID][channelID] ~= 1 then
+				self[serverID][channelID] = 1
+				stats.channels = stats.channels + 1
+				logger:log(4, "MEMORY: Added channel "..channelID.." in "..serverID)
+			end
+			if not conn:exec("SELECT * FROM channels WHERE id = "..channelID) then
+				local res = pcall(function() conn:exec("INSERT INTO channels VALUES("..channelID..","..serverID..")") end)
+				if res then logger:log(4, "DATABASE: Added channel "..channelID.." in "..serverID) end
+			end
+		end,
+		
+		deleteServer = function (self, serverID)
+			if self[serverID] then
+				self[serverID] = nil
+				stats.servers = stats.servers + 1
+				logger:log(4, "MEMORY: Deleted server "..serverID)
+			end
+			if conn:exec("SELECT * FROM servers WHERE id = "..serverID) then
+				local res = pcall(function() conn:exec("DELETE FROM servers WHERE id = "..serverID) end)
+				if res then logger:log(4, "DATABASE: Deleted server "..serverID) end
+			end
+		end,
+		
+		deleteLobby = function (self, serverID, lobbyID)
+			if self[serverID] and self[serverID][lobbyID] == 0 then 
+				self[serverID][lobbyID] = nil
+				stats.lobbies = stats.lobbies - 1
+				logger:log(4, "MEMORY: Deleted lobby "..lobbyID.." in "..serverID)
+			end
+			if conn:exec("SELECT * FROM lobbies WHERE id = "..lobbyID) then
+				local res = pcall(function() conn:exec("DELETE FROM lobbies WHERE id = "..lobbyID) end)
+				if res then logger:log(4, "DATABASE: Deleted lobby "..lobbyID.." in "..serverID) end
+			end
+		end,
+		
+		deleteChannel = function (self, serverID, channelID)
+			if self[serverID] and self[serverID][channelID] == 1 then
+				self[serverID][channelID] = nil
+				stats.channels = stats.channels - 1
+				logger:log(4, "MEMORY: Deleted channel "..channelID.." in "..serverID)
+			end
+			if conn:exec("SELECT * FROM channels WHERE id = "..channelID) then
+				local res = pcall(function() conn:exec("DELETE FROM channels WHERE id = "..channelID) end)
+				if res then logger:log(4, "DATABASE: Deleted channel "..channelID.." in "..serverID) end
+			end
+		end,
+		
+		checkServer = function (self, serverID)
+			if client:getGuild(serverID) then
+				self:addServer(serverID)
+				return true
+			else
+				self:deleteServer(serverID)
+				return false
+			end
+		end,
+		
+		checkLobby = function (self, lobbyID)
+			local lobby = client:getChannel(lobbyID)
+			if lobby then
+				self:addLobby(lobby.guild.id, lobby.id)
+			else
+				self:deleteLobby(nil, lobbyID)
+			end
+			return lobby
+		end,
+		
+		checkChannel = function (self, channelID)
+		local channel = client:getChannel(channelID)
+			if channel then
+				self:addChannel(channel.guild.id, channel.id)
+			else
+				self:deleteChannel(nil, channelID)
+			end
+			return lobby
+		end,
+		
+		load = function (self)		-- used only upon startup
+			logger:log(4, "Loading servers from client")
+			for _, server in pairs(client.guilds) do
+				self:checkServer(server.id)
+			end
+			
+			logger:log(4, "Loading servers from save")
+			local serverIDs = conn:exec("SELECT * FROM servers")
+			if serverIDs then
+				for _, serverID in ipairs(serverIDs[1]) do
+					self:checkServer(serverID)
+				end
+			end
+	
+			logger:log(4, "Loading lobbies")
+			local lobbyIDs = conn:exec("SELECT * FROM lobbies")
+			if lobbyIDs then
+				for _, lobbyID in ipairs(lobbyIDs[1]) do
+					self:checkLobby(lobbyID)
+				end
+			end
+			
+			logger:log(4, "Loading channels")
+			local channelIDs = conn:exec("SELECT * FROM channels")
+			if channelIDs then
+				for _, channelID in ipairs(channelIDs[1]) do
+					self:checkChannel(channelID)
+				end
+			end
+			
+			logger:log(4, "Loaded")
 		end
 	}
 })
@@ -279,8 +271,7 @@ actions = {
 		local id = actions.regFilter(message, commands.register)
 		if not id then return end
 		
-		servers[message.guild.id][id] = 0
-		servers:saveServers()
+		servers:addLobby(message.guild.id, id)
 		message.channel:send("Channel `"..client:getChannel(id).name.."` is now registered as a lobby")
 		logger:log(4, "Registered "..id.." successfully")
 		stats.lobbies = stats.lobbies + 1
@@ -290,8 +281,7 @@ actions = {
 		local id = actions.regFilter(message, commands.unregister)
 		if not id then return end
 		
-		servers[message.guild.id][id] = nil
-		servers:saveServers()
+		servers:deleteLobby(message.guild.id, id)
 		message.channel:send("Channel `"..client:getChannel(id).name.."` was unregistered")
 		logger:log(4, "Unregistered "..message.channel.id.." successfully")
 		stats.lobbies = stats.lobbies - 1
@@ -345,7 +335,7 @@ actions = {
 		logger:log(4, "List action invoked")
 		local str = "Registered lobbies on this server:\n"
 		local channels = 0
-		if not servers[message.guild.id] then servers[message.guild.id] = {} end
+		servers:checkServer(message.guild.id)
 		for channelID, type in pairs(servers[message.guild.id]) do
 			if pingChannel(message.guild.id, channelID) then
 				if type == 0 then
@@ -368,10 +358,9 @@ actions = {
 		local status, msg = pcall(function()
 			clock:stop()
 			client:stop()
+			--conn:close()
 		end)
-		logger:log(3, (status and "Shutdown successfull, saving data..." or ("Couldn't shutdown gracefully, "..msg)))
-		servers:saveServers()
-		servers:saveChannels()
+		logger:log(3, (status and "Shutdown successfull" or ("Couldn't shutdown gracefully, "..msg)))
 		process:exit()
 	end,
 	
@@ -392,18 +381,17 @@ actions = {
 	end
 }
 
-client:on('messageCreate', function (message)
+client:on(safeEvent('messageCreate', function (message)
 	if message.channel.type ~= channelType.text and not message.author.bot then
 		message:reply("This bot can only be used in servers. Mention the bot within the server to get the help message.")
 		return
 	end
 	
-	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.author.bot then 
-		return 
+	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.author.bot then
+		return
 	end
-
+	
 	logger:log(4, "Message received, processing...")
-	if not servers[message.guild.id] then servers[message.guild.id] = {} end
 	if not message.guild.me:getPermissions(message.channel):has(permission.manageChannels, permission.moveMembers) then
 		message:reply('This bot needs "Manage Channels" and "Move Members" permissions to function!')
 	end
@@ -412,73 +400,65 @@ client:on('messageCreate', function (message)
 	if not command then command = commands.help end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then logger:log(1, "Couldn't process the message, "..msg) end
-end)
+end))
 
-client:on('guildCreate', function (guild)
-	servers[guild.id] = {}
+client:on(safeEvent('guildCreate', function (guild)
+	servers:addServer(guild.id)
 	client:getChannel("676432067566895111"):send(guild.name.." added me!\n")
-	servers:saveServers()
-end)
+end))
 
-client:on('guildDelete', function (guild)
-	servers[guild.id] = nil
+client:on(safeEvent('guildDelete', function (guild)
+	servers:deleteServer(guild.id)
 	client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
-	servers:saveServers()
-end)
+end))
 
-client:on('voiceChannelJoin', function (member, channel)
-	if not servers[channel.guild.id] then servers[channel.guild.id] = {}; return end
+client:on(safeEvent('voiceChannelJoin', function (member, channel)
+	if not servers:checkServer(channel.guild.id) then return end
 	if servers[channel.guild.id][channel.id] == 0 then
 		logger:log(4, member.user.id.." joined lobby "..channel.id)
 		local category = channel.category or channel.guild
 		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s channel")
 		member:setVoiceChannel(newChannel.id)
-		logger:log(4, "Created new channel "..newChannel.id)
-		servers[channel.guild.id][newChannel.id] = 1
+		logger:log(4, "Created "..newChannel.id)
+		servers:addChannel(channel.guild.id, newChannel.id)
 		newChannel:setUserLimit(channel.userLimit)
 		if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
 		end
 	end
-end)
+end))
 
-client:on('voiceChannelLeave', function (member, channel)
-	if not channel then return end
-	if not servers[channel.guild.id] then servers[channel.guild.id] = {}; return end
+client:on(safeEvent('voiceChannelLeave', function (member, channel)
+	if not servers:checkServer(channel.guild.id) then return end
 	if servers[channel.guild.id][channel.id] == 1 and #channel.connectedMembers == 0 then
-		servers[channel.guild.id][channel.id] = nil
+		--servers:deleteChannel(channel.guild.id, channel.id) -- cleanup happens in channelDelete event
 		channel:delete()
 		logger:log(4, "Deleted "..channel.id)
 	end
-end)
+end))
 
-client:on('channelDelete', function (channel)
-	pingChannel(channel.guild.id, channel.id)
-end)
+client:on(safeEvent('channelDelete', function (channel)
+	servers:deleteLobby(channel.guild.id, channel.id)
+	servers:deleteChannel(channel.guild.id, channel.id)
+end))
 
-client:on('ready', function()
+client:on(safeEvent('ready', function()
 	servers:load()
-	servers:saveServers()
-	servers:saveChannels()
 	clock:start()
 	client:getChannel("676432067566895111"):send("I'm listening")
-end)
+end))
 
-clock:on('min', function()
-	servers:saveChannels()
+clock:on(safeEvent('min', function()
 	local people, channels = 0, 0
 	for serverID, server in pairs(servers) do
 		for channelID, type in pairs(server) do
-			if pingChannel(serverID, channelID) then
-				if type == 1 then
-					local channel = client:getChannel(channelID)
-					if #channel.connectedMembers ~= 0 then
-						channels = channels + 1
-						people = people + #channel.connectedMembers
-					else
-						channel:delete()
-						server[channelID] = nil
-					end
+			local channel = client:getChannel(channelID)
+			if channel and type == 1 then
+				if #channel.connectedMembers ~= 0 then
+					channels = channels + 1
+					people = people + #channel.connectedMembers
+				else
+					channel:delete()
 				end
 			end
 		end
@@ -489,9 +469,9 @@ clock:on('min', function()
 	client:getChannel("676791988518912020"):getLastMessage():delete()
 	client:getChannel("676791988518912020"):send("beep boop beep")
 	statservers()
-end)
+end))
 
-client:on('shutdown', actions[commands.shutdown])
+client:on(safeEvent('shutdown', actions[commands.shutdown]))
 
 local sd = function () client:emit("shutdown") end -- ensures graceful shutdown
 
