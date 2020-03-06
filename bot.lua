@@ -212,7 +212,7 @@ local statservers = setmetatable({
 					{{"Authorization", config.tokens[name]},{"Content-Type", "application/json"},{"Accept", "application/json"}},
 					json.encode({[server.body] = stats.servers}))
 				if res.code ~= 204 and res.code ~= 200 then 
-					logger:log(2, "Couldn't send stats to "..name.." - "..body)
+					logger:log(2, "Couldn't send stats to %s - %s", name, body)
 				end
 			end)(name, server)
 		end 
