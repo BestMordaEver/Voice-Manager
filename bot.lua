@@ -159,7 +159,7 @@ local statservers = {
 
 local actions
 actions = {
-	regFilter = function (message, command)
+	regFilter = function (message, command) -- returns a table of all ids
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
 			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to do this')
@@ -168,59 +168,79 @@ actions = {
 		
 		logger:log(4, command.." action invoked")
 		local id = message.content:match(command.."%s+(.-)$")
+		if not id then
+			logger:log(4, "Empty input")
+			message:reply("Need an ID or channel name to process that!")
+			return
+		end
 		
-		if not tonumber(id) and type(id) == "string" then
+		local ids = {}
+		for ID in id:gmatch("%d+") do
+			local channel = client:getChannel(ID)
+			if channel and channel.type == channelType.voice and channel.guild == message.guild then
+				table.insert(ids, ID)
+			end
+		end
+		
+		if #ids == 0 then
 			id = id:lower()
-			local channels = message.guild.voiceChannels:toArray("position", function (channel) return channel.name:lower() == id end)
+			local channels = message.guild.voiceChannels:toArray("position", function (channel) 
+				return channel.name:lower() == id and (command == commands.unregister and lobbies[channel.id] or command ~= commands.unregister)
+			end)
 			if #channels == 0 then
 				logger:log(4, "Bad "..command.." input")
-				message:reply("Couldn't find a channel by name")
+				message:reply("Couldn't find a specified channel")
 				return
 			elseif #channels == 1 then
-				id = channels[1].id
+				ids[1] = channels[1].id
+				return ids
 			else
 				logger:log(4, "Ambiguous "..command.." input")
 				actions[commands.id](message, id)
 				return
 			end
+		else
+			return ids
 		end
-		
-		if not id or not message.guild.voiceChannels:find(function(voiceChannel) if id == voiceChannel.id then return true end end) then 
-			logger:log(4, "Bad "..command.." input")
-			message:reply("You have to specify a valid voice channel id or name\nExample: `@Voice Manager "..command.." 123456789123456780`")
-			return
-		end
-		
-		return id
 	end,
 
 	[commands.help] = function (message)
 		logger:log(4, "Help action invoked")
 		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n**:arrow_down: You need a 'Manage Channels permission to use those commands! :arrow_down:**\n`"..
-			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby\n`"..
-			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby\n`"..
+			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby. You can list several channel IDs\n`"..
+			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby. You can list several channel IDs\n`"..
 			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n**:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**\n`"..
-			commands.list.."` - lists all registered lobbies\n`"..
+			commands.list.."` - lists all registered lobbies on the server\n`"..
 			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
 			commands.support.."` - sends an invite to support Discord server")
 	end,
 	
 	[commands.register] = function (message)
-		local id = actions.regFilter(message, commands.register)
-		if not id then return end
+		local ids = actions.regFilter(message, commands.register)
+		if not ids then return end
 		
-		lobbies:add(id)
-		message.channel:send("Channel `"..client:getChannel(id).name.."` is now registered as a lobby")
-		logger:log(4, "Registered "..id.." successfully")
+		local msg = "Registered "..#ids.." new "..(#ids == 1 and "lobby:" or "lobbies:")
+		for _, channelID in ipairs(ids) do
+			local channel = client:getChannel(channelID)
+			msg = msg.."\n`"..channelID.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`") or "`")
+			lobbies:add(channelID)
+		end
+		message:reply(msg)
+		logger:log(4, "Registered "..table.concat(ids, " ").." successfully")
 	end,
 
 	[commands.unregister] = function (message)
-		local id = actions.regFilter(message, commands.unregister)
-		if not id then return end
+		local ids = actions.regFilter(message, commands.unregister)
+		if not ids then return end
 		
-		lobbies:remove(id)
-		message.channel:send("Channel `"..client:getChannel(id).name.."` was unregistered")
-		logger:log(4, "Unregistered "..id.." successfully")
+		local msg = "Unregistered "..#ids..(#ids == 1 and " lobby:" or " lobbies:")
+		for _, channelID in ipairs(ids) do
+			local channel = client:getChannel(channelID)
+			msg = msg.."\n`"..channelID.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`") or "`")
+			lobbies:remove(channelID)
+		end
+		message:reply(msg)
+		logger:log(4, "Unregistered "..table.concat(ids, " ").." successfully")
 	end,
 	
 	[commands.id] = function (message, target)
@@ -255,9 +275,10 @@ actions = {
 	
 	[commands.list] = function (message)
 		logger:log(4, "List action invoked")
-		local str = "Registered lobbies on this server:\n"
-		for _,channel in ipairs(message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] end)) do
-			str = str.."`"..channel.id.."` -> `"..channel.name.."`\n"
+		local lobbies = message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] end)
+		local str = #lobbies == 0 and "No lobbies registered yet!" or "Registered lobbies on this server:\n"
+		for _,channel in ipairs(lobbies) do
+			str = str.."`"..channel.id.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`\n") or "`\n")
 		end
 		message:reply(str)
 	end,
