@@ -372,6 +372,7 @@ client:on(safeEvent('voiceChannelJoin', function (member, channel)
 end))
 
 client:on(safeEvent('voiceChannelLeave', function (member, channel)
+	if not channel then return end	-- until this is fixed
 	if channels[channel.id] then
 		stats.people = stats.people - 1
 		if #channel.connectedMembers == 0 then
