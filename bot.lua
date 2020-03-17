@@ -64,7 +64,7 @@ channels = setmetatable({}, {
 			local channelIDs = conn:exec("SELECT * FROM channels")
 			if channelIDs then
 				for _, channelID in ipairs(channelIDs[1]) do
-					local channel = client:getChannel(lobbyID)
+					local channel = client:getChannel(channelID)
 					if channel then
 						self:add(channelID)
 						stats.people = stats.people + #channel.connectedMembers
