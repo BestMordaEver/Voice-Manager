@@ -146,10 +146,10 @@ local statservers = {
 		body = "server_count"
 	},
 	
-	--["bots.ondiscord.xyz"] = {
-	--	endpoint = "https://bots.ondiscord.xyz/bot-api/bots/601347755046076427/guilds",
-	--	body = "guildCount"
-	--},
+	["bots.ondiscord.xyz"] = {
+		endpoint = "https://bots.ondiscord.xyz/bot-api/bots/601347755046076427/guilds",
+		body = "guildCount"
+	},
 	
 	["discord.bots.gg"] = {
 		endpoint = "https://discord.bots.gg/api/v1/bots/601347755046076427/stats",
@@ -345,6 +345,7 @@ client:on(safeEvent('messageCreate', function (message)
 end))
 
 client:on(safeEvent('guildCreate', function (guild)
+	logger:log(4, "%s", "Guild "..guild.id.." added")
 	client:getChannel("676432067566895111"):send(guild.name.." added me!\n")
 end))
 
@@ -352,6 +353,7 @@ client:on(safeEvent('guildDelete', function (guild)
 	for _,channel in pairs(guild.voiceChannels) do 
 		if channels[channel.id] then channels:remove(channel.id) end 
 	end
+	logger:log(4, "%s", "Guild "..guild.id.." removed")
 	client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
 end))
 
