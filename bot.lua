@@ -3,6 +3,7 @@ local config = require "./config.lua"
 local https = require "coro-http"
 local json = require "json"
 local conn = require "sqlite3".open("data.db")
+local locale = require "locale.lua"
 
 local client = discordia.Client()
 local clock = discordia.Clock()
@@ -162,7 +163,7 @@ actions = {
 	regFilter = function (message, command) -- returns a table of all ids
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
-			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to do this')
+			message:reply(string.format('%s, you need to have "Manage Channels" permission to do this', message.author.mentionString))
 			return
 		end
 		
@@ -219,10 +220,10 @@ actions = {
 		local ids = actions.regFilter(message, commands.register)
 		if not ids then return end
 		
-		local msg = "Registered "..#ids.." new "..(#ids == 1 and "lobby:" or "lobbies:")
+		local msg = string.format(#ids == 1 and ("Registered new lobby:") or ("Registered %d new lobbies:"), #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg.."\n`"..channelID.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`") or "`")
+			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
 			lobbies:add(channelID)
 		end
 		message:reply(msg)
@@ -233,10 +234,10 @@ actions = {
 		local ids = actions.regFilter(message, commands.unregister)
 		if not ids then return end
 		
-		local msg = "Unregistered "..#ids..(#ids == 1 and " lobby:" or " lobbies:")
+		local msg = string.format(#ids == 1 and ("Unregistered new lobby:") or ("Unregistered %d new lobbies:"), #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg.."\n`"..channelID.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`") or "`")
+			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
 			lobbies:remove(channelID)
 		end
 		message:reply(msg)
@@ -251,7 +252,7 @@ actions = {
 		end
 	
 		logger:log(4, "ID action invoked")
-		local msg = target and "There are several channels with this name\n" or ""
+		local msg = target and ("There are several channels with this name".."\n") or ""
 		target = target or message.content:match(commands.id.."%s+(.-)$")
 		
 		local channels = message.guild.voiceChannels:toArray()
@@ -263,12 +264,12 @@ actions = {
 		
 		for _, channel in ipairs(channels) do
 			if target and (channel.name:lower() == target or (channel.category and channel.name:lower() == target)) or not target then
-				msg = msg.."`"..channel.name..(channel.category and ("` in `"..channel.category.name) or "").."` -> `"..channel.id.."`\n"
+				msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
 			end
 		end
 		
-		if #msg > 2000 then
-			msg = msg:sub(1,1800).."\nPhew, I can't display more than that! Try to narrow down the list with the channel name, like ```@Voice Manager id channel_name```Also, consider turning the developer mode on, it's quite useful!"
+		if #msg > 2000 then	-- nice
+			msg = msg:sub(1,1949).."\n".."Can't display more than that!"
 		end
 		message:reply(msg)
 	end,
@@ -276,11 +277,11 @@ actions = {
 	[commands.list] = function (message)
 		logger:log(4, "List action invoked")
 		local lobbies = message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] end)
-		local str = #lobbies == 0 and "No lobbies registered yet!" or "Registered lobbies on this server:\n"
+		local msg = (#lobbies == 0 and "No lobbies registered yet!" or "Registered lobbies on this server:") .. "\n"
 		for _,channel in ipairs(lobbies) do
-			str = str.."`"..channel.id.."` -> `"..channel.name..(channel.category and ("` in `"..channel.category.name.."`\n") or "`\n")
+			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
 		end
-		message:reply(str)
+		message:reply(msg)
 	end,
 	
 	[commands.shutdown] = function (message)
@@ -304,11 +305,17 @@ actions = {
 		message.channel:broadcastTyping()
 		t = math.modf((os.clock() - t)*1000)
 		logger:log(4, "Stats action invoked")
-		message:reply("I'm currently on **`"..
-			#client.guilds..(#client.guilds == 1 and "`** server serving **`" or "`** servers serving **`")..
-			stats.lobbies..(stats.lobbies == 1 and "`** lobby\nThere " or "`** lobbies\nThere ")..
-			(stats.channels == 1 and "is **`" or "are **`")..stats.channels..(stats.channels == 1 and "`** new channel with **`" or "`** new channels with **`")..
-			stats.people..(stats.people == 1 and "`** person" or "`** people").."\nPing is **`"..t.."ms`**")
+		message:reply(string.format(
+			(#client.guilds == 1 and stats.lobbies == 1) and "I'm currently on **`%d`** server serving **`%d`** lobby" or (
+			#client.guilds == 1 and "I'm currently on **`%d`** server serving **`%d`** lobbies" or (
+			stats.lobbies == 1 and "I'm currently on **`%d`** servers serving **`%d`** lobby" or 
+			"I'm currently on **`%d`** servers serving **`%d`** lobbies")), #client.guilds, stats.lobbies) .. "\n" ..
+		string.format(
+			(stats.channels == 1 and stats.people == 1) and "There is **`%d`** new channel with **`%d`** person" or (
+			stats.channels == 1 and "There is **`%d`** new channel with **`%d`** people" or (
+			stats.people == 1 and "There are **`%d`** new channels with **`%d`** person" or -- practically impossible, but whatever
+			"There are **`%d`** new channels with **`%d`** people")), stats.channels, stats.people) .. "\n" ..
+		string.format("Ping is **`%d ms`**", t))
 	end,
 	
 	[commands.support] = function (message)
@@ -338,7 +345,7 @@ client:on(safeEvent('messageCreate', function (message)
 	if not res then 
 		logger:log(1, "Couldn't process the message, "..msg)
 		message:reply(message.author.id ~= "188731184501620736"
-			and ("Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is "..os.date("%b %d %X").."\nhttps://discord.gg/tqj6jvT")
+			and (string.format("Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s", os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
 			or "You done goofed")
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
 	end
