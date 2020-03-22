@@ -353,7 +353,8 @@ actions = {
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Language action invoked")
 		
-		local lang = message.content:match(commands.language.."%s+(.-)$"):lower()
+		local lang = message.content:match(commands.language.."%s+(.-)$")
+		if lang then lang = lang:lower() end
 		
 		for name, subLocale in pairs(locale) do
 			if locale[lang] then break end
