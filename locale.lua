@@ -24,35 +24,29 @@ commentary ends here]]
 return {
 	english = {
 		names = {
-			english = "English"
-		},
-		commands = {
-			help = "help",
-			register = "register",
-			unregister = "unregister",
-			list = "list",
-			shutdown = "shutdown",
-			stats = "stats",
-			support = "support",
-			id = "id"
+			english = "English",		-- name of your language in english, for example German or French
+			russian = "Английский",		-- name of your language in your language
+			"английский"				-- same, but lowercase
 		},
 		helpText = 
-[[Ping this bot to get help message
+[[Ping me to get help message
 Write commands after the mention, for example - `@Voice Manager register 123456789123456780`
 **:arrow_down: You need a 'Manage Channels permission to use those commands! :arrow_down:**
 `register [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby. You can list several channel IDs
 `unregister [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby. You can list several channel IDs
 `id [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category
+`prefix [new_prefix]` - set a new prefix for me. Mentioning will still work
+`language [new_language]` - change my language
 **:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**
 `list` - lists all registered lobbies on the server
-`stats` - take a sneak peek on bot's performance!
+`stats` - take a sneak peek on my performance!
 `support` - sends an invite to support Discord server]],
 		mentionInVain = '%s, you need to have "Manage Channels" permission to do this',	-- %s = ping, i.e. @Riddles#2773
 		emptyInput = "Need an ID or channel name to process that!",
 		badInput = "Couldn't find a specified channel",
 		registeredOne = "Registered new lobby:",
-		registeredMany = "Registered %d new lobbies:",		-- %d = amount of registered lobbies
-		unregisteredOne = "Unregistered new lobby:",
+		registeredMany = "Registered %d lobbies:",		-- %d = amount of registered lobbies
+		unregisteredOne = "Unregistered lobby:",
 		unregisteredMany = "Unregistered %d new lobbies:",	-- same
 		channelIDNameCategory = "`%s` -> `%s` in `%s`",		-- channel ID, then name, then category, contact me if you need to change words order
 		channelIDName = "`%s` -> `%s`",						-- same, without category
@@ -60,8 +54,13 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		bigMessage = "Can't display more than that!",		-- can't be more than 50 characters long, contact me if that's impossible to fit in
 		noLobbies = "No lobbies registered yet!",
 		someLobbies = "Registered lobbies on this server:",
+		updatedLocale = "Language updated to English",		-- should be your corresponding language
+		availableLanguages = "I can speak those languages:",
+		prefixConfirm = "Prefix is **`%s`** now",
+		prefixThis = "My prefix is **`%s`** or you can mention me",
+		prefixAbsent = "There is no active prefix, but you can always mention me",
 		
-		-- all follow the same format
+		-- all follow the same format, it's ok if you need to write the same things twice
 		serverLobby = "I'm currently on **`%d`** server serving **`%d`** lobby",
 		serverLobbies = "I'm currently on **`%d`** server serving **`%d`** lobbies",
 		serversLobby = "I'm currently on **`%d`** servers serving **`%d`** lobby",
@@ -74,65 +73,61 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		channelsPeople = "There are **`%d`** new channels with **`%d`** people",
 		
 		ping = "Ping is **`%d ms`**",
-		badChannel = "This bot can only be used in servers. Mention the bot within the server to get the help message.",
-		badPermissions = 'This bot needs "Manage Channels" and "Move Members" permissions to function!',
+		badChannel = "I can only be used in servers. Mention me within the server to get the help message.",
+		badPermissions = 'I need "Manage Channels" and "Move Members" permissions to function!',
 		error = "Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s"		-- %s = date and time
 	},
 	
-	newLang = {
+	russian = {
 		names = {
-			english = ""	-- name of your language in english, for example German or French
-		},
-		commands = {
-			help = "help",
-			register = "register",
-			unregister = "unregister",
-			list = "list",
-			shutdown = "shutdown",
-			stats = "stats",
-			support = "support",
-			id = "id"
+			english = "Russian",
+			russian = "Русский",
+			"русский"
 		},
 		helpText = 
-[[Ping this bot to get help message
-Write commands after the mention, for example - `@Voice Manager register 123456789123456780`
-**:arrow_down: You need a 'Manage Channels permission to use those commands! :arrow_down:**
-`register [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby. You can list several channel IDs
-`unregister [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby. You can list several channel IDs
-`id [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category
-**:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**
-`list` - lists all registered lobbies on the server
-`stats` - take a sneak peek on bot's performance!
-`support` - sends an invite to support Discord server]],
-		mentionInVain = '%s, you need to have "Manage Channels" permission to do this',	-- %s = ping, i.e. @Riddles#2773
-		emptyInput = "Need an ID or channel name to process that!",
-		badInput = "Couldn't find a specified channel",
-		registeredOne = "Registered new lobby:",
-		registeredMany = "Registered %d new lobbies:",		-- %d = amount of registered lobbies
-		unregisteredOne = "Unregistered new lobby:",
-		unregisteredMany = "Unregistered %d new lobbies:",	-- same
-		channelIDNameCategory = "`%s` -> `%s` in `%s`",		-- channel ID, then name, then category, contact me if you need to change words order
-		channelIDName = "`%s` -> `%s`",						-- same, without category
-		ambiguousID = "There are several channels with this name",
-		bigMessage = "Can't display more than that!",		-- can't be more than 50 characters long, contact me if that's impossible to fit in
-		noLobbies = "No lobbies registered yet!",
-		someLobbies = "Registered lobbies on this server:",
+[[Упомяните меня, чтобы получить сообщение со списком команд
+Пишите команды после упоминания, например - `@Voice Manager register 123456789123456780`
+**:arrow_down: Вам потребуются права 'Управлять каналами' для использования этих команд! :arrow_down:**
+`register [идентификатор_голосового_канала ИЛИ название_голосового_канала]` - регистрирует голосовой чат, который будет использоваться как лобби. Можно указывать несколько идентификаторов одновременно
+`unregister [идентификатор_голосового_канала ИЛИ название_голосового_канала]` - удаляет голосовой канал из списка лобби сервера. Можно указывать несколько идентификаторов одновременно
+`id [название_голосового_канала ИЛИ название_категории]` - перечисляет идентификаторы названых голосовых чатов ИЛИ идентификаторы голосовых чатов названой категории
+**:arrow_up: Вам потребуются права 'Управлять каналами' для использования этих команд! :arrow_up:**
+`list` - перечисляет все зарегестрированные лобби на этом сервере
+`stats` - показывает статистику
+`support` - отправляет приглашение на сервер поддержки]],
+		mentionInVain = '%s, вам требуются права "Управление каналами" чтобы сделать это',
+		emptyInput = "Скажите мне идентификатор или название канала чтобы я мог с ним хоть что-то сделать",
+		badInput = "Я не смог найти указанный канал",
+		registeredOne = "Зарегистрировал новое лобби:",
+		registeredMany = "Зарегистрировал %d новых лобби:",
+		unregisteredOne = "Удалил лобби:",
+		unregisteredMany = "Удалил %d лобби:",
+		channelIDNameCategory = "`%s` -> `%s` в `%s`",
+		channelIDName = "`%s` -> `%s`",
+		ambiguousID = "Несколько голосовых каналов имеют такое название",
+		bigMessage = "Я так много не могу выговорить!",
+		noLobbies = "Тут не зарегистрировано еще ни одного лобби!",
+		someLobbies = "Зарегистрированные лобби этого сервера:",
+		updatedLocale = "Текущий язык - русский",
+		availableLanguages = "Я знаю такие языки:",
+		prefixConfirm = "Установлен префикс **`%s`**",
+		prefixThis = "Мой префикс **`%s`**, также меня можно упомянуть",
+		prefixAbsent = "Активный префикс отсутствует, но меня всегда можно упомянуть",
 		
 		-- all follow the same format
-		serverLobby = "I'm currently on **`%d`** server serving **`%d`** lobby",
-		serverLobbies = "I'm currently on **`%d`** server serving **`%d`** lobbies",
-		serversLobby = "I'm currently on **`%d`** servers serving **`%d`** lobby",
-		serversLobbies = "I'm currently on **`%d`** servers serving **`%d`** lobbies",
+		serverLobby = "Я обитаю на **`%d`** сервере и обслуживаю **`%d`** лобби",
+		serverLobbies = "Я обитаю на **`%d`** сервере и обслуживаю **`%d`** лобби",
+		serversLobby = "Я обитаю на **`%d`** серверах и обслуживаю **`%d`** лобби",
+		serversLobbies = "Я обитаю на **`%d`** серверах и обслуживаю **`%d`** лобби",
 		
-		-- same
-		channelPerson = "There is **`%d`** new channel with **`%d`** person",
-		channelPeople = "There is **`%d`** new channel with **`%d`** people",
-		channelsPerson = "There are **`%d`** new channels with **`%d`** person",
-		channelsPeople = "There are **`%d`** new channels with **`%d`** people",
+		channelPerson = "Сейчас есть **`%d`** новый канал с **`%d`** человеком",
+		channelPeople = "Сейчас есть **`%d`** новый канал с **`%d`** людьми",
+		channelsPerson = "Сейчас есть **`%d`** новых каналов с **`%d`** человеком",
+		channelsPeople = "Сейчас есть **`%d`** новых каналов с **`%d`** людьми",
 		
-		ping = "Ping is **`%d ms`**",
-		badChannel = "This bot can only be used in servers. Mention the bot within the server to get the help message.",
-		badPermissions = 'This bot needs "Manage Channels" and "Move Members" permissions to function!',
-		error = "Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s"		-- %s = date and time
+		ping = "Пинг **`%d мс`**",
+		badChannel = "Я работаю только на серверах. Упомяните меня на сервере, чтобы получить сообщение со списком команд",
+		badPermissions = 'Мне нужны права "Управлять каналами" и "Перемещать участников" чтобы работать!',
+		error = "Что-то пошло не так. *Пввостите...*. Не могли бы вы зарепортить это на сервеве тех-поддержки? Время происшествия - %s"
 	}
 }

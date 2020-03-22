@@ -3,7 +3,7 @@ local config = require "./config.lua"
 local https = require "coro-http"
 local json = require "json"
 local conn = require "sqlite3".open("data.db")
-local locale = require "locale.lua"
+local locale = require "./locale.lua"
 
 local client = discordia.Client()
 local clock = discordia.Clock()
@@ -22,18 +22,7 @@ local function safeEvent (name, fn)
 	end
 end
 
-local commands = {
-	help = "help",
-	register = "register",
-	unregister = "unregister",
-	list = "list",
-	shutdown = "shutdown",
-	stats = "stats",
-	support = "support",
-	id = "id"
-}
-
-local channels, lobbies
+local channels, lobbies, servers
 channels = setmetatable({}, {
 	__index = {
 		add = function (self, channelID)
@@ -77,7 +66,12 @@ channels = setmetatable({}, {
 			end
 			logger:log(4, "Loaded!")
 		end
-	}
+	},
+	__len = function (self)
+		local count = 0
+		for v,_ in pairs (self) do count = count + 1 end
+		return count
+	end
 })
 
 lobbies = setmetatable({}, {
@@ -123,6 +117,77 @@ lobbies = setmetatable({}, {
 			end
 			logger:log(4, "Loaded!")
 		end
+	},
+	__len = function (self)
+		local count = 0
+		for v,_ in pairs (self) do count = count + 1 end
+		return count
+	end
+})
+
+guilds = setmetatable({}, {
+	__index = {
+		add = function (self, guildID)
+			if not self[guildID] then 
+				self[guildID] = {locale = "english"}
+				logger:log(4, "MEMORY: Added guild "..guildID)
+			end
+			if not conn:exec("SELECT * FROM guilds WHERE id = "..guildID) then
+				local res = pcall(function() conn:exec("INSERT INTO guilds VALUES("..guildID..", 'english', NULL)") end)
+				if res then logger:log(4, "DATABASE: Added guild "..guildID) end
+			end
+		end,
+		
+		remove = function (self, guildID)
+			if self[guildID] then
+				self[guildID] = nil
+				stats.lobbies = stats.lobbies - 1
+				logger:log(4, "MEMORY: Deleted guild "..guildID)
+			end
+			if conn:exec("SELECT * FROM guilds WHERE id = "..guildID) then
+				local res = pcall(function() conn:exec("DELETE FROM guilds WHERE id = "..guildID) end)
+				if res then logger:log(4, "DATABASE: Deleted guild "..guildID) end
+			end
+		end,
+		
+		load = function (self)
+			logger:log(4, "Loading guilds from save")
+			local guildIDs = conn:exec("SELECT * FROM guilds")
+			if guildIDs then
+				for i, guildID in ipairs(guildIDs[1]) do
+					if client:getGuild(guildID) then
+						self:add(guildID)
+						self:updateLocale(guildID, guildIDs.locale[i])
+						self:updatePrefix(guildID, guildIDs.prefix[i])
+					else
+						self:remove(guildID)
+					end
+				end
+			end
+			
+			logger:log(4, "Loading guilds from client")
+			for _, guild in pairs(client.guilds) do
+				if not self[guild.id] then self:add(guild.id) end
+			end
+			
+			logger:log(4, "Loaded!")
+		end,
+		
+		updateLocale = function (self, guildID, locale)
+			if locale then
+				self[guildID].locale = locale
+				conn:exec("UPDATE guilds SET locale = '"..locale.."' WHERE id = "..guildID)
+				logger:log(4, "Updated locale for "..guildID)
+			end
+		end,
+		
+		updatePrefix = function (self, guildID, prefix)
+			if prefix then
+				self[guildID].prefix = prefix
+				conn:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"):bind(prefix, guildID):step()
+				logger:log(4, "Updated prefix for "..guildID)
+			end
+		end
 	}
 })
 
@@ -158,20 +223,39 @@ local statservers = {
 	}
 }
 
+local commands = {
+	help = "help",
+	register = "register",
+	unregister = "unregister",
+	list = "list",
+	shutdown = "shutdown",
+	stats = "stats",
+	support = "support",
+	id = "id",
+	language = "language",
+	prefix = "prefix"
+}
+
 local actions
 actions = {
-	regFilter = function (message, command) -- returns a table of all ids
+	permCheck = function (message)
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
-			message:reply(string.format('%s, you need to have "Manage Channels" permission to do this', message.author.mentionString))
-			return
+			message:reply(string.format(locale[guilds[message.guild.id].locale].mentionInVain, message.author.mentionString))
+			return false
 		end
+		
+		return true
+	end,
+
+	regFilter = function (message, command) -- returns a table of all ids
+		if not actions.permCheck(message) then return end
 		
 		logger:log(4, command.." action invoked")
 		local id = message.content:match(command.."%s+(.-)$")
 		if not id then
 			logger:log(4, "Empty input")
-			message:reply("Need an ID or channel name to process that!")
+			message:reply(locale[guilds[message.guild.id].locale].emptyInput)
 			return
 		end
 		
@@ -190,7 +274,7 @@ actions = {
 			end)
 			if #channels == 0 then
 				logger:log(4, "Bad "..command.." input")
-				message:reply("Couldn't find a specified channel")
+				message:reply(locale[guilds[message.guild.id].locale].badInput)
 				return
 			elseif #channels == 1 then
 				ids[1] = channels[1].id
@@ -207,23 +291,17 @@ actions = {
 
 	[commands.help] = function (message)
 		logger:log(4, "Help action invoked")
-		message:reply("Ping this bot to get help message\nWrite commands after the mention, for example - `@Voice Manager register 123456789123456780`\n**:arrow_down: You need a 'Manage Channels permission to use those commands! :arrow_down:**\n`"..
-			commands.register.." [voice_chat_id OR voice_chat_name]` - registers a voice chat that will be used as a lobby. You can list several channel IDs\n`"..
-			commands.unregister.." [voice_chat_id OR voice_chat_name]` - unregisters an existing lobby. You can list several channel IDs\n`"..
-			commands.id.." [voice_chat_name OR category_name]` - use this to learn ids of voice channels by name or category\n**:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**\n`"..
-			commands.list.."` - lists all registered lobbies on the server\n`"..
-			commands.stats.."` - take a sneak peek on bot's performance!\n`"..
-			commands.support.."` - sends an invite to support Discord server")
+		message:reply(locale[guilds[message.guild.id].locale].helpText)
 	end,
 	
 	[commands.register] = function (message)
 		local ids = actions.regFilter(message, commands.register)
 		if not ids then return end
 		
-		local msg = string.format(#ids == 1 and ("Registered new lobby:") or ("Registered %d new lobbies:"), #ids).."\n"
+		local msg = string.format(#ids == 1 and locale[guilds[message.guild.id].locale].registeredOne or locale[guilds[message.guild.id].locale].registeredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..string.format(channel.category and locale[guilds[message.guild.id].locale].channelIDNameCategory or locale[guilds[message.guild.id].locale].channelIDName, channel.id, channel.name, channel.category.name).."\n"
 			lobbies:add(channelID)
 		end
 		message:reply(msg)
@@ -234,10 +312,10 @@ actions = {
 		local ids = actions.regFilter(message, commands.unregister)
 		if not ids then return end
 		
-		local msg = string.format(#ids == 1 and ("Unregistered new lobby:") or ("Unregistered %d new lobbies:"), #ids).."\n"
+		local msg = string.format(#ids == 1 and locale[guilds[message.guild.id].locale].unregisteredOne or locale[guilds[message.guild.id].locale].unregisteredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..string.format(channel.category and locale[guilds[message.guild.id].locale].channelIDNameCategory or locale[guilds[message.guild.id].locale].channelIDName, channel.id, channel.name, channel.category.name).."\n"
 			lobbies:remove(channelID)
 		end
 		message:reply(msg)
@@ -245,16 +323,12 @@ actions = {
 	end,
 	
 	[commands.id] = function (message, target)
-		if not message.member:hasPermission(permission.manageChannels) then
-			logger:log(4, "Mention in vain")
-			message:reply(message.author.mentionString.. ', you need to have "Manage Channels" permission to do this')
-			return
-		end
-	
-		logger:log(4, "ID action invoked")
-		local msg = target and ("There are several channels with this name".."\n") or ""
-		target = target or message.content:match(commands.id.."%s+(.-)$")
+		if not actions.permCheck(message) then return end
 		
+		logger:log(4, "ID action invoked")
+		local msg = target and (locale[guilds[message.guild.id].locale].ambiguousID.."\n") or ""
+		target = target or message.content:match(commands.id.."%s+(.-)$")
+
 		local channels = message.guild.voiceChannels:toArray()
 		table.sort(channels, function (a, b)
 			return (not a.category and b.category) or
@@ -263,23 +337,68 @@ actions = {
 			end)
 		
 		for _, channel in ipairs(channels) do
-			if target and (channel.name:lower() == target or (channel.category and channel.name:lower() == target)) or not target then
-				msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
+			if target and (channel.name:lower() == target or (channel.category and channel.category.name:lower() == target)) or not target then
+				msg = msg..string.format(channel.category and locale[guilds[message.guild.id].locale].channelIDNameCategory or locale[guilds[message.guild.id].locale].channelIDName, channel.id, channel.name, channel.category.name).."\n"
 			end
 		end
 		
-		if #msg > 2000 then	-- nice
-			msg = msg:sub(1,1949).."\n".."Can't display more than that!"
+		if #msg > 2000 then
+			msg = msg:sub(1,1949).."\n"..locale[guilds[message.guild.id].locale].bigMessage
 		end
+		
 		message:reply(msg)
+	end,
+	
+	[commands.language] = function (message)
+		if not actions.permCheck(message) then return end
+		logger:log(4, "Language action invoked")
+		
+		local lang = message.content:match(commands.language.."%s+(.-)$"):lower()
+		
+		for name, subLocale in pairs(locale) do
+			if locale[lang] then break end
+			for _, langName in pairs(subLocale.names) do
+				if langName:lower() == lang:lower() then
+					lang = name
+					break
+				end
+			end
+		end
+		
+		if locale[lang] then
+			guilds:updateLocale(message.guild.id, lang)
+			message:reply(locale[guilds[message.guild.id].locale].updatedLocale)
+		else
+			logger:log(4, "No language '"..lang.."' found")
+			local msg = locale[guilds[message.guild.id].locale].availableLanguages
+			for _, lang in pairs(locale) do
+				msg = msg.." "..lang.names[guilds[message.guild.id].locale]..","
+			end
+			msg = msg:sub(1,-2)
+			message:reply(msg)
+		end
+	end,
+	
+	[commands.prefix] = function (message)
+		if not actions.permCheck(message) then return end
+		logger:log(4, "Prefix action invoked")
+		
+		local prefix = message.content:match(commands.prefix.."%s+(.-)$")
+		
+		if prefix then
+			guilds:updatePrefix(message.guild.id, prefix)
+			message:reply(string.format(locale[guilds[message.guild.id].locale].prefixConfirm, prefix))
+		else
+			message:reply(string.format(guilds[message.guild.id].prefix and locale[guilds[message.guild.id].locale].prefixThis or locale[guilds[message.guild.id].locale].prefixAbsent, guilds[message.guild.id].prefix))
+		end
 	end,
 	
 	[commands.list] = function (message)
 		logger:log(4, "List action invoked")
 		local lobbies = message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] end)
-		local msg = (#lobbies == 0 and "No lobbies registered yet!" or "Registered lobbies on this server:") .. "\n"
+		local msg = (#lobbies == 0 and locale[guilds[message.guild.id].locale].noLobbies or locale[guilds[message.guild.id].locale].someLobbies) .. "\n"
 		for _,channel in ipairs(lobbies) do
-			msg = msg..string.format(channel.category and "`%s` -> `%s` in `%s`" or "`%s` -> `%s`", channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..string.format(channel.category and locale[guilds[message.guild.id].locale].channelIDNameCategory or locale[guilds[message.guild.id].locale].channelIDName, channel.id, channel.name, channel.category.name).."\n"
 		end
 		message:reply(msg)
 	end,
@@ -306,16 +425,16 @@ actions = {
 		t = math.modf((os.clock() - t)*1000)
 		logger:log(4, "Stats action invoked")
 		message:reply(string.format(
-			(#client.guilds == 1 and stats.lobbies == 1) and "I'm currently on **`%d`** server serving **`%d`** lobby" or (
-			#client.guilds == 1 and "I'm currently on **`%d`** server serving **`%d`** lobbies" or (
-			stats.lobbies == 1 and "I'm currently on **`%d`** servers serving **`%d`** lobby" or 
-			"I'm currently on **`%d`** servers serving **`%d`** lobbies")), #client.guilds, stats.lobbies) .. "\n" ..
+			(#client.guilds == 1 and stats.lobbies == 1) and locale[guilds[message.guild.id].locale].serverLobby or (
+			#client.guilds == 1 and locale[guilds[message.guild.id].locale].serverLobbies or (
+			stats.lobbies == 1 and locale[guilds[message.guild.id].locale].serversLobby or 
+			locale[guilds[message.guild.id].locale].serversLobbies)), #client.guilds, stats.lobbies) .. "\n" ..
 		string.format(
-			(stats.channels == 1 and stats.people == 1) and "There is **`%d`** new channel with **`%d`** person" or (
-			stats.channels == 1 and "There is **`%d`** new channel with **`%d`** people" or (
-			stats.people == 1 and "There are **`%d`** new channels with **`%d`** person" or -- practically impossible, but whatever
-			"There are **`%d`** new channels with **`%d`** people")), stats.channels, stats.people) .. "\n" ..
-		string.format("Ping is **`%d ms`**", t))
+			(stats.channels == 1 and stats.people == 1) and locale[guilds[message.guild.id].locale].channelPerson or (
+			stats.channels == 1 and locale[guilds[message.guild.id].locale].channelPeople or (
+			stats.people == 1 and locale[guilds[message.guild.id].locale].channelsPerson or -- practically impossible, but whatever
+			locale[guilds[message.guild.id].locale].channelsPeople)), stats.channels, stats.people) .. "\n" ..
+		string.format(locale[guilds[message.guild.id].locale].ping, t))
 	end,
 	
 	[commands.support] = function (message)
@@ -326,17 +445,19 @@ actions = {
 
 client:on(safeEvent('messageCreate', function (message)
 	if message.channel.type ~= channelType.text and not message.author.bot then
-		message:reply("This bot can only be used in servers. Mention the bot within the server to get the help message.")
+		message:reply(locale[guilds[message.guild.id].locale].badChannel)
 		return
 	end
 	
-	if not message.mentionedUsers:find(function(user) return user == client.user end) or message.author.bot then
+	if message.author.bot or (
+		not message.mentionedUsers:find(function(user) return user == client.user end) and 
+		not (guilds[message.guild.id].prefix and message.content:find(guilds[message.guild.id].prefix))) then
 		return
 	end
 	
 	logger:log(4, "Message received, processing...")
 	if not message.guild.me:getPermissions(message.channel):has(permission.manageChannels, permission.moveMembers) then
-		message:reply('This bot needs "Manage Channels" and "Move Members" permissions to function!')
+		message:reply(locale[guilds[message.guild.id].locale].badPermissions)
 	end
 	
 	local command = message.content:match("%s(%a+)")
@@ -344,23 +465,24 @@ client:on(safeEvent('messageCreate', function (message)
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, "..msg)
-		message:reply(message.author.id ~= "188731184501620736"
-			and (string.format("Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s", os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
-			or "You done goofed")
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
+		message:reply(message.author.id ~= "188731184501620736"
+			and (string.format(locale[guilds[message.guild.id].locale].error, os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
+			or "You done goofed")
 	end
 end))
 
 client:on(safeEvent('guildCreate', function (guild)
-	logger:log(4, "%s", "Guild "..guild.id.." added")
+	guilds:add(guild.id)
 	client:getChannel("676432067566895111"):send(guild.name.." added me!\n")
 end))
 
 client:on(safeEvent('guildDelete', function (guild)
+	guilds:remove(guild.id)
 	for _,channel in pairs(guild.voiceChannels) do 
 		if channels[channel.id] then channels:remove(channel.id) end 
+		if lobbies[channel.id] then lobbies:remove(channel.id) end
 	end
-	logger:log(4, "%s", "Guild "..guild.id.." removed")
 	client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
 end))
 
@@ -397,6 +519,7 @@ client:on(safeEvent('channelDelete', function (channel)
 end))
 
 client:on(safeEvent('ready', function()
+	guilds:load()
 	lobbies:load()
 	channels:load()
 	clock:start()
