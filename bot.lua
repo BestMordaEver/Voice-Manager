@@ -354,14 +354,15 @@ actions = {
 		logger:log(4, "Language action invoked")
 		
 		local lang = message.content:match(commands.language.."%s+(.-)$")
-		if lang then lang = lang:lower() end
-		
-		for name, subLocale in pairs(locale) do
-			if locale[lang] then break end
-			for _, langName in pairs(subLocale.names) do
-				if langName:lower() == lang:lower() then
-					lang = name
-					break
+		if lang then 
+			lang = lang:lower()
+			for name, subLocale in pairs(locale) do
+				if locale[lang] then break end
+				for _, langName in pairs(subLocale.names) do
+					if langName:lower() == lang:lower() then
+						lang = name
+						break
+					end
 				end
 			end
 		end
