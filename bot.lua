@@ -10,8 +10,6 @@ local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
-local stats = {lobbies = 0, channels = 0, people = 0}
-
 local function safeEvent (name, fn)
 	return name, function (...)
 		local success, err = pcall(fn, ...)
@@ -28,7 +26,6 @@ channels = setmetatable({}, {
 		add = function (self, channelID)
 			if not self[channelID] then
 				self[channelID] = true
-				stats.channels = stats.channels + 1
 				logger:log(4, "MEMORY: Added channel "..channelID)
 			end
 			if not conn:exec("SELECT * FROM channels WHERE id = "..channelID) then
@@ -40,7 +37,6 @@ channels = setmetatable({}, {
 		remove = function (self, channelID)
 			if self[channelID] then
 				self[channelID] = nil
-				stats.channels = stats.channels - 1
 				logger:log(4, "MEMORY: Deleted channel "..channelID)
 			end
 			if conn:exec("SELECT * FROM channels WHERE id = "..channelID) then
@@ -57,14 +53,20 @@ channels = setmetatable({}, {
 					local channel = client:getChannel(channelID)
 					if channel then
 						self:add(channelID)
-						stats.people = stats.people + #channel.connectedMembers
 					else
-						stats.channels = stats.channels + 1 -- remove decrements this, but it wasn't counted in yet
 						self:remove(channelID)
 					end
 				end
 			end
 			logger:log(4, "Loaded!")
+		end,
+		
+		people = function (self)
+			local p = 0
+			for channelID, _ in pairs(self) do
+				p = p + #client:getChannel(channelID).connectedMembers
+			end
+			return p
 		end
 	},
 	__len = function (self)
@@ -81,7 +83,6 @@ lobbies = setmetatable({}, {
 			
 			if not self[lobbyID] then 
 				self[lobbyID] = true
-				stats.lobbies = stats.lobbies + 1
 				logger:log(4, "MEMORY: Added lobby "..lobbyID)
 			end
 			if not conn:exec("SELECT * FROM lobbies WHERE id = "..lobbyID) then
@@ -93,7 +94,6 @@ lobbies = setmetatable({}, {
 		remove = function (self, lobbyID)
 			if self[lobbyID] then
 				self[lobbyID] = nil
-				stats.lobbies = stats.lobbies - 1
 				logger:log(4, "MEMORY: Deleted lobby "..lobbyID)
 			end
 			if conn:exec("SELECT * FROM lobbies WHERE id = "..lobbyID) then
@@ -110,7 +110,6 @@ lobbies = setmetatable({}, {
 					if client:getChannel(lobbyID) then 
 						self:add(lobbyID)
 					else
-						stats.lobbies = stats.lobbies + 1 -- remove decrements this, but it wasn't counted in yet
 						self:remove(lobbyID)
 					end
 				end
@@ -141,7 +140,6 @@ guilds = setmetatable({}, {
 		remove = function (self, guildID)
 			if self[guildID] then
 				self[guildID] = nil
-				stats.lobbies = stats.lobbies - 1
 				logger:log(4, "MEMORY: Deleted guild "..guildID)
 			end
 			if conn:exec("SELECT * FROM guilds WHERE id = "..guildID) then
@@ -353,7 +351,7 @@ actions = {
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Language action invoked")
 		
-		local lang = message.content:match(commands.language.."%s+(.-)$"):lower() or ""
+		local lang = (message.content:match(commands.language.."%s+(.-)$") or ""):lower()
 				
 		for name, subLocale in pairs(locale) do
 			if locale[lang] then break end
@@ -425,15 +423,15 @@ actions = {
 		t = math.modf((os.clock() - t)*1000)
 		logger:log(4, "Stats action invoked")
 		message:reply(string.format(
-			(#client.guilds == 1 and stats.lobbies == 1) and locale[guilds[message.guild.id].locale].serverLobby or (
+			(#client.guilds == 1 and #lobbies == 1) and locale[guilds[message.guild.id].locale].serverLobby or (
 			#client.guilds == 1 and locale[guilds[message.guild.id].locale].serverLobbies or (
-			stats.lobbies == 1 and locale[guilds[message.guild.id].locale].serversLobby or 
-			locale[guilds[message.guild.id].locale].serversLobbies)), #client.guilds, stats.lobbies) .. "\n" ..
+			#lobbies == 1 and locale[guilds[message.guild.id].locale].serversLobby or 
+			locale[guilds[message.guild.id].locale].serversLobbies)), #client.guilds, #lobbies) .. "\n" ..
 		string.format(
-			(stats.channels == 1 and stats.people == 1) and locale[guilds[message.guild.id].locale].channelPerson or (
-			stats.channels == 1 and locale[guilds[message.guild.id].locale].channelPeople or (
-			stats.people == 1 and locale[guilds[message.guild.id].locale].channelsPerson or -- practically impossible, but whatever
-			locale[guilds[message.guild.id].locale].channelsPeople)), stats.channels, stats.people) .. "\n" ..
+			(#channels == 1 and channels:people() == 1) and locale[guilds[message.guild.id].locale].channelPerson or (
+			#channels == 1 and locale[guilds[message.guild.id].locale].channelPeople or (
+			channels:people() == 1 and locale[guilds[message.guild.id].locale].channelsPerson or -- practically impossible, but whatever
+			locale[guilds[message.guild.id].locale].channelsPeople)), #channels, channels:people()) .. "\n" ..
 		string.format(locale[guilds[message.guild.id].locale].ping, t))
 	end,
 	
@@ -488,7 +486,6 @@ end))
 
 client:on(safeEvent('voiceChannelJoin', function (member, channel)
 	if lobbies[channel.id] then
-		stats.people = stats.people + 1
 		logger:log(4, member.user.id.." joined lobby "..channel.id)
 		local category = channel.category or channel.guild
 		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s channel")
@@ -505,7 +502,6 @@ end))
 client:on(safeEvent('voiceChannelLeave', function (member, channel)
 	if not channel then return end	-- until this is fixed
 	if channels[channel.id] then
-		stats.people = stats.people - 1
 		if #channel.connectedMembers == 0 then
 			channel:delete()
 			logger:log(4, "Deleted "..channel.id)
@@ -530,20 +526,16 @@ clock:on(safeEvent('min', function()
 	client:getChannel("676791988518912020"):getLastMessage():delete()
 	client:getChannel("676791988518912020"):send("beep boop beep")
 	
-	stats.people, stats.channels = 0, 0
 	for channelID,_ in pairs(channels) do
 		local channel = client:getChannel(channelID)
 		if channel then
-			if #channel.connectedMembers ~= 0 then
-				stats.channels = stats.channels + 1
-				stats.people = stats.people + #channel.connectedMembers
-			else
+			if #channel.connectedMembers == 0 then
 				channel:delete()
 			end
 		end
 	end
 	
-	client:setGame({name = stats.people == 0 and "the sound of silence" or (stats.people..(stats.people == 1 and " person" or " people").." on "..stats.channels..(stats.channels == 1 and " channel" or " channels")), type = 2})
+	client:setGame({name = channels:people() == 0 and "the sound of silence" or (channels:people()..(channels:people() == 1 and " person" or " people").." on "..#channels..(#channels == 1 and " channel" or " channels")), type = 2})
 	
 	for name, guild in pairs(statservers) do
 		client:emit("sendStats", name, guild)
