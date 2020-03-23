@@ -23,11 +23,7 @@ commentary ends here]]
 
 return {
 	english = {
-		names = {
-			english = "English",		-- name of your language in english, for example German or French
-			russian = "Английский",		-- name of your language in your language
-			"английский"				-- same, but lowercase
-		},
+		availableLanguages = "I can speak those languages:",	-- add yours here
 		helpText = 
 [[Ping me to get help message
 Write commands after the mention, for example - `@Voice Manager register 123456789123456780`
@@ -55,7 +51,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		noLobbies = "No lobbies registered yet!",
 		someLobbies = "Registered lobbies on this server:",
 		updatedLocale = "Language updated to English",		-- should be your corresponding language
-		availableLanguages = "I can speak those languages:",
 		prefixConfirm = "Prefix is **`%s`** now",
 		prefixThis = "My prefix is **`%s`** or you can mention me",
 		prefixAbsent = "There is no active prefix, but you can always mention me",
@@ -79,11 +74,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 	},
 	
 	russian = {
-		names = {
-			english = "Russian",
-			russian = "Русский",
-			"русский"
-		},
 		helpText = 
 [[Упомяните меня, чтобы получить сообщение со списком команд
 Пишите команды после упоминания, например - `@Voice Manager register 123456789123456780`
@@ -109,7 +99,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		noLobbies = "Тут не зарегистрировано еще ни одного лобби!",
 		someLobbies = "Зарегистрированные лобби этого сервера:",
 		updatedLocale = "Текущий язык - русский",
-		availableLanguages = "Я знаю такие языки:",
 		prefixConfirm = "Установлен префикс **`%s`**",
 		prefixThis = "Мой префикс **`%s`**, также меня можно упомянуть",
 		prefixAbsent = "Активный префикс отсутствует, но меня всегда можно упомянуть",
