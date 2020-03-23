@@ -13,6 +13,8 @@ List of available commands:
 - register \[voice_chat_id OR voice_chat_name\] - registers a voice chat that will be used as a lobby
 - unregister \[voice_chat_id OR voice_chat_name\] - unregisters an existing lobby
 - id \[voice_chat_name OR category_name\] - use this to learn ids of voice channels by name or category
+- prefix \[new_prefix\] - set a new prefix. Mentioning will still work
+- language \[new_language\] - change language
 - list - lists all registered lobbies and how many new channels exist
 - stats - take a sneak peek on bot's performance!
 - support - sends an invite to support Discord server

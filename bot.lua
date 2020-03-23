@@ -530,7 +530,9 @@ clock:on(safeEvent('min', function()
 	end
 	
 	client:setGame({name = channels:people() == 0 and "the sound of silence" or (channels:people()..(channels:people() == 1 and " person" or " people").." on "..#channels..(#channels == 1 and " channel" or " channels")), type = 2})
-	
+end))
+
+clock:on(safeEvent('hour', function()
 	for name, guild in pairs(statservers) do
 		client:emit("sendStats", name, guild)
 	end
