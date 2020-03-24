@@ -24,6 +24,12 @@ local function safeEvent (name, fn)
 	end
 end
 
+local function truePositionSorting (a, b)
+	return (not a.category and b.category) or
+		(a.category and b.category and a.category.position < b.category.position) or
+		(a.category == b.category and a.position < b.position)
+end
+
 local channels, lobbies, servers
 channels = setmetatable({}, {
 	__index = {
@@ -176,18 +182,28 @@ guilds = setmetatable({}, {
 		end,
 		
 		updateLocale = function (self, guildID, localeName)
-			if locale then
-				self[guildID].locale = locale[localeName]
-				conn:exec("UPDATE guilds SET locale = '"..localeName.."' WHERE id = "..guildID)
-				logger:log(4, "Updated locale for "..guildID)
+			if localeName then
+				if self[guildID].locale ~= locale[localeName] then
+					self[guildID].locale = locale[localeName]
+					logger:log(4, "MEMORY: Updated locale for "..guildID)
+				end
+				if not conn:exec("SELECT guilds WHERE locale = '"..localeName.."', id = "..guildID) then
+					conn:exec("UPDATE guilds SET locale = '"..localeName.."' WHERE id = "..guildID)
+					logger:log(4, "DATABASE: Updated locale for "..guildID)
+				end
 			end
 		end,
 		
 		updatePrefix = function (self, guildID, prefix)
 			if prefix then
-				self[guildID].prefix = prefix
-				conn:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"):bind(prefix, guildID):step()
-				logger:log(4, "Updated prefix for "..guildID)
+				if self[guildID].prefix ~= prefix then
+					self[guildID].prefix = prefix
+					logger:log(4, "MEMORY: Updated prefix for "..guildID)
+				end
+				if not conn:prepare("SELECT guilds WHERE prefix = ?, id = ?"):bind(prefix, guildID):step() then
+					conn:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"):bind(prefix, guildID):step()	-- don't even think about it
+					logger:log(4, "DATABASE: Updated prefix for "..guildID)
+				end
 			end
 		end
 	}
@@ -326,22 +342,18 @@ actions = {
 	
 	[commands.id] = function (message, target)
 		if not actions.permCheck(message) then return end
-		
 		logger:log(4, "ID action invoked")
+		
 		local msg = target and (guilds[message.guild.id].locale.ambiguousID.."\n") or ""
 		target = target or match(message.content, commands.id.."%s+(.-)$")
 
-		local channels = message.guild.voiceChannels:toArray()
-		sort(channels, function (a, b)
-			return (not a.category and b.category) or
-				(a.category and b.category and a.category.position < b.category.position) or
-				(a.category == b.category and a.position < b.position)
-			end)
+		local channels = message.guild.voiceChannels:toArray(function (channel) 
+			return target and (lower(channel.name) == target or (channel.category and channel.category.name:lower() == target)) or not target
+		end)
+		sort(channels, truePositionSorting)
 		
 		for _, channel in ipairs(channels) do
-			if target and (lower(channel.name) == target or (channel.category and channel.category.name:lower() == target)) or not target then
-				msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
-			end
+			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
 		end
 		
 		if #msg > 2000 then
@@ -387,11 +399,15 @@ actions = {
 	
 	[commands.list] = function (message)
 		logger:log(4, "List action invoked")
-		local lobbies = message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] end)
+		
+		local lobbies = message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
+		sort(lobbies, truePositionSorting)
+		
 		local msg = (#lobbies == 0 and guilds[message.guild.id].locale.noLobbies or guilds[message.guild.id].locale.someLobbies) .. "\n"
 		for _,channel in ipairs(lobbies) do
 			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
 		end
+		
 		message:reply(msg)
 	end,
 	
@@ -483,7 +499,8 @@ client:on(safeEvent('voiceChannelJoin', function (member, channel)
 		logger:log(4, member.user.id.." joined lobby "..channel.id)
 		local category = channel.category or channel.guild
 		local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s channel")
-		member:setVoiceChannel(newChannel.id)
+		assert(newChannel, "Failed to create new channel for lobby "..channel.id)
+		assert(member:setVoiceChannel(newChannel.id), "Failed to move "..member.user.id.." from "..channel.id.." to "..newChannel.id)
 		logger:log(4, "Created "..newChannel.id)
 		channels:add(newChannel.id)
 		newChannel:setUserLimit(channel.userLimit)
@@ -497,7 +514,7 @@ client:on(safeEvent('voiceChannelLeave', function (member, channel)
 	if not channel then return end	-- until this is fixed
 	if channels[channel.id] then
 		if #channel.connectedMembers == 0 then
-			channel:delete()
+			assert(channel:delete(), "Failed to delete channel "..channel.id)
 			logger:log(4, "Deleted "..channel.id)
 		end
 	end
@@ -517,8 +534,7 @@ client:on(safeEvent('ready', function()
 end))
 
 clock:on(safeEvent('min', function()
-	client:getChannel("676791988518912020"):getLastMessage():delete()
-	client:getChannel("676791988518912020"):send("beep boop beep")
+	client:getChannel("676791988518912020"):getLastMessage():setContent(os.date())
 	
 	for channelID,_ in pairs(channels) do
 		local channel = client:getChannel(channelID)
