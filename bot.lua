@@ -187,7 +187,7 @@ guilds = setmetatable({}, {
 					self[guildID].locale = locale[localeName]
 					logger:log(4, "MEMORY: Updated locale for "..guildID)
 				end
-				if not conn:exec("SELECT guilds WHERE locale = '"..localeName.."', id = "..guildID) then
+				if not conn:exec("SELECT * FROM guilds WHERE locale = '"..localeName.."' AND id = "..guildID) then
 					conn:exec("UPDATE guilds SET locale = '"..localeName.."' WHERE id = "..guildID)
 					logger:log(4, "DATABASE: Updated locale for "..guildID)
 				end
@@ -200,7 +200,7 @@ guilds = setmetatable({}, {
 					self[guildID].prefix = prefix
 					logger:log(4, "MEMORY: Updated prefix for "..guildID)
 				end
-				if not conn:prepare("SELECT guilds WHERE prefix = ?, id = ?"):bind(prefix, guildID):step() then
+				if not conn:prepare("SELECT * FROM guilds WHERE prefix = ? AND id = ?"):bind(prefix, guildID):step() then
 					conn:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"):bind(prefix, guildID):step()	-- don't even think about it
 					logger:log(4, "DATABASE: Updated prefix for "..guildID)
 				end
