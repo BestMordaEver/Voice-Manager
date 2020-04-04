@@ -452,8 +452,8 @@ actions = {
 }
 
 client:on(safeEvent('messageCreate', function (message)
-	if message.channel.type ~= channelType.text and not message.author.bot then
-		message:reply(guilds[message.guild.id].locale.badChannel)
+	if message.channel.type ~= channelType.text and not message.author.bot then	-- sent to pm, no guild
+		message:reply("I can only be used in servers. Mention me within the server to get the help message.")
 		return
 	end
 	
