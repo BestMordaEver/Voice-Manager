@@ -319,7 +319,7 @@ actions = {
 		local msg = format(#ids == 1 and guilds[message.guild.id].locale.registeredOne or guilds[message.guild.id].locale.registeredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:add(channelID)
 		end
 		message:reply(msg)
@@ -333,7 +333,7 @@ actions = {
 		local msg = format(#ids == 1 and guilds[message.guild.id].locale.unregisteredOne or guilds[message.guild.id].locale.unregisteredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:remove(channelID)
 		end
 		message:reply(msg)
