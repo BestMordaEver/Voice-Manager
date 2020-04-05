@@ -21,7 +21,7 @@ don't change the names of variables
 
 commentary ends here]]
 
-return {
+local locale = {
 	english = {
 		availableLanguages = "I can speak those languages:",	-- add yours here
 		helpText = 
@@ -118,3 +118,13 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		error = "Что-то пошло не так. *Пввостите...*. Не могли бы вы зарепортить это на сервеве тех-поддержки? Время происшествия - %s"
 	}
 }
+
+-- Don't go here, it's dangerous
+
+for localeName, localeTable in pairs(locale) do
+	for lineName,_ in pairs(locale.english) do
+		assert(localeTable[lineName], lineName.." in "..localeName.." isn't present")
+	end
+end
+
+return locale
