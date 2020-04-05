@@ -10,9 +10,6 @@ local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
-local format, gmatch, match, lower, sub = string.format, string.gmatch, string.match, string.lower, string.sub
-local insert, concat, sort = table.insert, table.concat, table.sort
-local setmetatable, pcall, pairs, ipairs = setmetatable, pcall, pairs, ipairs
 
 local function safeEvent (name, fn)
 	return name, function (...)
@@ -69,6 +66,17 @@ channels = setmetatable({}, {
 				end
 			end
 			logger:log(4, "Loaded!")
+		end,
+		
+		cleanup = function (self)
+			for channelID,_ in pairs(self) do
+				local channel = client:getChannel(channelID)
+				if channel then
+					if #channel.connectedMembers == 0 then
+						channel:delete()
+					end
+				end
+			end
 		end,
 		
 		people = function (self)
@@ -259,7 +267,7 @@ actions = {
 	permCheck = function (message)
 		if not message.member:hasPermission(permission.manageChannels) then
 			logger:log(4, "Mention in vain")
-			message:reply(format(guilds[message.guild.id].locale.mentionInVain, message.author.mentionString))
+			message:reply(guilds[message.guild.id].locale.mentionInVain:format(message.author.mentionString))
 			return false
 		end
 		
@@ -270,7 +278,7 @@ actions = {
 		if not actions.permCheck(message) then return end
 		
 		logger:log(4, command.." action invoked")
-		local id = match(message.content, command.."%s+(.-)$")
+		local id = message.content:match(command.."%s+(.-)$")
 		if not id then
 			logger:log(4, "Empty input")
 			message:reply(guilds[message.guild.id].locale.emptyInput)
@@ -278,17 +286,17 @@ actions = {
 		end
 		
 		local ids = {}
-		for ID in gmatch(id, "%d+") do
+		for ID in id:gmatch("%d+") do
 			local channel = client:getChannel(ID)
 			if channel and channel.type == channelType.voice and channel.guild == message.guild then
-				insert(ids, ID)
+				table.insert(ids, ID)
 			end
 		end
 		
 		if #ids == 0 then
-			id = lower(id)
-			local channels = message.guild.voiceChannels:toArray("position", function (channel) 
-				return lower(channel.name) == id and (command == commands.unregister and lobbies[channel.id] or command ~= commands.unregister)
+			id = id:lower()
+			local channels = message.guild.voiceChannels:toArray(function (channel) 
+				return channel.name:lower() == id and (command == commands.unregister and lobbies[channel.id] or command ~= commands.unregister)
 			end)
 			if #channels == 0 then
 				logger:log(4, "Bad "..command.." input")
@@ -316,48 +324,49 @@ actions = {
 		local ids = actions.regFilter(message, commands.register)
 		if not ids then return end
 		
-		local msg = format(#ids == 1 and guilds[message.guild.id].locale.registeredOne or guilds[message.guild.id].locale.registeredMany, #ids).."\n"
+		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.registeredOne or guilds[message.guild.id].locale.registeredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
+			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:add(channelID)
 		end
 		message:reply(msg)
-		logger:log(4, "Registered "..concat(ids, " ").." successfully")
+		logger:log(4, "Registered "..table.concat(ids, " ").." successfully")
 	end,
 
 	[commands.unregister] = function (message)
 		local ids = actions.regFilter(message, commands.unregister)
 		if not ids then return end
 		
-		local msg = format(#ids == 1 and guilds[message.guild.id].locale.unregisteredOne or guilds[message.guild.id].locale.unregisteredMany, #ids).."\n"
+		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.unregisteredOne or guilds[message.guild.id].locale.unregisteredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
+			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:remove(channelID)
 		end
 		message:reply(msg)
-		logger:log(4, "Unregistered "..concat(ids, " ").." successfully")
+		logger:log(4, "Unregistered "..table.concat(ids, " ").." successfully")
 	end,
 	
 	[commands.id] = function (message, target)
 		if not actions.permCheck(message) then return end
+		
 		logger:log(4, "ID action invoked")
 		
 		local msg = target and (guilds[message.guild.id].locale.ambiguousID.."\n") or ""
-		target = target or match(message.content, commands.id.."%s+(.-)$")
+		target = target or message.content:match(commands.id.."%s+(.-)$")
 
 		local channels = message.guild.voiceChannels:toArray(function (channel) 
-			return target and (lower(channel.name) == target or (channel.category and channel.category.name:lower() == target)) or not target
+			return target and (channel.name:lower() == target or (channel.category and channel.category.name:lower() == target)) or not target
 		end)
-		sort(channels, truePositionSorting)
+		table.sort(channels, truePositionSorting)
 		
 		for _, channel in ipairs(channels) do
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 		end
 		
 		if #msg > 2000 then
-			msg = sub(msg, 1,1949).."\n"..guilds[message.guild.id].locale.bigMessage
+			msg = msg:sub(1,1949).."\n"..guilds[message.guild.id].locale.bigMessage
 		end
 		
 		message:reply(msg)
@@ -367,7 +376,7 @@ actions = {
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Language action invoked")
 		
-		local lang = lower(match(message.content, commands.language.."%s+(.-)$") or "")
+		local lang = (message.content:match(commands.language.."%s+(.-)$") or ""):lower()
 		
 		if locale[lang] then
 			guilds:updateLocale(message.guild.id, lang)
@@ -378,7 +387,7 @@ actions = {
 			for langName, _ in pairs(locale) do
 				msg = msg.." "..langName..","
 			end
-			msg = sub(msg, 1,-2)
+			msg = msg:sub(1,-2)
 			message:reply(msg)
 		end
 	end,
@@ -387,13 +396,13 @@ actions = {
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Prefix action invoked")
 		
-		local prefix = match(message.content, commands.prefix.."%s+(.-)$")
+		local prefix = message.content:match(commands.prefix.."%s+(.-)$")
 		
 		if prefix then
 			guilds:updatePrefix(message.guild.id, prefix)
-			message:reply(format(guilds[message.guild.id].locale.prefixConfirm, prefix))
+			message:reply(guilds[message.guild.id].locale.prefixConfirm:format(prefix))
 		else
-			message:reply(format(guilds[message.guild.id].prefix and guilds[message.guild.id].locale.prefixThis or guilds[message.guild.id].locale.prefixAbsent, guilds[message.guild.id].prefix))
+			message:reply(string.format(guilds[message.guild.id].prefix and guilds[message.guild.id].locale.prefixThis or guilds[message.guild.id].locale.prefixAbsent, guilds[message.guild.id].prefix))
 		end
 	end,
 	
@@ -401,11 +410,11 @@ actions = {
 		logger:log(4, "List action invoked")
 		
 		local lobbies = message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
-		sort(lobbies, truePositionSorting)
+		table.sort(lobbies, truePositionSorting)
 		
 		local msg = (#lobbies == 0 and guilds[message.guild.id].locale.noLobbies or guilds[message.guild.id].locale.someLobbies) .. "\n"
 		for _,channel in ipairs(lobbies) do
-			msg = msg..format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category.name).."\n"
+			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or guilds[message.guild.id].locale.channelIDName, channel.id, channel.name, channel.category and channel.category.name).."\n"
 		end
 		
 		message:reply(msg)
@@ -432,17 +441,19 @@ actions = {
 		message.channel:broadcastTyping()
 		t = math.modf((os.clock() - t)*1000)
 		logger:log(4, "Stats action invoked")
-		message:reply(format(
-			(#client.guilds == 1 and #lobbies == 1) and guilds[message.guild.id].locale.serverLobby or (
-			#client.guilds == 1 and guilds[message.guild.id].locale.serverLobbies or (
-			#lobbies == 1 and guilds[message.guild.id].locale.serversLobby or 
-			guilds[message.guild.id].locale.serversLobbies)), #client.guilds, #lobbies) .. "\n" ..
-		format(
-			(#channels == 1 and channels:people() == 1) and guilds[message.guild.id].locale.channelPerson or (
-			#channels == 1 and guilds[message.guild.id].locale.channelPeople or (
-			channels:people() == 1 and guilds[message.guild.id].locale.channelsPerson or -- practically impossible, but whatever
-			guilds[message.guild.id].locale.channelsPeople)), #channels, channels:people()) .. "\n" ..
-		format(guilds[message.guild.id].locale.ping, t))
+		
+		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds, #lobbies, #channels, channels:people()
+		message:reply(string.format(
+			(guildCount == 1 and lobbyCount == 1) and guilds[message.guild.id].locale.serverLobby or (
+			guildCount == 1 and guilds[message.guild.id].locale.serverLobbies or (
+			lobbyCount == 1 and guilds[message.guild.id].locale.serversLobby or 
+			guilds[message.guild.id].locale.serversLobbies)), guildCount, lobbyCount) .. "\n" ..
+		string.format(
+			(channelCount == 1 and peopleCount == 1) and guilds[message.guild.id].locale.channelPerson or (
+			channelCount == 1 and guilds[message.guild.id].locale.channelPeople or (
+			peopleCount == 1 and guilds[message.guild.id].locale.channelsPerson or -- practically impossible, but whatever
+			guilds[message.guild.id].locale.channelsPeople)), channelCount, peopleCount) .. "\n" ..
+		string.format(guilds[message.guild.id].locale.ping, t))
 	end,
 	
 	[commands.support] = function (message)
@@ -468,14 +479,14 @@ client:on(safeEvent('messageCreate', function (message)
 		message:reply(guilds[message.guild.id].locale.badPermissions)
 	end
 	
-	local command = match(message.content, "%s(%a+)")
+	local command = message.content:match("%s(%a+)")
 	if not command then command = commands.help end
 	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, %s", msg)
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
 		message:reply(message.author.id ~= "188731184501620736"
-			and (format(guilds[message.guild.id].locale.error, os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
+			and (guilds[message.guild.id].locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
 			or "You done goofed")
 	end
 end))
@@ -534,17 +545,9 @@ client:on(safeEvent('ready', function()
 end))
 
 clock:on(safeEvent('min', function()
-	client:getChannel("676791988518912020"):getLastMessage():setContent(os.date())
-	
-	for channelID,_ in pairs(channels) do
-		local channel = client:getChannel(channelID)
-		if channel then
-			if #channel.connectedMembers == 0 then
-				channel:delete()
-			end
-		end
-	end
-	
+	client:getChannel("676791988518912020"):getMessage("692117540838703114"):setContent(os.date())
+	channels:cleanup()
+	embeds:tick()
 	client:setGame({name = channels:people() == 0 and "the sound of silence" or (channels:people()..(channels:people() == 1 and " person" or " people").." on "..#channels..(#channels == 1 and " channel" or " channels")), type = 2})
 end))
 

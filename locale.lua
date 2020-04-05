@@ -68,7 +68,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		channelsPeople = "There are **`%d`** new channels with **`%d`** people",
 		
 		ping = "Ping is **`%d ms`**",
-		badChannel = "I can only be used in servers. Mention me within the server to get the help message.",
 		badPermissions = 'I need "Manage Channels" and "Move Members" permissions to function!',
 		error = "Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s"		-- %s = date and time
 	},
@@ -115,7 +114,6 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		channelsPeople = "Сейчас есть **`%d`** новых каналов с **`%d`** людьми",
 		
 		ping = "Пинг **`%d мс`**",
-		badChannel = "Я работаю только на серверах. Упомяните меня на сервере, чтобы получить сообщение со списком команд",
 		badPermissions = 'Мне нужны права "Управлять каналами" и "Перемещать участников" чтобы работать!',
 		error = "Что-то пошло не так. *Пввостите...*. Не могли бы вы зарепортить это на сервеве тех-поддержки? Время происшествия - %s"
 	}
