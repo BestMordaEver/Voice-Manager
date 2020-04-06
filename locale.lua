@@ -73,6 +73,7 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 	},
 	
 	russian = {
+		availableLanguages = "Я разговариваю на таких языках:",
 		helpText = 
 [[Упомяните меня, чтобы получить сообщение со списком команд
 Пишите команды после упоминания, например - `@Voice Manager register 123456789123456780`
