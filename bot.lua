@@ -470,7 +470,7 @@ client:on(safeEvent('messageCreate', function (message)
 	
 	if message.author.bot or (
 		not message.mentionedUsers:find(function(user) return user == client.user end) and 
-		not (guilds[message.guild.id].prefix and message.content:find(guilds[message.guild.id].prefix))) then
+		not (guilds[message.guild.id].prefix and message.content:find(guilds[message.guild.id].prefix, 1, true))) then	-- allow % in prefixes
 		return
 	end
 	
