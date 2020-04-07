@@ -2,7 +2,7 @@
 
 Voice Manager is a simplistic bot, that allows your users to create new voice channels on demand!
 
-Assign a lobby and everybody entering this lobby will be placed in a newly created channel. Once everybody leaves this new channel - it gets deleted.
+Assign a lobby and everybody who enters this lobby will be placed in a newly created channel. Once everybody leaves this new channel - it gets deleted.
 
 The bot will keep new channels in the same category as the lobby and will enable same user limits as the lobby.
 
@@ -10,11 +10,10 @@ The bot will keep new channels in the same category as the lobby and will enable
 
 List of available commands:
 - help (or empty mention) - shows help message
-- register \[voice_chat_id OR voice_chat_name\] - registers a voice chat that will be used as a lobby
-- unregister \[voice_chat_id OR voice_chat_name\] - unregisters an existing lobby
-- id \[voice_chat_name OR category_name\] - use this to learn ids of voice channels by name or category
-- prefix \[new_prefix\] - set a new prefix. Mentioning will still work
-- language \[new_language\] - change language
+- register - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
+- unregister - unregisters an existing lobby. You can feed it channel IDs or channel name
+- prefix - set a new prefix. Mentioning will still work
+- language - change language
 - list - lists all registered lobbies and how many new channels exist
 - stats - take a sneak peek on bot's performance!
 - support - sends an invite to support Discord server
