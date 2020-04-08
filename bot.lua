@@ -220,93 +220,54 @@ guilds = setmetatable({}, {
 
 embeds = setmetatable({}, {
 	__index = {
-		reactions = {"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟", 
-			lobby = "🛃", channel = "🆕", none = "🆓",
-			left = "⬅", right = "➡", register = "✅", unregister = "❌", update = "🔄"},
+		reactions = {"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟",
+			["1️⃣"] = 1, ["2️⃣"] = 2, ["3️⃣"] = 3, ["4️⃣"] = 4, ["5️⃣"] = 5, ["6️⃣"] = 6, ["7️⃣"] = 7, ["8️⃣"] = 8, ["9️⃣"] = 9, ["🔟"] = 10,
+			left = "⬅", right = "➡"},
 		
 		new = function (self, locale, action, page, ids)
 			local reactions = self.reactions
-			local embed = {
-				title = action == "id" and locale.embedID or (
-					action == "register" and locale.embedRegister or locale.embedUnregister),
-				description = "",
-				footer = {text = action == "id" and "" or locale.embedFooter}
-			}
-			local clickable = {count = 0}
+			local embed = {title = action == "register" and locale.embedRegister or locale.embedUnregister, description = ""}
+			
 			for i=10*(page-1)+1,10*page do
 				if not ids[i] then break end
-				local id = ids[i]
-				local channel = client:getChannel(id)
-				
-				if (action == "unregister" and lobbies[id]) or (action == "register" and not channels[id] and not lobbies[id]) then
-					clickable.count = clickable.count + 1
-					clickable[reactions[clickable.count]] = id
-				end
-				
-				embed.description = embed.description.."\n"..(
-					channels[id] and reactions.channel or (
-					lobbies[id] and (action == "unregister" and reactions[clickable.count] or reactions.lobby) or (
-					action == "register" and reactions[clickable.count] or reactions.none)))
-					.." "
-					..(action == "id" and 
-						string.format(channel.category and locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name) or
-						string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name))
+				local channel = client:getChannel(ids[i])
+				embed.description = embed.description.."\n"..reactions[math.fmod(i-1,10)+1]..
+					string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name)
 			end
-			return embed, clickable
+			
+			return embed
 		end,
 		
-		decorate = function (self, message, action, clickableCount)
+		decorate = function (self, message)
 			local reactions = self.reactions
-			if self[message].page ~= 1 then message:addReaction(reactions.left) end
-			for i=1, clickableCount do
-				message:addReaction(reactions[i])
+			local embedData = self[message]
+			if embedData.page ~= 1 then message:addReaction(reactions.left) end
+			for i=10*(embedData.page-1)+1, 10*embedData.page do
+				if not embedData.ids[i] then break end
+				message:addReaction(reactions[math.fmod(i-1,10)+1])
 			end
-			if self[message].page ~= math.modf(#self[message].ids/10)+1 then message:addReaction(reactions.right) end
-			
-			if action ~= "register" then message:addReaction(reactions.register) end
-			if action ~= "unregister" then message:addReaction(reactions.unregister) end
-			if action ~= "id" then message:addReaction(reactions.update) end
+			if embedData.page ~= math.modf(#embedData.ids/10)+1 then message:addReaction(reactions.right) end
 		end,
 		
 		send = function (self, message, action, ids)
-			local embed, clickable = self:new(guilds[message.guild.id].locale, action, 1, ids)
-			local newMessage = message:reply {content = guilds[message.guild.id].locale.embedSigns, embed = embed}
-			self[newMessage] = {embed = embed, killIn = 10, ids = ids, clickable = clickable, page = 1, action = action}
-			self:decorate(newMessage, action, clickable.count)
+			local embed = self:new(guilds[message.guild.id].locale, action, 1, ids)
+			local newMessage = message:reply {embed = embed}
+			self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action}
+			self:decorate(newMessage)
 			
 			logger:log(4, "Created embed "..newMessage.id)
-		end,
-		
-		update = function (self, message)
-			local embedData = self[message]
-			embedData.embed, embedData.clickable = self:new(guilds[message.guild.id].locale, embedData.action, embedData.page, embedData.ids)
-			embedData.killIn = 10
-			
-			message:clearReactions()
-			message:setEmbed(embedData.embed)
-			self:decorate(message, embedData.action, embedData.clickable.count)
-		end,
-		
-		updateAction = function (self, message, action)
-			local embedData = self[message]
-			embedData.embed, embedData.clickable = self:new(guilds[message.guild.id].locale, action, embedData.page, embedData.ids)
-			embedData.killIn = 10
-			embedData.action = action
-			
-			message:clearReactions()
-			message:setEmbed(embedData.embed)
-			self:decorate(message, action, embedData.clickable.count)
+			return newMessage
 		end,
 		
 		updatePage = function (self, message, page)
 			local embedData = self[message]
-			embedData.embed, embedData.clickable = self:new(guilds[message.guild.id].locale, embedData.action, page, embedData.ids)
+			embedData.embed = self:new(guilds[message.guild.id].locale, embedData.action, page, embedData.ids)
 			embedData.killIn = 10
 			embedData.page = page
 			
 			message:clearReactions()
 			message:setEmbed(embedData.embed)
-			self:decorate(message, embedData.action, embedData.clickable.count)
+			self:decorate(message)
 		end,
 		
 		tick = function (self)
@@ -356,19 +317,6 @@ local statservers = {
 	}
 }
 
-local commands = {
-	help = "help",
-	register = "register",
-	unregister = "unregister",
-	list = "list",
-	shutdown = "shutdown",
-	stats = "stats",
-	support = "support",
-	id = "id",
-	language = "language",
-	prefix = "prefix"
-}
-
 local actions
 actions = {
 	permCheck = function (message)
@@ -388,8 +336,15 @@ actions = {
 		local id = message.content:match(command.."%s+(.-)$")
 		if not id then
 			logger:log(4, "Empty input")
+			if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+				message:reply(guilds[message.guild.id].locale.emptyInput)
+				return
+			end	
+			
 			local ids = {}
-			for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(), truePositionSorting)) do
+			for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel)
+				if lobbies[channel.id] then return command == "unregister" else return command == "register" end
+			end), truePositionSorting)) do
 				table.insert(ids, channel.id)
 			end
 			embeds:send(message, command, ids)
@@ -406,19 +361,26 @@ actions = {
 		
 		if #ids == 0 then
 			id = id:lower()
-			local channels = message.guild.voiceChannels:toArray(function (channel) 
-				return channel.name:lower() == id and (command == commands.unregister and lobbies[channel.id] or command ~= commands.unregister)
-			end)
-			if #channels == 0 then
+			for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) 
+				return channel.name:lower() == id and (command == "unregister" and lobbies[channel.id] or command ~= "unregister")
+			end), truePositionSorting)) do
+				table.insert(ids, channel.id)
+			end
+			
+			if #ids == 0 then
 				logger:log(4, "Bad "..command.." input")
 				message:reply(guilds[message.guild.id].locale.badInput)
 				return
-			elseif #channels == 1 then
-				ids[1] = channels[1].id
+			elseif #ids == 1 then
 				return ids
 			else
 				logger:log(4, "Ambiguous "..command.." input")
-				actions[commands.id](message, id)
+				if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+					message:reply(guilds[message.guild.id].locale.emptyInput)
+					return
+				end
+				
+				embeds:send(message, command, ids):setContent(guilds[message.guild.id].locale.ambiguousID)
 				return
 			end
 		else
@@ -426,20 +388,20 @@ actions = {
 		end
 	end,
 
-	[commands.help] = function (message)
+	help = function (message)
 		logger:log(4, "Help action invoked")
 		message:reply(guilds[message.guild.id].locale.helpText)
 	end,
 	
-	[commands.register] = function (message, id)
-		if id then -- sent by embed
-			lobbies:add(id)
-			logger:log(4, "Registered "..id.." successfully")
-			return
-		end
+	register = function (message, id)
+		local ids
 		
-		local ids = actions.regFilter(message, commands.register)
-		if not ids then return end
+		if id then -- sent by embed
+			ids = {id}
+		else
+			ids = actions.regFilter(message, "register")
+			if not ids then return end
+		end
 		
 		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.registeredOne or guilds[message.guild.id].locale.registeredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
@@ -447,19 +409,20 @@ actions = {
 			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:add(channelID)
 		end
+		
 		message:reply(msg)
 		logger:log(4, "Registered "..table.concat(ids, " ").." successfully")
 	end,
 
-	[commands.unregister] = function (message, id)
+	unregister = function (message, id)
+		local ids
+		
 		if id then -- sent by embed
-			lobbies:remove(id)
-			logger:log(4, "Unregistered "..id.." successfully")
-			return
+			ids = {id}
+		else
+			ids = actions.regFilter(message, "unregister")
+			if not ids then return end
 		end
-	
-		local ids = actions.regFilter(message, commands.unregister)
-		if not ids then return end
 		
 		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.unregisteredOne or guilds[message.guild.id].locale.unregisteredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
@@ -467,31 +430,16 @@ actions = {
 			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
 			lobbies:remove(channelID)
 		end
+		
 		message:reply(msg)
 		logger:log(4, "Unregistered "..table.concat(ids, " ").." successfully")
 	end,
 	
-	[commands.id] = function (message, target)
-		if not actions.permCheck(message) then return end
-		
-		logger:log(4, "ID action invoked")
-		
-		target = target or message.content:match(commands.id.."%s+(.-)$")
-		local ids = {}
-		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) 
-			return target and (channel.name:lower() == target or (channel.category and channel.category.name:lower() == target)) or not target
-		end), truePositionSorting)) do
-			table.insert(ids, channel.id)
-		end
-		
-		embeds:send(message, "id", ids)
-	end,
-	
-	[commands.language] = function (message)
+	language = function (message)
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Language action invoked")
 		
-		local lang = (message.content:match(commands.language.."%s+(.-)$") or ""):lower()
+		local lang = (message.content:match("language%s+(.-)$") or ""):lower()
 		
 		if locale[lang] then
 			guilds:updateLocale(message.guild.id, lang)
@@ -507,11 +455,11 @@ actions = {
 		end
 	end,
 	
-	[commands.prefix] = function (message)
+	prefix = function (message)
 		if not actions.permCheck(message) then return end
 		logger:log(4, "Prefix action invoked")
 		
-		local prefix = message.content:match(commands.prefix.."%s+(.-)$")
+		local prefix = message.content:match("prefix%s+(.-)$")
 		
 		if prefix then
 			guilds:updatePrefix(message.guild.id, prefix)
@@ -521,18 +469,22 @@ actions = {
 		end
 	end,
 	
-	[commands.list] = function (message)
+	list = function (message)
 		logger:log(4, "List action invoked")
 		
-		local ids = {}
-		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end), truePositionSorting)) do
-			table.insert(ids, channel.id)
+		local locale = guilds[message.guild.id].locale
+		local lobbies = message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
+		table.sort(lobbies, truePositionSorting)
+		
+		local msg = (#lobbies == 0 and locale.noLobbies or locale.someLobbies) .. "\n"
+		for _,channel in ipairs(lobbies) do
+			msg = msg..string.format(channel.category and locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
 		end
 		
-		embeds:send(message, "unregister", ids)
+		message:reply(msg)
 	end,
 	
-	[commands.shutdown] = function (message)
+	shutdown = function (message)
 		if message then
 			if message.author.id ~= "188731184501620736" then return end
 			message:reply("Shutting down gracefully")
@@ -548,7 +500,7 @@ actions = {
 		process:exit()
 	end,
 	
-	[commands.stats] = function (message)
+	stats = function (message)
 		local t = os.clock()
 		message.channel:broadcastTyping()
 		t = math.modf((os.clock() - t)*1000)
@@ -568,31 +520,9 @@ actions = {
 		string.format(guilds[message.guild.id].locale.ping, t))
 	end,
 	
-	[commands.support] = function (message)
+	support = function (message)
 		logger:log(4, "Support action invoked")
 		message:reply("https://discord.gg/tqj6jvT")
-	end
-}
-
-local reactionAction = {
-	["⬅"] = function (message)
-		embeds:updatePage(message, embeds[message].page - 1)
-	end,
-	
-	["➡"] = function (message)
-		embeds:updatePage(message, embeds[message].page + 1)
-	end,
-	
-	["✅"] = function (message)
-		embeds:updateAction(message, "register")
-	end,
-	
-	["❌"] = function (message)
-		embeds:updateAction(message, "unregister")
-	end,
-	
-	["🔄"] = function (message)
-		embeds:update(message)
 	end
 }
 
@@ -614,8 +544,8 @@ client:on(safeEvent('messageCreate', function (message)
 	end
 	
 	local command = message.content:match("%s(%a+)")
-	if not command then command = commands.help end
-	local res, msg = pcall(function() if actions[command] then actions[command](message) end end)
+	if not command then command = "help" end
+	local res, msg = pcall(function() if actions[command] then actions[command](message) else logger:log(4, "Nope!") end end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, %s", msg)
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
@@ -629,15 +559,15 @@ client:on(safeEvent('reactionAdd', function (reaction, userID)
 	if not (embeds[reaction.message] and reaction.message.guild and reaction.message.guild:getMember(userID):hasPermission(permission.manageChannels)) or 
 		client:getUser(userID).bot or not reaction.me then return end
 	
+	local embedData = embeds[reaction.message]
+	
 	logger:log(4, "Processing reaction")
-	if reactionAction[reaction.emojiHash] then
-		reactionAction[reaction.emojiHash](reaction.message)
+	if reaction.emojiHash == "⬅" then
+		embeds:updatePage(reaction.message, embedData.page - 1)
+	elseif reaction.emojiHash == "➡" then
+		embeds:updatePage(reaction.message, embedData.page + 1)
 	else
-		if embeds[reaction.message].action == "register" then
-			actions.register(reaction.message, embeds[reaction.message].clickable[reaction.emojiHash])
-		else
-			actions.unregister(reaction.message, embeds[reaction.message].clickable[reaction.emojiHash])
-		end
+		actions[embedData.action](reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
 	end
 end))
 
@@ -645,11 +575,13 @@ client:on(safeEvent('reactionRemove', function (reaction, userID)
 	if not (embeds[reaction.message] and reaction.message.guild and reaction.message.guild:getMember(userID):hasPermission(permission.manageChannels)) or 
 		client:getUser(userID).bot or not reaction.me then return end
 	
+	local embedData = embeds[reaction.message]
+	
 	logger:log(4, "Processing removed reaction")
 	if embeds[reaction.message].action == "unregister" then
-		actions.register(reaction.message, embeds[reaction.message].clickable[reaction.emojiHash])
+		actions.register(reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
 	else
-		actions.unregister(reaction.message, embeds[reaction.message].clickable[reaction.emojiHash])
+		actions.unregister(reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
 	end
 end))
 
@@ -727,7 +659,7 @@ client:on(safeEvent('sendStats', function(name, server)
 	end
 end))
 
-client:on(safeEvent('shutdown', actions[commands.shutdown]))
+client:on(safeEvent('shutdown', actions.shutdown))
 
 local sd = function () client:emit("shutdown") end -- ensures graceful shutdown
 

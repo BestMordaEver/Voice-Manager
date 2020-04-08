@@ -6,15 +6,16 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 **:arrow_down: You need a 'Manage Channels permission to use those commands! :arrow_down:**
 `register` - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
 `unregister` - unregisters an existing lobby. You can feed it channel IDs or channel name
-`id` - use this to learn ids of voice channels by name or category
 `prefix` - set a new prefix for me. Mentioning will still work
 `language` - change my language
 **:arrow_up: You need a 'Manage Channels permission to use those commands! :arrow_up:**
 `list` - lists all registered lobbies on the server
 `stats` - take a sneak peek on my performance!
 `support` - sends an invite to support Discord server]],
+
 		mentionInVain = '%s, you need to have "Manage Channels" permission to do this',		-- %s = ping, i.e. @Riddles#2773
 		badInput = "Couldn't find a specified channel",
+		ambiguousID = "There are several channels with this name",
 		
 		registeredOne = "Registered new lobby:",
 		registeredMany = "Registered %d lobbies:",			-- %d = amount of registered lobbies
@@ -48,12 +49,10 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 		
 		ping = "Ping is **`%d ms`**",
 		
-		embedID = "Click ✅ to register new lobbies or ❌ to unregister existing ones",
-		embedRegister = "Click on a channel number to register it or ❌ to unregister existing ones",
-		embedUnregister = "Click on a channel number to unregister it or ✅ to register new ones",
-		embedFooter = "Click 🔄 to update the widget",
-		embedSigns = "🛃 - lobby, 🆕 - new channel, 🆓 - normal channel",
+		embedRegister = "Click on a channel number to register it",
+		embedUnregister = "Click on a channel number to unregister it",
 		
+		emptyInput = 'I can process that, but I would need "Manage Messages" and "Add Reactions" permissions for that',
 		badPermissions = 'I need "Manage Channels" and "Move Members" permissions to function!',
 		error = "Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s"	-- %s = date and time
 	},
@@ -73,6 +72,7 @@ Write commands after the mention, for example - `@Voice Manager register 1234567
 `support` - отправляет приглашение на сервер поддержки]],
 		mentionInVain = '%s, вам требуются права "Управление каналами" чтобы сделать это',
 		badInput = "Я не смог найти указанный канал",
+		ambiguousID = "Несколько голосовых каналов имеют такое название",
 		
 		registeredOne = "Зарегистрировал новое лобби:",
 		registeredMany = "Зарегистрировал %d новых лобби:",
