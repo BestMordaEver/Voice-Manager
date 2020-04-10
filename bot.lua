@@ -532,9 +532,11 @@ client:on(safeEvent('messageCreate', function (message)
 		return
 	end
 	
+	local prefix = guilds[message.guild.id].prefix
+	
 	if message.author.bot or (
 		not message.mentionedUsers:find(function(user) return user == client.user end) and 
-		not (guilds[message.guild.id].prefix and message.content:find(guilds[message.guild.id].prefix, 1, true))) then	-- allow % in prefixes
+		not (prefix and message.content:find(prefix, 1, true))) then	-- allow % in prefixes
 		return
 	end
 	
@@ -543,9 +545,9 @@ client:on(safeEvent('messageCreate', function (message)
 		message:reply(guilds[message.guild.id].locale.badPermissions)
 	end
 	
-	local command = message.content:match("%s(%a+)")
-	if not command then command = "help" end
-	local res, msg = pcall(function() if actions[command] then actions[command](message) else logger:log(4, "Nope!") end end)
+	local command = prefix and message.content:match("%s*(%a+)",prefix:len()+1) or message.content:match("<@!676787135650463764>%s*(%a+)")
+	if not command or not actions[command] then command = "help" end
+	local res, msg = pcall(function() actions[command](message) end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, %s", msg)
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
