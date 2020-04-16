@@ -17,9 +17,9 @@ local locale = {
 		ambiguousID = "There are several channels with this name",
 		
 		registeredOne = "Registered new lobby:",
-		registeredMany = "Registered %d lobbies:",			-- %d = amount of registered lobbies
+		registeredMany = "Registered %d new lobbies:",			-- %d = amount of registered lobbies
 		unregisteredOne = "Unregistered lobby:",
-		unregisteredMany = "Unregistered %d new lobbies:",	-- same
+		unregisteredMany = "Unregistered %d lobbies:",	-- same
 		
 		channelIDNameCategory = "`%s` -> `%s` in `%s`",		-- channel ID, then name, then category, contact me if you need to change words order
 		channelNameCategory = "`%s` in `%s`",				-- same, without ID
