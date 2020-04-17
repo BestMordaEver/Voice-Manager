@@ -4,3 +4,4 @@
 config.lua
 sqlite3.dll
 data.db
+testing.lua

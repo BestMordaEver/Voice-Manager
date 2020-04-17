@@ -11,10 +11,6 @@ local locale = {
 `list` - lists all registered lobbies on the server
 `stats` - take a sneak peek on my performance!
 `support` - sends an invite to support Discord server]],
-
-		mentionInVain = '%s, you need to have "Manage Channels" permission to do this',		-- %s = ping, i.e. @Riddles#2773
-		badInput = "Couldn't find a specified channel",
-		ambiguousID = "There are several channels with this name",
 		
 		registeredOne = "Registered new lobby:",
 		registeredMany = "Registered %d new lobbies:",			-- %d = amount of registered lobbies
@@ -51,8 +47,27 @@ local locale = {
 		embedRegister = "Click on a channel number to register it",
 		embedUnregister = "Click on a channel number to unregister it",
 		
-		emptyInput = 'I can process that, but I would need "Manage Messages" and "Add Reactions" permissions for that',
-		badPermissions = 'I need "Manage Channels" and "Move Members" permissions to function!',
+		mentionInVain = '%s, you need to have "Manage Channels" permission to do this',        -- %s = ping, i.e. @Riddles#2773
+		badInput = "Couldn't find the specified channel",
+		ambiguousID = "There are several channels with this name",
+		gimmeReaction = 'I can process that, but I would need "Manage Messages" and "Add Reactions" permissions for that',
+
+		badBotPermission = "Couldn't register this channel due to insufficient permissions:",
+		badBotPermissions = "Couldn't register those channels due to insufficient permissions:",
+
+		badUserPermissionRegister = "You're not permitted to register this channel:",
+		badUserPermissionsRegister = "You're not permitted to register those channels:",
+		badUserPermissionUnregister = "You're not permitted to unregister this channel:",
+		badUserPermissionsUnregister = "You're not permitted to unregister those channels:",
+
+		badChannel = "This channel is not valid:",		-- you can't register text channel for example
+		badChannels = "Those channels are not valid:",
+
+		redundantRegister = "This channel is already registered:",
+		redundantRegisters = "Those channels are already registered:",
+		redundantUnregister = "This channel is not a lobby:",
+		redundantUnregisters = "Those channels are not a lobby:",
+		
 		error = "Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s"	-- %s = date and time
 	},
 	
