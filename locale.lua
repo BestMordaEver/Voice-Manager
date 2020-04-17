@@ -17,8 +17,7 @@ local locale = {
 		unregisteredOne = "Unregistered lobby:",
 		unregisteredMany = "Unregistered %d lobbies:",	-- same
 		
-		channelIDNameCategory = "`%s` -> `%s` in `%s`",		-- channel ID, then name, then category, contact me if you need to change words order
-		channelNameCategory = "`%s` in `%s`",				-- same, without ID
+		channelNameCategory = "`%s` in `%s`",				-- channel name, then category, contact me if you need to change words order
 		
 		noLobbies = "No lobbies registered yet!",
 		someLobbies = "Registered lobbies on this server:",
@@ -132,10 +131,12 @@ for _, localeTable in pairs(locale) do
 	setmetatable(localeTable, mt)
 end
 
---[[for localeName, localeTable in pairs(locale) do
+--[[
+for localeName, localeTable in pairs(locale) do
 	for lineName,_ in pairs(locale.english) do
-		assert(localeTable[lineName], lineName.." in "..localeName.." isn't present")
+		assert(rawget(localeTable, lineName), lineName.." in "..localeName.." isn't present")
 	end
-end]]
+end
+--]]
 
 return locale
