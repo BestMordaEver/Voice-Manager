@@ -9,6 +9,7 @@ discordia.extensions.table()
 local client = discordia.Client()
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
+local heroesNeverDie = discordia.Emitter()
 
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
@@ -28,7 +29,7 @@ local function truePositionSorting (a, b)
 		(a.category == b.category and a.position < b.position)
 end
 
-local channels, lobbies, servers, embeds
+local channels, lobbies, servers
 channels = setmetatable({}, {
 	__index = {
 		add = function (self, channelID)
@@ -218,7 +219,11 @@ guilds = setmetatable({}, {
 	}
 })
 
-embeds = setmetatable({}, {
+local function getLocale (guild)
+	return (guild and guilds[guild.id].locale or locale.english)
+end
+
+local embeds = setmetatable({}, {
 	__index = {
 		reactions = {"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟",
 			["1️⃣"] = 1, ["2️⃣"] = 2, ["3️⃣"] = 3, ["4️⃣"] = 4, ["5️⃣"] = 5, ["6️⃣"] = 6, ["7️⃣"] = 7, ["8️⃣"] = 8, ["9️⃣"] = 9, ["🔟"] = 10,
@@ -252,7 +257,7 @@ embeds = setmetatable({}, {
 		send = function (self, message, action, ids)
 			local embed = self:new(guilds[message.guild.id].locale, action, 1, ids)
 			local newMessage = message:reply {embed = embed}
-			self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action}
+			self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, author = message.author}
 			self:decorate(newMessage)
 			
 			logger:log(4, "Created embed "..newMessage.id)
@@ -261,7 +266,7 @@ embeds = setmetatable({}, {
 		
 		updatePage = function (self, message, page)
 			local embedData = self[message]
-			embedData.embed = self:new(guilds[message.guild.id].locale, embedData.action, page, embedData.ids)
+			embedData.embed = self:new(getLocale(message.guild), embedData.action, page, embedData.ids)
 			embedData.killIn = 10
 			embedData.page = page
 			
@@ -317,80 +322,170 @@ local statservers = {
 	}
 }
 
-local actions
-actions = {
-	permCheck = function (message)
-		if not message.member:hasPermission(permission.manageChannels) then
-			logger:log(4, "Mention in vain")
-			message:reply(guilds[message.guild.id].locale.mentionInVain:format(message.author.mentionString))
-			return false
-		end
-		
-		return true
-	end,
-
-	regFilter = function (message, command) -- returns a table of all ids
-		if not actions.permCheck(message) then return end
-		
-		logger:log(4, command.." action invoked")
-		local id = message.content:match(command.."%s+(.-)$")
-		if not id then
-			logger:log(4, "Empty input")
-			if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
-				message:reply(guilds[message.guild.id].locale.emptyInput)
-				return
-			end	
-			
-			local ids = {}
-			for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel)
-				if lobbies[channel.id] then return command == "unregister" else return command == "register" end
-			end), truePositionSorting)) do
-				table.insert(ids, channel.id)
-			end
-			embeds:send(message, command, ids)
+local function parseForIDs (message, command)			-- returns a table of all ids
+	logger:log(4, command.." action invoked")
+	local id = message.content:match(command.."%s+(.-)$")
+	if not id then
+		logger:log(4, "Empty input")
+		if not message.guild or not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+			message:reply(message.guild and getLocale(message.guild).gimmeReaction or ("This would work in server, but in DMs you have to include the ID of the channel that you want to "..command))
 			return
 		end
 		
 		local ids = {}
-		for ID in id:gmatch("%d+") do
-			local channel = client:getChannel(ID)
-			if channel and channel.type == channelType.voice and channel.guild == message.guild then
-				table.insert(ids, ID)
-			end
+		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel)
+			return (command == "register") == not lobbies[channel.id] and		-- embeds never offer invalid channels
+				message.guild.me:hasPermission(channel.category, permission.manageChannels) and
+				message.member:hasPermission(channel, permission.manageChannels)	-- non-embed related permission checks are in regunregAction
+		end), truePositionSorting)) do
+			table.insert(ids, channel.id)
+		end
+		embeds:send(message, command, ids)
+		return
+	end
+	
+	local ids = {}
+	for ID in id:gmatch("%d+") do
+		if client:getChannel(ID) then
+			table.insert(ids, ID)
+		end
+	end
+	
+	if #ids == 0 then
+		if not message.guild then
+			logger:log(4, command.." by name in dm")
+			message:reply("I can "..command.." by name only in server")
+			return
 		end
 		
+		id = id:lower()
+		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) 
+			return channel.name:lower() == id
+		end), truePositionSorting)) do
+			table.insert(ids, channel.id)
+		end
+		
+		
 		if #ids == 0 then
-			id = id:lower()
-			for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) 
-				return channel.name:lower() == id and (command == "unregister" and lobbies[channel.id] or command ~= "unregister")
-			end), truePositionSorting)) do
-				table.insert(ids, channel.id)
-			end
+			logger:log(4, "Bad "..command.." input")
+			message:reply(getLocale(message.guild).badInput)
+			return
+		elseif #ids == 1 then
+			return ids
+		else
+			local redundant, count = {}, #ids
 			
-			if #ids == 0 then
-				logger:log(4, "Bad "..command.." input")
-				message:reply(guilds[message.guild.id].locale.badInput)
-				return
-			elseif #ids == 1 then
-				return ids
-			else
-				logger:log(4, "Ambiguous "..command.." input")
-				if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
-					message:reply(guilds[message.guild.id].locale.emptyInput)
-					return
+			for i, _ in ipairs(ids) do repeat
+				local channel = client:getChannel(ids[i])
+				if not ((command == "register") == not lobbies[channel.id] and
+					message.guild.me:hasPermission(channel.category, permission.manageChannels) and
+					message.member:hasPermission(channel, permission.manageChannels)) then
+					
+					table.insert(redundant, table.remove(ids, i))
+				else
+					break
 				end
-				
-				embeds:send(message, command, ids):setContent(guilds[message.guild.id].locale.ambiguousID)
+			until not ids[i] end
+			
+			if #ids == 1 then return ids end
+			if #redundant == count then return redundant end
+			
+			logger:log(4, "Ambiguous "..command.." input")
+			
+			message:reply(getLocale(message.guild).ambiguousID)
+			if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+				message:reply(getLocale(message.guild).gimmeReaction)
 				return
+			end
+
+			embeds:send(message, command, ids)
+			return
+		end
+	else
+		return ids
+	end
+end
+
+local function regunregAction (message, ids, action)	-- register and unregister are painfully simmilar, unified here
+	local badUser, badBot, badChannel, redundant = {}, {}, {}, {}
+	local locale = getLocale(message.guild)
+	
+	for i,_ in ipairs(ids) do repeat
+		local channel = client:getChannel(ids[i])
+		if channel.type == channelType.voice then
+			if (action == "register") == not lobbies[channel.id] then
+				if channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
+					if action == "register" and not channel.guild.me:hasPermission(channel.category, permission.manageChannels) then
+						table.insert(badBot, table.remove(ids, i))
+					else
+						break
+					end
+				else
+					table.insert(badUser, table.remove(ids, i))
+				end
+			else
+				table.insert(redundant, table.remove(ids, i))
 			end
 		else
-			return ids
+			table.insert(badChannel, table.remove(ids, i))
 		end
-	end,
+	until not ids[i] end
 
+	local msg = ""
+	if #ids > 0 then
+		msg = string.format(#ids == 1 and (action == "register" and locale.registeredOne or locale.unregisteredOne) or (action == "register" and locale.registeredMany or locale.unregisteredMany), #ids).."\n"
+		for _, channelID in ipairs(ids) do
+			local channel = client:getChannel(channelID)
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			if action == "register" then
+				lobbies:add(channelID)
+			else
+				lobbies:remove(channelID)
+			end
+		end
+	end
+	
+	if #badChannel > 0 then
+		msg = msg..(#badChannel == 1 and locale.badChannel or locale.badChannels).."\n"
+		for _, channelID in ipairs(badChannel) do
+			local channel = client:getChannel(channelID)
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+		end
+	end
+	
+	if #redundant > 0 then
+		msg = msg..(action == "register" and (#redundant == 1 and locale.redundantRegister or locale.redundantRegisters) or 
+			(#redundant == 1 and locale.redundantUnregister or locale.redundantUnregisters)).."\n"
+		for _, channelID in ipairs(redundant) do
+			local channel = client:getChannel(channelID)
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+		end
+	end
+
+	if #badBot > 0 then
+		msg = msg..(#badBot == 1 and locale.badBotPermission or locale.badBotPermissions).."\n"
+		for _, channelID in ipairs(badBot) do
+			local channel = client:getChannel(channelID)
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+		end
+	end
+
+	if #badUser > 0 then
+		msg = msg..(action == "register" and (#badUser == 1 and locale.badUserPermissionRegister or locale.badUserPermissionsRegister) or 
+			(#badUser == 1 and locale.badUserPermissionUnregister or locale.badUserPermissionsUnregister)).."\n"
+		for _, channelID in ipairs(badUser) do
+			local channel = client:getChannel(channelID)
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+		end
+	end
+	
+	return msg
+end
+
+local actions = {
 	help = function (message)
 		logger:log(4, "Help action invoked")
-		message:reply(guilds[message.guild.id].locale.helpText)
+		message:reply(getLocale(message.guild).helpText)
 	end,
 	
 	register = function (message, id)
@@ -399,19 +494,11 @@ actions = {
 		if id then -- sent by embed
 			ids = {id}
 		else
-			ids = actions.regFilter(message, "register")
+			ids = parseForIDs(message, "register")
 			if not ids then return end
 		end
 		
-		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.registeredOne or guilds[message.guild.id].locale.registeredMany, #ids).."\n"
-		for _, channelID in ipairs(ids) do
-			local channel = client:getChannel(channelID)
-			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
-			lobbies:add(channelID)
-		end
-		
-		message:reply(msg)
-		logger:log(4, "Registered "..table.concat(ids, " ").." successfully")
+		message:reply(regunregAction(message, ids, "register"))
 	end,
 
 	unregister = function (message, id)
@@ -420,33 +507,36 @@ actions = {
 		if id then -- sent by embed
 			ids = {id}
 		else
-			ids = actions.regFilter(message, "unregister")
+			ids = parseForIDs(message, "unregister")
 			if not ids then return end
 		end
 		
-		local msg = string.format(#ids == 1 and guilds[message.guild.id].locale.unregisteredOne or guilds[message.guild.id].locale.unregisteredMany, #ids).."\n"
-		for _, channelID in ipairs(ids) do
-			local channel = client:getChannel(channelID)
-			msg = msg..string.format(channel.category and guilds[message.guild.id].locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
-			lobbies:remove(channelID)
-		end
-		
-		message:reply(msg)
-		logger:log(4, "Unregistered "..table.concat(ids, " ").." successfully")
+		message:reply(regunregAction(message, ids, "unregister"))
 	end,
 	
 	language = function (message)
-		if not actions.permCheck(message) then return end
+		if not message.guild then
+			logger:log(4, "Language in dm")
+			message:reply("I can process that only in server")
+			return
+		end
+		
+		if not message.member:hasPermission(permission.manageChannels) then
+			logger:log(4, "Mention in vain")
+			message:reply(getLocale(message.guild).mentionInVain:format(message.author.mentionString))
+			return
+		end
+		
 		logger:log(4, "Language action invoked")
 		
 		local lang = (message.content:match("language%s+(.-)$") or ""):lower()
 		
 		if locale[lang] then
 			guilds:updateLocale(message.guild.id, lang)
-			message:reply(guilds[message.guild.id].locale.updatedLocale)
+			message:reply(getLocale(message.guild).updatedLocale)
 		else
 			logger:log(4, "No language '%s' found", lang)
-			local msg = guilds[message.guild.id].locale.availableLanguages
+			local msg = getLocale(message.guild).availableLanguages
 			for langName, _ in pairs(locale) do
 				msg = msg.." "..langName..","
 			end
@@ -456,29 +546,46 @@ actions = {
 	end,
 	
 	prefix = function (message)
-		if not actions.permCheck(message) then return end
+		if not message.guild then
+			logger:log(4, "Prefix in dm")
+			message:reply("I can process that only in server")
+			return
+		end
+		
+		if not message.member:hasPermission(permission.manageChannels) then
+			logger:log(4, "Mention in vain")
+			message:reply(getLocale(message.guild).mentionInVain:format(message.author.mentionString))
+			return
+		end
+		
 		logger:log(4, "Prefix action invoked")
 		
 		local prefix = message.content:match("prefix%s+(.-)$")
 		
 		if prefix then
 			guilds:updatePrefix(message.guild.id, prefix)
-			message:reply(guilds[message.guild.id].locale.prefixConfirm:format(prefix))
+			message:reply(getLocale(message.guild).prefixConfirm:format(prefix))
 		else
-			message:reply(string.format(guilds[message.guild.id].prefix and guilds[message.guild.id].locale.prefixThis or guilds[message.guild.id].locale.prefixAbsent, guilds[message.guild.id].prefix))
+			message:reply(string.format(guilds[message.guild.id].prefix and getLocale(message.guild).prefixThis or getLocale(message.guild).prefixAbsent, guilds[message.guild.id].prefix))
 		end
 	end,
 	
 	list = function (message)
+		if not message.guild then
+			logger:log(4, "List in dm")
+			message:reply("I can process that only in server")
+			return
+		end
+		
 		logger:log(4, "List action invoked")
 		
-		local locale = guilds[message.guild.id].locale
+		local locale = getLocale(message.guild)
 		local lobbies = message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
 		table.sort(lobbies, truePositionSorting)
 		
 		local msg = (#lobbies == 0 and locale.noLobbies or locale.someLobbies) .. "\n"
 		for _,channel in ipairs(lobbies) do
-			msg = msg..string.format(channel.category and locale.channelIDNameCategory or "`%s` -> `%s`", channel.id, channel.name, channel.category and channel.category.name).."\n"
+			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
 		end
 		
 		message:reply(msg)
@@ -490,8 +597,9 @@ actions = {
 			message:reply("Shutting down gracefully")
 			logger:log(4, "Shutdown action invoked")
 		end
-		client:setGame({name = "the maintenance", type = 3})
+		
 		local status, msg = pcall(function()
+			client:setGame({name = "the maintenance", type = 3})
 			clock:stop()
 			client:stop()
 			--conn:close()
@@ -501,23 +609,25 @@ actions = {
 	end,
 	
 	stats = function (message)
+		logger:log(4, "Stats action invoked")
+		local locale = getLocale(message.guild)
+		
 		local t = os.clock()
 		message.channel:broadcastTyping()
 		t = math.modf((os.clock() - t)*1000)
-		logger:log(4, "Stats action invoked")
 		
 		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds, #lobbies, #channels, channels:people()
 		message:reply(string.format(
-			(guildCount == 1 and lobbyCount == 1) and guilds[message.guild.id].locale.serverLobby or (
-			guildCount == 1 and guilds[message.guild.id].locale.serverLobbies or (
-			lobbyCount == 1 and guilds[message.guild.id].locale.serversLobby or 
-			guilds[message.guild.id].locale.serversLobbies)), guildCount, lobbyCount) .. "\n" ..
+			(guildCount == 1 and lobbyCount == 1) and locale.serverLobby or (
+			guildCount == 1 and locale.serverLobbies or (
+			lobbyCount == 1 and locale.serversLobby or 
+			locale.serversLobbies)), guildCount, lobbyCount) .. "\n" ..
 		string.format(
-			(channelCount == 1 and peopleCount == 1) and guilds[message.guild.id].locale.channelPerson or (
-			channelCount == 1 and guilds[message.guild.id].locale.channelPeople or (
-			peopleCount == 1 and guilds[message.guild.id].locale.channelsPerson or -- practically impossible, but whatever
-			guilds[message.guild.id].locale.channelsPeople)), channelCount, peopleCount) .. "\n" ..
-		string.format(guilds[message.guild.id].locale.ping, t))
+			(channelCount == 1 and peopleCount == 1) and locale.channelPerson or (
+			channelCount == 1 and locale.channelPeople or (
+			peopleCount == 1 and locale.channelsPerson or -- practically impossible, but whatever
+			locale.channelsPeople)), channelCount, peopleCount) .. "\n" ..
+		string.format(locale.ping, t))
 	end,
 	
 	support = function (message)
@@ -527,39 +637,33 @@ actions = {
 }
 
 client:on(safeEvent('messageCreate', function (message)
-	if message.channel.type ~= channelType.text and not message.author.bot then	-- sent to pm, no guild
-		message:reply("I can only be used in servers. Mention me within the server to get the help message.")
-		return
-	end
-	
-	local prefix = guilds[message.guild.id].prefix
+	local prefix = message.guild and guilds[message.guild.id].prefix or nil
 	
 	if message.author.bot or (
 		not message.mentionedUsers:find(function(user) return user == client.user end) and 
-		not (prefix and message.content:find(prefix, 1, true))) then	-- allow % in prefixes
+		not (prefix and message.content:find(prefix, 1, true)) and 	-- allow % in prefixes
+		message.guild) then	-- ignore prefix req for dms
 		return
 	end
 	
 	logger:log(4, "Message received, processing...")
-	if not message.guild.me:getPermissions(message.channel):has(permission.manageChannels, permission.moveMembers) then
-		message:reply(guilds[message.guild.id].locale.badPermissions)
-	end
 	
-	local command = prefix and message.content:match("%s*(%a+)",prefix:len()+1) or message.content:match("<@!676787135650463764>%s*(%a+)")
+	--if message.guild then message.guild:getMember(message.author) end	-- cache the member object
+	
+	local command = prefix and message.content:match("%s*(%a+)",prefix:len()+1) or message.content:match("%s*(%a+)")
 	if not command or not actions[command] then command = "help" end
 	local res, msg = pcall(function() actions[command](message) end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, %s", msg)
 		client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
-		message:reply(message.author.id ~= "188731184501620736"
-			and (guilds[message.guild.id].locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
-			or "You done goofed")
+		message:reply(getLocale(message.guild).error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
 	end
 end))
 
 client:on(safeEvent('reactionAdd', function (reaction, userID)
-	if not (embeds[reaction.message] and reaction.message.guild and reaction.message.guild:getMember(userID):hasPermission(permission.manageChannels)) or 
-		client:getUser(userID).bot or not reaction.me then return end
+	if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
+		return
+	end
 	
 	local embedData = embeds[reaction.message]
 	
@@ -574,8 +678,9 @@ client:on(safeEvent('reactionAdd', function (reaction, userID)
 end))
 
 client:on(safeEvent('reactionRemove', function (reaction, userID)
-	if not (embeds[reaction.message] and reaction.message.guild and reaction.message.guild:getMember(userID):hasPermission(permission.manageChannels)) or 
-		client:getUser(userID).bot or not reaction.me then return end
+	if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
+		return
+	end
 	
 	local embedData = embeds[reaction.message]
 	
@@ -661,9 +766,9 @@ client:on(safeEvent('sendStats', function(name, server)
 	end
 end))
 
-client:on(safeEvent('shutdown', actions.shutdown))
+heroesNeverDie:on(safeEvent('shutdown', actions.shutdown))
 
-local sd = function () client:emit("shutdown") end -- ensures graceful shutdown
+local sd = function () heroesNeverDie:emit("shutdown") end -- ensures graceful shutdown
 
 process:on('sigterm', sd)
 process:on('sigint', sd)
