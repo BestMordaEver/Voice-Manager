@@ -10,6 +10,7 @@ local client = discordia.Client()
 local clock = discordia.Clock()
 local logger = discordia.Logger(4, '%F %T')
 local heroesNeverDie = discordia.Emitter()
+local aliveTracker = 5
 
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
@@ -660,6 +661,13 @@ client:on(safeEvent('messageCreate', function (message)
 	end
 end))
 
+client:on(safeEvent('messageUpdate', function (message)	-- hearbeat
+	if message.author.id == "601347755046076427" and message.channel.id == "676791988518912020" then
+		aliveTracker = 5
+		return
+	end
+end))
+
 client:on(safeEvent('reactionAdd', function (reaction, userID)
 	if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
 		return
@@ -745,6 +753,8 @@ client:on(safeEvent('ready', function()
 end))
 
 clock:on(safeEvent('min', function()
+	aliveTracker = aliveTracker - 1
+	if aliveTracker < 0 then heroesNeverDie:emit("shutdown") end
 	client:getChannel("676791988518912020"):getMessage("692117540838703114"):setContent(os.date())
 	channels:cleanup()
 	embeds:tick()
