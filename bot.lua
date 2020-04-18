@@ -149,11 +149,11 @@ guilds = setmetatable({}, {
 	__index = {
 		add = function (self, guildID)
 			if not self[guildID] then 
-				self[guildID] = {["locale"] = locale.english}
+				self[guildID] = {locale = locale.english, prefix = "!vm"}
 				logger:log(4, "MEMORY: Added guild "..guildID)
 			end
 			if not conn:exec("SELECT * FROM guilds WHERE id = "..guildID) then
-				local res = pcall(function() conn:exec("INSERT INTO guilds VALUES("..guildID..", 'english', NULL)") end)
+				local res = pcall(function() conn:exec("INSERT INTO guilds VALUES("..guildID..", 'english', '!vm')") end)
 				if res then logger:log(4, "DATABASE: Added guild "..guildID) end
 			end
 		end,
