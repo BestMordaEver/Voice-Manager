@@ -650,9 +650,9 @@ client:on(safeEvent('messageCreate', function (message)
 	logger:log(4, "Message received, processing...")
 	
 	--if message.guild then message.guild:getMember(message.author) end	-- cache the member object
-	
-	local command = prefix and message.content:match("%s*(%a+)",prefix:len()+1) or message.content:match("%s*(%a+)")
-	if not command or not actions[command] then command = "help" end
+
+	local command = prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%a+)") or message.content:match("^<@.?676787135650463764>%s*(%a+)")
+	if not actions[command] then logger:log(4, "Nothing"); return end
 	local res, msg = pcall(function() actions[command](message) end)
 	if not res then 
 		logger:log(1, "Couldn't process the message, %s", msg)

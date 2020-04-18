@@ -1,8 +1,7 @@
 local locale = {
 	english = {
 		helpText =	-- this is one big message
-[[Ping me to get help message
-**:arrow_down: You need a "Manage Channels" permission to use those commands! :arrow_down:**
+[[**:arrow_down: You need a "Manage Channels" permission to use those commands! :arrow_down:**
 `register` - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
 `unregister` - unregisters an existing lobby. You can feed it channel IDs or channel name
 `prefix` - set a new prefix for me. Mentioning will still work
@@ -72,8 +71,7 @@ local locale = {
 	
 	russian = {
 		helpText = 
-[[Упомяните меня, чтобы получить сообщение со списком команд
-**:arrow_down: Вам потребуются права "Управление каналами" для использования этих команд! :arrow_down:**
+[[**:arrow_down: Вам потребуются права "Управление каналами" для использования этих команд! :arrow_down:**
 `register` - регистрирует голосовой канал, который будет использоваться как лобби. Также можно указывать ID каналов или их название
 `unregister` - удаляет голосовой канал из списка лобби этого сервера. Также можно указывать ID каналов или их название
 `prefix` - добавляет новый префикс для работы со мной. Упоминания также все еще будут работать
