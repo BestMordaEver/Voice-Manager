@@ -784,4 +784,4 @@ local sd = function () heroesNeverDie:emit("shutdown") end -- ensures graceful s
 process:on('sigterm', sd)
 process:on('sigint', sd)
 
-client:run('Bot '..config.token)
+client:run('Bot '..config.token, {name = channels:people() == 0 and "the sound of silence" or (channels:people()..(channels:people() == 1 and " person" or " people").." on "..#channels..(#channels == 1 and " channel" or " channels")), type = 2})
