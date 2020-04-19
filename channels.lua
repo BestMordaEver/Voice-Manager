@@ -45,7 +45,7 @@ return setmetatable({}, {
 			for channelID,_ in pairs(self) do
 				local channel = client:getChannel(channelID)
 				if channel then
-					if #channel.connectedMemebers == 0 then
+					if #channel.connectedMembers == 0 then
 						channel:delete()
 					end
 				end
@@ -55,7 +55,7 @@ return setmetatable({}, {
 		people = function (self)
 			local p = 0
 			for channelID, _ in pairs(self) do
-				p = p + #client:getChannel(channelID).connectedMemebers
+				p = p + #client:getChannel(channelID).connectedMembers
 			end
 			return p
 		end
