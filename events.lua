@@ -11,7 +11,7 @@ local embeds = require "./embeds.lua"
 local actions = require "./actions.lua"
 local finalizer = require "./finalizer.lua"
 
-local getLocale = require "utils.lua".getLocale
+local getLocale = require "./utils.lua".getLocale
 local permission = require "discordia".enums.permission
 
 local events = {
@@ -29,8 +29,8 @@ local events = {
 		
 		if message.guild then message.guild:getMember(message.author) end	-- cache the member object
 
-		local command = prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%a+)") or 
-			(message.content:match("^<@.?601347755046076427>%s*(%a+)") or message.content:match("^<@.?676787135650463764>%s*(%a+)"))
+		local command = prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%w+)") or 
+			(message.content:match("^<@.?601347755046076427>%s*(%w+)") or message.content:match("^<@.?676787135650463764>%s*(%w+)"))
 		if not actions[command] then logger:log(4, "Nothing"); return end
 		local res, msg = pcall(function() actions[command](message) end)
 		if not res then 

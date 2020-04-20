@@ -174,10 +174,18 @@ local function regunregAction (message, ids, action)	-- register and unregister 
 	return msg
 end
 
-return {
+local actions
+
+actions = {
 	help = function (message)
 		logger:log(4, "Help action invoked")
-		message:reply(getLocale(message.guild).helpText)
+		local command = message.content:match("help%s*(.-)$")
+		local locale = getLocale(message.guild)
+		if command and locale[command] then
+			message:reply(locale[command])
+		else
+			message:reply(getLocale(message.guild).help)
+		end
 	end,
 	
 	register = function (message, id)
@@ -209,7 +217,25 @@ return {
 	template = function (message)
 		logger:log(4, "Template action invoked")
 		
-		local template, scope = content:match("^.-template%s*\"(.-)\"%s*\"(.-)\"$")
+		local target = message.content:match("^.-template%s*(.-)%s*$")
+		
+		if target == "" or target == "global" then
+		
+		end
+		
+		local scope, template = message.content:match("^.-template%s*\"(.-)\"%s*\"(.-)\"$")
+	end,
+	
+	template1 = function (message)
+		logger:log(4, "Template1 action invoked")
+		
+		local template, scope = message.content:match("^.-template%s*%[(.-)%]%s*%[(.-)%]$")
+	end,
+	
+	template2 = function (message)
+		logger:log(4, "Template2 action invoked")
+		
+		local delimeter = message.content
 	end,
 	
 	language = function (message)
@@ -334,3 +360,5 @@ return {
 		message:reply("https://discord.gg/tqj6jvT")
 	end
 }
+
+return actions
