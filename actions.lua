@@ -252,12 +252,15 @@ actions = {
 					else
 						if message.guild then
 							for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return channel.name == scope and lobbies[channel.id] end), truePositionSorting)) do
-								table.insert(ids, channel)
+								table.insert(ids, channel.id)
 							end
 							
 							if #ids == 0 then
 								message:reply(locale.badInput)
 								return 4, "Didn't find the channel by name"
+							elseif #ids == 1 then
+								message:reply(lobbies[ids[1]].template and locale.lobbyTemplate:format(client:getChannel(ids[1]).name, lobbies[ids[1]].template) or locale.noTemplate)
+								return 4, "Sent channel template"
 							elseif #ids > 1 then
 								message:reply(locale.ambiguousID)
 								return 4, "Ambiguous input"
@@ -316,7 +319,7 @@ actions = {
 						end
 						
 						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end), truePositionSorting)) do
-							table.insert(ids, channel)
+							table.insert(ids, channel.id)
 						end
 						
 						return 4, "Empty template, sent embed "..embeds:send(message, "template"..template, ids).id
