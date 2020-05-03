@@ -1,5 +1,6 @@
 local discordia = require "discordia"
-local client, sqlite, logger = discordia.storage.client, discordia.storage.sqlite, discordia.storage.logger
+local client, logger = discordia.storage.client, discordia.storage.logger
+local sqlite = require "sqlite3".open("channelsData.db")
 
 return setmetatable({}, {
 	__index = {
@@ -26,19 +27,23 @@ return setmetatable({}, {
 		end,
 		
 		load = function (self)
-			logger:log(4, "Loading channels")
+			logger:log(4, "STARTUP: Loading channels")
 			local channelIDs = sqlite:exec("SELECT * FROM channels")
 			if channelIDs then
 				for _, channelID in ipairs(channelIDs[1]) do
 					local channel = client:getChannel(channelID)
 					if channel then
-						self:add(channelID)
+						if #channel.connectedMembers > 0 then
+							self:add(channelID)
+						else
+							channel:delete()
+						end
 					else
 						self:remove(channelID)
 					end
 				end
 			end
-			logger:log(4, "Loaded!")
+			logger:log(4, "STARTUP: Loaded!")
 		end,
 		
 		cleanup = function (self)
@@ -52,12 +57,19 @@ return setmetatable({}, {
 			end
 		end,
 		
-		people = function (self)
+		people = function (self, guildID)
 			local p = 0
 			for channelID, _ in pairs(self) do
-				p = p + #client:getChannel(channelID).connectedMembers
+				local channel = client:getChannel(channelID)
+				if channel.guild.id == guildID then p = p + #channel.connectedMembers end
 			end
 			return p
+		end,
+		
+		inGuild = function (self, guildID)
+			local count = 0
+			for v,_ in pairs(self) do if client:getChannel(v).guild.id == guildID then count = count + 1 end end
+			return count
 		end
 	},
 	__len = function (self)

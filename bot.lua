@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local client = discordia.Client()
 local clock = discordia.Clock()
-discordia.storage = {client = client, clock = clock, logger = discordia.Logger(4, '%F %T'), sqlite = require "sqlite3".open("data.db")}
+discordia.storage = {client = client, clock = clock, logger = discordia.Logger(4, '%F %T')}
 
 local config = require "./config.lua"
 local events = require "./events.lua"

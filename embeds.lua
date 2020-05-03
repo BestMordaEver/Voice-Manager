@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local client, sqlite, logger = discordia.storage.client, discordia.storage.sqlite, discordia.storage.logger
-local locale = require "./locale.lua"
 local guilds = require "./guilds.lua"
+local locale = require "./locale"
 
 return setmetatable({}, {
 	__index = {
@@ -9,9 +9,14 @@ return setmetatable({}, {
 			["1️⃣"] = 1, ["2️⃣"] = 2, ["3️⃣"] = 3, ["4️⃣"] = 4, ["5️⃣"] = 5, ["6️⃣"] = 6, ["7️⃣"] = 7, ["8️⃣"] = 8, ["9️⃣"] = 9, ["🔟"] = 10,
 			left = "⬅", right = "➡"},
 		
-		new = function (self, locale, action, page, ids)
+		new = function (self, action, page, ids)
 			local reactions = self.reactions
-			local embed = {title = action == "register" and locale.embedRegister or locale.embedUnregister, description = ""}
+			local embed = {
+				title =
+					action == "register" and locale.embedRegister or (
+					action == "unregister" and locale.embedUnregister or locale.embedTemplate:format(action:match("^template(.-)$"))),
+				description = ""
+			}
 			
 			for i=10*(page-1)+1,10*page do
 				if not ids[i] then break end
@@ -35,18 +40,17 @@ return setmetatable({}, {
 		end,
 		
 		send = function (self, message, action, ids)
-			local embed = self:new(guilds[message.guild.id].locale, action, 1, ids)
+			local embed = self:new(action, 1, ids)
 			local newMessage = message:reply {embed = embed}
 			self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, author = message.author}
 			self:decorate(newMessage)
 			
-			logger:log(4, "Created embed "..newMessage.id)
 			return newMessage
 		end,
 		
 		updatePage = function (self, message, page)
 			local embedData = self[message]
-			embedData.embed = self:new(getLocale(message.guild), embedData.action, page, embedData.ids)
+			embedData.embed = self:new(embedData.action, page, embedData.ids)
 			embedData.killIn = 10
 			embedData.page = page
 			

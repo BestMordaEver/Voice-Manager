@@ -1,7 +1,7 @@
 *.json
 *.txt
 *.log
+*.db
+*.dll
 config.lua
-sqlite3.dll
-data.db
-testing.lua
+dbedit.lua

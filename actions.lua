@@ -1,39 +1,38 @@
 local discordia = require "discordia"
 local client, logger = discordia.storage.client, discordia.storage.logger
-local locale = require "./locale.lua"
-local utils = require "./utils.lua"
 
 local channels = require "./channels.lua"
 local lobbies = require "./lobbies.lua"
 local guilds = require "./guilds.lua"
 local embeds = require "./embeds.lua"
+local locale = require "./locale"
 
 local discordia = require "discordia"
 discordia.extensions.table()
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
-local truePositionSorting, getLocale = utils.truePositionSorting, utils.getLocale
+local truePositionSorting = require "./utils.lua".truePositionSorting
 
 local function parseForIDs (message, command)			-- returns a table of all ids
-	logger:log(4, command.." action invoked")
 	local id = message.content:match(command.."%s+(.-)$")
 	if not id then
-		logger:log(4, "Empty input")
-		if not message.guild or not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
-			message:reply(message.guild and getLocale(message.guild).gimmeReaction or ("This would work in server, but in DMs you have to include the ID of the channel that you want to "..command))
-			return
+		if not message.guild then
+			message:reply(locale.noID)
+			return 4, "Empty input in DM"
+		elseif not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+			message:reply(locale.gimmeReaction)
+			return 4, "Empty input, can't do embed"
 		end
 		
 		local ids = {}
 		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel)
-			return (command == "register") == not lobbies[channel.id] and		-- embeds never offer invalid channels
+			return (command == "register") == not lobbies[channel.id] and		-- embeds never offer redundant channels
 				message.guild.me:hasPermission(channel.category, permission.manageChannels) and
 				message.member:hasPermission(channel, permission.manageChannels)	-- non-embed related permission checks are in regunregAction
 		end), truePositionSorting)) do
 			table.insert(ids, channel.id)
 		end
-		embeds:send(message, command, ids)
-		return
+		return 4, "Empty input, sent embed "..embeds:send(message, command, ids).id
 	end
 	
 	local ids = {}
@@ -45,9 +44,8 @@ local function parseForIDs (message, command)			-- returns a table of all ids
 	
 	if #ids == 0 then
 		if not message.guild then
-			logger:log(4, command.." by name in dm")
-			message:reply("I can "..command.." by name only in server")
-			return
+			message:reply(locale.onlyInServer)
+			return 4, command.." by name in dm"
 		end
 		
 		id = id:lower()
@@ -59,9 +57,8 @@ local function parseForIDs (message, command)			-- returns a table of all ids
 		
 		
 		if #ids == 0 then
-			logger:log(4, "Bad "..command.." input")
-			message:reply(getLocale(message.guild).badInput)
-			return
+			message:reply(locale.badInput)
+			return 4, "Didn't find the channel by name"
 		elseif #ids == 1 then
 			return ids
 		else
@@ -82,57 +79,67 @@ local function parseForIDs (message, command)			-- returns a table of all ids
 			if #ids == 1 then return ids end
 			if #redundant == count then return redundant end
 			
-			logger:log(4, "Ambiguous "..command.." input")
-			
-			message:reply(getLocale(message.guild).ambiguousID)
 			if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
-				message:reply(getLocale(message.guild).gimmeReaction)
-				return
+				message:reply(locale.ambiguousID.."\n"..locale.gimmeReaction)
+				return 4, "Ambiguous input, can't do embed"
 			end
-
-			embeds:send(message, command, ids)
-			return
+			
+			local newMessage = embeds:send(message, command, ids)
+			newMessage:setContent(locale.ambiguousID)
+			return 4, "Ambiguous input, sent embed "..newMessage.id
 		end
 	else
 		return ids
 	end
 end
 
-local function regunregAction (message, ids, action)	-- register and unregister are painfully simmilar, unified here
+local function actionFinalizer (message, action, ids)	-- register, unregister and template are painfully simmilar, unified here
 	local badUser, badBot, badChannel, redundant = {}, {}, {}, {}
-	local locale = getLocale(message.guild)
 	
 	for i,_ in ipairs(ids) do repeat
 		local channel = client:getChannel(ids[i])
-		if channel.type == channelType.voice then
-			if (action == "register") == not lobbies[channel.id] then
-				if channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
-					if action == "register" and not channel.guild.me:hasPermission(channel.category, permission.manageChannels) then
-						table.insert(badBot, table.remove(ids, i))
+		if channel then
+			if channel.type == channelType.voice and channel.guild:getMember(message.author) then
+				if (action == "register") == not lobbies[channel.id] then
+					if channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
+						if action == "unregister" or channel.guild.me:hasPermission(channel.category, permission.manageChannels) then
+							break
+						else
+							table.insert(badBot, table.remove(ids, i))
+						end
 					else
-						break
+						table.insert(badUser, table.remove(ids, i))
 					end
 				else
-					table.insert(badUser, table.remove(ids, i))
+					table.insert(redundant, table.remove(ids, i))
 				end
 			else
-				table.insert(redundant, table.remove(ids, i))
+				table.insert(badChannel, table.remove(ids, i))
 			end
-		else
-			table.insert(badChannel, table.remove(ids, i))
-		end
+		else break end
 	until not ids[i] end
 
-	local msg = ""
+	local msg, template = "", action:match("^template(.-)$")
 	if #ids > 0 then
-		msg = string.format(#ids == 1 and (action == "register" and locale.registeredOne or locale.unregisteredOne) or (action == "register" and locale.registeredMany or locale.unregisteredMany), #ids).."\n"
+		msg = string.format(
+		action == "register" and 
+			(#ids == 1 and locale.registeredOne or locale.registeredMany) or 
+		action == "unregister" and 
+			(#ids == 1 and locale.unregisteredOne or locale.unregisteredMany) or
+		locale.newTemplate, template or #ids).."\n"
 		for _, channelID in ipairs(ids) do
-			local channel = client:getChannel(channelID)
-			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			local channel, guild = client:getChannel(channelID), client:getGuild(channelID)
+			msg = msg..(channel and 
+				string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name)
+			or
+				string.format(locale.channelNameCategory, "global", guild.name)
+			).."\n"
 			if action == "register" then
 				lobbies:add(channelID)
-			else
+			elseif action == "unregister" then
 				lobbies:remove(channelID)
+			else
+				(client:getGuild(channelID) and guilds or lobbies):updateTemplate(channelID, template)
 			end
 		end
 	end
@@ -151,6 +158,7 @@ local function regunregAction (message, ids, action)	-- register and unregister 
 		for _, channelID in ipairs(redundant) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			table.insert(badChannel, channelID)
 		end
 	end
 
@@ -159,6 +167,7 @@ local function regunregAction (message, ids, action)	-- register and unregister 
 		for _, channelID in ipairs(badBot) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			table.insert(badChannel, channelID)
 		end
 	end
 
@@ -168,144 +177,217 @@ local function regunregAction (message, ids, action)	-- register and unregister 
 		for _, channelID in ipairs(badUser) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			table.insert(badChannel, channelID)
 		end
 	end
 	
-	return msg
+	return msg, badChannel
 end
 
 local actions
 
 actions = {
 	help = function (message)
-		logger:log(4, "Help action invoked")
 		local command = message.content:match("help%s*(.-)$")
-		local locale = getLocale(message.guild)
 		if command and locale[command] then
 			message:reply(locale[command])
+			return 4, command.." help message"
 		else
-			message:reply(getLocale(message.guild).help)
+			message:reply(locale.help)
+			return 4, "Standard help message"
 		end
 	end,
 	
-	register = function (message, id)
-		local ids
+	register = function (message, ids)
+		local msg
 		
-		if id then -- sent by embed
-			ids = {id}
-		else
-			ids = parseForIDs(message, "register")
-			if not ids then return end
+		if not ids then -- ids may be sent by embed
+			ids, msg = parseForIDs(message, "register")
+			if msg then return ids, msg end
 		end
 		
-		message:reply(regunregAction(message, ids, "register"))
+		msg, ids = actionFinalizer(message, "register", ids)
+		message:reply(msg)
+		return 4, #ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " "))
 	end,
 
-	unregister = function (message, id)
-		local ids
+	unregister = function (message, ids)
+		local msg
 		
-		if id then -- sent by embed
-			ids = {id}
-		else
-			ids = parseForIDs(message, "unregister")
-			if not ids then return end
+		if not ids then
+			ids, msg = parseForIDs(message, "unregister")
+			if msg then return ids, msg end
 		end
 		
-		message:reply(regunregAction(message, ids, "unregister"))
+		msg, ids = actionFinalizer(message, "unregister", ids)
+		message:reply(msg)
+		return 4, #ids == 0 and "Successfully unregistered all" or ("Couldn't unregister "..table.concat(ids, " "))
 	end,
 	
-	template = function (message)
-		logger:log(4, "Template action invoked")
-		
-		local target = message.content:match("^.-template%s*(.-)%s*$")
-		
-		if target == "" or target == "global" then
-		
-		end
-		
-		local scope, template = message.content:match("^.-template%s*\"(.-)\"%s*\"(.-)\"$")
-	end,
-	
-	template1 = function (message)
-		logger:log(4, "Template1 action invoked")
-		
-		local template, scope = message.content:match("^.-template%s*%[(.-)%]%s*%[(.-)%]$")
-	end,
-	
-	template2 = function (message)
-		logger:log(4, "Template2 action invoked")
-		
-		local delimeter = message.content
-	end,
-	
-	language = function (message)
-		if not message.guild then
-			logger:log(4, "Language in dm")
-			message:reply("I can process that only in server")
-			return
-		end
-		
-		if not message.member:hasPermission(permission.manageChannels) then
-			logger:log(4, "Mention in vain")
-			message:reply(getLocale(message.guild).mentionInVain:format(message.author.mentionString))
-			return
-		end
-		
-		logger:log(4, "Language action invoked")
-		
-		local lang = (message.content:match("language%s+(.-)$") or ""):lower()
-		
-		if locale[lang] then
-			guilds:updateLocale(message.guild.id, lang)
-			message:reply(getLocale(message.guild).updatedLocale)
-		else
-			logger:log(4, "No language '%s' found", lang)
-			local msg = getLocale(message.guild).availableLanguages
-			for langName, _ in pairs(locale) do
-				msg = msg.." "..langName..","
+	template = function (message, ids, template)
+		if not ids then
+			ids = {}
+			local scope
+			scope, template = message.content:match('^.-template%s*"(.-)"%s*(.-)$')
+			
+			if scope then
+				local guild, lobby = client:getGuild(scope), lobbies[scope] and client:getChannel(scope)
+				if scope == "global" and message.guild then
+					scope = message.guild.id
+					guild = message.guild
+				end
+				
+				if (guild and not guild:getMember(message.author)) or (lobby and not lobby.guild:getMember(message.author)) then
+					message:reply(locale.notMember)
+					return 4, "Not a member"
+				end
+				
+				if template == "" then
+					if guild then
+						message:reply(guilds[guild.id].template and locale.globalTemplate:format(guilds[guild.id].template) or locale.defaultTemplate)
+						return 4, "Sent global template"
+					elseif lobby then
+						message:reply(lobbies[lobby.id].template and locale.lobbyTemplate:format(lobby.name, lobbies[lobby.id].template) or locale.noTemplate)
+						return 4, "Sent channel template"
+					else
+						if message.guild then
+							for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return channel.name == scope and lobbies[channel.id] end), truePositionSorting)) do
+								table.insert(ids, channel)
+							end
+							
+							if #ids == 0 then
+								message:reply(locale.badInput)
+								return 4, "Didn't find the channel by name"
+							elseif #ids > 1 then
+								message:reply(locale.ambiguousID)
+								return 4, "Ambiguous input"
+							end
+						else
+							message:reply(locale.onlyInServer)
+							return 4, "Template get by name in dm"
+						end
+					end
+				else
+					if guild or lobby then
+						ids[1] = scope
+					else
+						for id in scope:gmatch("%d+") do
+							if lobbies[id] and client:getChannel(id) then table.insert(ids, id) end
+						end
+						if #ids == 0 then
+							if message.guild then
+								scope = scope:lower()
+								for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) 
+									return channel.name:lower() == scope and lobbies[channel.id]
+								end), truePositionSorting)) do
+									table.insert(ids, channel.id)
+								end
+								
+								if #ids == 0 then
+									message:reply(locale.badInput)
+									return 4, "Didn't find the channel by name"
+								elseif #ids > 1 then
+									if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+										message:reply(locale.ambiguousID.."\n"..locale.gimmeReaction)
+										return 4, "Ambiguous input, can't do embed"
+									end
+									
+									local newMessage = embeds:send(message, "template"..template, ids)
+									newMessage:setContent(locale.ambiguousID)
+									return 4, "Ambiguous input, sent embed "..newMessage.id
+								end
+							else
+								message:reply(locale.onlyInServer)
+								return 4, "Template set by name in dm"
+							end
+						end
+					end
+				end
+			else
+				template = message.content:match("^.-template%s*(.-)%s*$")
+				if message.guild then
+					if template == "" then
+						message:reply(guilds[message.guild.id].template and locale.globalTemplate:format(guilds[message.guild.id].template) or locale.defaultTemplate)
+						return 4, "Sent global template"
+					else
+						if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
+							message:reply(locale.gimmeReaction)
+							return 4, "Empty template, can't do embed"
+						end
+						
+						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return$ lobbies[channel.id] end), truePositionSorting)) do
+							table.insert(ids, channel)
+						end
+						
+						return 4, "Empty template, sent embed "..embeds:send(message, "template"..template, ids).id
+					end
+				else
+					message:reply(locale.noID)
+					return 4, "Empty template in dm"
+				end
 			end
-			msg = msg:sub(1,-2)
-			message:reply(msg)
 		end
+
+		template, ids = actionFinalizer(message, "template"..template, ids)
+		message:reply(template)
+		return 4, #ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " "))
 	end,
 	
 	prefix = function (message)
-		if not message.guild then
-			logger:log(4, "Prefix in dm")
-			message:reply("I can process that only in server")
-			return
+		local prefix = message.guild and guilds[message.guild.id].prefix or nil
+		
+		local guild = client:getGuild(prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*prefix%s*(%d+).-$") or
+			message.content:match("^<@.?601347755046076427>%s*prefix%s*(%d+).-$") or
+			message.content:match("^<@.?676787135650463764>%s*prefix%s*(%d+).-$") or
+			message.content:match("^%s*prefix%s*(%d+).-$"))
+		
+		if guild and not guild:getMember(message.author) then
+			message:reply(locale.notMember)
+			return 4, "Not a member"
 		end
 		
-		logger:log(4, "Prefix action invoked")
-		local prefix = message.guild and guilds[message.guild.id].prefix or nil
 		local newPrefix = 
-			message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*prefix%s*(.-)$") or 
-			message.content:match("^<@.?601347755046076427>%s*prefix%s*(.-)$") or 
-			message.content:match("^<@.?676787135650463764>%s*prefix%s*(.-)$")
+			guild and (
+				prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*prefix%s*%d+%s*(.-)$") or
+				message.content:match("^<@.?601347755046076427>%s*prefix%s*%d+%s*(.-)$") or
+				message.content:match("^<@.?676787135650463764>%s*prefix%s*%d+%s*(.-)$") or
+				message.content:match("^%s*prefix%s*%d+%s*(.-)$")
+			) or (
+				prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*prefix%s*(.-)$") or
+				message.content:match("^<@.?601347755046076427>%s*prefix%s*(.-)$") or
+				message.content:match("^<@.?676787135650463764>%s*prefix%s*(.-)$") or
+				message.content:match("^%s*prefix%s*(.-)$"))
 		
-		if newPrefix then
-			if not message.member:hasPermission(permission.manageChannels) then
-				message:reply(getLocale(message.guild).mentionInVain:format(message.author.mentionString))
-				return
+		guild = guild or message.guild
+		if newPrefix and newPrefix ~= "" then
+			if not guild then
+				message:reply(locale.badServer)
+				return 4, "Didn't find the guild"
 			end
-			guilds:updatePrefix(message.guild.id, newPrefix)
-			message:reply(getLocale(message.guild).prefixConfirm:format(newPrefix))
+			if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
+				message:reply(locale.mentionInVain:format(message.author.mentionString))
+				return 4, "Bad user permissions"
+			end
+			guilds:updatePrefix(guild.id, newPrefix)
+			message:reply(locale.prefixConfirm:format(newPrefix))
+			return 4, "Set new prefix"
 		else
-			message:reply(string.format(guilds[message.guild.id].newPrefix and getLocale(message.guild).prefixThis or getLocale(message.guild).prefixAbsent, guilds[message.guild.id].Prefix))
+			message:reply(locale.prefixThis:format(guilds[guild.id].prefix))
+			return 4, "Sent current prefix"
 		end
 	end,
 	
 	list = function (message)
-		if not message.guild then
-			logger:log(4, "List in dm")
-			message:reply("I can process that only in server")
-			return
+		local guild = client:getGuild(message.content:match("list%s*(%d+)")) or message.guild
+		if not guild then
+			message:reply(locale.badServer)
+			return 4, "Didn't find the guild"
+		elseif not guild:getMember(message.author) then
+			message:reply(locale.notMember)
+			return 4, "Not a member"
 		end
 		
-		logger:log(4, "List action invoked")
-		
-		local locale = getLocale(message.guild)
-		local lobbies = message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
+		local lobbies = guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
 		table.sort(lobbies, truePositionSorting)
 		
 		local msg = (#lobbies == 0 and locale.noLobbies or locale.someLobbies) .. "\n"
@@ -314,6 +396,7 @@ actions = {
 		end
 		
 		message:reply(msg)
+		return 4, "Sent lobby list"
 	end,
 	
 	shutdown = function (message)
@@ -335,29 +418,46 @@ actions = {
 	
 	stats = function (message)
 		logger:log(4, "Stats action invoked")
-		local locale = getLocale(message.guild)
+		
+		local guildID = message.content:match("stats%s*(%d+)")
+		local guild = client:getGuild(guildID)
+		if guildID and not guild then
+			message:reply(locale.badServer)
+			return 4, "Didn't find the guild"
+		end
+		if guild and not guild:getMember(message.author) then
+			message:reply(locale.notMember)
+			return 4, "Not a member"
+		end
 		
 		local t = os.clock()
 		message.channel:broadcastTyping()
 		t = math.modf((os.clock() - t)*1000)
 		
-		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds, #lobbies, #channels, channels:people()
-		message:reply(string.format(
-			(guildCount == 1 and lobbyCount == 1) and locale.serverLobby or (
-			guildCount == 1 and locale.serverLobbies or (
-			lobbyCount == 1 and locale.serversLobby or 
-			locale.serversLobbies)), guildCount, lobbyCount) .. "\n" ..
-		string.format(
-			(channelCount == 1 and peopleCount == 1) and locale.channelPerson or (
-			channelCount == 1 and locale.channelPeople or (
-			peopleCount == 1 and locale.channelsPerson or -- practically impossible, but whatever
-			locale.channelsPeople)), channelCount, peopleCount) .. "\n" ..
-		string.format(locale.ping, t))
+		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds
+		if guild then
+			lobbyCount, channelCount, peopleCount = lobbies:inGuild(guild.id), channels:inGuild(guild.id), channels:people(guild.id)
+		else
+			lobbyCount, channelCount, peopleCount = #lobbies, #channels, channels:people()
+		end
+		message:reply((guild and (
+			lobbyCount == 1 and locale.lobby or locale.lobbies:format(lobbyCount)
+			) or (
+			(guildCount == 1 and lobbyCount == 1) and locale.serverLobby or string.format((
+				guildCount == 1 and locale.serverLobbies or (
+				lobbyCount == 1 and locale.serversLobby or 
+				locale.serversLobbies)), guildCount, lobbyCount))) .. "\n" ..
+			((channelCount == 1 and peopleCount == 1) and locale.channelPerson or string.format((
+				channelCount == 1 and locale.channelPeople or (
+				peopleCount == 1 and locale.channelsPerson or -- practically impossible, but whatever
+				locale.channelsPeople)), channelCount, peopleCount)) .. "\n" ..
+			string.format(locale.ping, t))
+		return 4, "Sent current stats"
 	end,
 	
 	support = function (message)
-		logger:log(4, "Support action invoked")
 		message:reply("https://discord.gg/tqj6jvT")
+		return 4, "Sent support invite"
 	end
 }
 

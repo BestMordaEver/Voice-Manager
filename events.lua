@@ -1,17 +1,16 @@
 local discordia = require "discordia"
 local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
-local locale = require "./locale.lua"
-local utils = require "./utils.lua"
 
 local channels = require "./channels.lua"
 local lobbies = require "./lobbies.lua"
 local guilds = require "./guilds.lua"
 local embeds = require "./embeds.lua"
 
+local locale = require "./locale"
 local actions = require "./actions.lua"
 local finalizer = require "./finalizer.lua"
 
-local getLocale = require "./utils.lua".getLocale
+local getTemplate = require "./utils.lua".getTemplate
 local permission = require "discordia".enums.permission
 
 local events = {
@@ -25,19 +24,29 @@ local events = {
 			return
 		end
 		
-		logger:log(4, "Message received, processing...")
+		logger:log(4, "Message received, processing -> %s", message.content)
 		
 		if message.guild then message.guild:getMember(message.author) end	-- cache the member object
 
-		local command = prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%w+)") or 
-			(message.content:match("^<@.?601347755046076427>%s*(%w+)") or message.content:match("^<@.?676787135650463764>%s*(%w+)"))
-		if not actions[command] then logger:log(4, "Nothing"); return end
-		local res, msg = pcall(function() actions[command](message) end)
-		if not res then 
-			logger:log(1, "Couldn't process the message, %s", msg)
-			client:getChannel("686261668522491980"):send("Couldn't process the message: "..message.content.."\n"..msg)
-			message:reply(getLocale(message.guild).error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
+		local command = 
+		prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%w+)") or 
+			message.content:match("^<@.?601347755046076427>%s*(%w+)") or 
+			message.content:match("^<@.?676787135650463764>%s*(%w+)") or
+			message.content:match("^(%w+)")
+		
+		if not actions[command] then 
+			logger:log(4, "Nothing")
+			return
+		else
+			logger:log(4, command.." action invoked")
 		end
+		
+		local res, msg = pcall(function() logger:log(actions[command](message)) end)
+		if not res then
+			message:reply(locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
+			error(msg)
+		end
+		logger:log(4, command.." action complete")
 	end,
 	
 	messageUpdate = function (message)	-- hearbeat
@@ -60,7 +69,7 @@ local events = {
 		elseif reaction.emojiHash == "➡" then
 			embeds:updatePage(reaction.message, embedData.page + 1)
 		else
-			actions[embedData.action](reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
+			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.-)$"))
 		end
 	end,
 	
@@ -72,10 +81,9 @@ local events = {
 		local embedData = embeds[reaction.message]
 		
 		logger:log(4, "Processing removed reaction")
-		if embeds[reaction.message].action == "unregister" then
-			actions.register(reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
-		else
-			actions.unregister(reaction.message, embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]])
+		if embeds.reactions[reaction.emojiHash] and not embedData.action:match("template") then
+			actions[embedData.action == "unregister" and "register" or (embedData.action == "register" and "unregister")]
+				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		end
 	end,
 	
@@ -97,10 +105,25 @@ local events = {
 		if lobbies[channel.id] then
 			logger:log(4, member.user.id.." joined lobby "..channel.id)
 			local category = channel.category or channel.guild
-			local newChannel = category:createVoiceChannel((member.nickname or member.user.name).."'s channel")
+			local name = getTemplate(channel)
+			if name:match("%%.-%%") then
+				local nickname = member.nickname or member.user.name
+				local rt = {
+					nickname = nickname,
+					name = member.user.name,
+					tag = member.user.tag,
+					["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
+					["name's"] = member.user.name .. (member.user.name:sub(-1,-1) == "s" and "'" or "'s")
+				}
+				name = name:gsub("%%(.-)%%", rt)
+			end
+			
+			local newChannel = category:createVoiceChannel(name)
 			member:setVoiceChannel(newChannel.id)
-			logger:log(4, "Created "..newChannel.id)
 			channels:add(newChannel.id)
+			
+			logger:log(4, "Created "..newChannel.id.." in "..channel.guild.id)
+			
 			newChannel:setUserLimit(channel.userLimit)
 			if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
