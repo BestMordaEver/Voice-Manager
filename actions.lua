@@ -315,7 +315,7 @@ actions = {
 							return 4, "Empty template, can't do embed"
 						end
 						
-						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return$ lobbies[channel.id] end), truePositionSorting)) do
+						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end), truePositionSorting)) do
 							table.insert(ids, channel)
 						end
 						
