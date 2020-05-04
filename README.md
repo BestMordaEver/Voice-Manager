@@ -9,12 +9,12 @@ The bot will keep new channels in the same category as the lobby and will enable
 [Here's how it looks](https://i.imgur.com/xNKVC2B.mp4)
 
 List of available commands:
-- help - shows help message
+- help - sends help message or information about another commands
 - register - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
 - unregister - unregisters an existing lobby. You can feed it channel IDs or channel name
+- template - change new channels' name template. Look at "help template" to learn more
 - prefix - set a new prefix. Mentioning will still work
-- language - change language
-- list - lists all registered lobbies
+- list - lists all registered lobbies on the server
 - stats - take a sneak peek on bot's performance!
 - support - sends an invite to support Discord server
 
