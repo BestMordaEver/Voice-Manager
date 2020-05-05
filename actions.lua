@@ -13,7 +13,7 @@ local permission, channelType = discordia.enums.permission, discordia.enums.chan
 
 local truePositionSorting = require "./utils.lua".truePositionSorting
 
-local function parseForIDs (message, command)			-- returns a table of all ids
+local function registerParse (message, command)			-- returns a table of all ids
 	local id = message.content:match(command.."%s+(.-)$")
 	if not id then
 		if not message.guild then
@@ -119,14 +119,14 @@ local function actionFinalizer (message, action, ids)	-- register, unregister an
 		else break end
 	until not ids[i] end
 
-	local msg, template = "", action:match("^template(.-)$")
+	local msg, template = "", action:match("^template(.+)$")
 	if #ids > 0 then
 		msg = string.format(
 		action == "register" and 
 			(#ids == 1 and locale.registeredOne or locale.registeredMany) or 
 		action == "unregister" and 
 			(#ids == 1 and locale.unregisteredOne or locale.unregisteredMany) or
-		locale.newTemplate, template or #ids).."\n"
+		template and locale.newTemplate or locale.resetTemplate, template or #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel, guild = client:getChannel(channelID), client:getGuild(channelID)
 			msg = msg..(channel and 
@@ -202,7 +202,7 @@ actions = {
 		local msg
 		
 		if not ids then -- ids may be sent by embed
-			ids, msg = parseForIDs(message, "register")
+			ids, msg = registerParse(message, "register")
 			if msg then return ids, msg end
 		end
 		
@@ -215,7 +215,7 @@ actions = {
 		local msg
 		
 		if not ids then
-			ids, msg = parseForIDs(message, "unregister")
+			ids, msg = registerParse(message, "unregister")
 			if msg then return ids, msg end
 		end
 		
@@ -227,22 +227,18 @@ actions = {
 	template = function (message, ids, template)
 		if not ids then
 			ids = {}
-			local scope
-			scope, template = message.content:match('^.-template%s*"(.-)"%s*(.-)$')
+			local scope, reset
+			reset, scope, template = message.content:match('^.-template%s*(.-)%s*"(.-)"%s*(.-)$')
 			
 			if scope then
-				local guild, lobby = client:getGuild(scope), lobbies[scope] and client:getChannel(scope)
-				if scope == "global" and message.guild then
-					scope = message.guild.id
-					guild = message.guild
-				end
+				local guild, lobby = scope == "global" and message.guild or client:getGuild(scope), lobbies[scope] and client:getChannel(scope)
 				
 				if (guild and not guild:getMember(message.author)) or (lobby and not lobby.guild:getMember(message.author)) then
 					message:reply(locale.notMember)
 					return 4, "Not a member"
 				end
 				
-				if template == "" then
+				if reset == "" and template == "" then
 					if guild then
 						message:reply(guilds[guild.id].template and locale.globalTemplate:format(guilds[guild.id].template) or locale.defaultTemplate)
 						return 4, "Sent global template"
@@ -272,7 +268,7 @@ actions = {
 					end
 				else
 					if guild or lobby then
-						ids[1] = scope
+						ids[1] = (guild or lobby).id
 					else
 						for id in scope:gmatch("%d+") do
 							if lobbies[id] and client:getChannel(id) then table.insert(ids, id) end
@@ -321,6 +317,7 @@ actions = {
 						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end), truePositionSorting)) do
 							table.insert(ids, channel.id)
 						end
+						if template == "reset" then template = "" end
 						
 						return 4, "Empty template, sent embed "..embeds:send(message, "template"..template, ids).id
 					end
@@ -331,7 +328,7 @@ actions = {
 			end
 		end
 
-		template, ids = actionFinalizer(message, "template"..template, ids)
+		template, ids = actionFinalizer(message, "template"..(template or ""), ids)
 		message:reply(template)
 		return 4, #ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " "))
 	end,

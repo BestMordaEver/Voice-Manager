@@ -45,15 +45,13 @@ return setmetatable({}, {
 		end,
 		
 		updateTemplate = function (self, lobbyID, template)
-			if template then
-				if self[lobbyID].template ~= template then
-					self[lobbyID].template = template
-					logger:log(4, "MEMORY: Updated template for lobby "..lobbyID)
-				end
-				if not sqlite:prepare("SELECT * FROM lobbies WHERE template = ? AND id = ?"):bind(template, lobbyID):step() then
-					sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"):bind(template, lobbyID):step()	-- don't even think about it
-					logger:log(4, "DATABASE: Updated template for lobby "..lobbyID)
-				end
+			if self[lobbyID].template ~= template then
+				self[lobbyID].template = template
+				logger:log(4, "MEMORY: Updated template for lobby "..lobbyID)
+			end
+			if not sqlite:prepare("SELECT * FROM lobbies WHERE template = ? AND id = ?"):bind(template, lobbyID):step() then
+				sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"):bind(template, lobbyID):step()	-- don't even think about it
+				logger:log(4, "DATABASE: Updated template for lobby "..lobbyID)
 			end
 		end,
 		
