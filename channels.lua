@@ -61,7 +61,7 @@ return setmetatable({}, {
 			local p = 0
 			for channelID, _ in pairs(self) do
 				local channel = client:getChannel(channelID)
-				if channel.guild.id == guildID then p = p + #channel.connectedMembers end
+				if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
 			end
 			return p
 		end,
