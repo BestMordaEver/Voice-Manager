@@ -61,15 +61,13 @@ return setmetatable({}, {
 		end,
 		
 		updateTemplate = function (self, guildID, template)
-			if template then
-				if self[guildID].template ~= template then
-					self[guildID].template = template
-					logger:log(4, "MEMORY: Updated prefix for "..guildID)
-				end
-				if not sqlite:prepare("SELECT * FROM guilds WHERE template = ? AND id = ?"):bind(template, guildID):step() then
-					sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"):bind(template, guildID):step()	-- don't even think about it
-					logger:log(4, "DATABASE: Updated template for guild "..guildID)
-				end
+			if self[guildID].template ~= template then
+				self[guildID].template = template
+				logger:log(4, "MEMORY: Updated prefix for "..guildID)
+			end
+			if not sqlite:prepare("SELECT * FROM guilds WHERE template = ? AND id = ?"):bind(template, guildID):step() then
+				sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"):bind(template, guildID):step()	-- don't even think about it
+				logger:log(4, "DATABASE: Updated template for guild "..guildID)
 			end
 		end
 	}

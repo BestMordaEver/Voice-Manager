@@ -11,10 +11,12 @@ return setmetatable({}, {
 		
 		new = function (self, action, page, ids)
 			local reactions = self.reactions
+			local template = action:match("^template(.-)$")
 			local embed = {
 				title =
 					action == "register" and locale.embedRegister or (
-					action == "unregister" and locale.embedUnregister or locale.embedTemplate:format(action:match("^template(.-)$"))),
+					action == "unregister" and locale.embedUnregister or (
+					template == "" and locale.embedResetTemplate or locale.embedTemplate:format(template))),
 				description = ""
 			}
 			

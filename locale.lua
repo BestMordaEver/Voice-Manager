@@ -2,7 +2,7 @@ local locale = {
 	help = [[**:arrow_down: You need a "Manage Channels" permission to use those commands! :arrow_down:**
 `register` - registers a voice channel that will be used as a lobby. You can feed it channel IDs or channel name
 `unregister` - unregisters an existing lobby. You can feed it channel IDs or channel name
-`template` - change the new channel's name template. Look at `help template` to learn more
+`template` - change new channels' name template. Look at `help template` to learn more
 `prefix` - set a new prefix for me. Mentioning will still work
 **:arrow_up: You need a "Manage Channels" permission to use those commands! :arrow_up:**
 `help` - sends this message or information about another commands
@@ -44,7 +44,18 @@ Changes the global template
 `template "<channel_id> <channel_id> ..." <template_text>`
 Changes the template for listed channels
 
-Default template is `%nickname's% channel`. You can customize it by including different `%combos%` to the template:
+`template reset "global"` OR
+`template reset "<server_id>"`
+Resets the global template to default `%nickname's% channel`
+
+`template reset "<channel_name>"` OR
+`template reset "<channel_id> <channel_id> ..."`
+Removes the template for listed channels so they will use global template
+
+`template reset`
+Sends a handy widget that helps you to reset channel template
+
+You can customize a template by including different `%combos%` to it:
 `%nickname%` - user's nickname (name is used if no nickname is set)
 `%name%` - user's name
 `%tag%` - user's tag (for example `Riddles#2773`)
@@ -79,9 +90,11 @@ Sends stats for specific server]],
 	globalTemplate = [[Current global template is **`%s`**]],
 	defaultTemplate = [[Your guild uses the default template `%nickname's% channel`]],
 	lobbyTemplate = [[Current template for **`%s`** is **`%s`**]],
-	newTemplate = [[Set a new template **`%s`**:]],
 	noTemplate = [[This lobby doesn't have a custom template]],
+	newTemplate = [[Set a new template **`%s`**:]],
+	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Click on a lobby number to apply template **`%s`** to it]],
+	embedResetTemplate = [[Click on a lobby number to reset its template]],
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],

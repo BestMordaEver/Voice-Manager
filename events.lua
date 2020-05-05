@@ -69,7 +69,7 @@ local events = {
 		elseif reaction.emojiHash == "➡" then
 			embeds:updatePage(reaction.message, embedData.page + 1)
 		else
-			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.-)$"))
+			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.+)$"))
 		end
 	end,
 	
@@ -81,8 +81,8 @@ local events = {
 		local embedData = embeds[reaction.message]
 		
 		logger:log(4, "Processing removed reaction")
-		if embeds.reactions[reaction.emojiHash] and not embedData.action:match("template") then
-			actions[embedData.action == "unregister" and "register" or (embedData.action == "register" and "unregister")]
+		if embeds.reactions[reaction.emojiHash] then
+			actions[embedData.action == "unregister" and "register" or (embedData.action == "register" and "unregister" or "template")]
 				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		end
 	end,
