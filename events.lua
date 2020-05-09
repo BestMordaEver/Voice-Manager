@@ -10,7 +10,6 @@ local locale = require "./locale"
 local actions = require "./actions.lua"
 local finalizer = require "./finalizer.lua"
 
-local getTemplate = require "./utils.lua".getTemplate
 local permission = discordia.enums.permission
 local reactions = embeds.reactions
 
@@ -74,6 +73,7 @@ local events = {
 		elseif reaction.emojiHash == reactions.right then
 			embeds:updatePage(reaction.message, embedData.page + 1)
 		elseif reaction.emojiHash == reactions.page then
+			reaction.message.channel:broadcastTyping()
 			local ids = {}
 			for i = embedData.page*10 - 9, embedData.page*10 do
 				if not embedData.ids[i] then break end
@@ -81,6 +81,7 @@ local events = {
 			end
 			(actions[embedData.action] or actions.template)(reaction.message, ids, embedData.action:match("^template(.+)$"))
 		elseif reaction.emojiHash == reactions.all then
+			reaction.message.channel:broadcastTyping();
 			(actions[embedData.action] or actions.template)(reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
 		else
 			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.+)$"))
@@ -98,6 +99,7 @@ local events = {
 		if embeds.reactions[reaction.emojiHash] then
 			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		elseif reaction.emojiHash == reactions.page then
+			reaction.message.channel:broadcastTyping()
 			local ids = {}
 			for i = embedData.page*10 - 9, embedData.page*10 do
 				if not embedData.ids[i] then break end
@@ -105,6 +107,7 @@ local events = {
 			end
 			actions[antiAction(embedData.action)](reaction.message, ids, embedData.action:match("^template(.+)$"))
 		elseif reaction.emojiHash == reactions.all then
+			reaction.message.channel:broadcastTyping();
 			actions[antiAction(embedData.action)](reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
 		end
 	end,
@@ -127,7 +130,7 @@ local events = {
 		if lobbies[channel.id] then
 			logger:log(4, member.user.id.." joined lobby "..channel.id)
 			local category = channel.category or channel.guild
-			local name = getTemplate(channel)
+			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
 			if name:match("%%.-%%") then
 				local nickname = member.nickname or member.user.name
 				local rt = {
