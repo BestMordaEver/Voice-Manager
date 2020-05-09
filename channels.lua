@@ -1,29 +1,39 @@
 local discordia = require "discordia"
+local mutex = discordia.Mutex()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
+
+local selectID, insert, delete = 
+	sqlite:prepare("SELECT * FROM channels WHERE id = ?"),
+	sqlite:prepare("INSERT INTO channels VALUES(?)"),
+	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
 return setmetatable({}, {
 	__index = {
 		add = function (self, channelID)
+			mutex:lock()
 			if not self[channelID] then
 				self[channelID] = true
 				logger:log(4, "MEMORY: Added channel "..channelID)
 			end
-			if not sqlite:exec("SELECT * FROM channels WHERE id = "..channelID) then
-				local res = pcall(function() sqlite:exec("INSERT INTO channels VALUES("..channelID..")") end)
-				if res then logger:log(4, "DATABASE: Added channel "..channelID) end
+			if not selectID:reset():bind(channelID):step() then
+				insert:reset():bind(channelID):step()
+				logger:log(4, "DATABASE: Added channel "..channelID)
 			end
+			mutex:unlock()
 		end,
 		
 		remove = function (self, channelID)
+			mutex:lock()
 			if self[channelID] then
 				self[channelID] = nil
 				logger:log(4, "MEMORY: Deleted channel "..channelID)
 			end
-			if sqlite:exec("SELECT * FROM channels WHERE id = "..channelID) then
-				local res = pcall(function() sqlite:exec("DELETE FROM channels WHERE id = "..channelID) end)
-				if res then logger:log(4, "DATABASE: Deleted channel "..channelID) end
+			if selectID:reset():bind(channelID):step() then
+				delete:reset():bind(channelID):step()
+				logger:log(4, "DATABASE: Deleted channel "..channelID)
 			end
+			mutex:unlock()
 		end,
 		
 		load = function (self)
@@ -47,6 +57,7 @@ return setmetatable({}, {
 		end,
 		
 		cleanup = function (self)
+			mutex:lock()
 			for channelID,_ in pairs(self) do
 				local channel = client:getChannel(channelID)
 				if channel then
@@ -55,6 +66,7 @@ return setmetatable({}, {
 					end
 				end
 			end
+			mutex:unlock()
 		end,
 		
 		people = function (self, guildID)

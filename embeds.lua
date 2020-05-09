@@ -7,17 +7,21 @@ return setmetatable({}, {
 	__index = {
 		reactions = {"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟",
 			["1️⃣"] = 1, ["2️⃣"] = 2, ["3️⃣"] = 3, ["4️⃣"] = 4, ["5️⃣"] = 5, ["6️⃣"] = 6, ["7️⃣"] = 7, ["8️⃣"] = 8, ["9️⃣"] = 9, ["🔟"] = 10,
-			left = "⬅", right = "➡"},
+			left = "⬅", right = "➡", page = "📄", all = "*️⃣"},
 		
 		new = function (self, action, page, ids)
 			local reactions = self.reactions
 			local template = action:match("^template(.-)$")
+			local nids = #ids
+			
 			local embed = {
 				title =
-					action == "register" and locale.embedRegister or (
-					action == "unregister" and locale.embedUnregister or (
-					template == "" and locale.embedResetTemplate or locale.embedTemplate:format(template))),
-				description = ""
+					action == "register" and (nids > 10 and locale.embedRegisterPages or locale.embedRegister) or (
+					action == "unregister" and (nids > 10 and locale.embedUnregisterPages or locale.embedUnregister) or (
+					template == "" and (nids > 10 and locale.embedResetTemplatePages or locale.embedResetTemplate) or 
+						(nids > 10 and locale.embedTemplatePages or locale.embedTemplate):format(template))),
+				description = "",
+				footer = nids > 10 and {text = locale.embedPages:format(page, math.ceil(nids/10))} or nil
 			}
 			
 			for i=10*(page-1)+1,10*page do
@@ -39,6 +43,8 @@ return setmetatable({}, {
 				message:addReaction(reactions[math.fmod(i-1,10)+1])
 			end
 			if embedData.page ~= math.modf(#embedData.ids/10)+1 then message:addReaction(reactions.right) end
+			if #embedData.ids > 10 then message:addReaction(reactions.page) end
+			message:addReaction(reactions.all)
 		end,
 		
 		send = function (self, message, action, ids)
