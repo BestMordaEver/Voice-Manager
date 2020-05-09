@@ -11,7 +11,12 @@ local actions = require "./actions.lua"
 local finalizer = require "./finalizer.lua"
 
 local getTemplate = require "./utils.lua".getTemplate
-local permission = require "discordia".enums.permission
+local permission = discordia.enums.permission
+local reactions = embeds.reactions
+
+local function antiAction (action)
+	return action == "unregister" and "register" or (action == "register" and "unregister" or "template")
+end
 
 local events = {
 	messageCreate = function (message)
@@ -64,10 +69,19 @@ local events = {
 		local embedData = embeds[reaction.message]
 		
 		logger:log(4, "Processing reaction")
-		if reaction.emojiHash == "⬅" then
+		if reaction.emojiHash == reactions.left then
 			embeds:updatePage(reaction.message, embedData.page - 1)
-		elseif reaction.emojiHash == "➡" then
+		elseif reaction.emojiHash == reactions.right then
 			embeds:updatePage(reaction.message, embedData.page + 1)
+		elseif reaction.emojiHash == reactions.page then
+			local ids = {}
+			for i = embedData.page*10 - 9, embedData.page*10 do
+				if not embedData.ids[i] then break end
+				table.insert(ids, embedData.ids[i])
+			end
+			(actions[embedData.action] or actions.template)(reaction.message, ids, embedData.action:match("^template(.+)$"))
+		elseif reaction.emojiHash == reactions.all then
+			(actions[embedData.action] or actions.template)(reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
 		else
 			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.+)$"))
 		end
@@ -82,8 +96,16 @@ local events = {
 		
 		logger:log(4, "Processing removed reaction")
 		if embeds.reactions[reaction.emojiHash] then
-			actions[embedData.action == "unregister" and "register" or (embedData.action == "register" and "unregister" or "template")]
-				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
+			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
+		elseif reaction.emojiHash == reactions.page then
+			local ids = {}
+			for i = embedData.page*10 - 9, embedData.page*10 do
+				if not embedData.ids[i] then break end
+				table.insert(ids, embedData.ids[i])
+			end
+			actions[antiAction(embedData.action)](reaction.message, ids, embedData.action:match("^template(.+)$"))
+		elseif reaction.emojiHash == reactions.all then
+			actions[antiAction(embedData.action)](reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
 		end
 	end,
 	

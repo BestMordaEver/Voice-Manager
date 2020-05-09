@@ -78,14 +78,17 @@ Sends general stats
 Sends stats for specific server]],
 	-- utility
 	channelNameCategory = [[`%s` in `%s`]],
+	embedPages = [[Page %d of %d]],
 	-- register
 	registeredOne = [[Registered new lobby:]],
 	registeredMany = [[Registered **`%d`** new lobbies:]],
-	embedRegister = [[Click on a channel number to register it]],
+	embedRegister = [[Click on a channel number to register it or :asterisk: to register all available channels]],
+	embedRegisterPages = [[Click on a channel number to register it, click :page_facing_up: to register the whole page or :asterisk: to register all available channels]],
 	-- unregister
 	unregisteredOne = [[Unregistered lobby:]],
 	unregisteredMany = [[Unregistered **`%d`** lobbies:]],
-	embedUnregister = [[Click on a channel number to unregister it]],
+	embedUnregister = [[Click on a channel number to unregister it or :asterisk: to unregister all lobbies]],
+	embedUnregisterPages = [[Click on a channel number to unregister it, click :page_facing_up: to unregister the whole page or :asterisk: to unregister all lobbies]],
 	-- template
 	globalTemplate = [[Current global template is **`%s`**]],
 	defaultTemplate = [[Your guild uses the default template `%nickname's% channel`]],
@@ -93,8 +96,10 @@ Sends stats for specific server]],
 	noTemplate = [[This lobby doesn't have a custom template]],
 	newTemplate = [[Set a new template **`%s`**:]],
 	resetTemplate = [[Reset a template:]],
-	embedTemplate = [[Click on a lobby number to apply template **`%s`** to it]],
-	embedResetTemplate = [[Click on a lobby number to reset its template]],
+	embedTemplate = [[Click on a lobby number to apply template **`%s`** to it or :asterisk: to apply it to all lobbies]],
+	embedTemplatePages = [[Click on a lobby number to apply template **`%s`** to it, click :page_facing_up: to apply it to the whole page or :asterisk: to apply it to all lobbies]],
+	embedResetTemplate = [[Click on a lobby number to reset its template or :asterisk: to reset all lobbies]],
+	embedResetTemplatePages = [[Click on a lobby number to reset its template, click :page_facing_up: to reset the whole page or :asterisk: to reset all lobbies]],
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],
