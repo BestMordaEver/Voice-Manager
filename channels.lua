@@ -64,6 +64,8 @@ return setmetatable({}, {
 					if #channel.connectedMembers == 0 then
 						channel:delete()
 					end
+				else
+					self:remove(channelID)
 				end
 			end
 			mutex:unlock()
