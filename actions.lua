@@ -28,7 +28,7 @@ local function registerParse (message, command)			-- returns a table of all ids
 		for _,channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel)
 			return (command == "register") == not lobbies[channel.id] and		-- embeds never offer redundant channels
 				message.guild.me:hasPermission(channel.category, permission.manageChannels) and
-				message.member:hasPermission(channel, permission.manageChannels)	-- non-embed related permission checks are in regunregAction
+				message.member:hasPermission(channel, permission.manageChannels)	-- non-embed related permission checks are in actionFinalizer
 		end), truePositionSorting)) do
 			table.insert(ids, channel.id)
 		end
@@ -129,7 +129,7 @@ local function actionFinalizer (message, action, ids)	-- register, unregister an
 		template and locale.newTemplate or locale.resetTemplate, template or #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel, guild = client:getChannel(channelID), client:getGuild(channelID)
-			msg = msg..(channel and 
+			msg = msg..(channel and
 				string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name)
 			or
 				string.format(locale.channelNameCategory, "global", guild.name)
@@ -359,11 +359,11 @@ actions = {
 				message.content:match("^%s*prefix%s*(.-)$"))
 		
 		guild = guild or message.guild
+		if not guild then
+			message:reply(locale.badServer)
+			return 4, "Didn't find the guild"
+		end
 		if newPrefix and newPrefix ~= "" then
-			if not guild then
-				message:reply(locale.badServer)
-				return 4, "Didn't find the guild"
-			end
 			if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
 				message:reply(locale.mentionInVain:format(message.author.mentionString))
 				return 4, "Bad user permissions"
@@ -399,28 +399,11 @@ actions = {
 		return 4, "Sent lobby list"
 	end,
 	
-	shutdown = function (message)
-		if message then
-			if message.author.id ~= "188731184501620736" then return end
-			message:reply("Shutting down gracefully")
-			logger:log(4, "Shutdown action invoked")
-		end
-		
-		local status, msg = pcall(function()
-			client:setGame({name = "the maintenance", type = 3})
-			clock:stop()
-			client:stop()
-			--conn:close()
-		end)
-		logger:log(3, (status and "Shutdown successfull" or ("Couldn't shutdown gracefully, "..msg)))
-		process:exit()
-	end,
-	
 	stats = function (message)
 		logger:log(4, "Stats action invoked")
 		
 		local guildID = message.content:match("stats%s*(%d+)")
-		local guild = client:getGuild(guildID)
+		local guild = guildID == "local" and message.guild or client:getGuild(guildID)
 		if guildID and not guild then
 			message:reply(locale.badServer)
 			return 4, "Didn't find the guild"
@@ -458,6 +441,23 @@ actions = {
 	support = function (message)
 		message:reply("https://discord.gg/tqj6jvT")
 		return 4, "Sent support invite"
+	end,
+	
+	shutdown = function (message)
+		if message then
+			if message.author.id ~= "188731184501620736" then return end
+			message:reply("Shutting down gracefully")
+			logger:log(4, "Shutdown action invoked")
+		end
+		
+		local status, msg = pcall(function()
+			client:setGame({name = "the maintenance", type = 3})
+			clock:stop()
+			client:stop()
+			--conn:close()
+		end)
+		logger:log(3, (status and "Shutdown successfull" or ("Couldn't shutdown gracefully, "..msg)))
+		process:exit()
 	end
 }
 

@@ -74,6 +74,9 @@ Lists all registered lobbies on the server]],
 	stats = [[`stats`
 Sends general stats
 
+`stats local`
+Sends stast for you server
+
 `stats <server_id>`
 Sends stats for specific server]],
 	-- utility
