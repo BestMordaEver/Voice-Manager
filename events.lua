@@ -189,7 +189,7 @@ local events = {
 		embeds:tick()
 		local people, channels = channels:people(), #channels
 		client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")),type = 2})
-		if finalizer:tick() then finalizer:kill() end
+		if finalizer:tick() or (people == 0 and os.clock() > 86000) then finalizer:kill() end
 	end,
 	
 	hour = require "./sendStats.lua"
