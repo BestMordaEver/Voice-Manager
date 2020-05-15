@@ -19,7 +19,7 @@ end
 
 local events = {
 	messageCreate = function (message)
-		if not guilds[message.guild.id] then return end
+		if message.guild and not guilds[message.guild.id] then return end
 		
 		local prefix = message.guild and guilds[message.guild.id].prefix or nil
 		
