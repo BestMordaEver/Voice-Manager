@@ -5,6 +5,8 @@ local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
 local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
+local channels = require "./channels.lua"
+
 local add, remove =
 	sqlite:prepare("INSERT INTO channels VALUES(?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
@@ -78,7 +80,11 @@ return setmetatable({}, {
 			local p = 0
 			for channelID, _ in pairs(self) do
 				local channel = client:getChannel(channelID)
-				if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
+				if channel then
+					if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
+				else
+					channels:remove(channelID)
+				end
 			end
 			return p
 		end,
