@@ -1,5 +1,4 @@
 local discordia = require "discordia"
-local mutex = discordia.Mutex()
 local emitter = discordia.Emitter()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
@@ -12,15 +11,11 @@ local add, remove =
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
 emitter:on("add", function (channelID)
-	mutex:lock()
 	pcall(storageInteractionEvent, add, channelID)
-	mutex:unlock()
 end)
 
 emitter:on("remove", function (channelID)
-	mutex:lock()
 	pcall(storageInteractionEvent, remove, channelID)
-	mutex:unlock()
 end)
 
 return setmetatable({}, {

@@ -1,5 +1,4 @@
 local discordia = require "discordia"
-local mutex = discordia.Mutex()
 local emitter = discordia.Emitter()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("guildsData.db")
@@ -12,27 +11,19 @@ local add, remove, updatePrefix, updateTemplate =
 	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?")
 
 emitter:on("add", function (guildID)
-	mutex:lock()
 	pcall(storageInteractionEvent, add, guildID)
-	mutex:unlock()
 end)
 
 emitter:on("remove", function (guildID)
-	mutex:lock()
 	pcall(storageInteractionEvent, remove, guildID)
-	mutex:unlock()
 end)
 
 emitter:on("updatePrefix", function (guildID, prefix)
-	mutex:lock()
 	pcall(storageInteractionEvent, updatePrefix, prefix, guildID)
-	mutex:unlock()
 end)
 
 emitter:on("updateTemplate", function (guildID, template)
-	mutex:lock()
 	pcall(storageInteractionEvent, updatePrefix, template, guildID)
-	mutex:unlock()
 end)
 
 return setmetatable({}, {

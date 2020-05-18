@@ -1,3 +1,6 @@
+local discordia = require "discordia"
+local mutexes = {}
+
 return {
 	truePositionSorting = function (a, b)
 		return (not a.category and b.category) or
@@ -6,6 +9,11 @@ return {
 	end,
 	
 	storageInteractionEvent = function (statement, ...)
+		if not mutexes[statement] then
+			mutexes[statement] = discordia.Mutex()
+		end
+		mutexes[statement]:lock()
 		statement:reset():bind(...):step()
+		mutexes[statement]:unlock()
 	end
 }
