@@ -1,5 +1,5 @@
 local discordia = require "discordia"
-local client, logger = discordia.storage.client, discordia.storage.logger
+local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
 
 local channels = require "./channels.lua"
 local lobbies = require "./lobbies.lua"
