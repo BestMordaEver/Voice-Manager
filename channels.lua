@@ -57,7 +57,6 @@ return setmetatable({}, {
 		end,
 		
 		cleanup = function (self)
-			mutex:lock()
 			for channelID,_ in pairs(self) do
 				local channel = client:getChannel(channelID)
 				if channel then
@@ -68,7 +67,6 @@ return setmetatable({}, {
 					self:remove(channelID)
 				end
 			end
-			mutex:unlock()
 		end,
 		
 		people = function (self, guildID)
