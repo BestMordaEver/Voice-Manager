@@ -129,17 +129,24 @@ local function actionFinalizer (message, action, ids)	-- register, unregister an
 		template and locale.newTemplate or locale.resetTemplate, template or #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel, guild = client:getChannel(channelID), client:getGuild(channelID)
-			msg = msg..(channel and
-				string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name)
-			or
-				string.format(locale.channelNameCategory, "global", guild.name)
-			).."\n"
+			if channel then
+				msg = msg..string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name).."\n"
+			end
+			if guild then 
+				msg = msg..string.format(locale.channelNameCategory, "global", guild.name).."\n"
+			end
+			
 			if action == "register" then
 				lobbies:add(channelID)
 			elseif action == "unregister" then
 				lobbies:remove(channelID)
 			else
-				(client:getGuild(channelID) and guilds or lobbies):updateTemplate(channelID, template)
+				if guilds[channelID] then
+					guilds:updateTemplate(channelID, template)
+				end
+				if lobbies[channelID] then
+					lobbies:updateTemplate(channelID, template)
+				end
 			end
 		end
 	end

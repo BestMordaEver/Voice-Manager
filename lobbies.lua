@@ -1,44 +1,46 @@
-local channels = require "./channels.lua"
 local discordia = require "discordia"
-local mutex = discordia.Mutex()
+local emitter = discordia.Emitter()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("lobbiesData.db")
+local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
-local selectID, insert, delete, selectTemplate, updateTemplate = 
-	sqlite:prepare("SELECT * FROM lobbies WHERE id = ?"),
+local channels = require "./channels.lua"
+
+local add, remove, updateTemplate =
 	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL)"),
 	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
-	sqlite:prepare("SELECT * FROM lobbies WHERE template = ? AND id = ?"),
 	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?")
+
+emitter:on("add", function (lobbyID)
+	pcall(storageInteractionEvent, add, lobbyID)
+end)
+
+emitter:on("remove", function (lobbyID)
+	pcall(storageInteractionEvent, remove, lobbyID)
+end)
+
+emitter:on("updateTemplate", function (lobbyID, template)
+	pcall(storageInteractionEvent, add, template, lobbyID)
+end)
 
 return setmetatable({}, {
 	__index = {
 		add = function (self, lobbyID, template)	-- additional parameter are used upon startup to prevent unnecessary checks
-			mutex:lock()
 			if channels[lobbyID] then channels:remove(lobbyID) end	-- I swear to god, there will be one crackhead
 			
 			if not self[lobbyID] then 
 				self[lobbyID] = {template = template}
 				logger:log(4, "MEMORY: Added lobby "..lobbyID)
 			end
-			if not selectID:reset():bind(lobbyID):step() then
-				insert:reset():bind(lobbyID):step()
-				logger:log(4, "DATABASE: Added lobby "..lobbyID)
-			end
-			mutex:unlock()
+			emitter:emit("add", lobbyID)
 		end,
 		
 		remove = function (self, lobbyID)
-			mutex:lock()
 			if self[lobbyID] then
 				self[lobbyID] = nil
 				logger:log(4, "MEMORY: Deleted lobby "..lobbyID)
 			end
-			if selectID:reset():bind(lobbyID):step() then
-				delete:reset():bind(lobbyID):step()
-				logger:log(4, "DATABASE: Deleted lobby "..lobbyID)
-			end
-			mutex:unlock()
+			emitter:emit("remove", lobbyID)
 		end,
 		
 		load = function (self)
@@ -57,16 +59,11 @@ return setmetatable({}, {
 		end,
 		
 		updateTemplate = function (self, lobbyID, template)
-			mutex:lock()
 			if self[lobbyID].template ~= template then
 				self[lobbyID].template = template
 				logger:log(4, "MEMORY: Updated template for lobby "..lobbyID)
 			end
-			if not selectTemplate:reset():bind(template, lobbyID):step() then
-				updateTemplate:reset():bind(template, lobbyID):step()
-				logger:log(4, "DATABASE: Updated template for lobby "..lobbyID)
-			end
-			mutex:unlock()
+			emitter:emit("updateTemplate", lobbyID, template)
 		end,
 		
 		inGuild = function (self, guildID)

@@ -1,39 +1,39 @@
 local discordia = require "discordia"
-local mutex = discordia.Mutex()
+local emitter = discordia.Emitter()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
+local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
-local selectID, insert, delete = 
-	sqlite:prepare("SELECT * FROM channels WHERE id = ?"),
+local channels = require "./channels.lua"
+
+local add, remove =
 	sqlite:prepare("INSERT INTO channels VALUES(?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
+emitter:on("add", function (channelID)
+	pcall(storageInteractionEvent, add, channelID)
+end)
+
+emitter:on("remove", function (channelID)
+	pcall(storageInteractionEvent, remove, channelID)
+end)
+
 return setmetatable({}, {
 	__index = {
-		add = function (self, channelID)
-			mutex:lock()
+		add = function (self, channelID)			
 			if not self[channelID] then
 				self[channelID] = true
 				logger:log(4, "MEMORY: Added channel "..channelID)
 			end
-			if not selectID:reset():bind(channelID):step() then
-				insert:reset():bind(channelID):step()
-				logger:log(4, "DATABASE: Added channel "..channelID)
-			end
-			mutex:unlock()
+			emitter:emit("add", channelID)
 		end,
 		
-		remove = function (self, channelID)
-			mutex:lock()
+		remove = function (self, channelID)			
 			if self[channelID] then
 				self[channelID] = nil
 				logger:log(4, "MEMORY: Deleted channel "..channelID)
 			end
-			if selectID:reset():bind(channelID):step() then
-				delete:reset():bind(channelID):step()
-				logger:log(4, "DATABASE: Deleted channel "..channelID)
-			end
-			mutex:unlock()
+			emitter:emit("remove", channelID)
 		end,
 		
 		load = function (self)
@@ -75,7 +75,11 @@ return setmetatable({}, {
 			local p = 0
 			for channelID, _ in pairs(self) do
 				local channel = client:getChannel(channelID)
-				if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
+				if channel then
+					if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
+				else
+					channels:remove(channelID)
+				end
 			end
 			return p
 		end,

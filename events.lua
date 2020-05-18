@@ -17,6 +17,44 @@ local function antiAction (action)
 	return action == "unregister" and "register" or (action == "register" and "unregister" or "template")
 end
 
+local status = setmetatable({},{__call = function (self)
+	local step = math.fmod(os.date("*t").min, 3)
+	if step == 0 then -- people
+		local people = channels:people()
+		
+		self.name =
+			people == 0 and "the sound of silence" or (
+			people .. (
+				people == 1 and " person" or " people") .. (
+				tostring(people):match("69") and " (nice!)" or ""))
+		
+		self.type = 2
+		
+	elseif step == 1 then -- channels
+		local channels = #channels
+		
+		self.name =
+			channels == 0 and "the world go by" or (
+			channels .. (
+				channels == 1 and " channel" or " channels") .. (
+				tostring(channels):match("69") and " (nice!)" or ""))
+		
+		self.type = 3
+		
+	elseif step == 2 then -- lobbies
+		local lobbies = #lobbies
+		
+		self.name =
+			lobbies == 0 and "the world go by" or (
+			lobbies .. (
+				lobbies == 1 and " lobby" or " lobbies") .. (
+				tostring(lobbies):match("69") and " (nice!)" or ""))
+		
+		self.type = 3
+	end
+	return self
+end})
+
 local events = {
 	messageCreate = function (message)
 		if message.guild and not guilds[message.guild.id] then return end
@@ -173,23 +211,23 @@ local events = {
 		channels:remove(channel.id)
 	end,
 	
-	ready = function()
+	ready = function ()
 		guilds:load()
 		lobbies:load()
 		channels:load()
 		clock:start()
-		local people, channels = channels:people(), #channels
-		client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")),type = 2})
+		
+		client:setGame(status())
 		client:getChannel("676432067566895111"):send("I'm listening")
 	end,
 
-	min = function()
+	min = function (date)
 		client:getChannel("676791988518912020"):getMessage("692117540838703114"):setContent(os.date())
 		channels:cleanup()
 		embeds:tick()
-		local people, channels = channels:people(), #channels
-		client:setGame({name = people == 0 and "the sound of silence" or (people..(people == 1 and " person" or " people").." on "..channels..(channels == 1 and " channel" or " channels")),type = 2})
-		if finalizer:tick() then finalizer:kill() end
+		client:setGame(status())
+		
+		if finalizer:tick() or (channels:people() == 0 and os.clock() > 86000) then finalizer:kill() end
 	end,
 	
 	hour = require "./sendStats.lua"
