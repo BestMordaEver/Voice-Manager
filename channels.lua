@@ -1,39 +1,42 @@
 local discordia = require "discordia"
 local mutex = discordia.Mutex()
+local emitter = discordia.Emitter()
 local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
+local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
-local selectID, insert, delete = 
-	sqlite:prepare("SELECT * FROM channels WHERE id = ?"),
+local add, remove =
 	sqlite:prepare("INSERT INTO channels VALUES(?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
+emitter:on("add", function (channelID)
+	mutex:lock()
+	pcall(storageInteractionEvent, add, channelID)
+	mutex:unlock()
+end)
+
+emitter:on("remove", function (channelID)
+	mutex:lock()
+	pcall(storageInteractionEvent, remove, channelID)
+	mutex:unlock()
+end)
+
 return setmetatable({}, {
 	__index = {
-		add = function (self, channelID)
-			mutex:lock()
+		add = function (self, channelID)			
 			if not self[channelID] then
 				self[channelID] = true
 				logger:log(4, "MEMORY: Added channel "..channelID)
 			end
-			if not selectID:reset():bind(channelID):step() then
-				insert:reset():bind(channelID):step()
-				logger:log(4, "DATABASE: Added channel "..channelID)
-			end
-			mutex:unlock()
+			emitter:emit("add", channelID)
 		end,
 		
-		remove = function (self, channelID)
-			mutex:lock()
+		remove = function (self, channelID)			
 			if self[channelID] then
 				self[channelID] = nil
 				logger:log(4, "MEMORY: Deleted channel "..channelID)
 			end
-			if selectID:reset():bind(channelID):step() then
-				delete:reset():bind(channelID):step()
-				logger:log(4, "DATABASE: Deleted channel "..channelID)
-			end
-			mutex:unlock()
+			emitter:emit("remove", channelID)
 		end,
 		
 		load = function (self)
