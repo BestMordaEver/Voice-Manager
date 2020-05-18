@@ -50,10 +50,12 @@ return setmetatable({}, {
 		send = function (self, message, action, ids)
 			local embed = self:new(action, 1, ids)
 			local newMessage = message:reply {embed = embed}
-			self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, author = message.author}
-			self:decorate(newMessage)
-			
-			return newMessage
+			if newMessage then
+				self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, author = message.author}
+				self:decorate(newMessage)
+				
+				return newMessage
+			end
 		end,
 		
 		updatePage = function (self, message, page)

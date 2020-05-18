@@ -32,7 +32,11 @@ local function registerParse (message, command)			-- returns a table of all ids
 		end), truePositionSorting)) do
 			table.insert(ids, channel.id)
 		end
-		return 4, "Empty input, sent embed "..embeds:send(message, command, ids).id
+		if newMessage then
+			return 4, "Empty input, sent embed ".. newMessage.id
+		else
+			return 4, "Couldn't send an embed"
+		end
 	end
 	
 	local ids = {}
@@ -85,8 +89,12 @@ local function registerParse (message, command)			-- returns a table of all ids
 			end
 			
 			local newMessage = embeds:send(message, command, ids)
-			newMessage:setContent(locale.ambiguousID)
-			return 4, "Ambiguous input, sent embed "..newMessage.id
+			if newMessage then 
+				newMessage:setContent(locale.ambiguousID)
+				return 4, "Ambiguous input, sent embed "..newMessage.id
+			else
+				return 4, "Couldn't send an embed"
+			end
 		end
 	else
 		return ids
@@ -299,8 +307,12 @@ actions = {
 									end
 									
 									local newMessage = embeds:send(message, "template"..template, ids)
-									newMessage:setContent(locale.ambiguousID)
-									return 4, "Ambiguous input, sent embed "..newMessage.id
+									if newMessage then
+										newMessage:setContent(locale.ambiguousID)
+										return 4, "Ambiguous input, sent embed "..newMessage.id
+									else
+										return 4, "Couldn't send an embed"
+									end
 								end
 							else
 								message:reply(locale.onlyInServer)
@@ -326,7 +338,12 @@ actions = {
 						end
 						if template == "reset" then template = "" end
 						
-						return 4, "Empty template, sent embed "..embeds:send(message, "template"..template, ids).id
+						local newMessage = embeds:send(message, "template"..template, ids)
+						if newMessage then
+							return 4, "Empty template, sent embed ".. newMessage.id
+						else
+							return 4, "Couldn't send an embed"
+						end
 					end
 				else
 					message:reply(locale.noID)
