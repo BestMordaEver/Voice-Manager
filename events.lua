@@ -214,8 +214,8 @@ local events = {
 	end,
 	
 	channelDelete = function (channel)
-		lobbies:remove(channel.id)
-		channels:remove(channel.id)
+		lobbies:remove(channel)
+		channels:remove(channel)
 	end,
 	
 	ready = function ()
