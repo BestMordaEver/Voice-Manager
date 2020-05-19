@@ -18,18 +18,24 @@ end)
 
 return setmetatable({}, {
 	__index = {
-		add = function (self, channelID)			
+		add = function (self, channelID)
+			local channel = client:getChannel(channelID)
 			if not self[channelID] then
-				self[channelID] = true
-				logger:log(4, "MEMORY: Added channel "..channelID)
+				if channel then
+					self[channelID] = true
+					logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
+				else
+					
+				end
 			end
 			emitter:emit("add", channelID)
 		end,
 		
-		remove = function (self, channelID)			
+		remove = function (self, channelID)
 			if self[channelID] then
 				self[channelID] = nil
-				logger:log(4, "MEMORY: Deleted channel "..channelID)
+				local channel = client:getChannel(channelID)
+				logger:log(4, "GUILD %s: Deleted channel %s", channel.guild.id, channelID)
 			end
 			emitter:emit("remove", channelID)
 		end,

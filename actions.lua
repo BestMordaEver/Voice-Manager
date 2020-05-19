@@ -18,10 +18,10 @@ local function registerParse (message, command)			-- returns a table of all ids
 	if not id then
 		if not message.guild then
 			message:reply(locale.noID)
-			return 4, "Empty input in DM"
+			return "Empty input"
 		elseif not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
 			message:reply(locale.gimmeReaction)
-			return 4, "Empty input, can't do embed"
+			return "Empty input, can't do embed"
 		end
 		
 		local ids = {}
@@ -32,10 +32,12 @@ local function registerParse (message, command)			-- returns a table of all ids
 		end), truePositionSorting)) do
 			table.insert(ids, channel.id)
 		end
+		
+		local newMessage = embeds:send(message, command, ids)
 		if newMessage then
-			return 4, "Empty input, sent embed ".. newMessage.id
+			return "Empty input, sent embed ".. newMessage.id
 		else
-			return 4, "Couldn't send an embed"
+			return "Couldn't send an embed"
 		end
 	end
 	
@@ -49,7 +51,7 @@ local function registerParse (message, command)			-- returns a table of all ids
 	if #ids == 0 then
 		if not message.guild then
 			message:reply(locale.onlyInServer)
-			return 4, command.." by name in dm"
+			return command.." by name in dm"
 		end
 		
 		id = id:lower()
@@ -62,7 +64,7 @@ local function registerParse (message, command)			-- returns a table of all ids
 		
 		if #ids == 0 then
 			message:reply(locale.badInput)
-			return 4, "Didn't find the channel by name"
+			return "Didn't find the channel by name"
 		elseif #ids == 1 then
 			return ids
 		else
@@ -85,15 +87,15 @@ local function registerParse (message, command)			-- returns a table of all ids
 			
 			if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
 				message:reply(locale.ambiguousID.."\n"..locale.gimmeReaction)
-				return 4, "Ambiguous input, can't do embed"
+				return "Ambiguous input, can't do embed"
 			end
 			
 			local newMessage = embeds:send(message, command, ids)
 			if newMessage then 
 				newMessage:setContent(locale.ambiguousID)
-				return 4, "Ambiguous input, sent embed "..newMessage.id
+				return "Ambiguous input, sent embed "..newMessage.id
 			else
-				return 4, "Couldn't send an embed"
+				return "Couldn't send an embed"
 			end
 		end
 	else
@@ -206,10 +208,10 @@ actions = {
 		local command = message.content:match("help%s*(.-)$")
 		if command and locale[command] then
 			message:reply(locale[command])
-			return 4, command.." help message"
+			return command.." help message"
 		else
 			message:reply(locale.help)
-			return 4, "Standard help message"
+			return "Standard help message"
 		end
 	end,
 	
@@ -217,26 +219,26 @@ actions = {
 		local msg
 		
 		if not ids then -- ids may be sent by embed
-			ids, msg = registerParse(message, "register")
-			if msg then return ids, msg end
+			ids = registerParse(message, "register")
+			if not ids[1] then return ids end -- message for logger
 		end
 		
 		msg, ids = actionFinalizer(message, "register", ids)
 		message:reply(msg)
-		return 4, #ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " "))
+		return (#ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " ")))
 	end,
 
 	unregister = function (message, ids)
 		local msg
 		
 		if not ids then
-			ids, msg = registerParse(message, "unregister")
-			if msg then return ids, msg end
+			ids = registerParse(message, "unregister")
+			if not ids[1] then return ids end -- message for logger
 		end
 		
 		msg, ids = actionFinalizer(message, "unregister", ids)
 		message:reply(msg)
-		return 4, #ids == 0 and "Successfully unregistered all" or ("Couldn't unregister "..table.concat(ids, " "))
+		return (#ids == 0 and "Successfully unregistered all" or ("Couldn't unregister "..table.concat(ids, " ")))
 	end,
 	
 	template = function (message, ids, template)
@@ -250,16 +252,16 @@ actions = {
 				
 				if (guild and not guild:getMember(message.author)) or (lobby and not lobby.guild:getMember(message.author)) then
 					message:reply(locale.notMember)
-					return 4, "Not a member"
+					return "Not a member"
 				end
 				
 				if reset == "" and template == "" then
 					if guild then
 						message:reply(guilds[guild.id].template and locale.globalTemplate:format(guilds[guild.id].template) or locale.defaultTemplate)
-						return 4, "Sent global template"
+						return "Sent global template"
 					elseif lobby then
 						message:reply(lobbies[lobby.id].template and locale.lobbyTemplate:format(lobby.name, lobbies[lobby.id].template) or locale.noTemplate)
-						return 4, "Sent channel template"
+						return "Sent channel template"
 					else
 						if message.guild then
 							for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return channel.name == scope and lobbies[channel.id] end), truePositionSorting)) do
@@ -268,17 +270,17 @@ actions = {
 							
 							if #ids == 0 then
 								message:reply(locale.badInput)
-								return 4, "Didn't find the channel by name"
+								return "Didn't find the channel by name"
 							elseif #ids == 1 then
 								message:reply(lobbies[ids[1]].template and locale.lobbyTemplate:format(client:getChannel(ids[1]).name, lobbies[ids[1]].template) or locale.noTemplate)
-								return 4, "Sent channel template"
+								return "Sent channel template"
 							elseif #ids > 1 then
 								message:reply(locale.ambiguousID)
-								return 4, "Ambiguous input"
+								return "Ambiguous input"
 							end
 						else
 							message:reply(locale.onlyInServer)
-							return 4, "Template get by name in dm"
+							return "Template get by name in dm"
 						end
 					end
 				else
@@ -299,24 +301,24 @@ actions = {
 								
 								if #ids == 0 then
 									message:reply(locale.badInput)
-									return 4, "Didn't find the channel by name"
+									return "Didn't find the channel by name"
 								elseif #ids > 1 then
 									if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
 										message:reply(locale.ambiguousID.."\n"..locale.gimmeReaction)
-										return 4, "Ambiguous input, can't do embed"
+										return "Ambiguous input, can't do embed"
 									end
 									
 									local newMessage = embeds:send(message, "template"..template, ids)
 									if newMessage then
 										newMessage:setContent(locale.ambiguousID)
-										return 4, "Ambiguous input, sent embed "..newMessage.id
+										return "Ambiguous input, sent embed "..newMessage.id
 									else
-										return 4, "Couldn't send an embed"
+										return "Couldn't send an embed"
 									end
 								end
 							else
 								message:reply(locale.onlyInServer)
-								return 4, "Template set by name in dm"
+								return "Template set by name in dm"
 							end
 						end
 					end
@@ -326,11 +328,11 @@ actions = {
 				if message.guild then
 					if template == "" then
 						message:reply(guilds[message.guild.id].template and locale.globalTemplate:format(guilds[message.guild.id].template) or locale.defaultTemplate)
-						return 4, "Sent global template"
+						return "Sent global template"
 					else
 						if not message.guild.me:getPermissions(message.channel):has(permission.manageMessages, permission.addReactions) then
 							message:reply(locale.gimmeReaction)
-							return 4, "Empty template, can't do embed"
+							return "Empty template, can't do embed"
 						end
 						
 						for _, channel in ipairs(table.sorted(message.guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end), truePositionSorting)) do
@@ -340,21 +342,21 @@ actions = {
 						
 						local newMessage = embeds:send(message, "template"..template, ids)
 						if newMessage then
-							return 4, "Empty template, sent embed ".. newMessage.id
+							return "Empty template, sent embed ".. newMessage.id
 						else
-							return 4, "Couldn't send an embed"
+							return "Couldn't send an embed"
 						end
 					end
 				else
 					message:reply(locale.noID)
-					return 4, "Empty template in dm"
+					return "Empty template in dm"
 				end
 			end
 		end
 
 		template, ids = actionFinalizer(message, "template"..(template or ""), ids)
 		message:reply(template)
-		return 4, #ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " "))
+		return (#ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " ")))
 	end,
 	
 	prefix = function (message)
@@ -367,7 +369,7 @@ actions = {
 		
 		if guild and not guild:getMember(message.author) then
 			message:reply(locale.notMember)
-			return 4, "Not a member"
+			return "Not a member"
 		end
 		
 		local newPrefix = 
@@ -385,19 +387,19 @@ actions = {
 		guild = guild or message.guild
 		if not guild then
 			message:reply(locale.badServer)
-			return 4, "Didn't find the guild"
+			return "Didn't find the guild"
 		end
 		if newPrefix and newPrefix ~= "" then
 			if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
 				message:reply(locale.mentionInVain:format(message.author.mentionString))
-				return 4, "Bad user permissions"
+				return "Bad user permissions"
 			end
 			guilds:updatePrefix(guild.id, newPrefix)
 			message:reply(locale.prefixConfirm:format(newPrefix))
-			return 4, "Set new prefix"
+			return "Set new prefix"
 		else
 			message:reply(locale.prefixThis:format(guilds[guild.id].prefix))
-			return 4, "Sent current prefix"
+			return "Sent current prefix"
 		end
 	end,
 	
@@ -405,10 +407,10 @@ actions = {
 		local guild = client:getGuild(message.content:match("list%s*(%d+)")) or message.guild
 		if not guild then
 			message:reply(locale.badServer)
-			return 4, "Didn't find the guild"
+			return "Didn't find the guild"
 		elseif not guild:getMember(message.author) then
 			message:reply(locale.notMember)
-			return 4, "Not a member"
+			return "Not a member"
 		end
 		
 		local lobbies = guild.voiceChannels:toArray(function (channel) return lobbies[channel.id] end)
@@ -420,21 +422,19 @@ actions = {
 		end
 		
 		message:reply(msg)
-		return 4, "Sent lobby list"
+		return "Sent lobby list"
 	end,
 	
 	stats = function (message)
-		logger:log(4, "Stats action invoked")
-		
 		local guildID = message.content:match("stats%s*(%d+)")
 		local guild = guildID == "local" and message.guild or client:getGuild(guildID)
 		if guildID and not guild then
 			message:reply(locale.badServer)
-			return 4, "Didn't find the guild"
+			return "Didn't find the guild"
 		end
 		if guild and not guild:getMember(message.author) then
 			message:reply(locale.notMember)
-			return 4, "Not a member"
+			return "Not a member"
 		end
 		
 		local t = os.clock()
@@ -459,19 +459,18 @@ actions = {
 				peopleCount == 1 and locale.channelsPerson or -- practically impossible, but whatever
 				locale.channelsPeople)), channelCount, peopleCount)) .. "\n" ..
 			string.format(locale.ping, t))
-		return 4, "Sent current stats"
+		return "Sent current stats"
 	end,
 	
 	support = function (message)
 		message:reply("https://discord.gg/tqj6jvT")
-		return 4, "Sent support invite"
+		return "Sent support invite"
 	end,
 	
 	shutdown = function (message)
 		if message then
 			if message.author.id ~= "188731184501620736" then return end
 			message:reply("Shutting down gracefully")
-			logger:log(4, "Shutdown action invoked")
 		end
 		
 		local status, msg = pcall(function()
