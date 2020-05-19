@@ -30,7 +30,8 @@ return setmetatable({}, {
 			
 			if not self[lobbyID] then 
 				self[lobbyID] = {template = template}
-				logger:log(4, "MEMORY: Added lobby "..lobbyID)
+				local channel = client:getChannel(lobbyID)
+				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 			end
 			emitter:emit("add", lobbyID)
 		end,
@@ -38,7 +39,8 @@ return setmetatable({}, {
 		remove = function (self, lobbyID)
 			if self[lobbyID] then
 				self[lobbyID] = nil
-				logger:log(4, "MEMORY: Deleted lobby "..lobbyID)
+				local channel = client:getChannel(lobbyID)
+				logger:log(4, "GUILD %s: Deleted lobby %s", channel.guild.id, lobbyID)
 			end
 			emitter:emit("remove", lobbyID)
 		end,
@@ -59,10 +61,9 @@ return setmetatable({}, {
 		end,
 		
 		updateTemplate = function (self, lobbyID, template)
-			if self[lobbyID].template ~= template then
-				self[lobbyID].template = template
-				logger:log(4, "MEMORY: Updated template for lobby "..lobbyID)
-			end
+			self[lobbyID].template = template
+			local channel = client:getChannel(lobbyID)
+			logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
 			emitter:emit("updateTemplate", lobbyID, template)
 		end,
 		

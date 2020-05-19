@@ -17,6 +17,14 @@ local function antiAction (action)
 	return action == "unregister" and "register" or (action == "register" and "unregister" or "template")
 end
 
+local function logAction (message, logMsg)
+	if message.guild then
+		logger:log(4, "GUILD %s USER %s: "..logMsg, message.guild.id, message.author.id)
+	else
+		logger:log(4, "DM %s: "..logMsg, message.author.id)
+	end
+end
+
 local status = setmetatable({},{__call = function (self)
 	local step = math.fmod(os.date("*t").min, 3)
 	if step == 0 then -- people
@@ -68,7 +76,7 @@ local events = {
 			return
 		end
 		
-		logger:log(4, "Message received, processing -> %s", message.content)
+		logAction(message, "=> "..message.content)
 		
 		if message.guild then message.guild:getMember(message.author) end	-- cache the member object
 
@@ -79,18 +87,20 @@ local events = {
 			message.content:match("^(%w+)")
 		
 		if not actions[command] then 
-			logger:log(4, "Nothing")
+			logAction(message, "Nothing")
 			return
 		else
-			logger:log(4, command.." action invoked")
+			logAction(message, command.." action invoked")
 		end
 		
-		local res, msg = pcall(function() logger:log(actions[command](message)) end)
+		local res, msg = pcall(logAction, message, actions[command](message))
+		
 		if not res then
 			message:reply(locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
 			error(msg)
 		end
-		logger:log(4, command.." action complete")
+		
+		logAction(message, command .. " action completed")
 	end,
 	
 	messageUpdate = function (message)	-- hearbeat
@@ -107,7 +117,7 @@ local events = {
 		
 		local embedData = embeds[reaction.message]
 		
-		logger:log(4, "Processing reaction")
+		logger:log(4, "GUILD %s USER %s on EMBED %s -> added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 		if reaction.emojiHash == reactions.left then
 			embeds:updatePage(reaction.message, embedData.page - 1)
 		elseif reaction.emojiHash == reactions.right then
@@ -135,7 +145,7 @@ local events = {
 		
 		local embedData = embeds[reaction.message]
 		
-		logger:log(4, "Processing removed reaction")
+		logger:log(4, "GUILD %s USER %s on EMBED %s -> removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 		if embeds.reactions[reaction.emojiHash] then
 			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		elseif reaction.emojiHash == reactions.page then
@@ -168,7 +178,7 @@ local events = {
 	
 	voiceChannelJoin = function (member, channel)
 		if lobbies[channel.id] then
-			logger:log(4, member.user.id.." joined lobby "..channel.id)
+			logger:log(4, "GUILD %s LOBBY %s: %s joined", channel.guild.id, channel.id, member.user.id)
 			local category = channel.category or channel.guild
 			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
 			if name:match("%%.-%%") then
@@ -186,9 +196,6 @@ local events = {
 			local newChannel = category:createVoiceChannel(name)
 			member:setVoiceChannel(newChannel.id)
 			channels:add(newChannel.id)
-			
-			logger:log(4, "Created "..newChannel.id.." in "..channel.guild.id)
-			
 			newChannel:setUserLimit(channel.userLimit)
 			if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
@@ -201,7 +208,7 @@ local events = {
 		if channels[channel.id] then
 			if #channel.connectedMembers == 0 then
 				channel:delete()
-				logger:log(4, "Deleted "..channel.id)
+				logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
 			end
 		end
 	end,

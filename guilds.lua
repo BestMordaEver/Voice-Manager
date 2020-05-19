@@ -29,18 +29,14 @@ end)
 return setmetatable({}, {
 	__index = {
 		add = function (self, guildID, prefix, template)	-- additional parameter are used upon startup to prevent unnecessary checks
-			if not self[guildID] then 
-				self[guildID] = {prefix = prefix or "!vm", template = template}
-				logger:log(4, "MEMORY: Added guild "..guildID)
-			end
+			self[guildID] = {prefix = prefix or "!vm", template = template}
+			logger:log(4, "GUILD %s: Added", guildID)
 			emitter:emit("add", guildID)
 		end,
 		
 		remove = function (self, guildID)
-			if self[guildID] then
-				self[guildID] = nil
-				logger:log(4, "MEMORY: Deleted guild "..guildID)
-			end
+			self[guildID] = nil
+			logger:log(4, "GUILD %s: Deleted", guildID)
 			emitter:emit("remove", guildID)
 		end,
 		
@@ -66,18 +62,14 @@ return setmetatable({}, {
 		end,
 		
 		updatePrefix = function (self, guildID, prefix)
-			if self[guildID].prefix ~= prefix then
-				self[guildID].prefix = prefix
-				logger:log(4, "MEMORY: Updated prefix for "..guildID)
-			end
+			self[guildID].prefix = prefix
+			logger:log(4, "GUILD %s: Updated prefix", guildID)
 			emitter:emit("updatePrefix", guildID, prefix)
 		end,
 		
 		updateTemplate = function (self, guildID, template)
-			if self[guildID].template ~= template then
-				self[guildID].template = template
-				logger:log(4, "MEMORY: Updated template for guild "..guildID)
-			end
+			self[guildID].template = template
+			logger:log(4, "GUILD %s: Updated template", guildID)
 			emitter:emit("updateTemplate", guildID, template)
 		end
 	}
