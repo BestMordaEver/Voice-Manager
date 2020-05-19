@@ -32,6 +32,8 @@ local function registerParse (message, command)			-- returns a table of all ids
 		end), truePositionSorting)) do
 			table.insert(ids, channel.id)
 		end
+		
+		local newMessage = embeds:send(message, command, ids)
 		if newMessage then
 			return 4, "Empty input, sent embed ".. newMessage.id
 		else
