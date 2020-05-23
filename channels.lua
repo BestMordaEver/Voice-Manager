@@ -31,10 +31,15 @@ return setmetatable({}, {
 			emitter:emit("add", channelID)
 		end,
 		
-		remove = function (self, channel)
-			if self[channel.id] then
-				self[channel.id] = nil
-				logger:log(4, "GUILD %s: Deleted channel %s", channel.guild.id, channel.id)
+		remove = function (self, channelID)
+			if self[channelID] then
+				self[channelID] = nil
+				local channel = client:getChannel(channelID)
+				if channel and channel.guild then
+					logger:log(4, "GUILD %s: Deleted channel %s", channel.guild.id, channelID)
+				else
+					logger:log(4, "NULL: Deleted channel %s", channelID)
+				end
 			end
 			emitter:emit("remove", channelID)
 		end,

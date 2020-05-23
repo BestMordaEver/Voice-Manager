@@ -36,10 +36,15 @@ return setmetatable({}, {
 			emitter:emit("add", lobbyID)
 		end,
 		
-		remove = function (self, lobby)
-			if self[lobby.id] then
-				self[lobby.id] = nil
-				logger:log(4, "GUILD %s: Deleted lobby %s", lobby.guild.id, lobby.id)
+		remove = function (self, lobbyID)
+			if self[lobbyID] then
+				self[lobbyID] = nil
+				local lobby = client:getChannel(lobbyID)
+				if lobby and lobby.guild then
+					logger:log(4, "GUILD %s: Deleted lobby %s", lobby.guild.id, lobbyID)
+				else
+					logger:log(4, "NULL: Deleted lobby %s", lobbyID)
+				end
 			end
 			emitter:emit("remove", lobbyID)
 		end,
