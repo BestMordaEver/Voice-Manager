@@ -19,9 +19,9 @@ end
 
 local function logAction (message, logMsg)
 	if message.guild then
-		logger:log(4, "GUILD %s USER %s: "..logMsg, message.guild.id, message.author.id)
+		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
 	else
-		logger:log(4, "DM %s: "..logMsg, message.author.id)
+		logger:log(4, "DM %s: %s", message.author.id, logMsg)
 	end
 end
 
