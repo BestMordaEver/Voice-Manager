@@ -9,11 +9,21 @@ local add, remove =
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
 emitter:on("add", function (channelID)
-	pcall(storageInteractionEvent, add, channelID)
+	local ok, msg = pcall(storageInteractionEvent, add, channelID)
+	if ok then
+		logger:log(4, "MEMORY: Added channel %s", channelID)
+	else
+		logger:log(2, "MEMORY: Couldn't add channel %s: %s", channelID, msg)
+	end
 end)
 
 emitter:on("remove", function (channelID)
-	pcall(storageInteractionEvent, remove, channelID)
+	local ok, msg = pcall(storageInteractionEvent, remove, channelID)
+	if ok then
+		logger:log(4, "MEMORY: Removed channel %s", channelID)
+	else
+		logger:log(2, "MEMORY: Couldn't remove channel %s: %s", channelID, msg)
+	end
 end)
 
 return setmetatable({}, {

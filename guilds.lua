@@ -11,19 +11,39 @@ local add, remove, updatePrefix, updateTemplate =
 	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?")
 
 emitter:on("add", function (guildID)
-	pcall(storageInteractionEvent, add, guildID)
+	local ok, msg = pcall(storageInteractionEvent, add, guildID)
+	if ok then
+		logger:log(4, "MEMORY: Added guild %s", guildID)
+	else
+		logger:log(2, "MEMORY: Couldn't add guild %s: %s", guildID, msg)
+	end
 end)
 
 emitter:on("remove", function (guildID)
-	pcall(storageInteractionEvent, remove, guildID)
+	local ok, msg = pcall(storageInteractionEvent, remove, guildID)
+	if ok then
+		logger:log(4, "MEMORY: Removed guild %s", guildID)
+	else
+		logger:log(2, "MEMORY: Couldn't remove guild %s: %s", guildID, msg)
+	end
 end)
 
 emitter:on("updatePrefix", function (guildID, prefix)
-	pcall(storageInteractionEvent, updatePrefix, prefix, guildID)
+	local ok, msg = pcall(storageInteractionEvent, updatePrefix, prefix, guildID)
+	if ok then
+		logger:log(4, "MEMORY: Updated prefix for guild %s to %s", guildID, prefix)
+	else
+		logger:log(2, "MEMORY: Couldn't update prefix for guild %s to %s: %s", guildID, prefix, msg)
+	end
 end)
 
 emitter:on("updateTemplate", function (guildID, template)
-	pcall(storageInteractionEvent, updatePrefix, template, guildID)
+	local ok, msg = pcall(storageInteractionEvent, updatePrefix, template, guildID)
+	if ok then
+		logger:log(4, "MEMORY: Updated template for guild %s to %s", guildID, template)
+	else
+		logger:log(2, "MEMORY: Couldn't update template for guild %s to %s: %s", guildID, template, msg)
+	end
 end)
 
 return setmetatable({}, {

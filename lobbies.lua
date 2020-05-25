@@ -12,15 +12,30 @@ local add, remove, updateTemplate =
 	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?")
 
 emitter:on("add", function (lobbyID)
-	pcall(storageInteractionEvent, add, lobbyID)
+	local ok, msg = pcall(storageInteractionEvent, add, lobbyID)
+	if ok then
+		logger:log(4, "MEMORY: Added lobby %s", lobbyID)
+	else
+		logger:log(2, "MEMORY: Couldn't add lobby %s: %s", lobbyID, msg)
+	end
 end)
 
 emitter:on("remove", function (lobbyID)
-	pcall(storageInteractionEvent, remove, lobbyID)
+	local ok, msg = pcall(storageInteractionEvent, remove, lobbyID)
+	if ok then
+		logger:log(4, "MEMORY: Removed lobby %s", lobbyID)
+	else
+		logger:log(2, "MEMORY: Couldn't remove lobby %s: %s", lobbyID, msg)
+	end
 end)
 
 emitter:on("updateTemplate", function (lobbyID, template)
-	pcall(storageInteractionEvent, add, template, lobbyID)
+	local ok, msg = pcall(storageInteractionEvent, add, template, lobbyID)
+	if ok then
+		logger:log(4, "MEMORY: Updated template for lobby %s to %s", lobbyID, template)
+	else
+		logger:log(2, "MEMORY: Couldn't update template for lobby %s to %s: %s", lobbyID, template, msg)
+	end
 end)
 
 return setmetatable({}, {
