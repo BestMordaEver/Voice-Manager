@@ -80,17 +80,19 @@ local events = {
 		
 		if message.guild then message.guild:getMember(message.author) end	-- cache the member object
 
-		local command = 
-		prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(%w+)") or 
-			message.content:match("^<@.?601347755046076427>%s*(%w+)") or 
-			message.content:match("^<@.?676787135650463764>%s*(%w+)") or
-			message.content:match("^(%w+)")
+		local content = 
+		prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or 
+			message.content:match("^<@.?601347755046076427>%s*(.-)$") or 
+			message.content:match("^<@.?676787135650463764>%s*(.-)$") or
+			message.content
+			
+		local command = content == "" and "help" or content:match("^(%w+)")
 		
-		if not actions[command] then 
+		if actions[command] then 
+			logAction(message, command.." action invoked")
+		else
 			logAction(message, "Nothing")
 			return
-		else
-			logAction(message, command.." action invoked")
 		end
 		
 		local res, msg = pcall(logAction, message, actions[command](message))
