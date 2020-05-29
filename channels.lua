@@ -28,17 +28,19 @@ end)
 
 return setmetatable({}, {
 	__index = {
-		add = function (self, channelID)
-			local channel = client:getChannel(channelID)
+		loadAdd = function (self, channelID)
 			if not self[channelID] then
-				if channel then
+				local channel = client:getChannel(channelID)
+				if channel and channel.guild then
 					self[channelID] = true
 					logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
-				else
-					
 				end
 			end
-			emitter:emit("add", channelID)
+		end,
+		
+		add = function (self, channelID)
+			self:loadAdd(channelID)
+			if self[channelID] then emitter:emit("add", channelID) end
 		end,
 		
 		remove = function (self, channelID)
@@ -46,9 +48,9 @@ return setmetatable({}, {
 				self[channelID] = nil
 				local channel = client:getChannel(channelID)
 				if channel and channel.guild then
-					logger:log(4, "GUILD %s: Deleted channel %s", channel.guild.id, channelID)
+					logger:log(4, "GUILD %s: Removed channel %s", channel.guild.id, channelID)
 				else
-					logger:log(4, "NULL: Deleted channel %s", channelID)
+					logger:log(4, "NULL: Removed channel %s", channelID)
 				end
 			end
 			emitter:emit("remove", channelID)
@@ -62,7 +64,7 @@ return setmetatable({}, {
 					local channel = client:getChannel(channelID)
 					if channel then
 						if #channel.connectedMembers > 0 then
-							self:add(channelID)
+							self:loadAdd(channelID)
 						else
 							channel:delete()
 						end

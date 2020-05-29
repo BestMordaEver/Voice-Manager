@@ -179,7 +179,7 @@ local events = {
 	end,
 	
 	voiceChannelJoin = function (member, channel)
-		if lobbies[channel.id] then
+		if channel and lobbies[channel.id] then
 			logger:log(4, "GUILD %s LOBBY %s: %s joined", channel.guild.id, channel.id, member.user.id)
 			local category = channel.category or channel.guild
 			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
@@ -206,8 +206,7 @@ local events = {
 	end,
 	
 	voiceChannelLeave = function (member, channel)
-		if not channel then return end	-- until this is fixed
-		if channels[channel.id] then
+		if channel and channels[channel.id] then
 			if #channel.connectedMembers == 0 then
 				channel:delete()
 				logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
@@ -216,8 +215,8 @@ local events = {
 	end,
 	
 	channelDelete = function (channel)
-		lobbies:remove(channel.id)
-		channels:remove(channel.id)
+		if lobbies[channel.id] then lobbies:remove(channel.id) end
+		if channels[channel.id] then channels:remove(channel.id) end
 	end,
 	
 	ready = function ()

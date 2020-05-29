@@ -48,15 +48,19 @@ end)
 
 return setmetatable({}, {
 	__index = {
-		add = function (self, guildID, prefix, template)	-- additional parameter are used upon startup to prevent unnecessary checks
+		loadAdd = function (self, guildID, prefix, template)
 			self[guildID] = {prefix = prefix or "!vm", template = template}
 			logger:log(4, "GUILD %s: Added", guildID)
+		end,
+		
+		add = function (self, guildID)
+			self:loadAdd(guildID)
 			emitter:emit("add", guildID)
 		end,
 		
 		remove = function (self, guildID)
 			self[guildID] = nil
-			logger:log(4, "GUILD %s: Deleted", guildID)
+			logger:log(4, "GUILD %s: Removed", guildID)
 			emitter:emit("remove", guildID)
 		end,
 		
@@ -66,7 +70,7 @@ return setmetatable({}, {
 			if guildIDs then
 				for i, guildID in ipairs(guildIDs.id) do
 					if client:getGuild(guildID) then
-						self:add(guildID, guildIDs.prefix[i], guildIDs.template[i])
+						self:loadAdd(guildID, guildIDs.prefix[i], guildIDs.template[i])
 					else
 						self:remove(guildID)
 					end

@@ -40,15 +40,21 @@ end)
 
 return setmetatable({}, {
 	__index = {
-		add = function (self, lobbyID, template)	-- additional parameter are used upon startup to prevent unnecessary checks
+		loadAdd = function (self, lobbyID, template)	-- additional parameter are used upon startup to prevent unnecessary checks
 			if channels[lobbyID] then channels:remove(lobbyID) end	-- I swear to god, there will be one crackhead
 			
-			if not self[lobbyID] then 
-				self[lobbyID] = {template = template}
+			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
-				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
+				if channel and channel.guild then
+					self[lobbyID] = {template = template}
+					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
+				end
 			end
-			emitter:emit("add", lobbyID)
+		end,
+
+		add = function (self, lobbyID)
+			self:loadAdd(lobbyID)
+			if self[lobbyID] then emitter:emit("add", lobbyID) end
 		end,
 		
 		remove = function (self, lobbyID)
@@ -56,9 +62,9 @@ return setmetatable({}, {
 				self[lobbyID] = nil
 				local lobby = client:getChannel(lobbyID)
 				if lobby and lobby.guild then
-					logger:log(4, "GUILD %s: Deleted lobby %s", lobby.guild.id, lobbyID)
+					logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, lobbyID)
 				else
-					logger:log(4, "NULL: Deleted lobby %s", lobbyID)
+					logger:log(4, "NULL: Removed lobby %s", lobbyID)
 				end
 			end
 			emitter:emit("remove", lobbyID)
@@ -69,8 +75,8 @@ return setmetatable({}, {
 			local lobbyIDs = sqlite:exec("SELECT * FROM lobbies")
 			if lobbyIDs then
 				for i, lobbyID in ipairs(lobbyIDs[1]) do
-					if client:getChannel(lobbyID) then 
-						self:add(lobbyID, lobbyIDs.template[i])
+					if client:getChannel(lobbyID) then
+						self:loadAdd(lobbyID, lobbyIDs.template[i])
 					else
 						self:remove(lobbyID)
 					end
@@ -80,10 +86,14 @@ return setmetatable({}, {
 		end,
 		
 		updateTemplate = function (self, lobbyID, template)
-			self[lobbyID].template = template
 			local channel = client:getChannel(lobbyID)
-			logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
-			emitter:emit("updateTemplate", lobbyID, template)
+			if channel and self[lobbyID] then
+				self[lobbyID].template = template
+				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
+				emitter:emit("updateTemplate", lobbyID, template)
+			else
+				self:remove(lobbyID)
+			end
 		end,
 		
 		inGuild = function (self, guildID)
