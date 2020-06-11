@@ -196,11 +196,15 @@ local events = {
 			end
 			
 			local newChannel = category:createVoiceChannel(name)
-			member:setVoiceChannel(newChannel.id)
-			channels:add(newChannel.id)
-			newChannel:setUserLimit(channel.userLimit)
-			if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
-				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+			if newChannel then
+				member:setVoiceChannel(newChannel.id)
+				channels:add(newChannel.id)
+				newChannel:setUserLimit(channel.userLimit)
+				if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
+					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+				end
+			else
+				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", channel.guild.id, channel.id, member.user.id)
 			end
 		end
 	end,
