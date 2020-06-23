@@ -13,7 +13,7 @@ return {
 			mutexes[statement] = discordia.Mutex()
 		end
 		mutexes[statement]:lock()
-		local ok, msg = pcall(function () statement:reset():bind(...):step() end)
+		local ok, msg = pcall(function (...) statement:reset():bind(...):step() end, ...)
 		mutexes[statement]:unlock()
 		if not ok then error(msg) end
 	end
