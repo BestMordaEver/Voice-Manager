@@ -1,9 +1,17 @@
+-- object to store data about new channels and interact with corresponding db
+
 local discordia = require "discordia"
-local emitter = discordia.Emitter()
-local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("channelsData.db")
+
+local client, logger = discordia.storage.client, discordia.storage.logger
+
 local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
+-- used to start storageInteractionEvent as async process
+-- because fuck data preservation, we need dat speed
+local emitter = discordia.Emitter()
+
+-- prepared statements
 local add, remove =
 	sqlite:prepare("INSERT INTO channels VALUES(?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
@@ -27,7 +35,9 @@ emitter:on("remove", function (channelID)
 end)
 
 return setmetatable({}, {
+	-- move functions to index table to iterate over channels easily
 	__index = {
+		-- perform checks and add channel to table
 		loadAdd = function (self, channelID)
 			if not self[channelID] then
 				local channel = client:getChannel(channelID)
@@ -38,11 +48,13 @@ return setmetatable({}, {
 			end
 		end,
 		
+		-- loadAdd and start interaction with db
 		add = function (self, channelID)
 			self:loadAdd(channelID)
 			if self[channelID] then emitter:emit("add", channelID) end
 		end,
 		
+		-- no granular control, if it goes away, it does so everywhere
 		remove = function (self, channelID)
 			if self[channelID] then
 				self[channelID] = nil
@@ -76,6 +88,7 @@ return setmetatable({}, {
 			logger:log(4, "STARTUP: Loaded!")
 		end,
 		
+		-- are there empty channels? kill!
 		cleanup = function (self)
 			for channelID,_ in pairs(self) do
 				local channel = client:getChannel(channelID)
@@ -89,6 +102,7 @@ return setmetatable({}, {
 			end
 		end,
 		
+		-- how many are there?
 		people = function (self, guildID)
 			local p = 0
 			for channelID, _ in pairs(self) do
@@ -102,6 +116,7 @@ return setmetatable({}, {
 			return p
 		end,
 		
+		-- check how many channels are in a specific guild
 		inGuild = function (self, guildID)
 			local count = 0
 			for v,_ in pairs(self) do if client:getChannel(v).guild.id == guildID then count = count + 1 end end

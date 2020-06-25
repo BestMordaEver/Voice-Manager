@@ -1,4 +1,7 @@
-local locale = {
+-- a static storage for everything the bot displays as text to user
+-- may be used as a foundation for translation
+
+return {
 	help = [[**:arrow_down: You need a "Manage Channels" permission to use those commands! :arrow_down:**
 `register` - registers a voice channel that will be used as a lobby. You can feed it channel IDs or channel name
 `unregister` - unregisters an existing lobby. You can feed it channel IDs or channel name
@@ -144,5 +147,3 @@ Sends stats for specific server]],
 	noID = [[This would work in server, but in DMs you have to include the ID]],
 	error = [[Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s]]
 }
-
-return locale

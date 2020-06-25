@@ -1,3 +1,5 @@
+-- stats to different bot boards are sent from here
+
 local https = require "coro-http"
 local json = require "json"
 

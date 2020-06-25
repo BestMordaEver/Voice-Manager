@@ -1,3 +1,5 @@
+-- all command processing happens here 
+
 local discordia = require "discordia"
 local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
 
@@ -8,12 +10,12 @@ local embeds = require "./embeds.lua"
 local locale = require "./locale"
 
 local discordia = require "discordia"
-discordia.extensions.table()
+discordia.extensions.table() -- a couple of neato functions
 local permission, channelType = discordia.enums.permission, discordia.enums.channelType
 
 local truePositionSorting = require "./utils.lua".truePositionSorting
 
-local function registerParse (message, command)			-- returns a table of all ids
+local function registerParse (message, command) -- register unregister action pre-processing
 	local id = message.content:match(command.."%s+(.-)$")
 	if not id then
 		if not message.guild then
@@ -201,9 +203,8 @@ local function actionFinalizer (message, action, ids)	-- register, unregister an
 	return msg, badChannel
 end
 
-local actions
-
-actions = {
+-- all possible bot commands are processed here, should return message for logger
+return {
 	help = function (message)
 		local command = message.content:match("help%s*(.-)$")
 		if command and locale[command] then
@@ -215,10 +216,11 @@ actions = {
 		end
 	end,
 	
+	-- this function is also used by embeds, they will supply ids
 	register = function (message, ids)
 		local msg
 		
-		if not ids then -- ids may be sent by embed
+		if not ids then
 			ids = registerParse(message, "register")
 			if not ids[1] then return ids end -- message for logger
 		end
@@ -227,7 +229,8 @@ actions = {
 		message:reply(msg)
 		return (#ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " ")))
 	end,
-
+	
+	-- this function is also used by embeds, they will supply ids
 	unregister = function (message, ids)
 		local msg
 		
@@ -241,6 +244,7 @@ actions = {
 		return (#ids == 0 and "Successfully unregistered all" or ("Couldn't unregister "..table.concat(ids, " ")))
 	end,
 	
+	-- this function is also used by embeds, they will supply ids and template
 	template = function (message, ids, template)
 		if not ids then
 			ids = {}
@@ -483,5 +487,3 @@ actions = {
 		process:exit()
 	end
 }
-
-return actions

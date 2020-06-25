@@ -1,3 +1,5 @@
+-- all event preprocessing happens here 
+
 local discordia = require "discordia"
 local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
 
@@ -13,10 +15,12 @@ local finalizer = require "./finalizer.lua"
 local permission = discordia.enums.permission
 local reactions = embeds.reactions
 
+-- register -> unregister; unregister -> register; template -> template
 local function antiAction (action)
 	return action == "unregister" and "register" or (action == "register" and "unregister" or "template")
 end
 
+-- message is a discord object, if it doesn't have guild property - it's a DM
 local function logAction (message, logMsg)
 	if message.guild then
 		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
@@ -25,8 +29,20 @@ local function logAction (message, logMsg)
 	end
 end
 
-local status = setmetatable({},{__call = function (self)
+--[[
+status generating function
+cycles 3 different metrics every minute
+bots still can't do custom statuses ;^;
+]]
+local status = function ()
+	local self = {
+	-- type - see enumeration activityType (https://github.com/SinisterRectus/Discordia/wiki/Enumerations), determines first word
+	-- name - everything after first word
+	}
+
+	-- determine the cycle
 	local step = math.fmod(os.date("*t").min, 3)
+	
 	if step == 0 then -- people
 		local people = channels:people()
 		
@@ -61,31 +77,40 @@ local status = setmetatable({},{__call = function (self)
 		self.type = 3
 	end
 	return self
-end})
+end
 
+--[[
+events are listed by name here, discordia events may differ from OG discord events for sake of convenience
+full list and arguments - https://github.com/SinisterRectus/Discordia/wiki/Events
+]]
 local events = {
 	messageCreate = function (message)
+		-- ignore non-initialized guilds
 		if message.guild and not guilds[message.guild.id] then return end
 		
 		local prefix = message.guild and guilds[message.guild.id].prefix or nil
 		
-		if message.author.bot or (
-			not message.mentionedUsers:find(function(user) return user == client.user end) and 
-			not (prefix and message.content:find(prefix, 1, true)) and 	-- allow % in prefixes
-			message.guild) then	-- ignore prefix req for dms
+		-- good luck with this one :3
+		if message.author.bot or ( -- ignore bots
+			not message.mentionedUsers:find(function(user) return user == client.user end) and -- find mentions
+			not (prefix and message.content:find(prefix, 1, true)) and 	-- find prefix
+			message.guild) then	-- of just roll with it if dm
 			return
 		end
 		
 		logAction(message, "=> "..message.content)
 		
-		if message.guild then message.guild:getMember(message.author) end	-- cache the member object
-
+		-- cache the member object just in case
+		if message.guild then message.guild:getMember(message.author) end
+		
+		-- find the request
 		local content = 
-		prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or 
-			message.content:match("^<@.?601347755046076427>%s*(.-)$") or 
-			message.content:match("^<@.?676787135650463764>%s*(.-)$") or
+		prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or
+			message.content:match("^<@.?601347755046076427>%s*(.-)$") or
+			message.content:match("^<@.?676787135650463764>%s*(.-)$") or	-- stop discriminating LabRat
 			message.content
 			
+		-- what command is it?
 		local command = content == "" and "help" or content:match("^(%w+)")
 		
 		if actions[command] then 
@@ -95,8 +120,10 @@ local events = {
 			return
 		end
 		
+		-- call the command, log it, and all in protected call
 		local res, msg = pcall(logAction, message, actions[command](message))
 		
+		-- notify user if failed
 		if not res then
 			message:reply(locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
 			error(msg)
@@ -105,21 +132,24 @@ local events = {
 		logAction(message, command .. " action completed")
 	end,
 	
-	messageUpdate = function (message)	-- hearbeat
+	messageUpdate = function (message)	-- hearbeat check
 		if message.author.id == "601347755046076427" and message.channel.id == "676791988518912020" then
 			finalizer:reset()
 			return
 		end
 	end,
 	
-	reactionAdd = function (reaction, userID)
+	reactionAdd = function (reaction, userID) -- embeds processing
+		-- check extensively if it's even our business
 		if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
 			return
 		end
 		
 		local embedData = embeds[reaction.message]
 		
-		logger:log(4, "GUILD %s USER %s on EMBED %s -> added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+		logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+		
+		-- just find corresponding emoji and pass instructions to embed
 		if reaction.emojiHash == reactions.left then
 			embeds:updatePage(reaction.message, embedData.page - 1)
 		elseif reaction.emojiHash == reactions.right then
@@ -133,21 +163,21 @@ local events = {
 			end
 			(actions[embedData.action] or actions.template)(reaction.message, ids, embedData.action:match("^template(.+)$"))
 		elseif reaction.emojiHash == reactions.all then
-			reaction.message.channel:broadcastTyping();
+			reaction.message.channel:broadcastTyping(); -- without semicolon next parenthesis is interpreted as a function call :\
 			(actions[embedData.action] or actions.template)(reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
-		else
+		else -- assume a number emoji
 			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.+)$"))
 		end
 	end,
 	
-	reactionRemove = function (reaction, userID)
+	reactionRemove = function (reaction, userID) -- same but opposite
 		if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
 			return
 		end
 		
 		local embedData = embeds[reaction.message]
 		
-		logger:log(4, "GUILD %s USER %s on EMBED %s -> removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+		logger:log(4, "GUILD %s USER %s on EMBED %s => removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 		if embeds.reactions[reaction.emojiHash] then
 			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		elseif reaction.emojiHash == reactions.page then
@@ -164,12 +194,12 @@ local events = {
 		end
 	end,
 	
-	guildCreate = function (guild)
+	guildCreate = function (guild) -- triggers whenever new guild appears in bot's scope
 		guilds:add(guild.id)
 		client:getChannel("676432067566895111"):send(guild.name.." added me!\n")
 	end,
 	
-	guildDelete = function (guild)
+	guildDelete = function (guild) -- same but opposite
 		guilds:remove(guild.id)
 		for _,channel in pairs(guild.voiceChannels) do 
 			if channels[channel.id] then channels:remove(channel.id) end 
@@ -178,10 +208,14 @@ local events = {
 		client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
 	end,
 	
-	voiceChannelJoin = function (member, channel)
+	voiceChannelJoin = function (member, channel) -- your purpose!
 		if channel and lobbies[channel.id] then
 			logger:log(4, "GUILD %s LOBBY %s: %s joined", channel.guild.id, channel.id, member.user.id)
+			
+			-- parent to which a new channel will be attached
 			local category = channel.category or channel.guild
+			
+			-- determine new channel name
 			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
 			if name:match("%%.-%%") then
 				local nickname = member.nickname or member.user.name
@@ -196,10 +230,13 @@ local events = {
 			end
 			
 			local newChannel = category:createVoiceChannel(name)
+			
+			-- did we fail? statistics say "probably yes!"
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
 				channels:add(newChannel.id)
 				newChannel:setUserLimit(channel.userLimit)
+				-- if given permissions, allow user moderation
 				if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
 				end
@@ -209,7 +246,7 @@ local events = {
 		end
 	end,
 	
-	voiceChannelLeave = function (member, channel)
+	voiceChannelLeave = function (member, channel) -- now remove the unwanted corpses!
 		if channel and channels[channel.id] then
 			if #channel.connectedMembers == 0 then
 				channel:delete()
@@ -218,7 +255,7 @@ local events = {
 		end
 	end,
 	
-	channelDelete = function (channel)
+	channelDelete = function (channel) -- and make sure there are no traces!
 		if lobbies[channel.id] then lobbies:remove(channel.id) end
 		if channels[channel.id] then channels:remove(channel.id) end
 	end,
@@ -234,11 +271,14 @@ local events = {
 	end,
 
 	min = function (date)
+		-- hearbeat happens
 		client:getChannel("676791988518912020"):getMessage("692117540838703114"):setContent(os.date())
+		
 		channels:cleanup()
 		embeds:tick()
 		client:setGame(status())
 		
+		-- hearbeat is partial? stop it!
 		if finalizer:tick() or (channels:people() == 0 and os.clock() > 86000) then finalizer:kill() end
 	end,
 	
@@ -246,6 +286,9 @@ local events = {
 }
 
 local function safeEvent (self, name)
+	-- will be sent to emitter:on() style function
+	-- name corresponds to event name
+	-- function starts protected calls of event responding functions from "events"
 	return name, function (...)
 		local success, err = pcall(self[name], ...)
 		if not success then

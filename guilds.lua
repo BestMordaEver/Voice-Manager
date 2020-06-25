@@ -1,9 +1,17 @@
+-- object to store data about guilds and interact with corresponding db
+
 local discordia = require "discordia"
-local emitter = discordia.Emitter()
-local client, logger = discordia.storage.client, discordia.storage.logger
 local sqlite = require "sqlite3".open("guildsData.db")
+
+local client, logger = discordia.storage.client, discordia.storage.logger
+
 local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
 
+-- used to start storageInteractionEvent as async process
+-- because fuck data preservation, we need dat speed
+local emitter = discordia.Emitter()
+
+-- prepared statements
 local add, remove, updatePrefix, updateTemplate =
 	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL)"),
 	sqlite:prepare("DELETE FROM guilds WHERE id = ?"),
@@ -47,17 +55,21 @@ emitter:on("updateTemplate", function (guildID, template)
 end)
 
 return setmetatable({}, {
+	-- move functions to index table to iterate over guilds easily
 	__index = {
+		-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
 		loadAdd = function (self, guildID, prefix, template)
 			self[guildID] = {prefix = prefix or "!vm", template = template}
 			logger:log(4, "GUILD %s: Added", guildID)
 		end,
 		
+		-- loadAdd and start interaction with db
 		add = function (self, guildID)
 			self:loadAdd(guildID)
 			emitter:emit("add", guildID)
 		end,
 		
+		-- no granular control, if it goes away, it does so everywhere
 		remove = function (self, guildID)
 			self[guildID] = nil
 			logger:log(4, "GUILD %s: Removed", guildID)
@@ -85,12 +97,14 @@ return setmetatable({}, {
 			logger:log(4, "STARTUP: Loaded!")
 		end,
 		
+		-- there should be enough checks to ensure that guild and prefix are valid
 		updatePrefix = function (self, guildID, prefix)
 			self[guildID].prefix = prefix
 			logger:log(4, "GUILD %s: Updated prefix", guildID)
 			emitter:emit("updatePrefix", guildID, prefix)
 		end,
 		
+		-- there should be enough checks to ensure that guild and template are valid
 		updateTemplate = function (self, guildID, template)
 			self[guildID].template = template
 			logger:log(4, "GUILD %s: Updated template", guildID)
