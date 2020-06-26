@@ -22,6 +22,7 @@ emitter:on("add", function (channelID)
 		logger:log(4, "MEMORY: Added channel %s", channelID)
 	else
 		logger:log(2, "MEMORY: Couldn't add channel %s: %s", channelID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't add channel %s: %s", channelID, msg)
 	end
 end)
 
@@ -31,6 +32,7 @@ emitter:on("remove", function (channelID)
 		logger:log(4, "MEMORY: Removed channel %s", channelID)
 	else
 		logger:log(2, "MEMORY: Couldn't remove channel %s: %s", channelID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't remove channel %s: %s", channelID, msg)
 	end
 end)
 

@@ -24,6 +24,7 @@ emitter:on("add", function (guildID)
 		logger:log(4, "MEMORY: Added guild %s", guildID)
 	else
 		logger:log(2, "MEMORY: Couldn't add guild %s: %s", guildID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't add guild %s: %s", guildID, msg)
 	end
 end)
 
@@ -33,6 +34,7 @@ emitter:on("remove", function (guildID)
 		logger:log(4, "MEMORY: Removed guild %s", guildID)
 	else
 		logger:log(2, "MEMORY: Couldn't remove guild %s: %s", guildID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't remove guild %s: %s", guildID, msg)
 	end
 end)
 
@@ -42,15 +44,17 @@ emitter:on("updatePrefix", function (guildID, prefix)
 		logger:log(4, "MEMORY: Updated prefix for guild %s to %s", guildID, prefix)
 	else
 		logger:log(2, "MEMORY: Couldn't update prefix for guild %s to %s: %s", guildID, prefix, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update prefix for guild %s to %s: %s", guildID, prefix, msg)
 	end
 end)
 
 emitter:on("updateTemplate", function (guildID, template)
-	local ok, msg = pcall(storageInteractionEvent, updatePrefix, template, guildID)
+	local ok, msg = pcall(storageInteractionEvent, updateTemplate, template, guildID)
 	if ok then
 		logger:log(4, "MEMORY: Updated template for guild %s to %s", guildID, template)
 	else
 		logger:log(2, "MEMORY: Couldn't update template for guild %s to %s: %s", guildID, template, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update template for guild %s to %s: %s", guildID, template, msg)
 	end
 end)
 

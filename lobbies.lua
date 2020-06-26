@@ -25,6 +25,7 @@ emitter:on("add", function (lobbyID)
 		logger:log(4, "MEMORY: Added lobby %s", lobbyID)
 	else
 		logger:log(2, "MEMORY: Couldn't add lobby %s: %s", lobbyID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't add lobby %s: %s", lobbyID, msg)
 	end
 end)
 
@@ -34,15 +35,17 @@ emitter:on("remove", function (lobbyID)
 		logger:log(4, "MEMORY: Removed lobby %s", lobbyID)
 	else
 		logger:log(2, "MEMORY: Couldn't remove lobby %s: %s", lobbyID, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't remove lobby %s: %s", lobbyID, msg)
 	end
 end)
 
 emitter:on("updateTemplate", function (lobbyID, template)
-	local ok, msg = pcall(storageInteractionEvent, add, template, lobbyID)
+	local ok, msg = pcall(storageInteractionEvent, updateTemplate, template, lobbyID)
 	if ok then
 		logger:log(4, "MEMORY: Updated template for lobby %s to %s", lobbyID, template)
 	else
 		logger:log(2, "MEMORY: Couldn't update template for lobby %s to %s: %s", lobbyID, template, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update template for lobby %s to %s: %s", lobbyID, template, msg)
 	end
 end)
 
