@@ -139,6 +139,10 @@ local events = {
 		end
 	end,
 	
+	messageDelete = function (message)	-- in case embed gets deleted
+		if embeds[message] then embeds[message] = nil end
+	end,
+	
 	reactionAdd = function (reaction, userID) -- embeds processing
 		-- check extensively if it's even our business
 		if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
