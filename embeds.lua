@@ -85,7 +85,7 @@ return setmetatable({}, {
 		-- it dies if not noticed for long enough
 		tick = function (self)
 			for message, embedData in pairs(self) do
-				if message and message.channel and client:getChannel(message.channel):getMessage(message) then
+				if message and message.channel then
 					embedData.killIn = embedData.killIn - 1
 					if embedData.killIn == 0 then
 						self[message] = nil 
