@@ -14,10 +14,11 @@ local emitter = discordia.Emitter()
 local channels = require "./channels.lua"
 
 -- prepared statements
-local add, remove, updateTemplate =
-	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL)"),
+local add, remove, updateTemplate, updateTarget =
+	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL)"),
 	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?")
+	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"),
+	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?")
 
 emitter:on("add", function (lobbyID)
 	local ok, msg = pcall(storageInteractionEvent, add, lobbyID)
@@ -49,17 +50,27 @@ emitter:on("updateTemplate", function (lobbyID, template)
 	end
 end)
 
+emitter:on("updateTarget", function (lobbyID, target)
+	local ok, msg = pcall(storageInteractionEvent, updateTarget, target, lobbyID)
+	if ok then
+		logger:log(4, "MEMORY: Updated target for lobby %s to %s", lobbyID, target)
+	else
+		logger:log(2, "MEMORY: Couldn't update target for lobby %s to %s: %s", lobbyID, target, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update target for lobby %s to %s: %s", lobbyID, target, msg)
+	end
+end)
+
 return setmetatable({}, {
 	-- move functions to index table to iterate over lobbies easily
 	__index = {
 	-- perform checks and add lobby to table
-		loadAdd = function (self, lobbyID, template)	-- additional parameter are used upon startup to prevent unnecessary checks
+		loadAdd = function (self, lobbyID, template, target)	-- additional parameter are used upon startup to prevent unnecessary checks
 			if channels[lobbyID] then channels:remove(lobbyID) end	-- I swear to god, there will be one crackhead
 			
 			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
 				if channel and channel.guild then
-					self[lobbyID] = {template = template}
+					self[lobbyID] = {template = template, target = target}
 					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 				end
 			end
@@ -91,7 +102,7 @@ return setmetatable({}, {
 			if lobbyIDs then
 				for i, lobbyID in ipairs(lobbyIDs[1]) do
 					if client:getChannel(lobbyID) then
-						self:loadAdd(lobbyID, lobbyIDs.template[i])
+						self:loadAdd(lobbyID, lobbyIDs.template[i], lobbyIDs.target[i])
 					else
 						self:remove(lobbyID)
 					end
@@ -107,6 +118,17 @@ return setmetatable({}, {
 				self[lobbyID].template = template
 				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
 				emitter:emit("updateTemplate", lobbyID, template)
+			else
+				self:remove(lobbyID)
+			end
+		end,
+		
+		updateTarget = function (self, lobbyID, target)
+			local channel = client:getChannel(lobbyID)
+			if channel and self[lobbyID] then
+				self[lobbyID].target = target
+				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, lobbyID)
+				emitter:emit("updateTarget", lobbyID, target)
 			else
 				self:remove(lobbyID)
 			end

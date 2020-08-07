@@ -16,30 +16,32 @@ return setmetatable({}, {
 		-- all relevant emojis
 		reactions = {"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟",
 			["1️⃣"] = 1, ["2️⃣"] = 2, ["3️⃣"] = 3, ["4️⃣"] = 4, ["5️⃣"] = 5, ["6️⃣"] = 6, ["7️⃣"] = 7, ["8️⃣"] = 8, ["9️⃣"] = 9, ["🔟"] = 10,
-			left = "⬅", right = "➡", page = "📄", all = "*️⃣",
-			["⬅"] = "left", ["➡"] = "right", ["📄"] = "page", ["*️⃣"] = all},
+			left = "⬅", right = "➡", page = "📄", all = "*️⃣", stop = "❌",
+			["⬅"] = "left", ["➡"] = "right", ["📄"] = "page", ["*️⃣"] = "all", ["❌"] = "stop"},
 		
 		-- create new data entry
 		new = function (self, action, page, ids)
 			local reactions = self.reactions
-			local template = action:match("^template(.-)$") -- could be nil
+			local argument = action:match("^template(.-)$") or action:match("^target(.-)$")
+			action = action:match("^template") or action:match("^target") or action
 			local nids = #ids
 			
 			local embed = {
-				title = -- upper bold text
-					action == "register" and (nids > 10 and locale.embedRegisterPages or locale.embedRegister) or (
-					action == "unregister" and (nids > 10 and locale.embedUnregisterPages or locale.embedUnregister) or (
-					template == "" and (nids > 10 and locale.embedResetTemplatePages or locale.embedResetTemplate) or 
-						(nids > 10 and locale.embedTemplatePages or locale.embedTemplate):format(template))),
-				description = "", -- main text, emoji + channel name
-				footer = nids > 10 and {text = locale.embedPages:format(page, math.ceil(nids/10))} or nil -- page number
+				title = action:gsub("^.", string.upper, 1),	-- upper bold text
+				color = 6561661,
+				description = (action == "register" and locale.embedRegister or 
+					action == "unregister" and locale.embedUnregister or 
+					action == "template" and (argument == "" and locale.embedResetTemplate or locale.embedTemplate) or
+					action == "target" and (argument == "" and locale.embedResetTarget or locale.embedTarget)
+					):format(argument).."\n"..(nids > 10 and (locale.embedPage.."\n") or "")..locale.embedAll.."\n",
+				footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number
 			}
 			
 			for i=10*(page-1)+1,10*page do
 				if not ids[i] then break end
 				local channel = client:getChannel(ids[i])
 				embed.description = embed.description.."\n"..reactions[math.fmod(i-1,10)+1]..
-					string.format(channel.category and locale.channelNameCategory or "`%s`", channel.name, channel.category and channel.category.name)
+					string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category")
 			end
 			
 			return embed
@@ -57,6 +59,7 @@ return setmetatable({}, {
 			if embedData.page ~= math.modf(#embedData.ids/10)+1 then message:addReaction(reactions.right) end
 			if #embedData.ids > 10 then message:addReaction(reactions.page) end
 			message:addReaction(reactions.all)
+			message:addReaction(reactions.stop)
 		end,
 		
 		-- create, save and send fully formed embed and decorate
@@ -88,7 +91,8 @@ return setmetatable({}, {
 				if message and message.channel then
 					embedData.killIn = embedData.killIn - 1
 					if embedData.killIn == 0 then
-						self[message] = nil 
+						self[message] = nil
+						message:delete()
 					end
 				else
 					self[message] = nil

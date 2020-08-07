@@ -3,6 +3,7 @@ local mutexes = {}
 
 return {
 	-- returns channels in the same order they are presented in the app
+	-- https://imgur.com/a/hRWM73c
 	truePositionSorting = function (a, b)
 		return (not a.category and b.category) or
 			(a.category and b.category and a.category.position < b.category.position) or

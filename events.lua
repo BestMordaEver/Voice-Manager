@@ -15,9 +15,11 @@ local finalizer = require "./finalizer.lua"
 local permission = discordia.enums.permission
 local reactions = embeds.reactions
 
--- register -> unregister; unregister -> register; template -> template
+-- register -> unregister; unregister -> register; templateblabla -> template; targetblabla -> target
 local function antiAction (action)
-	return action == "unregister" and "register" or (action == "register" and "unregister" or "template")
+	return action == "unregister" and "register" or 
+		action == "register" and "unregister" or 
+			action:match("^template") and "template" or "target"
 end
 
 -- message is a discord object, if it doesn't have guild property - it's a DM
@@ -165,12 +167,19 @@ local events = {
 				if not embedData.ids[i] then break end
 				table.insert(ids, embedData.ids[i])
 			end
-			(actions[embedData.action] or actions.template)(reaction.message, ids, embedData.action:match("^template(.+)$"))
+			(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
+				(reaction.message, ids, embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
 		elseif reaction.emojiHash == reactions.all then
 			reaction.message.channel:broadcastTyping(); -- without semicolon next parenthesis is interpreted as a function call :\
-			(actions[embedData.action] or actions.template)(reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
+			(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
+				(reaction.message, embedData.ids, embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+		elseif reaction.emojiHash == reactions.stop then
+			embeds[reaction.message] = nil
+			reaction.message:delete()
 		else -- assume a number emoji
-			(actions[embedData.action] or actions.template)(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.action:match("^template(.+)$"))
+			(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
+				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, 
+					embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
 		end
 	end,
 	
@@ -182,6 +191,7 @@ local events = {
 		local embedData = embeds[reaction.message]
 		
 		logger:log(4, "GUILD %s USER %s on EMBED %s => removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+		
 		if embeds.reactions[reaction.emojiHash] then
 			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		elseif reaction.emojiHash == reactions.page then
@@ -191,10 +201,10 @@ local events = {
 				if not embedData.ids[i] then break end
 				table.insert(ids, embedData.ids[i])
 			end
-			actions[antiAction(embedData.action)](reaction.message, ids, embedData.action:match("^template(.+)$"))
+			actions[antiAction(embedData.action)](reaction.message, ids)
 		elseif reaction.emojiHash == reactions.all then
 			reaction.message.channel:broadcastTyping();
-			actions[antiAction(embedData.action)](reaction.message, embedData.ids, embedData.action:match("^template(.+)$"))
+			actions[antiAction(embedData.action)](reaction.message, embedData.ids)
 		end
 	end,
 	
@@ -217,18 +227,22 @@ local events = {
 			logger:log(4, "GUILD %s LOBBY %s: %s joined", channel.guild.id, channel.id, member.user.id)
 			
 			-- parent to which a new channel will be attached
-			local category = channel.category or channel.guild
+			local category = client:getChannel(lobbies[channel.id].target) or channel.category or channel.guild
 			
 			-- determine new channel name
 			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
 			if name:match("%%.-%%") then
-				local nickname = member.nickname or member.user.name
+				local uname = member.user.name
+				local nickname = member.nickname or uname
+				local game = (member.activity.type == 0 or member.activity.type == 1) and member.activity.name or "no game"
+				
 				local rt = {
 					nickname = nickname,
-					name = member.user.name,
+					name = uname,
 					tag = member.user.tag,
+					game = game,
 					["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
-					["name's"] = member.user.name .. (member.user.name:sub(-1,-1) == "s" and "'" or "'s")
+					["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s")
 				}
 				name = name:gsub("%%(.-)%%", rt)
 			end
@@ -272,6 +286,14 @@ local events = {
 		
 		client:setGame(status())
 		client:getChannel("676432067566895111"):send("I'm listening")
+	end,
+	
+	error = function (err)
+		local channel = err:match("404 %- Not Found : DELETE.-channels/(%d+)")
+		if channel then 
+			if channels[channel] then channels:remove(channel) end
+			if lobbies[channel] then lobbies:remove(channel) end
+		end
 	end,
 
 	min = function (date)
