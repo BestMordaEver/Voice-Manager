@@ -228,7 +228,7 @@ local events = {
 		if lobby and lobbies[lobby.id] then
 			logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
 			
-			--if guilds[lobby.guild.id].limitation > guilds[lobby.guild.id]:
+			if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
 			
 			-- parent to which a new channel will be attached
 			local category = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
@@ -260,6 +260,7 @@ local events = {
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
 				channels:add(newChannel.id, lobby.id, lobbies:attachChild(lobby.id, newChannel.id, position))
+				guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 				newChannel:setUserLimit(lobby.userLimit)
 				
 				-- if given permissions, allow user moderation
@@ -293,10 +294,14 @@ local events = {
 	end,
 	
 	channelDelete = function (channel) -- and make sure there are no traces!
-		if lobbies[channel.id] then lobbies:remove(channel.id) end
+		if lobbies[channel.id] then
+			lobbies:remove(channel.id)
+			guilds[channel.guild.id].lobbies:remove(channel.id)
+		end
 		if channels[channel.id] then
-			lobbies:detachChild(channel.id)
 			channels:remove(channel.id)
+			lobbies:detachChild(channel.id)
+			guilds[channel.guild.id].channels = guilds[channel.guild.id].channels - 1
 		end
 	end,
 	

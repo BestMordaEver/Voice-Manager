@@ -10,6 +10,7 @@ local utils = require "./utils.lua"
 local storageInteractionEvent = utils.storageInteractionEvent
 local set = utils.set
 local lobbies = require "./lobbies.lua"
+local channels = require "./channels.lua"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -78,7 +79,7 @@ return setmetatable({}, {
 	__index = {
 		-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
 		loadAdd = function (self, guildID, prefix, template, limitation)
-			self[guildID] = {prefix = prefix or "!vm", template = template, limitation = limitation or 10000, lobbies = set()}
+			self[guildID] = {prefix = prefix or "!vm", template = template, limitation = limitation or 10000, lobbies = set(), channels = 0}
 			logger:log(4, "GUILD %s: Added", guildID)
 		end,
 		
@@ -114,7 +115,9 @@ return setmetatable({}, {
 			end
 			
 			for _, lobbyID in pairs(lobbies) do
-				self[client:getChannel(lobbyID).guild.id].lobbies:add(lobbyID)
+				local guild = self[client:getChannel(lobbyID).guild.id]
+				guild.lobbies:add(lobbyID)
+				guild.channels = guild.channels + 1
 			end
 			
 			logger:log(4, "STARTUP: Loaded!")
@@ -138,14 +141,6 @@ return setmetatable({}, {
 			self[guildID].limitation = limitation
 			logger:log(4, "GUILD %s: Updated limitation", guildID)
 			emitter:emit("updateLimitation", guildID, limitation)
-		end,
-		
-		channelsCount = function (self)
-			local c = 0
-			for lobbyID in lobbies:explist() do
-				c = c + #lobbies[lobbyID].children
-			end
-			return c
 		end
 	}
 })
