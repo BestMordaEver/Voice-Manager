@@ -1,17 +1,19 @@
 -- object to store data about lobbies and interact with corresponding db
+-- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR)
 
 local discordia = require "discordia"
 local sqlite = require "sqlite3".open("lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
+local utils = require "./utils.lua"
+local storageInteractionEvent = utils.storageInteractionEvent
+local hollowArray = utils.hollowArray
+local channels = require "./channels.lua"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
 local emitter = discordia.Emitter()
-
-local channels = require "./channels.lua"
 
 -- prepared statements
 local add, remove, updateTemplate, updateTarget =
@@ -65,12 +67,10 @@ return setmetatable({}, {
 	__index = {
 	-- perform checks and add lobby to table
 		loadAdd = function (self, lobbyID, template, target)	-- additional parameter are used upon startup to prevent unnecessary checks
-			if channels[lobbyID] then channels:remove(lobbyID) end	-- I swear to god, there will be one crackhead
-			
 			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
 				if channel and channel.guild then
-					self[lobbyID] = {template = template, target = target}
+					self[lobbyID] = {template = template, target = target, children = hollowArray()}
 					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 				end
 			end
@@ -107,6 +107,10 @@ return setmetatable({}, {
 						self:remove(lobbyID)
 					end
 				end
+				
+				for channelID, channelData in pairs(channels) do
+					self[channelData.parent].children:fill(channelID, tonumber(channelData.position))
+				end
 			end
 			logger:log(4, "STARTUP: Loaded!")
 		end,
@@ -134,11 +138,13 @@ return setmetatable({}, {
 			end
 		end,
 		
-		-- check how many lobbies are in a specific guild
-		inGuild = function (self, guildID)
-			local count = 0
-			for v,_ in pairs(self) do if client:getChannel(v).guild.id == guildID then count = count + 1 end end
-			return count
+		-- returns filled position
+		attachChild = function (self, lobbyID, channelID, position)
+			return self[lobbyID].children:fill(channelID, position)
+		end,
+		
+		detachChild = function (self, channelID)
+			self[channels[channelID].parent].children:drain(channels[channelID].position)
 		end
 	},
 	__len = function (self)

@@ -161,6 +161,10 @@ Sends stats for specific server]],
 	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
+	-- limitation
+	limitationConfirm = [[Your server limit is **`%d`** now]],
+	limitationThis = [[You've set a server limit of **`%d`**]],
+	limitationOOB = [[Server limit must be a number between 10,000 and 1]],
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],

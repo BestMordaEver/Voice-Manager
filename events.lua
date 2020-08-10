@@ -1,4 +1,6 @@
--- all event preprocessing happens here 
+-- all event preprocessing happens here
+
+local timer = require "timer"
 
 local discordia = require "discordia"
 local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
@@ -222,25 +224,30 @@ local events = {
 		client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
 	end,
 	
-	voiceChannelJoin = function (member, channel) -- your purpose!
-		if channel and lobbies[channel.id] then
-			logger:log(4, "GUILD %s LOBBY %s: %s joined", channel.guild.id, channel.id, member.user.id)
+	voiceChannelJoin = function (member, lobby) -- your purpose!
+		if lobby and lobbies[lobby.id] then
+			logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
+			
+			--if guilds[lobby.guild.id].limitation > guilds[lobby.guild.id]:
 			
 			-- parent to which a new channel will be attached
-			local category = client:getChannel(lobbies[channel.id].target) or channel.category or channel.guild
+			local category = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
 			
 			-- determine new channel name
-			local name = lobbies[channel.id].template or guilds[channel.guild.id].template or "%nickname's% channel"
+			local name = lobbies[lobby.id].template or guilds[lobby.guild.id].template or "%nickname's% channel"
+			local position = lobbies:attachChild(lobby.id, true)
+			local needsMove = name:match("%%counter%%") and true
 			if name:match("%%.-%%") then
 				local uname = member.user.name
 				local nickname = member.nickname or uname
-				local game = (member.activity.type == 0 or member.activity.type == 1) and member.activity.name or "no game"
+				local game = (member.activity and (member.activity.type == 0 or member.activity.type == 1)) and member.activity.name or "no game"
 				
 				local rt = {
 					nickname = nickname,
 					name = uname,
 					tag = member.user.tag,
 					game = game,
+					counter = position,
 					["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 					["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s")
 				}
@@ -252,14 +259,26 @@ local events = {
 			-- did we fail? statistics say "probably yes!"
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
-				channels:add(newChannel.id)
-				newChannel:setUserLimit(channel.userLimit)
+				channels:add(newChannel.id, lobby.id, lobbies:attachChild(lobby.id, newChannel.id, position))
+				newChannel:setUserLimit(lobby.userLimit)
+				
 				-- if given permissions, allow user moderation
-				if channel.guild.me:getPermissions(channel):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
+				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
 				end
+				
+				if needsMove then
+					local children, distance = lobbies[lobby.id].children, 0
+					repeat
+						distance = distance + 1
+					until children[position + distance] ~= nil or position + distance > children.max
+					if position + distance <= children.max then
+						newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
+					end
+					
+				end
 			else
-				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", channel.guild.id, channel.id, member.user.id)
+				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
 			end
 		end
 	end,
@@ -275,13 +294,16 @@ local events = {
 	
 	channelDelete = function (channel) -- and make sure there are no traces!
 		if lobbies[channel.id] then lobbies:remove(channel.id) end
-		if channels[channel.id] then channels:remove(channel.id) end
+		if channels[channel.id] then
+			lobbies:detachChild(channel.id)
+			channels:remove(channel.id)
+		end
 	end,
 	
 	ready = function ()
-		guilds:load()
-		lobbies:load()
 		channels:load()
+		lobbies:load()
+		guilds:load()
 		clock:start()
 		
 		client:setGame(status())

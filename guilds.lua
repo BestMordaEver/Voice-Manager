@@ -1,22 +1,27 @@
 -- object to store data about guilds and interact with corresponding db
+-- CREATE TABLE guilds(id VARCHAR PRIMARY KEY, prefix VARCHAR, template VARCHAR, limitation INTEGER)
 
 local discordia = require "discordia"
 local sqlite = require "sqlite3".open("guildsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
+local utils = require "./utils.lua"
+local storageInteractionEvent = utils.storageInteractionEvent
+local set = utils.set
+local lobbies = require "./lobbies.lua"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
 local emitter = discordia.Emitter()
 
 -- prepared statements
-local add, remove, updatePrefix, updateTemplate =
+local add, remove, updatePrefix, updateTemplate, updateLimitation =
 	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL)"),
 	sqlite:prepare("DELETE FROM guilds WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?")
+	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"),
+	sqlite:prepare("UPDATE guilds SET limitation = ? WHERE id = ?")
 
 emitter:on("add", function (guildID)
 	local ok, msg = pcall(storageInteractionEvent, add, guildID)
@@ -58,12 +63,22 @@ emitter:on("updateTemplate", function (guildID, template)
 	end
 end)
 
+emitter:on("updateLimitation", function (guildID, limitation)
+	local ok, msg = pcall(storageInteractionEvent, updateLimitation, limitation, guildID)
+	if ok then
+		logger:log(4, "MEMORY: Updated limitation for guild %s to %s", guildID, limitation)
+	else
+		logger:log(2, "MEMORY: Couldn't update limitation for guild %s to %s: %s", guildID, limitation, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update limitation for guild %s to %s: %s", guildID, limitation, msg)
+	end
+end)
+
 return setmetatable({}, {
 	-- move functions to index table to iterate over guilds easily
 	__index = {
 		-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
-		loadAdd = function (self, guildID, prefix, template)
-			self[guildID] = {prefix = prefix or "!vm", template = template}
+		loadAdd = function (self, guildID, prefix, template, limitation)
+			self[guildID] = {prefix = prefix or "!vm", template = template, limitation = limitation or 10000, lobbies = set()}
 			logger:log(4, "GUILD %s: Added", guildID)
 		end,
 		
@@ -86,7 +101,7 @@ return setmetatable({}, {
 			if guildIDs then
 				for i, guildID in ipairs(guildIDs.id) do
 					if client:getGuild(guildID) then
-						self:loadAdd(guildID, guildIDs.prefix[i], guildIDs.template[i])
+						self:loadAdd(guildID, guildIDs.prefix[i], guildIDs.template[i], tonumber(guildIDs.limitation[i]))
 					else
 						self:remove(guildID)
 					end
@@ -96,6 +111,10 @@ return setmetatable({}, {
 			logger:log(4, "STARTUP: Loading guilds from client")
 			for _, guild in pairs(client.guilds) do
 				if not self[guild.id] then self:add(guild.id) end
+			end
+			
+			for _, lobbyID in pairs(lobbies) do
+				self[client:getChannel(lobbyID).guild.id].lobbies:add(lobbyID)
 			end
 			
 			logger:log(4, "STARTUP: Loaded!")
@@ -113,6 +132,20 @@ return setmetatable({}, {
 			self[guildID].template = template
 			logger:log(4, "GUILD %s: Updated template", guildID)
 			emitter:emit("updateTemplate", guildID, template)
+		end,
+		
+		updateLimitation = function (self, guildID, limitation)
+			self[guildID].limitation = limitation
+			logger:log(4, "GUILD %s: Updated limitation", guildID)
+			emitter:emit("updateLimitation", guildID, limitation)
+		end,
+		
+		channelsCount = function (self)
+			local c = 0
+			for lobbyID in lobbies:explist() do
+				c = c + #lobbies[lobbyID].children
+			end
+			return c
 		end
 	}
 })

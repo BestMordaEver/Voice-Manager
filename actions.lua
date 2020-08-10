@@ -233,7 +233,7 @@ return {
 		end
 		
 		local targetCategory = client:getChannel(target)
-		if not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
+		if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
 			message:reply(locale.badBotPermission.." "..targetCategory.name)
 			return "Bad permissions for target"
 		end
@@ -253,6 +253,41 @@ return {
 		template, ids = actionFinalizer(message, ids, "template"..(template or ""))
 		message:reply(template)
 		return (#ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " ")))
+	end,
+	
+	limitation = function (message)
+		local guild, limitation = message.content:match("limitation%s*(%d*)%s*(%d*)$")
+		if not limitation then
+			limitation, guild = guild, message.guild
+		end
+		
+		
+		if not guild then
+			message:reply(locale.badServer)
+			return "Didn't find the guild"
+		end
+		if guild and not guild:getMember(message.author) then
+			message:reply(locale.notMember)
+			return "Not a member"
+		end
+		
+		if limitation then
+			if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
+				message:reply(locale.mentionInVain:format(message.author.mentionString))
+				return "Bad user permissions"
+			end
+			if not tonumber(limitation) or limitation > 100000 or limitation < 1 then
+				message:reply(locale.limitationOOB)
+				return "Limitation OOB"
+			end
+			
+			guilds:updateLimitation(guild.id, limitation)
+			message:reply(locale.limitationConfirm:format(limitation))
+			return "Set new limitation"
+		else
+			message:reply(locale.limitationThis:format(guilds[guild.id].limitation))
+			return "Sent current limitation"
+		end
 	end,
 	
 	prefix = function (message)
@@ -339,7 +374,7 @@ return {
 		
 		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds
 		if guild then
-			lobbyCount, channelCount, peopleCount = lobbies:inGuild(guild.id), channels:inGuild(guild.id), channels:people(guild.id)
+			lobbyCount, channelCount, peopleCount = #guilds[guild.id].lobbies, guilds[guild.id]:channelsCount(), channels:people(guild.id)
 		else
 			lobbyCount, channelCount, peopleCount = #lobbies, #channels, channels:people()
 		end

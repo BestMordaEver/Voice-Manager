@@ -1,4 +1,5 @@
 -- object to store data about new channels and interact with corresponding db
+-- CREATE TABLE channels(id VARCHAR PRIMARY KEY, parent VARCHAR, position INTEGER)
 
 local discordia = require "discordia"
 local sqlite = require "sqlite3".open("channelsData.db")
@@ -13,11 +14,11 @@ local emitter = discordia.Emitter()
 
 -- prepared statements
 local add, remove =
-	sqlite:prepare("INSERT INTO channels VALUES(?)"),
+	sqlite:prepare("INSERT INTO channels VALUES(?,?,?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
-emitter:on("add", function (channelID)
-	local ok, msg = pcall(storageInteractionEvent, add, channelID)
+emitter:on("add", function (channelID, parent, position)
+	local ok, msg = pcall(storageInteractionEvent, add, channelID, parent, position)
 	if ok then
 		logger:log(4, "MEMORY: Added channel %s", channelID)
 	else
@@ -40,20 +41,20 @@ return setmetatable({}, {
 	-- move functions to index table to iterate over channels easily
 	__index = {
 		-- perform checks and add channel to table
-		loadAdd = function (self, channelID)
+		loadAdd = function (self, channelID, parent, position)
 			if not self[channelID] then
 				local channel = client:getChannel(channelID)
 				if channel and channel.guild then
-					self[channelID] = true
+					self[channelID] = {parent = parent, position = position}
 					logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
 				end
 			end
 		end,
 		
 		-- loadAdd and start interaction with db
-		add = function (self, channelID)
-			self:loadAdd(channelID)
-			if self[channelID] then emitter:emit("add", channelID) end
+		add = function (self, channelID, parent, position)
+			self:loadAdd(channelID, parent, position)
+			if self[channelID] then emitter:emit("add", channelID, parent, position) end
 		end,
 		
 		-- no granular control, if it goes away, it does so everywhere
@@ -74,11 +75,11 @@ return setmetatable({}, {
 			logger:log(4, "STARTUP: Loading channels")
 			local channelIDs = sqlite:exec("SELECT * FROM channels")
 			if channelIDs then
-				for _, channelID in ipairs(channelIDs[1]) do
+				for i, channelID in ipairs(channelIDs[1]) do
 					local channel = client:getChannel(channelID)
 					if channel then
 						if #channel.connectedMembers > 0 then
-							self:loadAdd(channelID)
+							self:loadAdd(channelID, channelIDs[2][i], tonumber(channelIDs[3][i]))
 						else
 							channel:delete()
 						end
@@ -116,13 +117,6 @@ return setmetatable({}, {
 				end
 			end
 			return p
-		end,
-		
-		-- check how many channels are in a specific guild
-		inGuild = function (self, guildID)
-			local count = 0
-			for v,_ in pairs(self) do if client:getChannel(v).guild.id == guildID then count = count + 1 end end
-			return count
 		end
 	},
 	__len = function (self)
