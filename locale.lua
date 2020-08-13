@@ -15,6 +15,9 @@ Unregisters an existing lobby
 **template**
 Change new channels' name template
 
+**limitation**
+Change how many new channels can be created in your server
+
 **prefix**
 Set a new prefix. Mentioning will still work
 
@@ -107,6 +110,15 @@ You can customize a template by including different `%combos%` to it:
 `%tag%` - user's tag (for example `Riddles#2773`)
 `%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)]],
 	
+	limitation = [[You need a **"Manage Channels"** permission to use this command!
+
+`limitation`
+Shows currently set channel limit. Default is 100,000
+
+`limitation <limit>` OR
+`limitation <server ID> <limit>`
+Changes the channel limit. Must be between 1 and 100,000]],
+	
 	prefix = [[You need a **"Manage Channels"** permission to use this command!
 
 `prefix`
@@ -163,7 +175,7 @@ Sends stats for specific server]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
-	limitationThis = [[You've set a server limit of **`%d`**]],
+	limitationThis = [[Your server limit is **`%d`**]],
 	limitationOOB = [[Server limit must be a number between 10,000 and 1]],
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],

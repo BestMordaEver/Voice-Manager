@@ -18,7 +18,7 @@ local emitter = discordia.Emitter()
 
 -- prepared statements
 local add, remove, updatePrefix, updateTemplate, updateLimitation =
-	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL)"),
+	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL, 100000)"),
 	sqlite:prepare("DELETE FROM guilds WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"),
@@ -79,7 +79,7 @@ return setmetatable({}, {
 	__index = {
 		-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
 		loadAdd = function (self, guildID, prefix, template, limitation)
-			self[guildID] = {prefix = prefix or "!vm", template = template, limitation = limitation or 10000, lobbies = set(), channels = 0}
+			self[guildID] = {prefix = prefix or "!vm", template = template, limitation = limitation or 100000, lobbies = set(), channels = 0}
 			logger:log(4, "GUILD %s: Added", guildID)
 		end,
 		
@@ -114,9 +114,12 @@ return setmetatable({}, {
 				if not self[guild.id] then self:add(guild.id) end
 			end
 			
-			for _, lobbyID in pairs(lobbies) do
-				local guild = self[client:getChannel(lobbyID).guild.id]
-				guild.lobbies:add(lobbyID)
+			for lobbyID, _ in pairs(lobbies) do
+				self[client:getChannel(lobbyID).guild.id].lobbies:add(lobbyID)
+			end
+			
+			for channelID, _ in pairs(channels) do
+				local guild = self[client:getChannel(channelID).guild.id]
 				guild.channels = guild.channels + 1
 			end
 			

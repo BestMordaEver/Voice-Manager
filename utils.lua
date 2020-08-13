@@ -10,13 +10,12 @@ local hollowArray = {
 		self[pos] = o
 		if pos > self.max then self.max = pos end
 		while self[self.space] ~= nil do self.space = self.space + 1 end
-		print("Filled position "..pos.." with "..tostring(o).."; space = "..self.space..", n = "..self.n..", max = "..self.max)
 		self.mutex:unlock()
 		return pos
 	end,
 	
 	drain = function (self, pos)
-		if self[pos] == nil then print("nothing to drain"); return end
+		if self[pos] == nil then return end
 		
 		self.mutex:lock()
 		local ret = self[pos]
@@ -24,7 +23,6 @@ local hollowArray = {
 		self.n = self.n - 1
 		if pos < self.space then self.space = pos end
 		while self[self.max] == nil and self.max > 0 do self.max = self.max - 1 end
-		print("Drained position "..pos.." of "..ret.."; space = "..self.space..", n = "..self.n..", max = "..self.max)
 		self.mutex:unlock()
 		return ret
 	end
