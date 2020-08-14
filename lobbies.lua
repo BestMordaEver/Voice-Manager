@@ -109,7 +109,9 @@ return setmetatable({}, {
 				end
 				
 				for channelID, channelData in pairs(channels) do
-					self[channelData.parent].children:fill(channelID, tonumber(channelData.position))
+					if self[channelData.parent] then
+						self[channelData.parent].children:fill(channelID, tonumber(channelData.position))
+					end
 				end
 			end
 			logger:log(4, "STARTUP: Loaded!")
