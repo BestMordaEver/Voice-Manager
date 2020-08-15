@@ -183,7 +183,7 @@ end
 -- all possible bot commands are processed here, should return message for logger
 return {
 	help = function (message)
-		local command = message.content:match("help%s*(.-)$"):lower()
+		local command = (message.content:match("help%s*(.-)$") or "help"):lower()
 		if not (command and locale[command]) then
 			command = "help"
 		end
