@@ -12,7 +12,9 @@ List of available commands:
 - help - sends help message or information about another commands
 - register - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
 - unregister - unregisters an existing lobby. You can feed it channel IDs or channel name
+- target - select where to create new channels
 - template - change new channels' name template. Look at "help template" to learn more
+- limitation - change how many new channels can be created in your server
 - prefix - set a new prefix. Mentioning will still work
 - list - lists all registered lobbies on the server
 - stats - take a sneak peek on bot's performance!
