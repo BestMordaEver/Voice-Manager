@@ -34,7 +34,7 @@ Take a sneak peek on my performance!
 
 **Links**
 [Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[Support Server](https://discord.com/tqj6jvT)
+[Support Server](https://discord.gg/tqj6jvT)
 ]],
 	
 	register = [[You need a **"Manage Channels"** permission to use this command!
