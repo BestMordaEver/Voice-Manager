@@ -12,6 +12,9 @@ Registers a voice channel that will be used as a lobby
 **unregister**
 Unregisters an existing lobby
 
+**target**
+Select where to create new channels
+
 **template**
 Change new channels' name template
 
