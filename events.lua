@@ -87,10 +87,11 @@ end
 events are listed by name here, discordia events may differ from OG discord events for sake of convenience
 full list and arguments - https://github.com/SinisterRectus/Discordia/wiki/Events
 ]]
-local events = {
+local events
+events = {
 	messageCreate = function (message)
 		-- ignore non-initialized guilds
-		if message.guild and not guilds[message.guild.id] then return end
+		if message.guild and not guilds[message.guild.id] or not message.content then return end
 		
 		local prefix = message.guild and guilds[message.guild.id].prefix or nil
 		
@@ -269,14 +270,24 @@ local events = {
 				end
 				
 				if needsMove then
-					local children, distance = lobbies[lobby.id].children, 0
+					local moved = false
 					repeat
-						distance = distance + 1
-					until children[position + distance] ~= nil or position + distance > children.max
-					if position + distance <= children.max then
-						newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
-					end
-					
+						local children, distance = lobbies[lobby.id].children, 0
+						repeat
+							distance = distance + 1
+						until children[position + distance] ~= nil or position + distance > children.max
+						if position + distance <= children.max then
+							local topChannel = client:getChannel(children[position + distance])
+							if topChannel then
+								newChannel:moveUp(newChannel.position - topChannel.position)
+								moved = true
+							else
+								channels:remove(children[position + distance])
+							end
+						else
+							moved = true
+						end
+					until moved
 				end
 			else
 				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
@@ -313,6 +324,18 @@ local events = {
 		
 		client:setGame(status())
 		client:getChannel("676432067566895111"):send("I'm listening")
+		
+		client:on(events("messageCreate"))
+		client:on(events("messageUpdate"))
+		client:on(events("reactionAdd"))
+		client:on(events("reactionRemove"))
+		client:on(events("guildCreate"))
+		client:on(events("guildDelete"))
+		client:on(events("voiceChannelJoin"))
+		client:on(events("voiceChannelLeave"))
+		client:on(events("channelDelete"))
+		clock:on(events("min"))
+		clock:on(events("hour"))
 	end,
 	
 	error = function (err)

@@ -51,6 +51,7 @@ local hamt = {
 	end
 }
 
+-- classic set
 local set = {
 	add = function (self, o)
 		if self[o] then return end

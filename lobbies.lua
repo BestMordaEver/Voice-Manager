@@ -146,7 +146,9 @@ return setmetatable({}, {
 		end,
 		
 		detachChild = function (self, channelID)
-			self[channels[channelID].parent].children:drain(channels[channelID].position)
+			if channels[channelID] and self[channels[channelID].parent] then
+				self[channels[channelID].parent].children:drain(channels[channelID].position)
+			end
 		end
 	},
 	__len = function (self)

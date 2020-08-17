@@ -33,19 +33,8 @@ notice that metametod call of the table produces two values
 ]]
 local events = require "./events.lua"
 
--- register all events here
-client:on(events("messageCreate"))
-client:on(events("messageUpdate"))
-client:on(events("reactionAdd"))
-client:on(events("reactionRemove"))
-client:on(events("guildCreate"))
-client:on(events("guildDelete"))
-client:on(events("voiceChannelJoin"))
-client:on(events("voiceChannelLeave"))
-client:on(events("channelDelete"))
+-- Other events are registered in "ready"
 client:on(events("ready"))
-clock:on(events("min"))
-clock:on(events("hour"))
 
 -- bot starts working here
 client:run('Bot '..config.token)
