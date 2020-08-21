@@ -33,15 +33,6 @@ local function logAction (message, logMsg)
 	end
 end
 
-local function moveTimeout (cycles, newChannel)
-	if cycles > 10 then
-		logger:log(4, "GUILD %s LOBBY %s: Can't delay move of %s", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
-	else
-		logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
-	end
-	return cycles + 1
-end
-
 --[[
 status generating function
 cycles 3 different metrics every minute
@@ -292,12 +283,18 @@ events = {
 								newChannel:moveUp(newChannel.position - topChannel.position)
 								moved = true
 							else
-								cycles = timer:setTimeout(1000, moveTimeout, cycles, newChannel)
+								cycles = cycles + 1
+								if cycles > 10 then
+									break
+								else
+									logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
+									timer.sleep(1000)
+								end
 							end
 						else
 							moved = true
 						end
-					until moved or cycles > 10
+					until moved
 				end
 			else
 				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
