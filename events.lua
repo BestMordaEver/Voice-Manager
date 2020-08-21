@@ -39,7 +39,7 @@ local function moveTimeout (cycles, newChannel)
 	else
 		logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
 	end
-	cycles = cycles + 1
+	return cycles + 1
 end
 
 --[[
@@ -292,7 +292,7 @@ events = {
 								newChannel:moveUp(newChannel.position - topChannel.position)
 								moved = true
 							else
-								timer:setTimeout(1000, moveTimeout, cycles, newChannel)
+								cycles = timer:setTimeout(1000, moveTimeout, cycles, newChannel)
 							end
 						else
 							moved = true
