@@ -33,6 +33,15 @@ local function logAction (message, logMsg)
 	end
 end
 
+local function moveTimeout (cycles, newChannel)
+	if cycles > 10 then
+		logger:log(4, "GUILD %s LOBBY %s: Can't delay move of %s", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
+	else
+		logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
+	end
+	cycles = cycles + 1
+end
+
 --[[
 status generating function
 cycles 3 different metrics every minute
@@ -260,7 +269,8 @@ events = {
 			-- did we fail? statistics say "probably yes!"
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
-				channels:add(newChannel.id, lobby.id, lobbies:attachChild(lobby.id, newChannel.id, position))
+				channels:add(newChannel.id, lobby.id, position)
+				lobbies:attachChild(lobby.id, newChannel.id, position)
 				guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 				newChannel:setUserLimit(lobby.userLimit)
 				
@@ -270,7 +280,7 @@ events = {
 				end
 				
 				if needsMove then
-					local moved = false
+					local moved, cycles = false, 0
 					repeat
 						local children, distance = lobbies[lobby.id].children, 0
 						repeat
@@ -282,12 +292,12 @@ events = {
 								newChannel:moveUp(newChannel.position - topChannel.position)
 								moved = true
 							else
-								channels:remove(children[position + distance])
+								timer:setTimeout(1000, moveTimeout, cycles, newChannel)
 							end
 						else
 							moved = true
 						end
-					until moved
+					until moved or cycles > 10
 				end
 			else
 				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
