@@ -287,7 +287,7 @@ events = {
 								if cycles > 10 then
 									break
 								else
-									logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, channels[newChannel.id].parent, newChannel.id)
+									logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, lobby.id, newChannel.id)
 									timer.sleep(1000)
 								end
 							end
