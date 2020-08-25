@@ -195,7 +195,7 @@ events = {
 		
 		logger:log(4, "GUILD %s USER %s on EMBED %s => removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 		
-		if embeds.reactions[reaction.emojiHash] then
+		if tonumber(embeds.reactions[reaction.emojiHash]) then
 			actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
 		elseif reaction.emojiHash == reactions.page then
 			reaction.message.channel:broadcastTyping()
