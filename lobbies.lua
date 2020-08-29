@@ -102,7 +102,7 @@ return setmetatable({}, {
 			if lobbyIDs then
 				for i, lobbyID in ipairs(lobbyIDs[1]) do
 					if client:getChannel(lobbyID) then
-						self:loadAdd(lobbyID, lobbyIDs.template[i], lobbyIDs.target[i])
+						self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil)
 					else
 						self:remove(lobbyID)
 					end
