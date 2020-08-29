@@ -146,6 +146,30 @@ local function complexParse (message, command) -- template target action pre-pro
 		elseif reset == "reset" then
 			return ids
 		elseif argument ~= "" then
+			if command == "template" then
+				local parent = client:getChannel(argument)
+				
+				if not (parent and parent.createVoiceChannel) then
+					if not message.guild then
+						message:reply(locale.noID)
+						return "Template by name in dm"
+					end
+					
+					local categories = message.guild.categories:toArray(function (category) return category.name:lower() == argument:lower() end)
+					if not categories[1] then
+						message:reply(locale.badInput)
+						return "Didn't find the channel"
+					end
+					argument = categories[1].id
+					parent = categories[1]
+				end
+				
+				if not parent.guild:getMember(message.author):hasPermission(parent, permission.manageChannels) then
+					message:reply(locale.badUserPermission.."\nCategory `"..parent.name.."`")
+					return "User doesn't have permission to manage the category"
+				end
+			end
+			
 			return ids, argument
 		end
 	else

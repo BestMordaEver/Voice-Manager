@@ -212,6 +212,6 @@ Sends stats for specific server]],
 	badChannel = [[This channel is not valid:]],
 	badChannels = [[Those channels are not valid:]],
 	notMember = [[You're not a member of this server]],
-	noID = [[I can work only with IDs from DMs]],
+	noID = [[When in DMs, I can only work with IDs]],
 	error = [[Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s]]
 }
