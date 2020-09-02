@@ -362,7 +362,10 @@ events = {
 		client:setGame(status())
 		
 		-- hearbeat is partial? stop it!
-		if finalizer:tick() or (channels:people() == 0 and os.clock() > 86000) then finalizer:kill() end
+		if finalizer:tick() 
+		-- uncomment next line to allow bot to reboot daily
+		-- or (channels:people() == 0 and os.clock() > 86000) 
+		then finalizer:kill() end
 	end,
 	
 	hour = require "./sendStats.lua"
