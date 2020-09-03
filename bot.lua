@@ -34,7 +34,7 @@ notice that metametod call of the table produces two values
 local events = require "./events.lua"
 
 -- Other events are registered in "ready"
-client:on(events("ready"))
+client:once(events("ready"))
 
 -- bot starts working here
 client:run('Bot '..config.token)
