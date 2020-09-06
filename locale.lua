@@ -111,7 +111,8 @@ You can customize a template by including different `%combos%` to it:
 `%name%` - user's name
 `%nickname's%`,`%name's%` - corresponding combo with **'s** or **'** attached (difference between `Riddles's` and `Riddles'`)
 `%tag%` - user's tag (for example `Riddles#2773`)
-`%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)]],
+`%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
+`%counter%` - channel's position. The channel will be moved to fill in holes in numbering]],
 	
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
 
