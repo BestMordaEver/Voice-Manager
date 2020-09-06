@@ -111,7 +111,17 @@ You can customize a template by including different `%combos%` to it:
 `%name%` - user's name
 `%nickname's%`,`%name's%` - corresponding combo with **'s** or **'** attached (difference between `Riddles's` and `Riddles'`)
 `%tag%` - user's tag (for example `Riddles#2773`)
-`%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)]],
+`%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
+`%counter%` - channel's position. The channel will be moved to fill in holes in numbering]],
+	
+	permissions = [[You need a **"Manage Channels"** permission to use this command!
+
+`template` OR
+`template "<server ID>"`
+Displays current global template, that will be used in new channel's name (unless that channel has their own template)
+
+You can customize a template by including different `%combos%` to it:
+`%nickname%` - user's nickname (name is used if no nickname is set)]],
 	
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
 
@@ -167,6 +177,7 @@ Sends stats for specific server]],
 	resetTarget = [[Reset a target:]],
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
 	embedResetTarget = [[Select a lobby to reset its target]],
+	badCategory = [[Couldn't find the category to target]],
 	-- template
 	globalTemplate = [[Current global template is **`%s`**]],
 	defaultTemplate = [[Your guild uses the default template `%nickname's% channel`]],
@@ -176,6 +187,10 @@ Sends stats for specific server]],
 	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
+	-- permissions
+	noPermission = [[There's no such permission]],
+	noToggle = [[No toggle found]],
+	
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],

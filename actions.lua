@@ -117,11 +117,11 @@ local function complexParse (message, command) -- template target action pre-pro
 		local ids, duplicateNames
 		if command == "template" and scope == "global" and message.guild then 
 			ids = {[1] = message.guild.id}
-		else 
+		else
 			ids, duplicateNames = getIDs(message.guild, scope)
 		end
 		
-		if #ids > 1 and duplicateNames then 
+		if #ids > 1 and duplicateNames then
 			message:reply(locale.ambiguousID)
 			return "Ambiguous input"
 		end
@@ -146,7 +146,7 @@ local function complexParse (message, command) -- template target action pre-pro
 		elseif reset == "reset" then
 			return ids
 		elseif argument ~= "" then
-			if command == "template" then
+			if command == "target" then
 				local parent = client:getChannel(argument)
 				
 				if not (parent and parent.createVoiceChannel) then
@@ -160,8 +160,8 @@ local function complexParse (message, command) -- template target action pre-pro
 						message:reply(locale.badInput)
 						return "Didn't find the channel"
 					end
-					argument = categories[1].id
 					parent = categories[1]
+					argument = parent.id
 				end
 				
 				if not parent.guild:getMember(message.author):hasPermission(parent, permission.manageChannels) then
@@ -257,6 +257,22 @@ return {
 		end
 		
 		local targetCategory = client:getChannel(target)
+		if target and not targetCategory then
+			local ids = {}
+			if message.guild then
+				for _, channel in pairs(message.guild.categories) do
+					if channel.name:lower() == line then
+						table.insert(ids, channel.id)
+					end
+				end
+			end
+			if not ids[1] then
+				message:reply(locale.badCategory)
+				return "Couldn't find target"
+			end
+			targetCategory = ids[1]
+		end
+		
 		if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
 			message:reply(locale.badBotPermission.." "..targetCategory.name)
 			return "Bad permissions for target"
@@ -277,6 +293,38 @@ return {
 		template, ids = actionFinalizer(message, ids, "template"..(template or ""))
 		message:reply(template)
 		return (#ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " ")))
+	end,
+	
+	-- possible permissions - mute, deafen, disconnect (move), manage
+	permissions = function (message, ids, permissions, toggle)
+		if not ids then
+			ids, permissions, toggle = message.content:match('permissions%s*"(.-)"%s*(%a*)%s*(.-)$')
+			if scope then
+				if permissions == "mute" then
+					permissions = permission.muteMembers
+				elseif permissions == "deafen" then
+					permissions = permission.deafenMembers
+				elseif permissions == "disconnect" then
+					permissions = permission.moveMembers
+				elseif permissions == "manage" then
+					permissions = permission.manageChannels
+				else
+					message:reply(locale.noPermission)
+					return "No permission was selected"
+				end
+				
+				if toggle ~= "on" and toggle ~= "off" then
+					message:reply(locale.noToggle)
+					return "No toggle was selected"
+				end
+			else
+			
+			end
+		end
+		
+		permission, ids = actionFinalizer(message, ids, "permissions"..(template or ""))
+		message:reply(permission)
+		return (#ids == 0 and "Successfully applied permission to all" or ("Couldn't apply permission to "..table.concat(ids, " ")))
 	end,
 	
 	limitation = function (message)
@@ -402,7 +450,7 @@ return {
 		
 		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds
 		if guild then
-			lobbyCount, channelCount, peopleCount = #guilds[guild.id].lobbies, guilds[guild.id]:channelsCount(), channels:people(guild.id)
+			lobbyCount, channelCount, peopleCount = #guilds[guild.id].lobbies, guilds[guild.id].channels, channels:people(guild.id)
 		else
 			lobbyCount, channelCount, peopleCount = #lobbies, #channels, channels:people()
 		end

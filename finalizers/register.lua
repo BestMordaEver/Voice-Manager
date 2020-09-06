@@ -1,6 +1,7 @@
 local discordia = require "discordia"
 local locale = require "../locale.lua"
 
+local guilds = require "../guilds.lua"
 local lobbies = require "../lobbies.lua"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
@@ -38,6 +39,7 @@ return function (message, ids)
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
+			guilds[channel.guild.id].lobbies:add(channelID)
 			lobbies:add(channelID)
 		end
 	end

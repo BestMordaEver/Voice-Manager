@@ -261,13 +261,21 @@ events = {
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
 				channels:add(newChannel.id, lobby.id, position)
-				lobbies:attachChild(lobby.id, newChannel.id, position)
 				guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 				newChannel:setUserLimit(lobby.userLimit)
 				
 				-- if given permissions, allow user moderation
+				--[[
 				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+				end
+				--]]
+				
+				if lobbies[lobby.id].permissions ~= 0 then
+					local perms = discordia.Permissions(lobbies[lobby.id].permissions)
+					if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
+						newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
+					end
 				end
 				
 				if needsMove then
@@ -295,6 +303,7 @@ events = {
 							moved = true
 						end
 					until moved
+					lobbies:attachChild(lobby.id, newChannel.id, position)
 				end
 			else
 				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
