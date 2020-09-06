@@ -402,7 +402,7 @@ return {
 		
 		local guildCount, lobbyCount, channelCount, peopleCount = #client.guilds
 		if guild then
-			lobbyCount, channelCount, peopleCount = #guilds[guild.id].lobbies, guilds[guild.id]:channelsCount(), channels:people(guild.id)
+			lobbyCount, channelCount, peopleCount = #guilds[guild.id].lobbies, guilds[guild.id].channels, channels:people(guild.id)
 		else
 			lobbyCount, channelCount, peopleCount = #lobbies, #channels, channels:people()
 		end
