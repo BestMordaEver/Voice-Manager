@@ -261,6 +261,7 @@ events = {
 			if newChannel then
 				member:setVoiceChannel(newChannel.id)
 				channels:add(newChannel.id, lobby.id, position)
+				lobbies:attachChild(lobby.id, newChannel.id, position)
 				guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 				newChannel:setUserLimit(lobby.userLimit)
 				
@@ -303,7 +304,6 @@ events = {
 							moved = true
 						end
 					until moved
-					lobbies:attachChild(lobby.id, newChannel.id, position)
 				end
 			else
 				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
