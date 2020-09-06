@@ -17,7 +17,7 @@ local emitter = discordia.Emitter()
 
 -- prepared statements
 local add, remove, updateTemplate, updateTarget, updatePermissions =
-	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL)"),
+	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL, 0)"),
 	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?"),
@@ -81,7 +81,7 @@ return setmetatable({}, {
 			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
 				if channel and channel.guild then
-					self[lobbyID] = {template = template, target = target, permissions = permissions, children = hollowArray()}
+					self[lobbyID] = {template = template, target = target, permissions = permissions or 0, children = hollowArray()}
 					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 				end
 			end

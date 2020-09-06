@@ -114,6 +114,15 @@ You can customize a template by including different `%combos%` to it:
 `%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
 `%counter%` - channel's position. The channel will be moved to fill in holes in numbering]],
 	
+	permissions = [[You need a **"Manage Channels"** permission to use this command!
+
+`template` OR
+`template "<server ID>"`
+Displays current global template, that will be used in new channel's name (unless that channel has their own template)
+
+You can customize a template by including different `%combos%` to it:
+`%nickname%` - user's nickname (name is used if no nickname is set)]],
+	
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
 
 `limitation`
@@ -178,6 +187,10 @@ Sends stats for specific server]],
 	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
+	-- permissions
+	noPermission = [[There's no such permission]],
+	noToggle = [[No toggle found]],
+	
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
