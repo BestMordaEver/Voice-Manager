@@ -167,6 +167,7 @@ Sends stats for specific server]],
 	resetTarget = [[Reset a target:]],
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
 	embedResetTarget = [[Select a lobby to reset its target]],
+	badCategory = [[Couldn't find the category to target]],
 	-- template
 	globalTemplate = [[Current global template is **`%s`**]],
 	defaultTemplate = [[Your guild uses the default template `%nickname's% channel`]],

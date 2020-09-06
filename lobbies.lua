@@ -16,11 +16,12 @@ local channels = require "./channels.lua"
 local emitter = discordia.Emitter()
 
 -- prepared statements
-local add, remove, updateTemplate, updateTarget =
+local add, remove, updateTemplate, updateTarget, updatePermissions =
 	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL)"),
 	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?")
+	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?"),
+	sqlite:prepare("UPDATE lobbies SET permissions = ? WHERE id = ?")
 
 emitter:on("add", function (lobbyID)
 	local ok, msg = pcall(storageInteractionEvent, add, lobbyID)
@@ -62,15 +63,25 @@ emitter:on("updateTarget", function (lobbyID, target)
 	end
 end)
 
+emitter:on("updatePermissions", function (lobbyID, permissions)
+	local ok, msg = pcall(storageInteractionEvent, updatePermissions, permissions, lobbyID)
+	if ok then
+		logger:log(4, "MEMORY: Updated permissions for lobby %s to %s", lobbyID, permissions)
+	else
+		logger:log(2, "MEMORY: Couldn't update permissions for lobby %s to %s: %s", lobbyID, permissions, msg)
+		client:getChannel("686261668522491980"):sendf("Couldn't update permissions for lobby %s to %s: %s", lobbyID, permissions, msg)
+	end
+end)
+
 return setmetatable({}, {
 	-- move functions to index table to iterate over lobbies easily
 	__index = {
 	-- perform checks and add lobby to table
-		loadAdd = function (self, lobbyID, template, target)	-- additional parameter are used upon startup to prevent unnecessary checks
+		loadAdd = function (self, lobbyID, template, target, permissions)	-- additional parameter are used upon startup to prevent unnecessary checks
 			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
 				if channel and channel.guild then
-					self[lobbyID] = {template = template, target = target, children = hollowArray()}
+					self[lobbyID] = {template = template, target = target, permissions = permissions, children = hollowArray()}
 					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 				end
 			end
@@ -102,7 +113,7 @@ return setmetatable({}, {
 			if lobbyIDs then
 				for i, lobbyID in ipairs(lobbyIDs[1]) do
 					if client:getChannel(lobbyID) then
-						self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil)
+						self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil, lobbyIDs.permissions[i])
 					else
 						self:remove(lobbyID)
 					end
@@ -135,6 +146,17 @@ return setmetatable({}, {
 				self[lobbyID].target = target
 				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, lobbyID)
 				emitter:emit("updateTarget", lobbyID, target)
+			else
+				self:remove(lobbyID)
+			end
+		end,
+		
+		updatePermissions = function (self, lobbyID, permissions)
+			local channel = client:getChannel(lobbyID)
+			if channel and self[lobbyID] then
+				self[lobbyID].permissions = permissions
+				logger:log(4, "GUILD %s: Updated permissions for lobby %s", channel.guild.id, lobbyID)
+				emitter:emit("updatePermissions", lobbyID, permissions)
 			else
 				self:remove(lobbyID)
 			end

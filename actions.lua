@@ -257,6 +257,22 @@ return {
 		end
 		
 		local targetCategory = client:getChannel(target)
+		if not targetCategory then
+			local ids = {}
+			if message.guild then
+				for _, channel in pairs(message.guild.categories) do
+					if channel.name:lower() == line then
+						table.insert(ids, channel.id)
+					end
+				end
+			end
+			if not ids[1] then
+				message:reply(locale.badCategory)
+				return "Couldn't find target"
+			end
+			targetCategory = ids[1]
+		end
+		
 		if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
 			message:reply(locale.badBotPermission.." "..targetCategory.name)
 			return "Bad permissions for target"
@@ -277,6 +293,17 @@ return {
 		template, ids = actionFinalizer(message, ids, "template"..(template or ""))
 		message:reply(template)
 		return (#ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " ")))
+	end,
+	
+	-- possible permissions - mute, deafen, disconnect (move), manage
+	permissions = function (message, ids, permissions)
+		if not ids then
+			local scope, permission, toggle = message.content:match("")
+		end
+		
+		permission, ids = actionFinalizer(message, ids, "permissions"..(template or ""))
+		message:reply(permission)
+		return (#ids == 0 and "Successfully applied permission to all" or ("Couldn't apply permission to "..table.concat(ids, " ")))
 	end,
 	
 	limitation = function (message)

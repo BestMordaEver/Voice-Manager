@@ -266,8 +266,14 @@ events = {
 				newChannel:setUserLimit(lobby.userLimit)
 				
 				-- if given permissions, allow user moderation
+				--[[
 				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
 					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+				end
+				--]]
+				
+				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, lobby.permissions) then
+					newChannel:getPermissionOverwriteFor(member):allowPermissions(lobby.permissions)
 				end
 				
 				if needsMove then
