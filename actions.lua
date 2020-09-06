@@ -117,11 +117,11 @@ local function complexParse (message, command) -- template target action pre-pro
 		local ids, duplicateNames
 		if command == "template" and scope == "global" and message.guild then 
 			ids = {[1] = message.guild.id}
-		else 
+		else
 			ids, duplicateNames = getIDs(message.guild, scope)
 		end
 		
-		if #ids > 1 and duplicateNames then 
+		if #ids > 1 and duplicateNames then
 			message:reply(locale.ambiguousID)
 			return "Ambiguous input"
 		end
@@ -146,7 +146,7 @@ local function complexParse (message, command) -- template target action pre-pro
 		elseif reset == "reset" then
 			return ids
 		elseif argument ~= "" then
-			if command == "template" then
+			if command == "target" then
 				local parent = client:getChannel(argument)
 				
 				if not (parent and parent.createVoiceChannel) then
@@ -160,8 +160,8 @@ local function complexParse (message, command) -- template target action pre-pro
 						message:reply(locale.badInput)
 						return "Didn't find the channel"
 					end
-					argument = categories[1].id
 					parent = categories[1]
+					argument = parent.id
 				end
 				
 				if not parent.guild:getMember(message.author):hasPermission(parent, permission.manageChannels) then
@@ -257,7 +257,7 @@ return {
 		end
 		
 		local targetCategory = client:getChannel(target)
-		if not targetCategory then
+		if target and not targetCategory then
 			local ids = {}
 			if message.guild then
 				for _, channel in pairs(message.guild.categories) do

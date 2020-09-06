@@ -81,7 +81,7 @@ return setmetatable({}, {
 			if not self[lobbyID] then
 				local channel = client:getChannel(lobbyID)
 				if channel and channel.guild then
-					self[lobbyID] = {template = template, target = target, permissions = permissions or 0, children = hollowArray()}
+					self[lobbyID] = {template = template, target = target, permissions = tonumber(permissions) or 0, children = hollowArray()}
 					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 				end
 			end

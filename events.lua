@@ -271,8 +271,11 @@ events = {
 				end
 				--]]
 				
-				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, lobby.permissions) then
-					newChannel:getPermissionOverwriteFor(member):allowPermissions(lobby.permissions)
+				if lobbies[lobby.id].permissions ~= 0 then
+					local perms = discordia.Permissions(lobbies[lobby.id].permissions)
+					if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
+						newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
+					end
 				end
 				
 				if needsMove then
