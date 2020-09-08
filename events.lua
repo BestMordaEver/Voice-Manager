@@ -227,87 +227,77 @@ events = {
 	
 	voiceChannelJoin = function (member, lobby) -- your purpose!
 		if lobby and lobbies[lobby.id] then
-			logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
+			lobbies[lobby.id].mutex:lock()
+			local ok, err = pcall(events.voiceChannelJoin_pcall, member, lobby)
+			lobbies[lobby.id].mutex:unlock()
+			if not ok then error(err) end	-- no ignoring!
+		end
+	end,
+	
+	voiceChannelJoin_pcall = function (member, lobby)
+		logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
 			
-			if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
+		if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
+		
+		-- parent to which a new channel will be attached
+		local category = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+		
+		-- determine new channel name
+		local name = lobbies[lobby.id].template or guilds[lobby.guild.id].template or "%nickname's% channel"
+		local position = lobbies:attachChild(lobby.id, true)
+		local needsMove = name:match("%%counter%%") and true
+		if name:match("%%.-%%") then
+			local uname = member.user.name
+			local nickname = member.nickname or uname
+			local game = (member.activity and (member.activity.type == 0 or member.activity.type == 1)) and member.activity.name or "no game"
 			
-			-- parent to which a new channel will be attached
-			local category = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+			local rt = {
+				nickname = nickname,
+				name = uname,
+				tag = member.user.tag,
+				game = game,
+				counter = position,
+				["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
+				["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s")
+			}
+			name = name:gsub("%%(.-)%%", rt)
+		end
+		
+		local newChannel = category:createVoiceChannel(name)
+		
+		-- did we fail? statistics say "probably yes!"
+		if newChannel then
+			member:setVoiceChannel(newChannel.id)
+			channels:add(newChannel.id, lobby.id, position)
+			lobbies:attachChild(lobby.id, newChannel.id, position)
+			guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
+			newChannel:setUserLimit(lobby.userLimit)
 			
-			-- determine new channel name
-			local name = lobbies[lobby.id].template or guilds[lobby.guild.id].template or "%nickname's% channel"
-			local position = lobbies:attachChild(lobby.id, true)
-			local needsMove = name:match("%%counter%%") and true
-			if name:match("%%.-%%") then
-				local uname = member.user.name
-				local nickname = member.nickname or uname
-				local game = (member.activity and (member.activity.type == 0 or member.activity.type == 1)) and member.activity.name or "no game"
-				
-				local rt = {
-					nickname = nickname,
-					name = uname,
-					tag = member.user.tag,
-					game = game,
-					counter = position,
-					["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
-					["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s")
-				}
-				name = name:gsub("%%(.-)%%", rt)
+			-- if given permissions, allow user moderation
+			--[[
+			if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
+				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+			end
+			--]]
+			
+			if lobbies[lobby.id].permissions ~= 0 then
+				local perms = discordia.Permissions(lobbies[lobby.id].permissions)
+				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
+					newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
+				end
 			end
 			
-			local newChannel = category:createVoiceChannel(name)
-			
-			-- did we fail? statistics say "probably yes!"
-			if newChannel then
-				member:setVoiceChannel(newChannel.id)
-				channels:add(newChannel.id, lobby.id, position)
-				lobbies:attachChild(lobby.id, newChannel.id, position)
-				guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
-				newChannel:setUserLimit(lobby.userLimit)
-				
-				-- if given permissions, allow user moderation
-				--[[
-				if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
-					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
+			if needsMove then
+				local children, distance = lobbies[lobby.id].children, 0
+				repeat
+					distance = distance + 1
+				until children[position + distance] ~= nil or position + distance > children.max
+				if position + distance <= children.max then
+					newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
 				end
-				--]]
-				
-				if lobbies[lobby.id].permissions ~= 0 then
-					local perms = discordia.Permissions(lobbies[lobby.id].permissions)
-					if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
-						newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
-					end
-				end
-				
-				if needsMove then
-					local moved, cycles = false, 0
-					repeat
-						local children, distance = lobbies[lobby.id].children, 0
-						repeat
-							distance = distance + 1
-						until children[position + distance] ~= nil or position + distance > children.max
-						if position + distance <= children.max then
-							local topChannel = client:getChannel(children[position + distance])
-							if topChannel then
-								newChannel:moveUp(newChannel.position - topChannel.position)
-								moved = true
-							else
-								cycles = cycles + 1
-								if cycles > 10 then
-									break
-								else
-									logger:log(4, "GUILD %s LOBBY %s: Delaying move of %s by a second", newChannel.guild.id, lobby.id, newChannel.id)
-									timer.sleep(1000)
-								end
-							end
-						else
-							moved = true
-						end
-					until moved
-				end
-			else
-				logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
 			end
+		else
+			logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
 		end
 	end,
 	
