@@ -291,6 +291,9 @@ events = {
 				local children, distance = lobbies[lobby.id].children, 0
 				repeat
 					distance = distance + 1
+					if children[position + distance] ~= nil and not client:getChannel(children[position + distance]) then
+						children:drain(position + distance)
+					end
 				until children[position + distance] ~= nil or position + distance > children.max
 				if position + distance <= children.max then
 					newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
