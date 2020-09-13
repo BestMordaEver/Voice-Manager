@@ -295,7 +295,6 @@ return {
 		return (#ids == 0 and "Successfully applied template to all" or ("Couldn't apply template to "..table.concat(ids, " ")))
 	end,
 	
-	-- possible permissions - mute, deafen, disconnect (move), manage
 	permissions = function (message, ids, permissions, toggle)
 		if not ids then
 			ids, permissions, toggle = message.content:match('permissions%s*"(.-)"%s*(%a*)%s*(.-)$')

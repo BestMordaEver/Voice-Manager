@@ -26,6 +26,22 @@ Set a new prefix. Mentioning will still work
 
 **:arrow_up: You need a "Manage Channels" permission to use those commands! :arrow_up:**
 
+**:arrow_down: You need to be a channel host to use those commands! :arrow_down:**
+
+**name**
+Change your channel's name
+
+**capacity**
+Change your channel's capacity
+
+**bitrate**
+Change your channel's bitrate
+
+**promote**
+Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
+
+**:arrow_up: You need to be a channel host to use those commands! :arrow_up:**
+
 **list**
 Lists all registered lobbies on the server
 
@@ -56,19 +72,22 @@ If you don't provide any arguments, I will send a handy widget with all the chan
 	
 	target = [[You need a **"Manage Channels"** permission to use this command!
 
-`target "<channel name>"` OR
-`target "<channel ID>"`
+`target "<lobby name>"` OR
+`target "<lobby ID>"`
 Displays current target for the listed channel
 
-`target "<channel name>" <target ID>` OR
-`target "<channel ID> [channel_id] ..." <target ID>`
+`target "<lobby name>" <category ID>` OR
+`target "<lobby name>" <category name>` OR
+`target "<lobby ID> [lobby ID] ..." <category ID>`
+`target "<lobby ID> [lobby ID] ..." <category name>`
+
 Changes the target for listed channels
 
-`target <target ID>`
+`target <category ID>`
 Sends a handy widget with all the channels that you can apply this target to
 
-`target reset "<channel_name>"` OR
-`target reset "<channel_id> [channel_id] ..."`
+`target reset "<lobby name>"` OR
+`target reset "<lobby ID> [lobby ID] ..."`
 Removes the target for listed channels
 
 `target reset`
@@ -80,8 +99,8 @@ Sends a handy widget with all the channels that you can reset target for]],
 `template "<server ID>"`
 Displays current global template, that will be used in new channel's name (unless that channel has their own template)
 
-`template "<channel name>"` OR
-`template "<channel ID>"`
+`template "<lobby name>"` OR
+`template "<lobby ID>"`
 Displays current template for the listed channel. A channel template overrides a global one
 
 `template <template text>`
@@ -91,16 +110,16 @@ Sends a handy widget with all the channels that you can apply this template to
 `template "<server ID>" <template text>`
 Changes the global template
 
-`template "<channel name>" <template text>` OR
-`template "<channel ID> [channel_id] ..." <template_text>`
+`template "<lobby name>" <template text>` OR
+`template "<lobby ID> [lobby ID] ..." <template_text>`
 Changes the template for listed channels
 
 `template reset "global"` OR
 `template reset "<server ID>"`
 Resets the global template to default `%nickname's% channel`
 
-`template reset "<channel_name>"` OR
-`template reset "<channel_id> [channel_id] ..."`
+`template reset "<lobby name>"` OR
+`template reset "<lobby ID> [lobby ID] ..."`
 Removes the template for listed channels so they will use global template
 
 `template reset`
@@ -116,12 +135,24 @@ You can customize a template by including different `%combos%` to it:
 	
 	permissions = [[You need a **"Manage Channels"** permission to use this command!
 
-`template` OR
-`template "<server ID>"`
-Displays current global template, that will be used in new channel's name (unless that channel has their own template)
+`permissions "<lobby ID>"`
+Displays current permissions that will be given to the host
 
-You can customize a template by including different `%combos%` to it:
-`%nickname%` - user's nickname (name is used if no nickname is set)]],
+`permissions "<lobby name>" <permission> [permission] ... <on/off>` OR
+`permissions "<lobby ID> [lobby ID] ..." <permission> [permission] ... <on/off>`
+Changes permissions for listed channels
+
+`permissions <permission> [permission] ... <on/off>`
+Sends a handy widget with all the channels that you can change permissions for
+
+You can grant following permissions:
+mute - allows to server mute people in channel
+deafen - allows to server deafen people in channel
+disconnect - allows to disconnect people from channel
+manage - allows to manage channel properties
+name - allows use of `!vm name`
+capacity - allows use of `!vm capacity`
+bitrate - allows use of `!vm bitrate`]],
 	
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
 
@@ -139,6 +170,26 @@ Displays the current prefix. Default is !vm
 
 `prefix [server ID] <new prefix>`
 Updates the prefix in the server]],
+	
+	name = [[You can enable channel hosts to use this command via `!vm permissions`
+
+`name <new name>`
+Changes your current channel's name]],
+	
+	capacity = [[You can enable channel hosts to use this command via `!vm permissions`
+
+`capacity <number between 0 and 99>`
+Changes your current channel's capacity]],
+	
+	bitrate = [[You can enable channel hosts to use this command via `!vm permissions`
+
+`bitrate <number between 8 and 96>`
+Changes your current channel's bitrate]],
+	
+	promote = [[You need to be a channel host to use this command!
+	
+`promote <user mention>`
+Transfers all host privileges to mentioned user]],
 	
 	list = [[`list [server ID]`
 Lists all registered lobbies on the server]],
