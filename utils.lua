@@ -95,6 +95,32 @@ do
 	})
 end
 
+local Bitfield = {}
+do
+	local bmt = {
+		__add = function (left, right)
+			return bit.bor(left, right)
+		end,
+		
+		__sub = function (left, right)
+			return bit.xor(left, right)
+		end,
+		
+		__index = function (self, key)
+			key = tonumber(key)
+			if not key or key > 8 or key < 1 then error("Out of bounds - trying to access \""..tostring(key).."\" bit") end
+			return bit.band(self.raw, 2^(key-1)) ~= 0
+		end
+	}
+	
+	setmetatable(Bitfield,{
+		__call = function ()
+			return setmetatable({raw = 0},bmt)
+		end
+	})
+end
+
+
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end
 
 return {
