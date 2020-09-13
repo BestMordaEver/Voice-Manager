@@ -27,29 +27,36 @@ local hollowArray = {
 		return ret
 	end
 }
-
-local haIter = function (t, index)
-	if not index then index = 0 end
-	index = index + 1
-	
-	repeat 
-		if t[index] then
-			return index, t[index]
-		else
-			index = index + 1
-		end
-	until index > t.max
-	
-	return nil
-end
-
-local hamt = {
-	__index = hollowArray,
-	__len = function (self) return self.n end,
-	__pairs = function (self)
-		return haIter, self
+do
+	local haIter = function (t, index)
+		if not index then index = 0 end
+		index = index + 1
+		
+		repeat 
+			if t[index] then
+				return index, t[index]
+			else
+				index = index + 1
+			end
+		until index > t.max
+		
+		return nil
 	end
-}
+
+	local hamt = {
+		__index = hollowArray,
+		__len = function (self) return self.n end,
+		__pairs = function (self)
+			return haIter, self
+		end
+	}
+	
+	setmetatable(hollowArray,{
+		__call = function ()
+			return setmetatable({n = 0, space = 1, max = 0, mutex = discordia.Mutex()},hamt)
+		end
+	})
+end
 
 -- classic set
 local set = {
@@ -75,11 +82,18 @@ local set = {
 		end, self
 	end
 }
-
-local smt = {
-	__index = set,
-	__len = function (self) return self.n end
-}
+do
+	local smt = {
+		__index = set,
+		__len = function (self) return self.n end
+	}
+	
+	setmetatable(set,{
+		__call = function ()
+			return setmetatable({n = 0},smt)
+		end
+	})
+end
 
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end
 
@@ -104,15 +118,7 @@ return {
 		if not ok then error(msg) end
 	end,
 	
-	hollowArray = setmetatable(hollowArray,{
-		__call = function ()
-			return setmetatable({n = 0, space = 1, max = 0, mutex = discordia.Mutex()},hamt)
-		end
-	}),
+	hollowArray = hollowArray,
 	
-	set = setmetatable(set,{
-		__call = function ()
-			return setmetatable({n = 0},smt)
-		end
-	})
+	set = set
 }
