@@ -2,14 +2,13 @@
 -- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("lobbiesData.db")
+local sqlite = require "sqlite3".open("libs/storage/lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local utils = require "./utils.lua"
-local storageInteractionEvent = utils.storageInteractionEvent
-local hollowArray = utils.hollowArray
-local channels = require "./channels.lua"
+local channels = require "storage/channels"
+local storageInteraction = require "utils/storageInteraction"
+local hollowArray = require "utils/hollowArray"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -23,55 +22,11 @@ local add, remove, updateTemplate, updateTarget, updatePermissions =
 	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET permissions = ? WHERE id = ?")
 
-emitter:on("add", function (lobbyID)
-	local ok, msg = pcall(storageInteractionEvent, add, lobbyID)
-	if ok then
-		logger:log(4, "MEMORY: Added lobby %s", lobbyID)
-	else
-		logger:log(2, "MEMORY: Couldn't add lobby %s: %s", lobbyID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't add lobby %s: %s", lobbyID, msg)
-	end
-end)
-
-emitter:on("remove", function (lobbyID)
-	local ok, msg = pcall(storageInteractionEvent, remove, lobbyID)
-	if ok then
-		logger:log(4, "MEMORY: Removed lobby %s", lobbyID)
-	else
-		logger:log(2, "MEMORY: Couldn't remove lobby %s: %s", lobbyID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't remove lobby %s: %s", lobbyID, msg)
-	end
-end)
-
-emitter:on("updateTemplate", function (lobbyID, template)
-	local ok, msg = pcall(storageInteractionEvent, updateTemplate, template, lobbyID)
-	if ok then
-		logger:log(4, "MEMORY: Updated template for lobby %s to %s", lobbyID, template)
-	else
-		logger:log(2, "MEMORY: Couldn't update template for lobby %s to %s: %s", lobbyID, template, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update template for lobby %s to %s: %s", lobbyID, template, msg)
-	end
-end)
-
-emitter:on("updateTarget", function (lobbyID, target)
-	local ok, msg = pcall(storageInteractionEvent, updateTarget, target, lobbyID)
-	if ok then
-		logger:log(4, "MEMORY: Updated target for lobby %s to %s", lobbyID, target)
-	else
-		logger:log(2, "MEMORY: Couldn't update target for lobby %s to %s: %s", lobbyID, target, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update target for lobby %s to %s: %s", lobbyID, target, msg)
-	end
-end)
-
-emitter:on("updatePermissions", function (lobbyID, permissions)
-	local ok, msg = pcall(storageInteractionEvent, updatePermissions, permissions, lobbyID)
-	if ok then
-		logger:log(4, "MEMORY: Updated permissions for lobby %s to %s", lobbyID, permissions)
-	else
-		logger:log(2, "MEMORY: Couldn't update permissions for lobby %s to %s: %s", lobbyID, permissions, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update permissions for lobby %s to %s: %s", lobbyID, permissions, msg)
-	end
-end)
+emitter:on("add", storageInteraction(add, "Added lobby %s", "Couldn't add lobby %s"))
+emitter:on("remove", storageInteraction(remove, "Removed lobby %s", "Couldn't remove lobby %s"))
+emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated template to %s for lobby %s", "Couldn't update template to %s for lobby %s"))
+emitter:on("updateTarget", storageInteraction(updateTarget, "Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"))
+emitter:on("updatePermissions", storageInteraction(updatePermissions, "Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"))
 
 return setmetatable({}, {
 	-- move functions to index table to iterate over lobbies easily

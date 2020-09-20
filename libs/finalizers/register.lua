@@ -1,8 +1,8 @@
 local discordia = require "discordia"
-local locale = require "../locale.lua"
+local locale = require "locale"
 
-local guild = require "../guilds.lua"
-local lobbies = require "../lobbies.lua"
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client

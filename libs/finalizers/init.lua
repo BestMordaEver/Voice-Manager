@@ -1,3 +1,5 @@
+error("what a surprise")
+
 return setmetatable({
 	register = require "./register.lua",
 	unregister = require "./unregister.lua",

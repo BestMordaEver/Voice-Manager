@@ -1,31 +1,27 @@
 local discordia = require "discordia"
-local locale = require "../locale.lua"
+local locale = require "locale"
 
-local guilds = require "../guilds.lua"
-local lobbies = require "../lobbies.lua"
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client
 
 return function (message, ids)
-	local badUser, badBot, badChannel, redundant = {}, {}, {}, {}
+	local badUser, badChannel, notLobby = {}, {}, {}
 	
 	for i,_ in ipairs(ids) do repeat
 		local channel = client:getChannel(ids[i])
 		if channel then
 			if channel.type == channelType.voice and channel.guild:getMember(message.author) then
-				if not lobbies[channel.id] then
-					if channel.guild:getMember(message.author) and channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
-						if channel.guild.me:hasPermission(channel.category, permission.manageChannels) then
-							break
-						else
-							table.insert(badBot, table.remove(ids, i))
-						end
+				if lobbies[channel.id] then
+					if channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
+						break
 					else
 						table.insert(badUser, table.remove(ids, i))
 					end
 				else
-					table.insert(redundant, table.remove(ids, i))
+					table.insert(notLobby, table.remove(ids, i))
 				end
 			else
 				table.insert(badChannel, table.remove(ids, i))
@@ -35,12 +31,12 @@ return function (message, ids)
 
 	local msg = ""
 	if #ids > 0 then
-		msg = string.format(#ids == 1 and locale.registeredOne or locale.registeredMany,#ids).."\n"
+		msg = string.format(#ids == 1 and locale.unregisteredOne or locale.unregisteredMany, #ids).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-			guilds[channel.guild.id].lobbies:add(channelID)
-			lobbies:add(channelID)
+			guilds[channel.guild.id].lobbies:remove(channelID)
+			lobbies:remove(channelID)
 		end
 	end
 	
@@ -52,18 +48,9 @@ return function (message, ids)
 		end
 	end
 	
-	if #redundant > 0 then
-		msg = msg..(#redundant == 1 and locale.redundantRegister or locale.redundantRegisters).."\n"
-		for _, channelID in ipairs(redundant) do
-			local channel = client:getChannel(channelID)
-			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-			table.insert(badChannel, channelID)
-		end
-	end
-
-	if #badBot > 0 then
-		msg = msg..(#badBot == 1 and locale.badBotPermission or locale.badBotPermissions).."\n"
-		for _, channelID in ipairs(badBot) do
+	if #notLobby > 0 then
+		msg = msg..(#notLobby == 1 and locale.notLobby or locale.notLobbies).."\n"
+		for _, channelID in ipairs(notLobby) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
 			table.insert(badChannel, channelID)

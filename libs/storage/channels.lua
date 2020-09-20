@@ -2,11 +2,11 @@
 -- CREATE TABLE channels(id VARCHAR PRIMARY KEY, parent VARCHAR, position INTEGER)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("channelsData.db")
+local sqlite = require "sqlite3".open("libs/storage/channelsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local storageInteractionEvent = require "./utils.lua".storageInteractionEvent
+local storageInteraction = require "utils/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -17,25 +17,8 @@ local add, remove =
 	sqlite:prepare("INSERT INTO channels VALUES(?,?,?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?")
 
-emitter:on("add", function (channelID, parent, position)
-	local ok, msg = pcall(storageInteractionEvent, add, channelID, parent, position)
-	if ok then
-		logger:log(4, "MEMORY: Added channel %s", channelID)
-	else
-		logger:log(2, "MEMORY: Couldn't add channel %s: %s", channelID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't add channel %s: %s", channelID, msg)
-	end
-end)
-
-emitter:on("remove", function (channelID)
-	local ok, msg = pcall(storageInteractionEvent, remove, channelID)
-	if ok then
-		logger:log(4, "MEMORY: Removed channel %s", channelID)
-	else
-		logger:log(2, "MEMORY: Couldn't remove channel %s: %s", channelID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't remove channel %s: %s", channelID, msg)
-	end
-end)
+emitter:on("add", storageInteraction(add, "Added channel %s", "Couldn't add channel %s"))
+emitter:on("remove", storageInteraction(remove, "Removed channel %s", "Couldn't remove channel %s"))
 
 return setmetatable({}, {
 	-- move functions to index table to iterate over channels easily

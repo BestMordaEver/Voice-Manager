@@ -2,15 +2,14 @@
 -- CREATE TABLE guilds(id VARCHAR PRIMARY KEY, prefix VARCHAR, template VARCHAR, limitation INTEGER)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("guildsData.db")
+local sqlite = require "sqlite3".open("libs/storage/guildsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local utils = require "./utils.lua"
-local storageInteractionEvent = utils.storageInteractionEvent
-local set = utils.set
-local lobbies = require "./lobbies.lua"
-local channels = require "./channels.lua"
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
+local storageInteraction = require "utils/storageInteraction"
+local set = require "utils/set"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -24,55 +23,11 @@ local add, remove, updatePrefix, updateTemplate, updateLimitation =
 	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET limitation = ? WHERE id = ?")
 
-emitter:on("add", function (guildID)
-	local ok, msg = pcall(storageInteractionEvent, add, guildID)
-	if ok then
-		logger:log(4, "MEMORY: Added guild %s", guildID)
-	else
-		logger:log(2, "MEMORY: Couldn't add guild %s: %s", guildID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't add guild %s: %s", guildID, msg)
-	end
-end)
-
-emitter:on("remove", function (guildID)
-	local ok, msg = pcall(storageInteractionEvent, remove, guildID)
-	if ok then
-		logger:log(4, "MEMORY: Removed guild %s", guildID)
-	else
-		logger:log(2, "MEMORY: Couldn't remove guild %s: %s", guildID, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't remove guild %s: %s", guildID, msg)
-	end
-end)
-
-emitter:on("updatePrefix", function (guildID, prefix)
-	local ok, msg = pcall(storageInteractionEvent, updatePrefix, prefix, guildID)
-	if ok then
-		logger:log(4, "MEMORY: Updated prefix for guild %s to %s", guildID, prefix)
-	else
-		logger:log(2, "MEMORY: Couldn't update prefix for guild %s to %s: %s", guildID, prefix, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update prefix for guild %s to %s: %s", guildID, prefix, msg)
-	end
-end)
-
-emitter:on("updateTemplate", function (guildID, template)
-	local ok, msg = pcall(storageInteractionEvent, updateTemplate, template, guildID)
-	if ok then
-		logger:log(4, "MEMORY: Updated template for guild %s to %s", guildID, template)
-	else
-		logger:log(2, "MEMORY: Couldn't update template for guild %s to %s: %s", guildID, template, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update template for guild %s to %s: %s", guildID, template, msg)
-	end
-end)
-
-emitter:on("updateLimitation", function (guildID, limitation)
-	local ok, msg = pcall(storageInteractionEvent, updateLimitation, limitation, guildID)
-	if ok then
-		logger:log(4, "MEMORY: Updated limitation for guild %s to %s", guildID, limitation)
-	else
-		logger:log(2, "MEMORY: Couldn't update limitation for guild %s to %s: %s", guildID, limitation, msg)
-		client:getChannel("686261668522491980"):sendf("Couldn't update limitation for guild %s to %s: %s", guildID, limitation, msg)
-	end
-end)
+emitter:on("add", storageInteraction(add, "Added guild %s", "Couldn't add guild %s"))
+emitter:on("remove", storageInteraction(remove, "Removed guild %s", "Couldn't remove guild %s"))
+emitter:on("updatePrefix", storageInteraction(updatePrefix, "Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"))
+emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated template to %s for guild %s", "Couldn't update template to %s for guild %s"))
+emitter:on("updateLimitation", storageInteraction (updateLimitation, "Updated limitation to %s for guild %s", "Couldn't update limitation to %s for guild %s"))
 
 return setmetatable({}, {
 	-- move functions to index table to iterate over guilds easily

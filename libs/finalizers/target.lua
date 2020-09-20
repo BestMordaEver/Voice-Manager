@@ -1,20 +1,19 @@
 local discordia = require "discordia"
-local locale = require "../locale.lua"
+local locale = require "locale"
 
-local guilds = require "../guilds.lua"
-local lobbies = require "../lobbies.lua"
+local lobbies = require "storage/lobbies"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client
 
-return function (message, ids)
+return function (message, ids, action)
 	local badUser, badChannel, notLobby = {}, {}, {}
 	
 	for i,_ in ipairs(ids) do repeat
 		local channel = client:getChannel(ids[i])
 		if channel then
 			if channel.type == channelType.voice and channel.guild:getMember(message.author) then
-				if lobbies[channel.id] then
+				if lobbies[channel.id] then 
 					if channel.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) then
 						break
 					else
@@ -29,14 +28,13 @@ return function (message, ids)
 		else break end
 	until not ids[i] end
 
-	local msg = ""
+	local msg, target = "", action:match("^target(.+)$")
 	if #ids > 0 then
-		msg = string.format(#ids == 1 and locale.unregisteredOne or locale.unregisteredMany, #ids).."\n"
+		msg = string.format(target and locale.newTarget or locale.resetTarget, target).."\n"
 		for _, channelID in ipairs(ids) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-			guilds[channel.guild.id].lobbies:remove(channelID)
-			lobbies:remove(channelID)
+			lobbies:updateTarget(channelID, target)
 		end
 	end
 	
@@ -49,8 +47,8 @@ return function (message, ids)
 	end
 	
 	if #notLobby > 0 then
-		msg = msg..(#notLobby == 1 and locale.notLobby or locale.notLobbies).."\n"
-		for _, channelID in ipairs(notLobby) do
+		msg = msg..(#redundant == 1 and locale.notLobby or locale.notLobbies).."\n"
+		for _, channelID in ipairs(redundant) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
 			table.insert(badChannel, channelID)

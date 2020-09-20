@@ -1,5 +1,5 @@
 local heroesNeverDie = require "discordia".Emitter()
-local actions = require "./actions.lua"
+local actions = require "actions"
 
 local aliveTracker = 5
 

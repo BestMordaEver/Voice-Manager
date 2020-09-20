@@ -1,7 +1,8 @@
 local discordia = require "discordia"
-local locale = require "../locale.lua"
+local locale = require "locale"
 
-local lobbies = require "../lobbies.lua"
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client
@@ -28,13 +29,19 @@ return function (message, ids, action)
 		else break end
 	until not ids[i] end
 
-	local msg, target = "", action:match("^target(.+)$")
+	local msg, template = "", action:match("^template(.+)$")
 	if #ids > 0 then
-		msg = string.format(target and locale.newTarget or locale.resetTarget, target).."\n"
+		msg = string.format(template and locale.newTemplate or locale.resetTemplate, template).."\n"
 		for _, channelID in ipairs(ids) do
-			local channel = client:getChannel(channelID)
-			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-			lobbies:updateTarget(channelID, target)
+			local channel, guild = client:getChannel(channelID), client:getGuild(channelID)
+			if channel then
+				msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
+				lobbies:updateTemplate(channelID, template)
+			end
+			if guild then 
+				msg = msg..string.format(locale.channelNameCategory, "global", guild.name).."\n"
+				guilds:updateTemplate(channelID, template)
+			end
 		end
 	end
 	
@@ -45,13 +52,12 @@ return function (message, ids, action)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
 		end
 	end
-	
+
 	if #notLobby > 0 then
-		msg = msg..(#redundant == 1 and locale.notLobby or locale.notLobbies).."\n"
-		for _, channelID in ipairs(redundant) do
+		msg = msg..(#notLobby == 1 and locale.notLobby or locale.notLobbies).."\n"
+		for _, channelID in ipairs(notLobby) do
 			local channel = client:getChannel(channelID)
 			msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-			table.insert(badChannel, channelID)
 		end
 	end
 

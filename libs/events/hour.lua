@@ -3,7 +3,7 @@
 local https = require "coro-http"
 local json = require "json"
 
-local config = require "./config.lua"
+local config = require "config"
 local discordia = require "discordia"
 local client, logger, emitter = discordia.storage.client, discordia.storage.logger, discordia.Emitter()
 
@@ -17,7 +17,7 @@ local function send (name, server)
 end
 
 emitter:on("send", function (name, server)
-	local success, err = pcall(send, name, server)
+	local success, err = xpcall(send, debug.traceback, name, server)
 	if not success then
 		logger:log(1, "Error on %s: %s", name, err)
 		client:getChannel("686261668522491980"):sendf("Error on %s: %s", name, err)

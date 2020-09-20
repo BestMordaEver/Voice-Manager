@@ -7,8 +7,8 @@ https://discord.com/developers/docs/resources/channel#embed-object
 
 local discordia = require "discordia"
 local client, sqlite, logger = discordia.storage.client, discordia.storage.sqlite, discordia.storage.logger
-local guilds = require "./guilds.lua"
-local locale = require "./locale"
+local guilds = require "storage/guilds"
+local locale = require "locale"
 
 return setmetatable({}, {
 	-- move functions and static data to index table to iterate over embeds easily
