@@ -1,5 +1,5 @@
 local discordia = require "discordia"
-local permissions = require discordia.enums.permissions
+local permissions = discordia.enums.permissions
 local mutexes = {}
 
 -- array, that allows holes
