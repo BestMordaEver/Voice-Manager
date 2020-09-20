@@ -29,26 +29,24 @@ local hollowArray = {
 	end
 }
 do
-	local haIter = function (t, index)
-		if not index then index = 0 end
-		index = index + 1
-		
-		repeat 
-			if t[index] then
-				return index, t[index]
-			else
-				index = index + 1
-			end
-		until index > t.max
-		
-		return nil
-	end
-
 	local hamt = {
 		__index = hollowArray,
 		__len = function (self) return self.n end,
 		__pairs = function (self)
-			return haIter, self
+			return function (t, index)
+				if not index then index = 0 end
+				index = index + 1
+				
+				repeat 
+					if t[index] then
+						return index, t[index]
+					else
+						index = index + 1
+					end
+				until index > t.max
+				
+				return nil
+			end, self
 		end
 	}
 	
@@ -73,20 +71,19 @@ local set = {
 		
 		self[o] = nil
 		self.n = self.n - 1
-	end,
-	
-	explist = function (self)
+	end
+}
+do
+	local smt = {
+		__index = set,
+		__len = function (self) return self.n end,
+		__pairs = function (self)
 		return function (t, index)
 			local k = next(t, index)
 			if k == "n" then k = next(t,k) end
 			return k
 		end, self
 	end
-}
-do
-	local smt = {
-		__index = set,
-		__len = function (self) return self.n end
 	}
 	
 	setmetatable(set,{
