@@ -19,6 +19,7 @@ return function (reaction, userID) -- reactionAdd but opposite
 	end
 	
 	local embedData = embeds[reaction.message]
+	if embedData.action == "help" then return end
 	
 	logger:log(4, "GUILD %s USER %s on EMBED %s => removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 	

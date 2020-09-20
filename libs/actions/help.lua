@@ -1,4 +1,5 @@
 local locale = require "locale"
+local embeds = require "embeds"
 
 return function (message)
 	local command = (message.content:match("help%s*(.-)$") or "help"):lower()
@@ -6,11 +7,6 @@ return function (message)
 		command = "help"
 	end
 	
-	message:reply({embed = {
-		title = command:gsub("^.", string.upper, 1),	-- upper bold text
-		color = 6561661,
-		description = locale[command],
-		footer = {text = command ~= "help" and locale.embedTip or nil}
-	}})
+	embeds:sendHelp(message)
 	return command.." help message"
 end

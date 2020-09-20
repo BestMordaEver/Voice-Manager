@@ -74,15 +74,49 @@ return setmetatable({}, {
 			end
 		end,
 		
+		-- exclusively for help
+		sendHelp = function (self, message)
+			local reactions = self.reactions
+			local embed = {
+				title = locale.helpAdminTitle,
+				color = 6561661,
+				description = locale.helpAdmin,
+				footer = {text = locale.embedPages:format(1,3).." | "..locale.embedDelete}
+			}
+			local newMessage = message:reply {embed = embed}
+			if newMessage then
+				self[newMessage] = {embed = embed, killIn = 10, page = 1, action = "help", author = message.author}
+				newMessage:addReaction(reactions[1])
+				newMessage:addReaction(reactions[2])
+				newMessage:addReaction(reactions[3])
+				newMessage:addReaction(reactions.stop)
+				
+				return newMessage
+			end
+		end,
+		
 		updatePage = function (self, message, page)
 			local embedData = self[message]
-			embedData.embed = self:new(embedData.action, page, embedData.ids)
-			embedData.killIn = 10
-			embedData.page = page
-			
-			message:clearReactions()
-			message:setEmbed(embedData.embed)
-			self:decorate(message)
+			if embedData.action == "help" then
+				embedData.embed = {
+					title = page == 1 and locale.helpAdminTitle or page == 2 and locale.helpHostTitle or locale.helpUserTitle,
+					color = 6561661,
+					description = page == 1 and locale.helpAdmin or page == 2 and locale.helpHost or locale.helpUser,
+					footer = {text = locale.embedPages:format(page,3).." | "..locale.embedDelete}
+				}
+				embedData.killIn = 10
+				embedData.page = page
+				message:setEmbed(embedData.embed)
+				
+			else
+				embedData.embed = self:new(embedData.action, page, embedData.ids)
+				embedData.killIn = 10
+				embedData.page = page
+				
+				message:clearReactions()
+				message:setEmbed(embedData.embed)
+				self:decorate(message)
+			end
 		end,
 		
 		-- it dies if not noticed for long enough

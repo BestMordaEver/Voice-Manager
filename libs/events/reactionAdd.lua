@@ -38,8 +38,13 @@ return function (reaction, userID) -- embeds processing
 		embeds[reaction.message] = nil
 		reaction.message:delete()
 	else -- assume a number emoji
-		(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
-			(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, 
-				embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+		if embedData.action == "help" then
+			reaction:delete(userID)
+			embeds:updatePage(reaction.message, reactions[reaction.emojiHash])
+		else
+			(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
+				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, 
+					embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+		end
 	end
 end

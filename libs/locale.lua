@@ -2,57 +2,6 @@
 -- may be used as a foundation for translation
 
 return {
-	help = [[You can learn more about each command by using `help`, for example `!vm help template`
-	
-**:arrow_down: You need a "Manage Channels" permission to use those commands! :arrow_down:**
-	
-**register**
-Registers a voice channel that will be used as a lobby
-
-**unregister**
-Unregisters an existing lobby
-
-**target**
-Select where to create new channels
-
-**template**
-Change new channels' name template
-
-**limitation**
-Change how many new channels can be created in your server
-
-**prefix**
-Set a new prefix. Mentioning will still work
-
-**:arrow_up: You need a "Manage Channels" permission to use those commands! :arrow_up:**
-
-**:arrow_down: You need to be a channel host to use those commands! :arrow_down:**
-
-**name**
-Change your channel's name
-
-**capacity**
-Change your channel's capacity
-
-**bitrate**
-Change your channel's bitrate
-
-**promote**
-Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
-
-**:arrow_up: You need to be a channel host to use those commands! :arrow_up:**
-
-**list**
-Lists all registered lobbies on the server
-
-**stats**
-Take a sneak peek on my performance!
-
-**Links**
-[Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[Support Server](https://discord.gg/tqj6jvT)
-]],
-	
 	register = [[You need a **"Manage Channels"** permission to use this command!
 
 `register` OR
@@ -209,6 +158,69 @@ Sends stats for specific server]],
 	embedTip = [[<> - required, [] - optional]],
 	embedPage = [[Click :page_facing_up: to select the whole page]],
 	embedAll = [[Click :asterisk: to select all available channels]],
+	-- help
+	helpAdminTitle = [[Help | Admin commands]],
+	helpHostTitle = [[Help | Host commands]],
+	helpUserTitle = [[Help | User commands]],
+	helpAdmin = [[You need a "Manage Channels" permission to use those commands!
+You can learn more about each command by using `help`, for example `!vm help template`
+
+**register**
+Registers a voice channel that will be used as a lobby
+
+**unregister**
+Unregisters an existing lobby
+
+**target**
+Select where to create new channels
+
+**template**
+Change new channels' name template
+
+**limitation**
+Change how many new channels can be created in your server
+
+**prefix**
+Set a new prefix. Mentioning will still work
+
+**Links**
+[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
+[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
+[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+[Support Server](https://discord.gg/tqj6jvT)]],
+	helpHost = [[You need to be a channel host to use those commands!
+You can learn more about each command by using `help`, for example `!vm help template`
+
+**name**
+Change your channel's name
+
+**capacity**
+Change your channel's capacity
+
+**bitrate**
+Change your channel's bitrate
+
+**promote**
+Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
+
+**Links**
+[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
+[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
+[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+[Support Server](https://discord.gg/tqj6jvT)]],
+	helpUser = [[You can learn more about each command by using `help`, for example `!vm help template`
+	
+**list**
+Lists all registered lobbies on the server
+
+**stats**
+Take a sneak peek on my performance!
+
+**Links**
+[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
+[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
+[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+[Support Server](https://discord.gg/tqj6jvT)]],
 	-- register
 	registeredOne = [[Registered new lobby:]],
 	registeredMany = [[Registered **`%d`** new lobbies:]],
