@@ -2,7 +2,7 @@
 -- CREATE TABLE channels(id VARCHAR PRIMARY KEY, parent VARCHAR, position INTEGER)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("libs/storage/channelsData.db")
+local sqlite = require "sqlite3".open("channelsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 

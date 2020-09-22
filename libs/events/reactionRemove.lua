@@ -10,7 +10,7 @@ local reactions = embeds.reactions
 local function antiAction (action)
 	return action == "unregister" and "register" or
 		action == "register" and "unregister" or
-			action:match("^template") and "template" or "target"	-- reaction remove on template and target will always be interpreted as reset
+			action == "template" and "template" or "target"	-- reaction remove on template and target will always be interpreted as reset
 end
 
 return function (reaction, userID) -- reactionAdd but opposite

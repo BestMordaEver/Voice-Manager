@@ -23,8 +23,8 @@ return function (statement, success, failure)
 		if ok then
 			logger:log(4, "MEMORY: "..success, ...)
 		else
-			logger:log(2, string.format("MEMORY: "..failure, ...)..": %s", msg)
-			client:getChannel("686261668522491980"):sendf(string.format(failure, ...)..": %s", msg)
+			logger:log(2, "%s", string.format("MEMORY: "..failure, ...) .. ": " .. msg)
+			client:getChannel("686261668522491980"):send(string.format(failure, ...) .. ": " .. msg)
 		end
 	end
 end

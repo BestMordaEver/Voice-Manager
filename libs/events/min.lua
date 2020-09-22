@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local channels = require "storage/channels"
 local embeds = require "embeds"
-local finalizer = require "finalizer"
+local mercy = require "mercy"
 local status = require "utils/status"
 
 local client = discordia.storage.client
@@ -15,8 +15,8 @@ return function (date)
 	client:setGame(status())
 	
 	-- hearbeat is partial? stop it!
-	if finalizer:tick() 
+	if mercy:tick() 
 	-- uncomment next line to allow bot to reboot daily
 	-- or (channels:people() == 0 and os.clock() > 86000) 
-	then finalizer:kill() end
+	then mercy:kill() end
 end

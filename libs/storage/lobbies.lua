@@ -2,7 +2,7 @@
 -- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("libs/storage/lobbiesData.db")
+local sqlite = require "sqlite3".open("lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
@@ -89,7 +89,7 @@ return setmetatable({}, {
 			if channel and self[lobbyID] then
 				self[lobbyID].template = template
 				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updateTemplate", lobbyID, template)
+				emitter:emit("updateTemplate", template, lobbyID)
 			else
 				self:remove(lobbyID)
 			end
@@ -100,7 +100,7 @@ return setmetatable({}, {
 			if channel and self[lobbyID] then
 				self[lobbyID].target = target
 				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updateTarget", lobbyID, target)
+				emitter:emit("updateTarget", target, lobbyID)
 			else
 				self:remove(lobbyID)
 			end
@@ -111,7 +111,7 @@ return setmetatable({}, {
 			if channel and self[lobbyID] then
 				self[lobbyID].permissions = permissions
 				logger:log(4, "GUILD %s: Updated permissions for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updatePermissions", lobbyID, permissions)
+				emitter:emit("updatePermissions", permissions, lobbyID)
 			else
 				self:remove(lobbyID)
 			end

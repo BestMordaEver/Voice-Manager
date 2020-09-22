@@ -8,6 +8,7 @@ https://discord.com/developers/docs/resources/channel#embed-object
 local discordia = require "discordia"
 local client, sqlite, logger = discordia.storage.client, discordia.storage.sqlite, discordia.storage.logger
 local guilds = require "storage/guilds"
+local bitfield = require "utils/bitfield"
 local locale = require "locale"
 
 return setmetatable({}, {
@@ -20,11 +21,10 @@ return setmetatable({}, {
 			["⬅"] = "left", ["➡"] = "right", ["📄"] = "page", ["*️⃣"] = "all", ["❌"] = "stop"},
 		
 		-- create new data entry
-		new = function (self, action, page, ids)
+		new = function (self, ids, page, action, argument)
 			local reactions = self.reactions
-			local argument = action:match("^template(.-)$") or action:match("^target(.-)$")
-			action = action:match("^template") or action:match("^target") or action
 			local nids = #ids
+			if action == "permissions" then argument = bitfield(argument) end
 			
 			local embed = {
 				title = action:gsub("^.", string.upper, 1),	-- upper bold text
@@ -32,7 +32,8 @@ return setmetatable({}, {
 				description = (action == "register" and locale.embedRegister or 
 					action == "unregister" and locale.embedUnregister or 
 					action == "template" and (argument == "" and locale.embedResetTemplate or locale.embedTemplate) or
-					action == "target" and (argument == "" and locale.embedResetTarget or locale.embedTarget)
+					action == "target" and (argument == "" and locale.embedResetTarget or locale.embedTarget) or
+					action == "permissions" and (argument:has(argument.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)
 					):format(argument).."\n"..(nids > 10 and (locale.embedPage.."\n") or "")..locale.embedAll.."\n",
 				footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number
 			}
@@ -63,11 +64,11 @@ return setmetatable({}, {
 		end,
 		
 		-- create, save and send fully formed embed and decorate
-		send = function (self, message, action, ids)
-			local embed = self:new(action, 1, ids)
+		send = function (self, message, ids, action, argument)
+			local embed = self:new(ids, 1, action, argument)
 			local newMessage = message:reply {embed = embed}
 			if newMessage then
-				self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, author = message.author}
+				self[newMessage] = {embed = embed, killIn = 10, ids = ids, page = 1, action = action, argument = argument, author = message.author}
 				self:decorate(newMessage)
 				
 				return newMessage

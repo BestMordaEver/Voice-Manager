@@ -1,41 +1,53 @@
 local discordia = require "discordia"
 local locale = require "locale"
+local lobbies = require "storage/lobbies"
 
 local client = discordia.storage.client
 local permission = discordia.enums.permission
-local complexParse = require "actions/complexParse"
-local actionFinalizer = require "finalizers/target"
+local actionParse = require "utils/actionParse"
+local finalizer = require "finalizer"
 
 -- this function is also used by embeds, they will supply ids and target
 return function (message, ids, target)
 	if not ids then
-		ids, target = complexParse(message, "target")
+		target = message.content:match('target%s*".-"%s*(.-)$') or message.content:match('target%s*(.-)$')
+		
+		local targetCategory = client:getChannel(target)
+		if not (targetCategory and targetCategory.createVoiceChannel) then
+			if not message.guild then
+				message:reply(locale.noID)
+				return "Template by name in dm"
+			end
+			
+			local categories = message.guild.categories:toArray(function (category) return category.name:lower() == target:lower() end)
+			if not categories[1] then
+				message:reply(locale.badInput)
+				return "Didn't find the target"
+			end
+			targetCategory = categories[1]
+			target = targetCategory.id
+		end
+		
+		if not targetCategory.guild:getMember(message.author):hasPermission(targetCategory, permission.manageChannels) then
+			message:reply(locale.badUserPermission.." "..targetCategory.name)
+			return "User doesn't have permission to manage the target"
+		end
+		
+		if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
+			message:reply(locale.badBotPermission.." "..targetCategory.name)
+			return "Bot doesn't have permission to manage the target"
+		end
+		
+		ids = actionParse(message, message.content:match('"(.-)"'), "target", target)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	local targetCategory = client:getChannel(target)
-	if target and not targetCategory then
-		local ids = {}
-		if message.guild then
-			for _, channel in pairs(message.guild.categories) do
-				if channel.name:lower() == line then
-					table.insert(ids, channel.id)
-				end
-			end
-		end
-		if not ids[1] then
-			message:reply(locale.badCategory)
-			return "Couldn't find target"
-		end
-		targetCategory = ids[1]
+	if target == "" then
+		message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, lobbies[ids[1]].target) or locale.noTarget)
+		return "Sent channel target"
 	end
 	
-	if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
-		message:reply(locale.badBotPermission.." "..targetCategory.name)
-		return "Bad permissions for target"
-	end
-	
-	target, ids = actionFinalizer(message, ids, "target"..(target or ""))
+	target, ids = finalizer.target(message, ids, target)
 	message:reply(target)
 	return (#ids == 0 and "Successfully applied target to all" or ("Couldn't apply target to "..table.concat(ids, " ")))
 end

@@ -28,12 +28,10 @@ return function (reaction, userID) -- embeds processing
 			if not embedData.ids[i] then break end
 			table.insert(ids, embedData.ids[i])
 		end
-		(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
-			(reaction.message, ids, embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+		actions[embedData.action](reaction.message, ids, embedData.argument)
 	elseif reaction.emojiHash == reactions.all then
-		reaction.message.channel:broadcastTyping(); -- without semicolon next parenthesis is interpreted as a function call :\
-		(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
-			(reaction.message, embedData.ids, embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+		reaction.message.channel:broadcastTyping()	-- without semicolon next parenthesis is interpreted as a function call :\
+		actions[embedData.action](reaction.message, embedData.ids, embedData.argument)
 	elseif reaction.emojiHash == reactions.stop then
 		embeds[reaction.message] = nil
 		reaction.message:delete()
@@ -42,9 +40,7 @@ return function (reaction, userID) -- embeds processing
 			reaction:delete(userID)
 			embeds:updatePage(reaction.message, reactions[reaction.emojiHash])
 		else
-			(actions[embedData.action] or actions[embedData.action:match("^template")] or actions[embedData.action:match("^target")])
-				(reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, 
-					embedData.action:match("^template(.+)$") or embedData.action:match("^target(.+)$"))
+			actions[embedData.action](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.argument)
 		end
 	end
 end

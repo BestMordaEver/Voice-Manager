@@ -33,46 +33,20 @@ Displays current target for the listed channel
 Changes the target for listed channels
 
 `target <category ID>`
-Sends a handy widget with all the channels that you can apply this target to
-
-`target reset "<lobby name>"` OR
-`target reset "<lobby ID> [lobby ID] ..."`
-Removes the target for listed channels
-
-`target reset`
-Sends a handy widget with all the channels that you can reset target for]],
+Sends a handy widget with all the channels that you can apply this target to]],
 	
 	template = [[You need a **"Manage Channels"** permission to use this command!
-
-`template` OR
-`template "<server ID>"`
-Displays current global template, that will be used in new channel's name (unless that channel has their own template)
 
 `template "<lobby name>"` OR
 `template "<lobby ID>"`
 Displays current template for the listed channel. A channel template overrides a global one
 
-`template <template text>`
-Sends a handy widget with all the channels that you can apply this template to
-
-`template "global" <template text>` OR
-`template "<server ID>" <template text>`
-Changes the global template
-
 `template "<lobby name>" <template text>` OR
 `template "<lobby ID> [lobby ID] ..." <template_text>`
 Changes the template for listed channels
 
-`template reset "global"` OR
-`template reset "<server ID>"`
-Resets the global template to default `%nickname's% channel`
-
-`template reset "<lobby name>"` OR
-`template reset "<lobby ID> [lobby ID] ..."`
-Removes the template for listed channels so they will use global template
-
-`template reset`
-Sends a handy widget with all the channels that you can reset templates for
+`template <template text>`
+Sends a handy widget with all the channels that you can apply this template to
 
 You can customize a template by including different `%combos%` to it:
 `%nickname%` - user's nickname (name is used if no nickname is set)
@@ -225,8 +199,6 @@ Take a sneak peek on my performance!
 	registeredOne = [[Registered new lobby:]],
 	registeredMany = [[Registered **`%d`** new lobbies:]],
 	embedRegister = [[Select a channel to register]],
-	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
-	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],
 	redundantRegister = [[This channel is already registered:]],
 	redundantRegisters = [[Those channels are already registered:]],
 	-- unregister
@@ -242,8 +214,6 @@ Take a sneak peek on my performance!
 	embedResetTarget = [[Select a lobby to reset its target]],
 	badCategory = [[Couldn't find the category to target]],
 	-- template
-	globalTemplate = [[Current global template is **`%s`**]],
-	defaultTemplate = [[Your guild uses the default template `%nickname's% channel`]],
 	lobbyTemplate = [[Current template for **`%s`** is **`%s`**]],
 	noTemplate = [[This lobby doesn't have a custom template]],
 	newTemplate = [[Set a new template **`%s`**:]],
@@ -251,9 +221,14 @@ Take a sneak peek on my performance!
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
 	-- permissions
+	lobbyPermissions = [[Current lobby permissions for **`%s`** include: **`%s`**]],
+	newPermissions = [[Added new permissions **`%s`**:]],
+	revokedPermissions = [[Revoked permissions **`%s`**:]],
+	resetPermissions = [[Reset permissions:]],
+	embedAddPermissions = [[Select a lobby that will receive listed permissions]],
+	embedRemovePermissions = [[Select a lobby that will lose listed permissions]],
 	noPermission = [[There's no such permission]],
 	noToggle = [[No toggle found]],
-	
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
@@ -283,6 +258,8 @@ Take a sneak peek on my performance!
 	ambiguousID = [[There are several channels with this name]],
 	gimmeReaction = [[I can process that, but I need "Manage Messages" and "Add Reactions" permissions for that]],
 	
+	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
+	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],
 	badUserPermission = [[You're not permitted to manage this channel:]],
 	badUserPermissions = [[You're not permitted to manage those channels:]],
 	notLobby = [[This channel is not a lobby:]],

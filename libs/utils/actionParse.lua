@@ -6,10 +6,31 @@ local embeds = require "embeds"
 local client = discordia.storage.client
 local permission = discordia.enums.permission
 local truePositionSorting = require "utils/truePositionSorting"
-local getIDs = require "actions/getIDs"
 
-return function (message, command) -- register unregister action pre-processing
-	local ids, nameDuplicates = getIDs(message.guild, message.content:match(command.."%s+(.-)$"))
+return function (message, context, command, argument)	-- action pre-processing
+	local ids, nameDuplicates = {}, false
+	if context then
+		context = context:lower()
+	
+		if message.guild then
+			for _, channel in pairs(message.guild.voiceChannels) do
+				if channel.name:lower() == context then
+					table.insert(ids, channel.id)
+				end
+			end
+		end
+		
+		if #ids == 0 then
+			for id in context:gmatch("%d+") do
+				if client:getChannel(id) then table.insert(ids,id) end
+			end
+			
+			if #ids ~= 0 then
+				return ids
+			end
+		end
+	end
+	
 	if not ids[1] then
 		if not message.guild then
 			message:reply(locale.noID)
@@ -28,7 +49,7 @@ return function (message, command) -- register unregister action pre-processing
 			table.insert(ids, channel.id)
 		end
 		
-		local newMessage = embeds:send(message, command, ids)
+		local newMessage = embeds:send(message, ids, command, argument)
 		if newMessage then
 			return "Empty input, sent embed ".. newMessage.id
 		else
@@ -36,10 +57,7 @@ return function (message, command) -- register unregister action pre-processing
 		end
 	end
 	
-	if #ids == 0 then
-		message:reply(locale.badInput)
-		return "Didn't find the channel"
-	elseif nameDuplicates then
+	if #ids > 2 then
 		local redundant, count = {}, #ids
 		
 		for i, _ in ipairs(ids) do repeat	-- clear out invalid channels
@@ -62,7 +80,7 @@ return function (message, command) -- register unregister action pre-processing
 			return "Ambiguous input, can't do embed"
 		end
 		
-		local newMessage = embeds:send(message, command, ids)
+		local newMessage = embeds:send(message, ids, command, argument)
 		if newMessage then 
 			newMessage:setContent(locale.ambiguousID)
 			return "Ambiguous input, sent embed "..newMessage.id

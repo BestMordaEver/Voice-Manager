@@ -2,7 +2,7 @@
 -- CREATE TABLE guilds(id VARCHAR PRIMARY KEY, prefix VARCHAR, template VARCHAR, limitation INTEGER)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("libs/storage/guildsData.db")
+local sqlite = require "sqlite3".open("guildsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
@@ -85,20 +85,20 @@ return setmetatable({}, {
 		updatePrefix = function (self, guildID, prefix)
 			self[guildID].prefix = prefix
 			logger:log(4, "GUILD %s: Updated prefix", guildID)
-			emitter:emit("updatePrefix", guildID, prefix)
+			emitter:emit("updatePrefix", prefix, guildID)
 		end,
 		
 		-- there should be enough checks to ensure that guild and template are valid
 		updateTemplate = function (self, guildID, template)
 			self[guildID].template = template
 			logger:log(4, "GUILD %s: Updated template", guildID)
-			emitter:emit("updateTemplate", guildID, template)
+			emitter:emit("updateTemplate", template, guildID)
 		end,
 		
 		updateLimitation = function (self, guildID, limitation)
 			self[guildID].limitation = limitation
 			logger:log(4, "GUILD %s: Updated limitation", guildID)
-			emitter:emit("updateLimitation", guildID, limitation)
+			emitter:emit("updateLimitation", limitation, guildID)
 		end
 	}
 })
