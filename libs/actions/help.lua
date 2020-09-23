@@ -7,6 +7,16 @@ return function (message)
 		command = "help"
 	end
 	
-	embeds:sendHelp(message)
+	if command == "help" then
+		embeds:sendHelp(message)
+	else
+		message:reply({embed = {
+			title = command:gsub("^.", string.upper, 1),	-- upper bold text
+			color = 6561661,
+			description = locale[command],
+			footer = {text = command ~= "help" and locale.embedTip or nil}
+		}})
+	end
+	
 	return command.." help message"
 end

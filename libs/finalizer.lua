@@ -130,11 +130,11 @@ return {
 	target = new(
 		{isLobby,isUser},
 		{
-			default = function (nids, target) return string.format(template and locale.newTarget or locale.resetTarget, target).."\n" end,
+			default = function (nids, target) return string.format(target and locale.newTarget or locale.resetTarget, target).."\n" end,
 			notLobby, badUser
 		},
 		function (channel, target)
-			lobbies:updateTarget(channelID, target)
+			lobbies:updateTarget(channel.id, target)
 		end
 	),
 	
@@ -152,7 +152,7 @@ return {
 			notLobby, badUser
 		},
 		function (channel, permissions)
-			lobbies:updatePermissions(channelID, permissions)
+			lobbies:updatePermissions(channel.id, permissions)
 		end
 	)
 }

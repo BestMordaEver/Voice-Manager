@@ -3,23 +3,27 @@
 
 return {
 	register = [[You need a **"Manage Channels"** permission to use this command!
+Register a voice channel that will be used as a lobby. Enter this lobby to create a new channel, that will be deleted once it's empty.
 
-`register` OR
+`register`
+Sends a handy widget with all the channels that you can register
+
 `register <channel name>` OR
 `register <channel ID> [channel ID] ...`
-
-Registers a voice channel that will be used as a lobby. Enter this lobby to create a new channel, that will be deleted once it's empty.
-If you don't provide any arguments, I will send a handy widget with all the channels that you can register]],
+Registers all listed channels]],
 	
 	unregister = [[You need a **"Manage Channels"** permission to use this command!
+Unregister an existing lobby. New channels that were created by this lobby will be deleted once they are empty, as usual
 
-`unregister` OR
+`unregister`
+Sends a handy widget with all the channels that you can unregister
+
 `unregister <channel_name>` OR
 `unregister <channel ID> [channel ID] ...`
-Unregisters an existing lobby. New channels that were created by this lobby will be deleted once they are empty, as usual
-If you don't provide any arguments, I will send a handy widget with all the channels that I can unregister]],
+Unregisters all listed channels]],
 	
 	target = [[You need a **"Manage Channels"** permission to use this command!
+Select a category in which new channels will be created
 
 `target "<lobby name>"` OR
 `target "<lobby ID>"`
@@ -36,6 +40,7 @@ Changes the target for listed channels
 Sends a handy widget with all the channels that you can apply this target to]],
 	
 	template = [[You need a **"Manage Channels"** permission to use this command!
+Change new channels' name template
 
 `template "<lobby name>"` OR
 `template "<lobby ID>"`
@@ -57,6 +62,7 @@ You can customize a template by including different `%combos%` to it:
 `%counter%` - channel's position. The channel will be moved to fill in holes in numbering]],
 	
 	permissions = [[You need a **"Manage Channels"** permission to use this command!
+Give your users control over their new channels
 
 `permissions "<lobby ID>"`
 Displays current permissions that will be given to the host
@@ -72,12 +78,13 @@ You can grant following permissions:
 mute - allows to server mute people in channel
 deafen - allows to server deafen people in channel
 disconnect - allows to disconnect people from channel
-manage - allows to manage channel properties
+manage - shortcut for next three permissions, plus allows to delete the new channel prematurely
 name - allows use of `!vm name`
 capacity - allows use of `!vm capacity`
 bitrate - allows use of `!vm bitrate`]],
 	
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
+Change how many new channels can be created in your server
 
 `limitation`
 Shows currently set channel limit. Default is 100,000
@@ -87,6 +94,7 @@ Shows currently set channel limit. Default is 100,000
 Changes the channel limit. Must be between 1 and 100,000]],
 	
 	prefix = [[You need a **"Manage Channels"** permission to use this command!
+Set a new prefix. Mentioning will still work
 
 `prefix`
 Displays the current prefix. Default is !vm
@@ -95,21 +103,25 @@ Displays the current prefix. Default is !vm
 Updates the prefix in the server]],
 	
 	name = [[You can enable channel hosts to use this command via `!vm permissions`
+Change your channel's name
 
 `name <new name>`
 Changes your current channel's name]],
 	
 	capacity = [[You can enable channel hosts to use this command via `!vm permissions`
+Change your channel's capacity
 
 `capacity <number between 0 and 99>`
 Changes your current channel's capacity]],
 	
 	bitrate = [[You can enable channel hosts to use this command via `!vm permissions`
+Change your channel's bitrate
 
 `bitrate <number between 8 and 96>`
 Changes your current channel's bitrate]],
 	
 	promote = [[You need to be a channel host to use this command!
+Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
 	
 `promote <user mention>`
 Transfers all host privileges to mentioned user]],
@@ -140,16 +152,19 @@ Sends stats for specific server]],
 You can learn more about each command by using `help`, for example `!vm help template`
 
 **register**
-Registers a voice channel that will be used as a lobby
+Registers a voice channel that will be used as a lobby. Enter this lobby to create a new channel, that will be deleted once it's empty.
 
 **unregister**
-Unregisters an existing lobby
+Unregisters an existing lobby. New channels that were created by this lobby will be deleted once they are empty, as usual
 
 **target**
-Select where to create new channels
+Select a category in which new channels will be created
 
 **template**
 Change new channels' name template
+
+**permissions**
+Give your users control over their new channels
 
 **limitation**
 Change how many new channels can be created in your server
