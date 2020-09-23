@@ -16,6 +16,14 @@ return {
 	
 	prefix = require "actions/prefix",
 	
+	name = require "actions/name",
+	
+	capacity = require "actions/capacity",
+	
+	bitrate = require "actions/bitrate",
+	
+	promote = require "actions/promote",
+	
 	list = require "actions/list",
 	
 	stats = require "actions/stats",

@@ -251,6 +251,15 @@ Take a sneak peek on my performance!
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],
+	-- name
+	
+	-- capacity
+	
+	-- bitrate
+	
+	-- promote
+	newHost = [[New host assigned]],
+	noMember = [[No such user in your channel]],
 	-- list
 	noLobbies = [[No lobbies registered yet!]],
 	someLobbies = [[Registered lobbies on this server:]],
@@ -282,6 +291,8 @@ Take a sneak peek on my performance!
 	badChannel = [[This channel is not valid:]],
 	badChannels = [[Those channels are not valid:]],
 	notMember = [[You're not a member of this server]],
-	noID = [[When in DMs, I can only work with IDs]],
-	error = [[Something went wrong. *I'm sowwy*. Can you report this on our support server? Timestamp is %s]]
+	noID = [[I can't process this input in DMs]],
+	notHost = [[You're not a channel host]],
+	badHostPermission = [[You're not permitted to perform this action]],
+	error = [[Something went wrong. *I'm sowwy*. The issue was reported already, fix will eventually happen]]
 }

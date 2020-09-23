@@ -2,6 +2,7 @@ local discordia = require "discordia"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local bitfield = require "utils/bitfield"
 
 local client = discordia.storage.client
 local logger = discordia.storage.logger
@@ -41,20 +42,13 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
 		member:setVoiceChannel(newChannel.id)
-		channels:add(newChannel.id, lobby.id, position)
+		channels:add(newChannel.id, member.user.id, lobby.id, position)
 		lobbies:attachChild(lobby.id, newChannel.id, position)
 		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 		newChannel:setUserLimit(lobby.userLimit)
 		
-		-- if given permissions, allow user moderation
-		--[[
-		if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers) then
-			newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageChannels, permission.muteMembers, permission.deafenMembers, permission.moveMembers)
-		end
-		--]]
-		
 		if lobbies[lobby.id].permissions ~= 0 then
-			local perms = discordia.Permissions(lobbies[lobby.id].permissions)
+			local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
 			if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
 				newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
 			end

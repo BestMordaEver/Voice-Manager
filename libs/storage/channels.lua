@@ -13,31 +13,34 @@ local storageInteraction = require "utils/storageInteraction"
 local emitter = discordia.Emitter()
 
 -- prepared statements
-local add, remove =
-	sqlite:prepare("INSERT INTO channels VALUES(?,?,?)"),
-	sqlite:prepare("DELETE FROM channels WHERE id = ?")
+local add, remove, updateHost =
+	sqlite:prepare("INSERT INTO channels VALUES(?,?,?,?)"),
+	sqlite:prepare("DELETE FROM channels WHERE id = ?"),
+	sqlite:prepare("UPDATE channels SET host = ? WHERE id = ?")
+	
 
 emitter:on("add", storageInteraction(add, "Added channel %s", "Couldn't add channel %s"))
 emitter:on("remove", storageInteraction(remove, "Removed channel %s", "Couldn't remove channel %s"))
+emitter:on("updateHost", storageInteraction(updateHost, "Updated host to %s for channel %s", "Couldn't update host to %s for channel %s"))
 
 return setmetatable({}, {
 	-- move functions to index table to iterate over channels easily
 	__index = {
 		-- perform checks and add channel to table
-		loadAdd = function (self, channelID, parent, position)
+		loadAdd = function (self, channelID, host, parent, position)
 			if not self[channelID] then
 				local channel = client:getChannel(channelID)
 				if channel and channel.guild then
-					self[channelID] = {parent = parent, position = position}
+					self[channelID] = {host = host, parent = parent, position = position}
 					logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
 				end
 			end
 		end,
 		
 		-- loadAdd and start interaction with db
-		add = function (self, channelID, parent, position)
-			self:loadAdd(channelID, parent, position)
-			if self[channelID] then emitter:emit("add", channelID, parent, position) end
+		add = function (self, channelID, host, parent, position)
+			self:loadAdd(channelID, host, parent, position)
+			if self[channelID] then emitter:emit("add", channelID, parent, position, host) end
 		end,
 		
 		-- no granular control, if it goes away, it does so everywhere
@@ -62,7 +65,7 @@ return setmetatable({}, {
 					local channel = client:getChannel(channelID)
 					if channel then
 						if #channel.connectedMembers > 0 then
-							self:loadAdd(channelID, channelIDs[2][i], tonumber(channelIDs[3][i]))
+							self:loadAdd(channelID, channelIDs.host[i], channelIDs.parent[i], tonumber(channelIDs.position[i]))
 						else
 							channel:delete()
 						end
@@ -72,6 +75,17 @@ return setmetatable({}, {
 				end
 			end
 			logger:log(4, "STARTUP: Loaded!")
+		end,
+		
+		updateHost = function (self, channelID, hostID)
+			local channel = client:getChannel(channelID)
+			if channel and self[channelID] then
+				self[channelID].host = hostID
+				logger:log(4, "GUILD %s: Updated host for channel %s", channel.guild.id, channelID)
+				emitter:emit("updateHost", hostID, channelID)
+			else
+				self:remove(channelID)
+			end
 		end,
 		
 		-- are there empty channels? kill!
