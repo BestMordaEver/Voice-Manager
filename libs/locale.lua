@@ -106,7 +106,9 @@ Updates the prefix in the server]],
 Change your channel's name
 
 `name <new name>`
-Changes your current channel's name]],
+Changes your current channel's name
+
+**Changing channel name is currently ratelimited by Discord!** Bots can't change channel name more often than 2 times per 10 minutes, so use this command wisely.]],
 	
 	capacity = [[You can enable channel hosts to use this command via `!vm permissions`
 Change your channel's capacity
@@ -252,11 +254,13 @@ Take a sneak peek on my performance!
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],
 	-- name
-	
+	changedName = [[Successfully changed channel name!]],
+	ratelimitRemaining = [[This action is ratelimited. You can do this **1** more time in next **%s**]],
+	ratelimitReached = [[This action is ratelimited. You will be able to perform this action after **%s**]],
 	-- capacity
-	
+	changedCapacity = [[Successfully changed channel capacity!]],
 	-- bitrate
-	
+	changedBitrate = [[Successfully changed channel bitrate!]],
 	-- promote
 	newHost = [[New host assigned]],
 	noMember = [[No such user in your channel]],
@@ -294,5 +298,6 @@ Take a sneak peek on my performance!
 	noID = [[I can't process this input in DMs]],
 	notHost = [[You're not a channel host]],
 	badHostPermission = [[You're not permitted to perform this action]],
+	hostError = [[Something went wrong. *And it's probably not my fault*. Poke your admins if this continues to happen]],
 	error = [[Something went wrong. *I'm sowwy*. The issue was reported already, fix will eventually happen]]
 }

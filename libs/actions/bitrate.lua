@@ -14,11 +14,19 @@ return function (message)
 	end
 	
 	local permissions = bitfield(lobbies[channels[channel.id].parent].permissions)
-	if not (message.guild:getMember(message.author)):hasPermission(channel, permission.manageChannels or permissions:has(permission.bits.name)) then
+	if not (message.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) or permissions:has(permissions.bits.bitrate)) then
 		message:reply(locale.badHostPermission)
 		return "Insufficient permissions"
 	end
 	
-	--channels:updateHost(channels)
-	--return (#ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " ")))
+	local success, err = channel:setBitrate(tonumber(message.content:match("bitrate(.-)$")) * 1000)
+	if success then
+		if not message:addReaction("✅") then
+			message:reply(locale.changedBitrate)
+		end
+	else
+		message:reply(locale.hostError)
+	end
+	
+	return success and "Successfully changed channel bitrate" or ("Couldn't change channel bitrate: "..err)
 end

@@ -21,11 +21,12 @@ return function (member, channel) -- now remove the unwanted corpses!
 			if newHost then
 				channels:updateHost(channel.id, newHost.user.id)
 				
-				local lobby = client:getChannel(lobbies[channels[channel.id].parent])
-				if lobby and lobbies[lobby.id].permissions ~= 0 then
+				local lobby = client:getChannel(channels[channel.id].parent)
+				if lobby then
 					local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
-					if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
-						newChannel:getPermissionOverwriteFor(newHost):allowPermissions(perms)
+					if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
+						channel:getPermissionOverwriteFor(member):delete()
+						channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
 					end
 				end
 			end

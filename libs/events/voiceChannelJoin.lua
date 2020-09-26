@@ -47,11 +47,9 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 		newChannel:setUserLimit(lobby.userLimit)
 		
-		if lobbies[lobby.id].permissions ~= 0 then
-			local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
-			if lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, perms) then
-				newChannel:getPermissionOverwriteFor(member):allowPermissions(perms)
-			end
+		local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
+		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
+			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 		end
 		
 		if needsMove then

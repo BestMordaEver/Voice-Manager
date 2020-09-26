@@ -6,6 +6,7 @@ local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
 local status = require "utils/status"
+local safeEvent = require "utils/safeEvent"
 
 --[[
 events are listed by name here, discordia events may differ from OG discord events for sake of convenience
@@ -60,17 +61,6 @@ events = {
 	hour = require "events/hour"
 }
 
-local function safeEvent (self, name)
-	-- will be sent to emitter:on() style function
-	-- name corresponds to event name
-	-- function starts protected calls of event responding functions from "events"
-	return name, function (...)
-		local success, err = xpcall(self[name], debug.traceback, ...)
-		if not success then
-			logger:log(1, "Error on %s: %s", name, err)
-			client:getChannel("686261668522491980"):sendf("Error on %s: %s", name, err)
-		end
-	end
-end
-
-return setmetatable(events, {__call = safeEvent})
+return setmetatable(events, {__call = function (self, name)
+	return safeEvent(name, self[name])
+end})

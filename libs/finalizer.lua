@@ -3,6 +3,7 @@ local locale = require "locale"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
@@ -152,7 +153,9 @@ return {
 			notLobby, badUser
 		},
 		function (channel, permissions)
-			lobbies:updatePermissions(channel.id, permissions)
+			local permissionBits = bitfield(lobbies[channel.id].permissions)
+			local newPermissionBits = bitfield(permissions)
+			lobbies:updatePermissions(channel.id, newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
 		end
 	)
 }

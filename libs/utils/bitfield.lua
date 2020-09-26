@@ -1,5 +1,5 @@
 local discordia = require "discordia"
-local permissions = discordia.enums.permissions
+local permission = discordia.enums.permission
 
 local bitfield = {
 	bits = {
@@ -24,18 +24,18 @@ local bitfield = {
 		[0x80] = "on"
 	},
 	
-	has = function (self, permission)
-		return bit.band(self.raw, permission) == permission
+	has = function (self, permissions)
+		return bit.band(self.raw, permissions) == permissions
 	end,
 	
 	toDiscordia = function (self)
-		local perms = 
-			(self:has(self.deafen) and permissions.deafenMembers or 0) +
-			(self:has(self.mute) and permissions.muteMembers or 0) +
-			(self:has(self.disconnect) and permissions.moveMembers or 0) +
-			(self:has(self.manage) and permissions.manageChannels or 0)
+		local perms = {}
+		if self:has(self.bits.deafen) then table.insert(perms, permission.deafenMembers) end
+		if self:has(self.bits.mute) then table.insert(perms, permission.muteMembers) end
+		if self:has(self.bits.disconnect) then table.insert(perms, permission.moveMembers) end
+		if self:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 		
-		return discordia.Permissions.fromMany(perms)
+		return perms
 	end
 }
 
@@ -67,7 +67,7 @@ return setmetatable({},{
 			__tostring = function (self)
 				local str = ""
 				for bit, name in pairs(self.perms) do
-					if self:has(bit) then
+					if name ~= "on" and self:has(bit) then
 						str = str .. name .. " "
 					end
 				end

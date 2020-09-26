@@ -14,11 +14,19 @@ return function (message)
 	end
 	
 	local permissions = bitfield(lobbies[channels[channel.id].parent].permissions)
-	if not (message.guild:getMember(message.author)):hasPermission(channel, permission.manageChannels or permissions:has(permission.bits.name)) then
+	if not (message.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) or permissions:has(permissions.bits.capacity)) then
 		message:reply(locale.badHostPermission)
 		return "Insufficient permissions"
 	end
 	
-	--channels:updateHost(channels)
-	--return (#ids == 0 and "Successfully registered all" or ("Couldn't register "..table.concat(ids, " ")))
+	local success, err = channel:setUserLimit(message.content:match("capacity(.-)$"))
+	if success then
+		if not message:addReaction("✅") then
+			message:reply(locale.changedCapacity)
+		end
+	else
+		message:reply(locale.hostError)
+	end
+	
+	return success and "Successfully changed channel capacity" or ("Couldn't change channel capacity: "..err)
 end

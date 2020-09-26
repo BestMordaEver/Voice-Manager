@@ -12,6 +12,9 @@ return function (message, ids, target)
 	if not ids then
 		target = message.content:match('target%s*".-"%s*(.-)$') or message.content:match('target%s*(.-)$')
 		
+		ids = actionParse(message, message.content:match('"(.-)"'), "target", target)
+		if not ids[1] then return ids end -- message for logger
+		
 		local targetCategory = client:getChannel(target)
 		if not (targetCategory and targetCategory.createVoiceChannel) then
 			if not message.guild then
@@ -20,10 +23,12 @@ return function (message, ids, target)
 			end
 			
 			local categories = message.guild.categories:toArray(function (category) return category.name:lower() == target:lower() end)
-			if not categories[1] then
-				message:reply(locale.badInput)
-				return "Didn't find the target"
+			
+			if target == "" then
+				message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, lobbies[ids[1]].target) or locale.noTarget)
+				return "Sent channel target"
 			end
+			
 			targetCategory = categories[1]
 			target = targetCategory.id
 		end
@@ -37,14 +42,6 @@ return function (message, ids, target)
 			message:reply(locale.badBotPermission.." "..targetCategory.name)
 			return "Bot doesn't have permission to manage the target"
 		end
-		
-		ids = actionParse(message, message.content:match('"(.-)"'), "target", target)
-		if not ids[1] then return ids end -- message for logger
-	end
-	
-	if target == "" then
-		message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, lobbies[ids[1]].target) or locale.noTarget)
-		return "Sent channel target"
 	end
 	
 	target, ids = finalizer.target(message, ids, target)

@@ -21,6 +21,7 @@ return function (message, ids, permissions)
 			end
 		end
 		
+		--[[
 		if permissionBits.raw == 0 then
 			message:reply(locale.noPermission)
 			return "No permission was selected"
@@ -30,6 +31,7 @@ return function (message, ids, permissions)
 			message:reply(locale.noToggle)
 			return "No toggle was selected"
 		end
+		--]]
 		
 		permissions = permissionBits.raw
 		ids = actionParse(message, message.content:match('"(.-)"'), "permissions", permissions)
