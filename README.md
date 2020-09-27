@@ -1,24 +1,15 @@
 [Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-set-up-Voice-Manager) | [Support and news Discord server](https://discord.gg/tqj6jvT)
 
-Voice Manager is a simplistic bot, that allows your users to create new voice channels on demand!
+Voice Manager is a bot, that allows your users to create new voice channels on demand! [Here's what it looks like](https://i.imgur.com/xNKVC2B.mp4)
 
-Assign a lobby and everybody who enters this lobby will be placed in a newly created channel. Once everybody leaves this new channel - it gets deleted.
+Assign a lobby and everybody who enters this lobby will be placed in a newly created channel. Once everybody leaves this new channel - it gets deleted, so there's never any clutter!
 
-The bot will keep new channels in the same category as the lobby and will enable same user limits as the lobby.
-
-[Here's how it looks](https://i.imgur.com/xNKVC2B.mp4)
-
-List of available commands:
-- help - sends help message or information about another commands
-- register - registers a voice chat that will be used as a lobby. You can feed it channel IDs or channel name
-- unregister - unregisters an existing lobby. You can feed it channel IDs or channel name
-- target - select where to create new channels
-- template - change new channels' name template. Look at "help template" to learn more
-- limitation - change how many new channels can be created in your server
-- prefix - set a new prefix. Mentioning will still work
-- list - lists all registered lobbies on the server
-- stats - take a sneak peek on bot's performance!
-- support - sends an invite to support Discord server
+Voice Manager is highly customizable!
+- You can make your own template for new channels' names, that can include your username, tag or a game that you play!
+- Bot can do ordered channels! Check out `%counter%` combo in `help template`.
+- Channels can be created under any category, just point you lobby to it with `target`!
+- Give your users granular control over their new channels with `permissions` command! Let them kick the killjoys or change thier channel name to something stupid!
+- Yes, you can change prefix. Future!
 
 <a href="https://discordbotlist.com/bots/601347755046076427">
 	<img 
