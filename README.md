@@ -1,4 +1,4 @@
-[Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-set-up-Voice-Manager) | [Support and news Discord server](https://discord.gg/tqj6jvT)
+[Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [Support and news Discord server](https://discord.gg/tqj6jvT)
 
 Voice Manager is a bot, that allows your users to create new voice channels on demand! [Here's what it looks like](https://i.imgur.com/xNKVC2B.mp4)
 
