@@ -1,37 +1,45 @@
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return {
-	help = require "actions/help",
+	help = require "actions/misc/help",
 	
-	register = require "actions/register",
+	register = require "actions/admin/register",
 	
-	unregister = require "actions/unregister",
+	unregister = require "actions/admin/unregister",
 	
-	target = require "actions/target",
+	target = require "actions/admin/target",
 	
-	template = require "actions/template",
+	template = require "actions/admin/template",
 	
-	permissions = require "actions/permissions",
+	permissions = require "actions/admin/permissions",
 	
-	limitation = require "actions/limitation",
+	limitation = require "actions/admin/limitation",
 	
-	prefix = require "actions/prefix",
+	prefix = require "actions/admin/prefix",
 	
-	name = require "actions/name",
+	ban = require "actions/host/ban",
 	
-	capacity = require "actions/capacity",
+	deafen = require "actions/host/deafen",
 	
-	bitrate = require "actions/bitrate",
+	mute = require "actions/host/mute",
 	
-	promote = require "actions/promote",
+	reserve = require "actions/host/reserve",
 	
-	list = require "actions/list",
+	name = require "actions/host/name",
 	
-	stats = require "actions/stats",
+	capacity = require "actions/host/capacity",
+	
+	bitrate = require "actions/host/bitrate",
+	
+	promote = require "actions/host/promote",
+	
+	list = require "actions/misc/list",
+	
+	stats = require "actions/misc/stats",
 	
 	support = function (message)
 		message:reply("https://discord.gg/tqj6jvT")
 		return "Sent support invite"
 	end,
 	
-	shutdown = require "actions/shutdown"
+	shutdown = require "actions/misc/shutdown"
 }
