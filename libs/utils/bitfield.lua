@@ -3,9 +3,9 @@ local permission = discordia.enums.permission
 
 local bitfield = {
 	bits = {
-		deafen = 0x01,
+		--deafen = 0x01,
 		mute = 0x02,
-		disconnect = 0x04,
+		moderate = 0x04,
 		manage = 0x08,
 		name = 0x10,
 		capacity = 0x20,
@@ -14,9 +14,9 @@ local bitfield = {
 	},
 	
 	perms = {
-		[0x01] = "deafen",
+		--[0x01] = "deafen",
 		[0x02] = "mute",
-		[0x04] = "disconnect",
+		[0x04] = "moderate",
 		[0x08] = "manage",
 		[0x10] = "name",
 		[0x20] = "capacity",
@@ -30,9 +30,8 @@ local bitfield = {
 	
 	toDiscordia = function (self)
 		local perms = {}
-		if self:has(self.bits.deafen) then table.insert(perms, permission.deafenMembers) end
-		if self:has(self.bits.mute) then table.insert(perms, permission.muteMembers) end
-		if self:has(self.bits.disconnect) then table.insert(perms, permission.moveMembers) end
+		--if self:has(self.bits.deafen) then table.insert(perms, permission.deafenMembers) end
+		if self:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
 		if self:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 		
 		return perms

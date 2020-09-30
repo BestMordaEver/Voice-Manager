@@ -38,6 +38,9 @@ Set a new prefix. Mentioning will still work
 	helpHost = [[You need to be a channel host to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
+**ban**
+Keep those nasty trolls out of your lobby
+
 **name**
 Change your channel's name
 
@@ -141,10 +144,9 @@ Changes permissions for listed channels
 Sends a handy widget with all the channels that you can change permissions for
 
 You can grant following permissions:
-mute - allows to server mute people in channel
-deafen - allows to server deafen people in channel
-disconnect - allows to disconnect people from channel
-manage - shortcut for next three permissions, plus allows to delete the new channel prematurely
+mute - allows use of `!vm mute`
+moderate - allows to disconnect people from channel and allows use of `!vm blacklist` and `!vm whitelist`
+manage - gives user "Manage Channel" permission and gives access to next three commands
 name - allows use of `!vm name`
 capacity - allows use of `!vm capacity`
 bitrate - allows use of `!vm bitrate`]],
@@ -168,22 +170,66 @@ Displays the current prefix. Default is !vm
 `prefix [server ID] <new prefix>`
 Updates the prefix in the server]],
 	
-	name = [[You can enable channel hosts to use this command via `!vm permissions`
-Change your channel's name
+	blacklist = [[You need to be a channel host to use this command!
+This command is enabled with permission "moderate"
+**This command will conflict with `whitelist` command!**
+
+`blacklist <user mention> [user mention] ...` OR
+`blacklist add <user mention> [user mention] ...`
+Restricts mentioned users from connecting to your channel
+
+`blacklist remove <user mention> [user mention] ...`
+Removes restriction for mentioned users
+
+`blacklist clear`
+Removes all restrictions]],
+	
+	whitelist = [[You need to be a channel host to use this command!
+This command is enabled with permission "moderate"
+**This command will conflict with `blacklist` command!**
+
+`whitelist lock`
+Whitelist all the people who are already in the lobby
+
+`whitelist <user mention> [user mention] ...` OR
+`whitelist add <user mention> [user mention] ...`
+Whitelists all mentioned users
+
+`whitelist remove <user mention> [user mention] ...`
+Removes all mentioned users from whitelist
+
+`whitelist clear`
+Disables the whitelist]],
+	
+	mute = [[You need to be a channel host to use this command!
+This command is enabled with permission "mute"
+
+`mute <user mention> [user mention] ...` OR
+`mute add <user mention> [user mention] ...`
+Mutes mentioned users when they enter your channel
+
+`mute remove <user mention> [user mention] ...`
+Unmutes all mentioned users
+
+`mute clear`
+Unmutes all users]],
+
+	name = [[You need to be a channel host to use this command!
+This command is enabled with permission "name"
 
 `name <new name>`
 Changes your current channel's name
 
 **Changing channel name is currently ratelimited by Discord!** Bots can't change channel name more often than 2 times per 10 minutes, so use this command wisely.]],
 	
-	capacity = [[You can enable channel hosts to use this command via `!vm permissions`
-Change your channel's capacity
+	capacity = [[You need to be a channel host to use this command!
+This command is enabled with permission "capacity"
 
 `capacity <number between 0 and 99>`
 Changes your current channel's capacity]],
 	
-	bitrate = [[You can enable channel hosts to use this command via `!vm permissions`
-Change your channel's bitrate
+	bitrate = [[You need to be a channel host to use this command!
+This command is enabled with permission "bitrate"
 
 `bitrate <number between 8 and 96>`
 Changes your current channel's bitrate]],
@@ -285,6 +331,7 @@ Sends stats for specific server]],
 	badServer = [[Couldn't find the specified server]],
 	ambiguousID = [[There are several channels with this name]],
 	gimmeReaction = [[I can process that, but I need "Manage Messages" and "Add Reactions" permissions for that]],
+	badArgument = [[You didn't specify the action]],
 	
 	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
 	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],
