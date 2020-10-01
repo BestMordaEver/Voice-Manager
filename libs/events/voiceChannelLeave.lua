@@ -10,11 +10,16 @@ local permission = discordia.enums.permission
 return function (member, channel) -- now remove the unwanted corpses!
 	if channel and channels[channel.id] then
 		if #channel.connectedMembers == 0 then
-			local mutex = lobbies[channels[channel.id].parent].mutex
-			mutex:lock()
-			channel:delete()
-			logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
-			mutex:unlock()
+			local lobby = lobbies[channels[channel.id].parent]
+			if lobby then
+				lobby.mutex:lock()
+				channel:delete()
+				logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
+				lobby.mutex:unlock()
+			else
+				channel:delete()
+				logger:log(4, "GUILD %s: Deleted %s without sync, parent missing", channel.guild.id, channel.id)
+			end
 		elseif channels[channel.id].host == member.user.id then
 			local newHost = channel.connectedMembers:random()
 			
