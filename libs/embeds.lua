@@ -110,7 +110,7 @@ return setmetatable({}, {
 				message:setEmbed(embedData.embed)
 				
 			else
-				embedData.embed = self:new(embedData.action, page, embedData.ids)
+				embedData.embed = self:new(embedData.ids, page, embedData.action, embedData.argument)
 				embedData.killIn = 10
 				embedData.page = page
 				
