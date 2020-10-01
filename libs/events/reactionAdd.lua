@@ -30,7 +30,7 @@ return function (reaction, userID) -- embeds processing
 		end
 		actions[embedData.action](reaction.message, ids, embedData.argument)
 	elseif reaction.emojiHash == reactions.all then
-		reaction.message.channel:broadcastTyping()	-- without semicolon next parenthesis is interpreted as a function call :\
+		reaction.message.channel:broadcastTyping()
 		actions[embedData.action](reaction.message, embedData.ids, embedData.argument)
 	elseif reaction.emojiHash == reactions.stop then
 		embeds[reaction.message] = nil

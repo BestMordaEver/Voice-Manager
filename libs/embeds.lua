@@ -59,7 +59,7 @@ return setmetatable({}, {
 			end
 			if embedData.page ~= math.modf(#embedData.ids/10)+1 then message:addReaction(reactions.right) end
 			if #embedData.ids > 10 then message:addReaction(reactions.page) end
-			message:addReaction(reactions.all)
+			if #embedData.ids > 0 then message:addReaction(reactions.all) end
 			message:addReaction(reactions.stop)
 		end,
 		
