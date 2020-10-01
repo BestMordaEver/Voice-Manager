@@ -20,7 +20,9 @@ actions = {
 			
 			-- blacklist mentioned users
 			for _, user in pairs(message.mentionedUsers) do
-				if not channel:getPermissionOverwriteFor(channel.guild:getMember(user)):denyPermissions(permission.connect) then return end
+				local member = channel.guild:getMember(user)
+				if member.voiceChannel == channel then member:setVoiceChannel() end
+				if not channel:getPermissionOverwriteFor(member):denyPermissions(permission.connect) then return end
 				channels[channel.id].blacklisted[user] = true
 			end
 			return true
