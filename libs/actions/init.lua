@@ -11,6 +11,7 @@ return {
 	blacklist = require "actions/host/moderate",
 	whitelist = require "actions/host/moderate",
 	mute = require "actions/host/mute",
+	unmute = require "actions/host/mute",
 	name = require "actions/host/name",
 	capacity = require "actions/host/capacity",
 	bitrate = require "actions/host/bitrate",

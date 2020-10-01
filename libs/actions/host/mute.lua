@@ -50,7 +50,9 @@ return function (message)
 	end
 	
 	local action = message.content:match("mute%s*(%a*)"):lower()
-	if not actions[action] then
+	if message.content:lower():match("unmute") then
+		action = "remove"
+	elseif not actions[action] then
 		action = "add"
 	end
 	
