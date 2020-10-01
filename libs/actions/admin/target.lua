@@ -24,7 +24,7 @@ return function (message, ids, target)
 			
 			local categories = message.guild.categories:toArray(function (category) return category.name:lower() == target:lower() end)
 			
-			if target == "" then
+			if not categories[1] then
 				message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, lobbies[ids[1]].target) or locale.noTarget)
 				return "Sent channel target"
 			end
