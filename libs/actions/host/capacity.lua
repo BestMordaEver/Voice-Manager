@@ -19,7 +19,10 @@ return function (message)
 		return "Insufficient permissions"
 	end
 	
-	local success, err = channel:setUserLimit(message.content:match("capacity(.-)$"))
+	local capacity = tonumber(message.content:match("capacity(.-)$"))
+	if not capacity then return end
+	
+	local success, err = channel:setUserLimit(capacity)
 	if success then
 		if not message:addReaction("✅") then
 			message:reply(locale.changedCapacity)

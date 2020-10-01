@@ -19,7 +19,10 @@ return function (message)
 		return "Insufficient permissions"
 	end
 	
-	local success, err = channel:setBitrate(tonumber(message.content:match("bitrate(.-)$")) * 1000)
+	local bitrate = tonumber(message.content:match("bitrate(.-)$"))
+	if not bitrate then return end
+	
+	local success, err = channel:setBitrate( * 1000)
 	if success then
 		if not message:addReaction("✅") then
 			message:reply(locale.changedBitrate)
