@@ -346,5 +346,6 @@ Sends stats for specific server]],
 	notHost = [[You're not a channel host]],
 	badHostPermission = [[You're not permitted to perform this action]],
 	hostError = [[Something went wrong. *And it's probably not my fault*. Poke your admins if this continues to happen]],
-	error = [[Something went wrong. *I'm sowwy*. The issue was reported already, fix will eventually happen]]
+	error = [[Something went wrong. *I'm sowwy*. The issue is reported, a fix will arrive soon
+https://discord.gg/tqj6jvT]]
 }

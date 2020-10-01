@@ -52,11 +52,13 @@ return function (message)
 	end
 	
 	-- call the command, log it, and all in protected call
-	local res, msg = xpcall(logAction, debug.traceback, message, actions[command](message))
+	local res, msg = xpcall(actions[command], debug.traceback, message)
 	
 	-- notify user if failed
-	if not res then
-		message:reply(locale.error:format(os.date("%b %d %X")).."\nhttps://discord.gg/tqj6jvT")
+	if res then
+		logAction(message, res)
+	else
+		--message:reply(locale.error)
 		error(msg)
 	end
 	

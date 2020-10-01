@@ -11,10 +11,10 @@ return function (message, context, command, argument)	-- action pre-processing
 	local ids, nameDuplicates = {}, false
 	if context then
 		context = context:lower()
-	
+		
 		if message.guild then
 			for _, channel in pairs(message.guild.voiceChannels) do
-				if channel.name:lower() == context then
+				if channel.name:lower() == context and ((command == "register") == not lobbies[channel.id]) then
 					table.insert(ids, channel.id)
 				end
 			end
@@ -22,7 +22,7 @@ return function (message, context, command, argument)	-- action pre-processing
 		
 		if #ids == 0 then
 			for id in context:gmatch("%d+") do
-				if client:getChannel(id) then table.insert(ids,id) end
+				if client:getChannel(id) and ((command == "register") == not lobbies[channel.id]) then table.insert(ids,id) end
 			end
 			
 			if #ids ~= 0 then

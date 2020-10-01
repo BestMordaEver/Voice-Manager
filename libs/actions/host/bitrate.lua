@@ -22,7 +22,7 @@ return function (message)
 	local bitrate = tonumber(message.content:match("bitrate(.-)$"))
 	if not bitrate then return end
 	
-	local success, err = channel:setBitrate( * 1000)
+	local success, err = channel:setBitrate(bitrate * 1000)
 	if success then
 		if not message:addReaction("✅") then
 			message:reply(locale.changedBitrate)
