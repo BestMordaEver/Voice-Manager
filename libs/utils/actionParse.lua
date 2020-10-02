@@ -22,7 +22,7 @@ return function (message, context, command, argument)	-- action pre-processing
 		
 		if #ids == 0 then
 			for id in context:gmatch("%d+") do
-				if client:getChannel(id) and ((command == "register") == not lobbies[channel.id]) then table.insert(ids,id) end
+				if client:getChannel(id) and ((command == "register") == not lobbies[id]) then table.insert(ids,id) end
 			end
 			
 			if #ids ~= 0 then
