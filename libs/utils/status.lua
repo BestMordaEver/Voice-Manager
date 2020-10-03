@@ -48,13 +48,13 @@ return function ()
 				tostring(lobbies):match("69") and " (nice!)" or ""))
 		
 		self.type = 3
-	elseif step == 2 then -- lobbies
+	elseif step == 3 then -- guilds
 		local guilds = #client.guilds
 		
 		self.name =
 			guilds == 0 and "the world go by" or (
 			guilds .. (
-				guilds == 1 and " guild" or " guilds") .. (
+				guilds == 1 and " server" or " servers") .. (
 				tostring(guilds):match("69") and " (nice!)" or ""))
 		
 		self.type = 3
