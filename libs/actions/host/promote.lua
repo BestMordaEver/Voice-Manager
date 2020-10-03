@@ -19,6 +19,7 @@ return function (message)
 	
 	if not (member and member.voiceChannel and member.voiceChannel == channel) then
 		message:reply(locale.noMember)
+		return
 	end
 	
 	channels:updateHost(channel.id, member.user.id)
