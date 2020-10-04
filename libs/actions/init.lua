@@ -4,6 +4,8 @@ return {
 	register = require "actions/admin/register",
 	unregister = require "actions/admin/unregister",
 	target = require "actions/admin/target",
+	["matchmaking target"] = require "actions/admin/target",
+	["matchmaking template"] = require "actions/admin/template",
 	template = require "actions/admin/template",
 	permissions = require "actions/admin/permissions",
 	limitation = require "actions/admin/limitation",

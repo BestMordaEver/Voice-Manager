@@ -11,9 +11,9 @@ return function (message)
 		embeds:sendHelp(message)
 	else
 		message:reply({embed = {
-			title = command:gsub("^.", string.upper, 1),	-- upper bold text
+			title = "Help | " .. command:gsub("^.", string.upper, 1),	-- upper bold text
 			color = 6561661,
-			description = locale[command],
+			description = locale[command]..locale.links,
 			footer = {text = command ~= "help" and locale.embedTip or nil}
 		}})
 	end

@@ -7,14 +7,72 @@ local bitfield = require "utils/bitfield"
 local client = discordia.storage.client
 local logger = discordia.storage.logger
 local permission = discordia.enums.permission
+local channelType = discordia.enums.channelType
+
+local matchmakers = {
+	random = function (channels)
+		return channels[math.random(#channels)]
+	end,
+	
+	max = function (channels)
+		local max = channels[1]
+		for i, channel in pairs(channels) do
+			if #max.connectedMembers < #channel.connectedMembers then
+				max = channel
+			end
+		end
+		return max
+	end,
+	
+	min = function (channels)
+		local min = channels[1]
+		for i, channel in pairs(channels) do
+			if #min.connectedMembers > #channel.connectedMembers then
+				min = channel
+			end
+		end
+		return min
+	end,
+	
+	first = function (channels)
+		return channels[1]
+	end,
+	
+	last = function (channels)
+		return channels[#channels]
+	end
+}
 
 local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
-		
-	if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
 	
 	-- parent to which a new channel will be attached
-	local category = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+	
+	-- target is voice channel? matchmake!
+	if target.type == channelType.voice then
+		local targetData = lobbies[target.id]
+		
+		local channels = lobby.guild.voiceChannels:toArray("position", function (channel)
+			if channels[channel.id] then
+				local parent = client:getChannel(channels[channel.id].parent)
+				return (parent == target) and (parent.userLimit == 0 or #parent.connectedMembers < parent.userLimit) and member:hasPermission(parent, permission.connect)
+			end
+		end)
+		
+		if #channels == 1 then
+			member:setVoiceChannel(channels[1])
+			return
+		elseif #channels > 1 then
+			member:setVoiceChannel((matchmakers[targetData.template] or matchmakers.random)(channels))
+			return
+		else	-- if no available channels - create new
+			lobby = target
+			target = client:getChannel(targetData.target) or lobby.category or lobby.guild
+		end
+	end
+	
+	if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
 	
 	-- determine new channel name
 	local name = lobbies[lobby.id].template or guilds[lobby.guild.id].template or "%nickname's% channel"
@@ -37,7 +95,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		name = name:gsub("%%(.-)%%", rt)
 	end
 	
-	local newChannel = category:createVoiceChannel(name)
+	local newChannel = target:createVoiceChannel(name)
 	
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then

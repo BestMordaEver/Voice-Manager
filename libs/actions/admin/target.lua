@@ -15,31 +15,32 @@ return function (message, ids, target)
 		ids = actionParse(message, message.content:match('"(.-)"'), "target", target)
 		if not ids[1] then return ids end -- message for logger
 		
-		local targetCategory = client:getChannel(target)
-		if not (targetCategory and targetCategory.createVoiceChannel) then
+		local potentialTarget = client:getChannel(target)
+		if not potentialTarget then
 			if not message.guild then
 				message:reply(locale.noID)
 				return "Template by name in dm"
 			end
 			
-			local categories = message.guild.categories:toArray(function (category) return category.name:lower() == target:lower() end)
+			local categories = message.guild.categories:toArray("position", function (category) return category.name:lower() == target:lower() end)
+			local localLobbies = message.guild.voiceChannels:toArray("position", function (channel) return lobbies[channel.id] and channel.name:lower() == target:lower() end)
 			
-			if not categories[1] then
-				message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, lobbies[ids[1]].target) or locale.noTarget)
+			if not (categories[1] or localLobbies[1]) then
+				message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].target).name) or locale.noTarget)
 				return "Sent channel target"
 			end
 			
-			targetCategory = categories[1]
-			target = targetCategory.id
+			potentialTarget = categories[1] or localLobbies[1]
+			target = potentialTarget.id
 		end
 		
-		if not targetCategory.guild:getMember(message.author):hasPermission(targetCategory, permission.manageChannels) then
-			message:reply(locale.badUserPermission.." "..targetCategory.name)
+		if not potentialTarget.guild:getMember(message.author):hasPermission(potentialTarget, permission.manageChannels) then
+			message:reply(locale.badUserPermission.." "..potentialTarget.name)
 			return "User doesn't have permission to manage the target"
 		end
 		
-		if targetCategory and not targetCategory.guild.me:hasPermission(targetCategory, permission.manageChannels) then
-			message:reply(locale.badBotPermission.." "..targetCategory.name)
+		if potentialTarget and not potentialTarget.guild.me:hasPermission(potentialTarget, permission.manageChannels) then
+			message:reply(locale.badBotPermission.." "..potentialTarget.name)
 			return "Bot doesn't have permission to manage the target"
 		end
 	end

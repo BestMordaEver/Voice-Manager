@@ -43,6 +43,7 @@ return function (message)
 		
 	-- what command is it?
 	local command = content == "" and "help" or content:match("^(%w+)")
+	if command == "matchmaking" then command = content:match("^matchmaking (%w+)") end
 	
 	if actions[command] then 
 		logAction(message, command.." action invoked")

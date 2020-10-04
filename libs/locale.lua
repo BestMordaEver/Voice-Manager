@@ -3,43 +3,41 @@
 
 return {
 	-- help
-	helpAdminTitle = [[Help | Admin commands]],
-	helpHostTitle = [[Help | Host commands]],
-	helpUserTitle = [[Help | User commands]],
-	helpAdmin = [[You need a "Manage Channels" permission to use those commands!
+	helpLobbyTitle = [[Help | Lobby commands]],
+	helpLobby = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
 **register**
-Registers a voice channel that will be used as a lobby. Enter this lobby to create a new channel, that will be deleted once it's empty.
+Turns a voice channel into a lobby. Entering this lobby will create a new, temporary channel
 
 **unregister**
-Unregisters an existing lobby. New channels that were created by this lobby will be deleted once they are empty, as usual
+Reverts a lobby channel back to a normal channel. Channels created by the existing lobby channel will be deleted once vacant
 
 **target**
 Select a category in which new channels will be created
 
 **template**
-Change new channels' name template
+Change the name of new channels
 
 **permissions**
-Give your users control over their new channels
+Give your users control over their new channels]],
+	
+	helpMatchmakingTitle = [[Help | Matchmaking commands]],
+	helpMatchmaking = [[You need a "Manage Channels" permission to use those commands!
+You can learn more about each command by using `help`, for example `!vm help template`
 
-**limitation**
-Change how many new channels can be created in your server
+**matchmaking target**
+Select a lobby that will be matchmade
 
-**prefix**
-Set a new prefix. Mentioning will still work
+**matchmaking template**
+Select a matchmaking mode]],
 
-**Links**
-[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
-[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
-[Support Server](https://discord.gg/tqj6jvT)]],
+	helpHostTitle = [[Help | Host commands]],
 	helpHost = [[You need to be a channel host to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**ban**
-Keep those nasty trolls out of your lobby
+**whitelist** and **blacklist**
+Control who can enter your channel
 
 **name**
 Change your channel's name
@@ -51,14 +49,20 @@ Change your channel's capacity
 Change your channel's bitrate
 
 **promote**
-Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
+Transfer your host privileges to other user. Transfer happens automatically if you leave your channel]],
+	
+	helpServerTitle = [[Help | Server commands]],
+	helpServer = [[You need a "Manage Channels" permission to use those commands!
+You can learn more about each command by using `help`, for example `!vm help template`
 
-**Links**
-[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
-[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
-[Support Server](https://discord.gg/tqj6jvT)]],
-	helpUser = [[You can learn more about each command by using `help`, for example `!vm help template`
+**limitation**
+Change how many new channels can be created in your server
+
+**prefix**
+Set a new prefix. Mentioning will still work]],
+
+	helpOtherTitle = [[Help | Other commands]],
+	helpOther = [[You can learn more about each command by using `help`, for example `!vm help template`
 	
 **list**
 Lists all registered lobbies on the server
@@ -66,198 +70,323 @@ Lists all registered lobbies on the server
 **stats**
 Take a sneak peek on my performance!
 
-**Links**
-[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
-[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
-[Support Server](https://discord.gg/tqj6jvT)]],
-	register = [[You need a **"Manage Channels"** permission to use this command!
-Register a voice channel that will be used as a lobby. Enter this lobby to create a new channel, that will be deleted once it's empty.
+**support**
+Get a support server invite]],
 
-`register`
-Sends a handy widget with all the channels that you can register
+	-- lobby
+	register = [[You need the **Manage Channels** permission in order to use this command
 
-`register <channel name>` OR
-`register <channel ID> [channel ID] ...`
-Registers all listed channels]],
+Turns a voice channel into a lobby. Entering this lobby will create a new, temporary channel
+
+**• Usage**
+*(Create a single lobby channel)*
+<prefix> register <channel ID or name>
+
+*(Create multiple lobby channels)*
+<prefix> register <channel ID> [channel ID] ...
+
+You can also use **<prefix> register** to be given a list of channels that can be turned into lobbies
+
+**• Example**
+!vm register Join to create new channel
+!vm register 759657662773330022
+!vm register 759657662773330022 759213923588112406]],
 	
-	unregister = [[You need a **"Manage Channels"** permission to use this command!
-Unregister an existing lobby. New channels that were created by this lobby will be deleted once they are empty, as usual
+	unregister = [[You need the **Manage Channels** permission in order to use this command
 
-`unregister`
-Sends a handy widget with all the channels that you can unregister
+Reverts a lobby channel back to a normal channel. Channels created by the existing lobby channel will be deleted once vacant
 
-`unregister <channel_name>` OR
-`unregister <channel ID> [channel ID] ...`
-Unregisters all listed channels]],
+**• Usage**
+*(Unregister a single lobby channel)*
+<prefix> unregister <channel ID or name>
+
+*(Unregister multiple lobby channels)*
+<prefix> unregister <channel ID> [channel ID] ...
+
+You can also use **<prefix> unregister** to be given a list of lobbies that can be reverted into normal channels
+
+**• Example**
+!vm unregister Join to create new channel
+!vm unregister 759657662773330022
+!vm unregister 759657662773330022 759213923588112406]],
 	
-	target = [[You need a **"Manage Channels"** permission to use this command!
-Select a category in which new channels will be created
+	target = [[You need the **Manage Channels** permission in order to use this command
+Select the category where new channels will be created
 
-`target "<lobby name>"` OR
-`target "<lobby ID>"`
-Displays current target for the listed channel
+**• Usage**
+*(Show the current target for the provided channel)*
+<prefix> target "<channel ID or name>"
 
-`target "<lobby name>" <category ID>` OR
-`target "<lobby name>" <category name>` OR
-`target "<lobby ID> [lobby ID] ..." <category ID>`
-`target "<lobby ID> [lobby ID] ..." <category name>`
+*(Change the target for the provided channels)*
+<prefix> target "<channel ID or name>" <category ID or name> *OR*
+<prefix> target "<channel ID> [channel ID] ..." <category ID or name>
 
-Changes the target for listed channels
+You can also use **<prefix> target <category ID or name>** to be given a list of lobbies that you can change target for
 
-`target <category ID>`
-Sends a handy widget with all the channels that you can apply this target to]],
+**• Example**
+!vm target "Join to connect to random party" Join to create new channel
+!vm target "759657662773330022" 759657549745750026
+!vm target "759657662773330022 759213923588112406" 759657549745750026]],
 	
 	template = [[You need a **"Manage Channels"** permission to use this command!
-Change new channels' name template
+Change the name of new channels
 
-`template "<lobby name>"` OR
-`template "<lobby ID>"`
-Displays current template for the listed channel. A channel template overrides a global one
+**• Usage**
+*(Show the current template for the provided channel)*
+<prefix> template "<channel ID or name>"
 
-`template "<lobby name>" <template text>` OR
-`template "<lobby ID> [lobby ID] ..." <template_text>`
-Changes the template for listed channels
+*(Change the template for the provided channels)*
+<prefix> template "<channel ID or name>" <template text> *OR*
+<prefix> template "<channel ID> [channel ID] ..." <template text>
 
-`template <template text>`
-Sends a handy widget with all the channels that you can apply this template to
+You can also use **<prefix> template <template text>** to be given a list of lobbies that you can change template for
 
 You can customize a template by including different `%combos%` to it:
-`%nickname%` - user's nickname (name is used if no nickname is set)
-`%name%` - user's name
-`%nickname's%`,`%name's%` - corresponding combo with **'s** or **'** attached (difference between `Riddles's` and `Riddles'`)
-`%tag%` - user's tag (for example `Riddles#2773`)
-`%game%` - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
-`%counter%` - channel's position. The channel will be moved to fill in holes in numbering]],
+**%nickname%** - user's nickname (name is used if no nickname is set)
+**%name%** - user's name
+**%nickname's%**, **%name's%** - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
+**%tag%** - user's tag (for example **Riddles#2773**)
+**%game%** - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
+**%counter%** - channel's position. The channel will be moved to fill in holes in numbering
+
+**• Example**
+!vm template "Join to create new channel" %nickname's% funky place
+!vm template "759657662773330022" Raid room %counter%
+!vm template "759657662773330022 759213923588112406" %game% - Room %counter%]],
 	
 	permissions = [[You need a **"Manage Channels"** permission to use this command!
 Give your users control over their new channels
 
-`permissions "<lobby ID>"`
-Displays current permissions that will be given to the host
+**• Usage**
+*(Show the current permissions for the provided channel)*
+<prefix> permissions "<channel ID or name>"
 
-`permissions "<lobby name>" <permission> [permission] ... <on/off>` OR
-`permissions "<lobby ID> [lobby ID] ..." <permission> [permission] ... <on/off>`
-Changes permissions for listed channels
+*(Change the permissions for the provided channels)*
+<prefix> permissions "<channel ID or name>" <permission> [permission] ... <on/off> *OR*
+<prefix> permissions "<channel ID> [channel ID] ..." <permission> [permission] ... <on/off>
 
-`permissions <permission> [permission] ... <on/off>`
-Sends a handy widget with all the channels that you can change permissions for
+You can also use **<prefix> permissions <permission> [permission] ... <on/off>** to be given a list of lobbies that you can change permissions for
 
 You can grant following permissions:
-mute - allows use of `!vm mute`
-moderate - allows to disconnect people from channel and allows use of `!vm blacklist` and `!vm whitelist`
-manage - gives user "Manage Channel" permission and gives access to next three commands
-name - allows use of `!vm name`
-capacity - allows use of `!vm capacity`
-bitrate - allows use of `!vm bitrate`]],
+**mute** - allows use of host command **mute**
+**moderate** - allows to disconnect people from channel and allows use of host commands **blacklist** and **whitelist**
+**manage** - gives user "Manage Channel" permission and gives access to next three commands
+**name** - allows use of host command **name**
+**capacity** - allows use of host command **capacity**
+**bitrate** - allows use of host command **bitrate**
+
+**• Example**
+!vm permissions "Join to create new channel" mute moderate manage on
+!vm permissions "759657662773330022" manage off
+!vm permissions "759657662773330022 759213923588112406" moderate name on]],
 	
-	limitation = [[You need a **"Manage Channels"** permission to use this command!
-Change how many new channels can be created in your server
+	-- matchmaking
+	["matchmaking target"] = [[You need a **"Manage Channels"** permission to use this command!
+Turns a lobby into a matchmaking lobby. Entering this lobby will join you to one of existing new channels. Bot will respect channel capacity and whitelists/blacklists
+Both matchmaking target and matchmaking lobby must be registered lobbies!
 
-`limitation`
-Shows currently set channel limit. Default is 100,000
+**• Usage**
+*(Show the current matchmaking target for the provided channel)*
+<prefix> target "<channel ID or name>"
 
-`limitation <limit>` OR
-`limitation <server ID> <limit>`
-Changes the channel limit. Must be between 1 and 100,000]],
+*(Change the matchmaking target for the provided channels)*
+<prefix> target "<channel ID or name>" <target channel ID or name> *OR*
+<prefix> target "<channel ID> [channel ID] ..." <target channel ID or name>
+
+You can also use **<prefix> target <target channel ID or name>** to be given a list of lobbies that you can change matchmaking target for
+
+**• Example**
+!vm target "Join to connect to random party" Join to create new channel
+!vm target "759657662773330022" 759657549745750026
+!vm target "759657662773330022 759213923588112406" 759657549745750026]],
 	
-	prefix = [[You need a **"Manage Channels"** permission to use this command!
-Set a new prefix. Mentioning will still work
+	["matchmaking template"] = [[You need a **"Manage Channels"** permission to use this command!
+Change matchmaking mode for matchmaking lobby. This will determine how bot will match users
 
-`prefix`
-Displays the current prefix. Default is !vm
+**• Usage**
+*(Show the current matchmaking mode for the provided channel)*
+<prefix> template "<channel ID or name>"
 
-`prefix [server ID] <new prefix>`
-Updates the prefix in the server]],
+*(Change the matchmaking mode for the provided channels)*
+<prefix> template "<channel ID or name>" <matchmaking mode> *OR*
+<prefix> template "<channel ID> [channel ID] ..." <matchmaking mode>
+
+You can also use **<prefix> template <matchmaking mode>** to be given a list of lobbies that you can change matchmaking template for
+
+There are several matchmaking modes available:
+**random** - selects a random channel, default mode of operation
+**first** - selects the first available channel
+**last** - selects the last available channel
+**max** - selects the most filled available channel
+**min - select the least filled available channel
+
+**• Example**
+!vm template "Join to connect to random party" random
+!vm template "759657662773330022" max
+!vm template "759657662773330022 759213923588112406" min]],
 	
+	-- host
 	blacklist = [[You need to be a channel host to use this command!
 This command is enabled with permission "moderate"
 **This command will conflict with `whitelist` command!**
 
-`blacklist <user mention> [user mention] ...` OR
-`blacklist add <user mention> [user mention] ...`
-Restricts mentioned users from connecting to your channel
+Restrict specific users from entering your channel
 
-`blacklist remove <user mention> [user mention] ...`
-Removes restriction for mentioned users
+**• Usage**
+*(Restrict mentioned users from connecting to your channel)*
+<prefix> blacklist [add] <user mention> [user mention] ...
 
-`blacklist clear`
-Removes all restrictions]],
+*(Allow mentioned users to connect again)*
+<prefix> blacklist remove <user mention> [user mention] ...
+
+*(Remove all restrictions)*
+<prefix> blacklist clear
+
+**• Example**
+!vm blacklist @heckingtroll @urmom @nastydude
+!vm blacklist remove @dudebro123]],
 	
 	whitelist = [[You need to be a channel host to use this command!
 This command is enabled with permission "moderate"
 **This command will conflict with `blacklist` command!**
 
-`whitelist lock`
-Whitelist all the people who are already in the lobby
+Let only specific people to enter your channels and restrict everybody else
 
-`whitelist <user mention> [user mention] ...` OR
-`whitelist add <user mention> [user mention] ...`
-Whitelists all mentioned users
+**• Usage**
+*(Whitelist all the people who are already in the lobby)*
+<prefix> whitelist lock
 
-`whitelist remove <user mention> [user mention] ...`
-Removes all mentioned users from whitelist
+*(Allow all mentioned users to connect)*
+<prefix> whitelist [add] <user mention> [user mention] ...
 
-`whitelist clear`
-Disables the whitelist]],
+*(Restrict the mentioned users from connecting to your channel again)*
+<prefix> whitelist remove <user mention> [user mention] ...
+
+*(Remove all restrictions)*
+<prefix> whitelist clear
+
+**• Example**
+!vm whitelist @wumpus @atrustworthysnail
+!vm whitelist remove @nastydude]],
 	
 	mute = [[You need to be a channel host to use this command!
 This command is enabled with permission "mute"
 
-`mute <user mention> [user mention] ...` OR
-`mute add <user mention> [user mention] ...`
-Mutes mentioned users when they enter your channel
+Restrict people from talking in your lobby
 
-`mute remove <user mention> [user mention] ...`
-Unmutes all mentioned users
+**• Usage**
+*(Restrict mentioned users from talking in your channel)*
+<prefix> mute [add] <user mention> [user mention] ...
 
-`mute clear`
-Unmutes all users]],
+*(Allow mentioned users to talk in your channel again)*
+<prefix> mute remove <user mention> [user mention] ...
+
+*(Unmute everybody in your channel)*
+<prefix> mute clear
+
+**• Example**
+!vm mute @ispeaktoomuch @theloudeater @constructionworker
+!vm mute remove @sneezy]],
 
 	name = [[You need to be a channel host to use this command!
 This command is enabled with permission "name"
 
-`name <new name>`
-Changes your current channel's name
+Change your channel's name
 
-**Changing channel name is currently ratelimited by Discord!** Bots can't change channel name more often than 2 times per 10 minutes, so use this command wisely.]],
+**• Usage**
+<prefix> name <new name>
+
+**Changing channel name is currently ratelimited by Discord!** Bots can't change channel name more often than 2 times per 10 minutes, so use this command wisely
+
+**• Example**
+!vm name We respect women in this chatroom]],
 	
 	capacity = [[You need to be a channel host to use this command!
 This command is enabled with permission "capacity"
 
-`capacity <number between 0 and 99>`
-Changes your current channel's capacity]],
+Change your channel's capacity
+
+**• Usage**
+<prefix> capacity <number between 0 and 99>
+
+**• Example**
+!vm capacity 4]],
 	
 	bitrate = [[You need to be a channel host to use this command!
 This command is enabled with permission "bitrate"
 
-`bitrate <number between 8 and 96>`
-Changes your current channel's bitrate]],
+Change your channel's bitrate
+
+**• Usage**
+<prefix> bitrate <number between 8 and 96>
+
+**• Example**
+!vm bitrate 96]],
 	
 	promote = [[You need to be a channel host to use this command!
-Transfer your host privileges to other user. Transfer happens automatically if you leave your channel
-	
-`promote <user mention>`
-Transfers all host privileges to mentioned user]],
-	
-	list = [[`list [server ID]`
-Lists all registered lobbies on the server]],
-	
-	stats = [[`stats`
-Sends general stats
 
-`stats local`
-Sends stast for you server
+Transfer all your host privileges to other user. Transfer happens automatically if you leave your channel
 
-`stats <server_id>`
-Sends stats for specific server]],
+**• Usage**
+<prefix> promote <user mention>
+
+**• Example**
+!vm promote @atrustworthysnail]],
+	
+	-- server
+	limitation = [[You need a **"Manage Channels"** permission to use this command!
+Change how many new channels can be created in your server. Absolute maximum is 100,000
+
+**• Usage**
+*(Show the current channel limit in your server)*
+<prefix> limitation
+
+*(Change the current channel limit in your server)*
+<prefix> limitation [server ID] <number between 0 and 100,000>
+
+**• Example**
+!vm limitation 20
+!vm limitation 759657662773330022 100]],
+	
+	prefix = [[You need a **"Manage Channels"** permission to use this command!
+Set a new prefix. Mentioning will still work
+
+**• Usage**
+*(Show the current prefix. Default is !vm)*
+<prefix> prefix
+
+*(Change the prefix in your server)*
+prefix [server ID] <new prefix>
+
+**• Example**
+!vm prefix vm/
+!vm prefix 759657662773330022 According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! Coming! Hang on a second. Hello? - Barry? - Adam? - Can you believe this is happening? - I can't. I'll pick you up. Looking sharp. Use the stairs. Your father paid good money for those. Sorry. I'm excited.]],
+	
+	-- user
+	list = [=[Show all lobbies in the server
+<prefix> list [server ID]]=],
+	
+	stats = [[Show global bot stats
+<prefix> stats
+
+Show stats for you server
+<prefix> stats local
+
+Show stats for specific server
+<prefix> stats <server_id>]],
+	
 	-- utility
 	channelNameCategory = [[`%s` in `%s`]],
 	embedPages = [[Page %d of %d]],
 	embedDelete = [[❌ - delete this message]],
-	embedTip = [[<> - required, [] - optional]],
+	embedTip = [[<> - required, [] - optional, "" - include those in message]],
 	embedPage = [[Click :page_facing_up: to select the whole page]],
 	embedAll = [[Click :asterisk: to select all available channels]],
+	links = "\n\n"..[[**Links**
+[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
+[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
+[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+[Support Server](https://discord.gg/tqj6jvT)]],
 	-- register
 	registeredOne = [[Registered new lobby:]],
 	registeredMany = [[Registered **`%d`** new lobbies:]],
@@ -271,7 +400,7 @@ Sends stats for specific server]],
 	-- target
 	lobbyTarget = [[Current target for **`%s`** is **`%s`**]],
 	noTarget = [[This lobby doesn't have a custom target]],
-	newTarget = [[Set a new target **`%s`**:]],
+	newTarget = [[Set a new target **`%s`** for:]],
 	resetTarget = [[Reset a target:]],
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
 	embedResetTarget = [[Select a lobby to reset its target]],
@@ -279,13 +408,13 @@ Sends stats for specific server]],
 	-- template
 	lobbyTemplate = [[Current template for **`%s`** is **`%s`**]],
 	noTemplate = [[This lobby doesn't have a custom template]],
-	newTemplate = [[Set a new template **`%s`**:]],
+	newTemplate = [[Set a new template **`%s`** for:]],
 	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
 	-- permissions
 	lobbyPermissions = [[Current lobby permissions for **`%s`** include: **`%s`**]],
-	newPermissions = [[Added new permissions **`%s`**:]],
+	newPermissions = [[Added new permissions **`%s`** for:]],
 	revokedPermissions = [[Revoked permissions **`%s`**:]],
 	resetPermissions = [[Reset permissions:]],
 	embedAddPermissions = [[Select a lobby that will receive listed permissions]],

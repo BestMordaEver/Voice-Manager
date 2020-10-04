@@ -79,10 +79,10 @@ return setmetatable({}, {
 		sendHelp = function (self, message)
 			local reactions = self.reactions
 			local embed = {
-				title = locale.helpAdminTitle,
+				title = locale.helpLobbyTitle,
 				color = 6561661,
-				description = locale.helpAdmin,
-				footer = {text = locale.embedPages:format(1,3).." | "..locale.embedDelete}
+				description = locale.helpLobby..locale.links,
+				footer = {text = locale.embedPages:format(1,5).." | "..locale.embedDelete}
 			}
 			local newMessage = message:reply {embed = embed}
 			if newMessage then
@@ -90,6 +90,8 @@ return setmetatable({}, {
 				newMessage:addReaction(reactions[1])
 				newMessage:addReaction(reactions[2])
 				newMessage:addReaction(reactions[3])
+				newMessage:addReaction(reactions[4])
+				newMessage:addReaction(reactions[5])
 				newMessage:addReaction(reactions.stop)
 				
 				return newMessage
@@ -100,10 +102,18 @@ return setmetatable({}, {
 			local embedData = self[message]
 			if embedData.action == "help" then
 				embedData.embed = {
-					title = page == 1 and locale.helpAdminTitle or page == 2 and locale.helpHostTitle or locale.helpUserTitle,
+					title = page == 1 and locale.helpLobbyTitle or
+						page == 2 and locale.helpMatchmakingTitle or
+						page == 3 and locale.helpHostTitle or
+						page == 4 and locale.helpServerTitle or
+						locale.helpOtherTitle,
 					color = 6561661,
-					description = page == 1 and locale.helpAdmin or page == 2 and locale.helpHost or locale.helpUser,
-					footer = {text = locale.embedPages:format(page,3).." | "..locale.embedDelete}
+					description = (page == 1 and locale.helpLobby or
+						page == 2 and locale.helpMatchmaking or
+						page == 3 and locale.helpHost or
+						page == 4 and locale.helpServer or
+						locale.helpOther)..locale.links,
+					footer = {text = locale.embedPages:format(page,5).." | "..locale.embedDelete}
 				}
 				embedData.killIn = 10
 				embedData.page = page
@@ -127,7 +137,6 @@ return setmetatable({}, {
 					embedData.killIn = embedData.killIn - 1
 					if embedData.killIn == 0 then
 						self[message] = nil
-						message:delete()
 					end
 				else
 					self[message] = nil

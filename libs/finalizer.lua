@@ -131,7 +131,7 @@ return {
 	target = new(
 		{isLobby,isUser},
 		{
-			default = function (nids, target) return string.format(target and locale.newTarget or locale.resetTarget, target).."\n" end,
+			default = function (nids, target) return string.format(target and locale.newTarget or locale.resetTarget, client:getChannel(target).name).."\n" end,
 			notLobby, badUser
 		},
 		function (channel, target)
