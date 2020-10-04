@@ -385,6 +385,7 @@ Show stats for specific server
 	links = "\n\n"..[[**Links**
 [Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
 [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
+[How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID)
 [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
 [Support Server](https://discord.gg/tqj6jvT)]],
 	-- register
