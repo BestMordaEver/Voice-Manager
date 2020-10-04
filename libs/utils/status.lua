@@ -32,7 +32,7 @@ return function ()
 		
 		self.name =
 			channels == 0 and "the world go by" or (
-			channels .. (
+			"over "..channels .. (
 				channels == 1 and " channel" or " channels") .. (
 				tostring(channels):match("69") and " (nice!)" or ""))
 		
@@ -43,7 +43,7 @@ return function ()
 		
 		self.name =
 			lobbies == 0 and "the world go by" or (
-			lobbies .. (
+			"over "..lobbies .. (
 				lobbies == 1 and " lobby" or " lobbies") .. (
 				tostring(lobbies):match("69") and " (nice!)" or ""))
 		
@@ -53,7 +53,7 @@ return function ()
 		
 		self.name =
 			guilds == 0 and "the world go by" or (
-			guilds .. (
+			"over "..guilds .. (
 				guilds == 1 and " server" or " servers") .. (
 				tostring(guilds):match("69") and " (nice!)" or ""))
 		
