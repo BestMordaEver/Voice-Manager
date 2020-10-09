@@ -24,7 +24,7 @@ return function (reaction, userID) -- reactionAdd but opposite
 	logger:log(4, "GUILD %s USER %s on EMBED %s => removed %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 	
 	if tonumber(embeds.reactions[reaction.emojiHash]) then
-		actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]})
+		actions[antiAction(embedData.action)](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, "")
 	elseif reaction.emojiHash == reactions.page then
 		reaction.message.channel:broadcastTyping()
 		local ids = {}
@@ -32,9 +32,9 @@ return function (reaction, userID) -- reactionAdd but opposite
 			if not embedData.ids[i] then break end
 			table.insert(ids, embedData.ids[i])
 		end
-		actions[antiAction(embedData.action)](reaction.message, ids)
+		actions[antiAction(embedData.action)](reaction.message, ids, "")
 	elseif reaction.emojiHash == reactions.all then
 		reaction.message.channel:broadcastTyping();
-		actions[antiAction(embedData.action)](reaction.message, embedData.ids)
+		actions[antiAction(embedData.action)](reaction.message, embedData.ids, "")
 	end
 end

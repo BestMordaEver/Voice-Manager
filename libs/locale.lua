@@ -404,6 +404,7 @@ Show stats for specific server
 	newTarget = [[Set a new target **`%s`** for:]],
 	resetTarget = [[Reset a target:]],
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
+	embedLobbyTarget = [[Select a lobby to show its target]],
 	embedResetTarget = [[Select a lobby to reset its target]],
 	badCategory = [[Couldn't find the category to target]],
 	-- template
@@ -412,14 +413,15 @@ Show stats for specific server
 	newTemplate = [[Set a new template **`%s`** for:]],
 	resetTemplate = [[Reset a template:]],
 	embedTemplate = [[Select a lobby that will have template **`%s`**]],
+	embedLobbyTemplate = [[Select a lobby to show its template]],
 	embedResetTemplate = [[Select a lobby to reset its template]],
 	-- permissions
 	lobbyPermissions = [[Current lobby permissions for **`%s`** include: **`%s`**]],
 	newPermissions = [[Added new permissions **`%s`** for:]],
 	revokedPermissions = [[Revoked permissions **`%s`**:]],
-	resetPermissions = [[Reset permissions:]],
 	embedAddPermissions = [[Select a lobby that will receive listed permissions]],
 	embedRemovePermissions = [[Select a lobby that will lose listed permissions]],
+	embedLobbyPermissions = [[Select a lobby to show its permissions]],
 	noPermission = [[There's no such permission]],
 	noToggle = [[No toggle found]],
 	-- limitation
