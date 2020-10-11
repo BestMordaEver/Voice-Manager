@@ -61,14 +61,19 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		end)
 		
 		if #channels == 1 then
-			member:setVoiceChannel(channels[1])
+			if member:setVoiceChannel(channels[1]) then
+				logger:log(4, "GUILD %s LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
+			end
 			return
 		elseif #channels > 1 then
-			member:setVoiceChannel((matchmakers[targetData.template] or matchmakers.random)(channels))
+			if member:setVoiceChannel((matchmakers[targetData.template] or matchmakers.random)(channels)) then
+				logger:log(4, "GUILD %s LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
+			end
 			return
 		else	-- if no available channels - create new
 			lobby = target
 			target = client:getChannel(targetData.target) or lobby.category or lobby.guild
+			logger:log(4, "GUILD %s LOBBY %s: no available channels, delegating to %s", lobby.guild.id, lobby.id, target.id)
 		end
 	end
 	
