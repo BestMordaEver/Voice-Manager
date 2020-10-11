@@ -4,7 +4,6 @@ local lobbies = require "storage/lobbies"
 
 local client = discordia.storage.client
 local permission = discordia.enums.permission
-local channelType = discordia.enums.channelType
 local actionParse = require "utils/actionParse"
 local finalizer = require "finalizer"
 
@@ -33,18 +32,6 @@ return function (message, ids, target)
 			
 			potentialTarget = categories[1] or localLobbies[1]
 			target = potentialTarget.id
-			
-			if potentialTarget.type == channelType.voice and client:getChannel(lobbies[target].target).type == channelType.voice then
-				message:reply(locale.badTarget.." "..potentialTarget.name)
-				return "Target is matchmaking lobby"
-			end
-			
-			for _, id in ipairs(ids) do
-				if id == target then	-- there is a more elegant way, but i can't bother
-					message:reply(locale.badTarget.." "..potentialTarget.name)
-					return "Target is self-referenced"
-				end
-			end
 		end
 		
 		if not potentialTarget.guild:getMember(message.author):hasPermission(potentialTarget, permission.manageChannels) then
