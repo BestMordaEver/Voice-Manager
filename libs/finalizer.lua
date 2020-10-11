@@ -45,7 +45,7 @@ local function new (conditionsToPass, messageConstructors, action)
 			
 			for j,_ in ipairs(ids) do repeat
 				local channel = client:getChannel(ids[j])
-				if conditionToPass(message.author, channel) then
+				if channel and conditionToPass(message.author, channel, argument) then
 					break
 				else
 					table.insert(failed[i], table.remove(ids,j))
@@ -68,7 +68,9 @@ local function new (conditionsToPass, messageConstructors, action)
 				msg = msg..messageConstructors[i](#failures)
 				for _, channelID in ipairs(failures) do
 					local channel = client:getChannel(channelID)
-					msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
+					if channel then
+						msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
+					end
 					table.insert(failed.final, channelID)
 				end
 			end
@@ -129,10 +131,11 @@ return {
 	),
 	
 	target = new(
-		{isLobby,isUser},
+		{isLobby,isUser, function (author, channel, argument) return channel ~= client:getChannel(argument) end},
 		{
 			default = function (nids, target) return string.format(target and locale.newTarget or locale.resetTarget, client:getChannel(target).name).."\n" end,
-			notLobby, badUser
+			notLobby, badUser, 
+			function (nids) return locale.selfTarget.."\n" end
 		},
 		function (channel, target)
 			lobbies:updateTarget(channel.id, target)

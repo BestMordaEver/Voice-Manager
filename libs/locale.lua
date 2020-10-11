@@ -402,11 +402,12 @@ Show stats for specific server
 	lobbyTarget = [[Current target for **`%s`** is **`%s`**]],
 	noTarget = [[This lobby doesn't have a custom target]],
 	newTarget = [[Set a new target **`%s`** for:]],
+	selfTarget = [[This is a self-reference:]],
 	resetTarget = [[Reset a target:]],
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
 	embedLobbyTarget = [[Select a lobby to show its target]],
 	embedResetTarget = [[Select a lobby to reset its target]],
-	badCategory = [[Couldn't find the category to target]],
+	badTarget = [[Couldn't find the target specified target]],
 	-- template
 	lobbyTemplate = [[Current template for **`%s`** is **`%s`**]],
 	noTemplate = [[This lobby doesn't have a custom template]],

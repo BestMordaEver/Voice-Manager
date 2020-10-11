@@ -57,7 +57,7 @@ return function (message)
 	
 	-- notify user if failed
 	if res then
-		logAction(message, res)
+		logAction(message, msg)
 	else
 		--message:reply(locale.error)
 		error(msg)
