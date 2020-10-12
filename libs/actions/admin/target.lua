@@ -4,6 +4,7 @@ local lobbies = require "storage/lobbies"
 
 local client = discordia.storage.client
 local permission = discordia.enums.permission
+local channelType = discordia.enums.channelType
 local actionParse = require "utils/actionParse"
 local finalizer = require "finalizer"
 
@@ -27,7 +28,7 @@ return function (message, ids, target)
 		end
 		
 		if potentialTarget then
-			if potentialTarget.type == channelType.voice and client:getChannel(lobbies[target].target).type == channelType.voice then
+			if potentialTarget.type == channelType.voice and lobbies[target].target and client:getChannel(lobbies[target].target).type == channelType.voice then
 				message:reply(locale.badTarget.." "..potentialTarget.name)
 				return "Target is matchmaking lobby"
 			end

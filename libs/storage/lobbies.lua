@@ -6,7 +6,6 @@ local sqlite = require "sqlite3".open("lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local channels = require "storage/channels"
 local storageInteraction = require "utils/storageInteraction"
 local hollowArray = require "utils/hollowArray"
 
@@ -28,109 +27,113 @@ emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated templat
 emitter:on("updateTarget", storageInteraction(updateTarget, "Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"))
 emitter:on("updatePermissions", storageInteraction(updatePermissions, "Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"))
 
-return setmetatable({}, {
-	-- move functions to index table to iterate over lobbies easily
+local lobbies = {}
+local lobbyMT = {
 	__index = {
-	-- perform checks and add lobby to table
-		loadAdd = function (self, lobbyID, template, target, permissions)	-- additional parameter are used upon startup to prevent unnecessary checks
-			if not self[lobbyID] then
-				local channel = client:getChannel(lobbyID)
-				if channel and channel.guild then
-					self[lobbyID] = {template = template, target = target, permissions = tonumber(permissions) or 0, children = hollowArray(), mutex = discordia.Mutex()}
-					logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
-				end
-			end
-		end,
-		
-		-- loadAdd and start interaction with db
-		add = function (self, lobbyID)
-			self:loadAdd(lobbyID)
-			if self[lobbyID] then emitter:emit("add", lobbyID) end
-		end,
-		
 		-- no granular control, if it goes away, it does so everywhere
-		remove = function (self, lobbyID)
-			if self[lobbyID] then
-				self[lobbyID] = nil
-				local lobby = client:getChannel(lobbyID)
+		delete = function (self)
+			if lobbies[self.id] then
+				lobbies[self.id] = nil
+				local lobby = client:getChannel(self.id)
 				if lobby and lobby.guild then
-					logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, lobbyID)
+					logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, self.id)
 				else
-					logger:log(4, "NULL: Removed lobby %s", lobbyID)
+					logger:log(4, "NULL: Removed lobby %s", self.id)
 				end
 			end
-			emitter:emit("remove", lobbyID)
-		end,
-		
-		load = function (self)
-			logger:log(4, "STARTUP: Loading lobbies")
-			local lobbyIDs = sqlite:exec("SELECT * FROM lobbies")
-			if lobbyIDs then
-				for i, lobbyID in ipairs(lobbyIDs[1]) do
-					if client:getChannel(lobbyID) then
-						self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil, lobbyIDs.permissions[i])
-					else
-						self:remove(lobbyID)
-					end
-				end
-				
-				for channelID, channelData in pairs(channels) do
-					if self[channelData.parent] then
-						self[channelData.parent].children:fill(channelID, tonumber(channelData.position))
-					end
-				end
-			end
-			logger:log(4, "STARTUP: Loaded!")
+			emitter:emit("remove", self.id)
 		end,
 		
 		-- there should be enough checks to ensure that lobby and template are valid
-		updateTemplate = function (self, lobbyID, template)
-			local channel = client:getChannel(lobbyID)
-			if channel and self[lobbyID] then
-				self[lobbyID].template = template
-				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updateTemplate", template, lobbyID)
+		updateTemplate = function (self, template)
+			local channel = client:getChannel(self.id)
+			if channel and lobbies[self.id] then
+				self.template = template
+				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, self.id)
+				emitter:emit("updateTemplate", template, self.id)
 			else
-				self:remove(lobbyID)
+				self:delete()
 			end
 		end,
 		
-		updateTarget = function (self, lobbyID, target)
-			local channel = client:getChannel(lobbyID)
-			if channel and self[lobbyID] then
-				self[lobbyID].target = target
-				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updateTarget", target, lobbyID)
+		updateTarget = function (self, target)
+			local channel = client:getChannel(self.id)
+			if channel and lobbies[self.id] then
+				self.target = target
+				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, self.id)
+				emitter:emit("updateTarget", target, self.id)
 			else
-				self:remove(lobbyID)
+				self:delete()
 			end
 		end,
 		
-		updatePermissions = function (self, lobbyID, permissions)
-			local channel = client:getChannel(lobbyID)
-			if channel and self[lobbyID] then
-				self[lobbyID].permissions = permissions
-				logger:log(4, "GUILD %s: Updated permissions for lobby %s", channel.guild.id, lobbyID)
-				emitter:emit("updatePermissions", permissions, lobbyID)
+		updatePermissions = function (self, permissions)
+			local channel = client:getChannel(self.id)
+			if channel and lobbies[self.id] then
+				self.permissions = permissions
+				logger:log(4, "GUILD %s: Updated permissions for lobby %s", channel.guild.id, self.id)
+				emitter:emit("updatePermissions", permissions, self.id)
 			else
-				self:remove(lobbyID)
+				self:delete()
 			end
 		end,
 		
 		-- returns filled position
-		attachChild = function (self, lobbyID, channelID, position)
-			return self[lobbyID].children:fill(channelID, position)
+		attachChild = function (self, channelID, position)
+			return self.children:fill(channelID, position)
 		end,
 		
-		detachChild = function (self, channelID)
-			if channels[channelID] and self[channels[channelID].parent] then
-				self[channels[channelID].parent].children:drain(channels[channelID].position)
-			end
+		detachChild = function (self, position)
+			self.children:drain(position)
 		end
 	},
+	__tostring = function (self) return string.format("LobbyData: %s", self.id) end
+}
+local lobbiesIndex = {
+	-- perform checks and add lobby to table
+	loadAdd = function (self, lobbyID, template, target, permissions)	-- additional parameter are used upon startup to prevent unnecessary checks
+		if not self[lobbyID] then
+			local channel = client:getChannel(lobbyID)
+			if channel and channel.guild then
+				self[lobbyID] = setmetatable({
+					id = lobbyID, template = template, target = target, permissions = tonumber(permissions) or 0, children = hollowArray(), mutex = discordia.Mutex()
+				}, lobbyMT)
+				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
+			end
+		end
+	end,
+	
+	-- loadAdd and start interaction with db
+	add = function (self, lobbyID)
+		self:loadAdd(lobbyID)
+		if self[lobbyID] then
+			emitter:emit("add", lobbyID)
+			return self[lobbyID]
+		end
+	end,
+	
+	load = function (self)
+		logger:log(4, "STARTUP: Loading lobbies")
+		local lobbyIDs = sqlite:exec("SELECT * FROM lobbies")
+		if lobbyIDs then
+			for i, lobbyID in ipairs(lobbyIDs[1]) do
+				if client:getChannel(lobbyID) then
+					self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil, lobbyIDs.permissions[i])
+				else
+					emitter:emit("remove", lobbyID)
+				end
+			end
+		end
+		logger:log(4, "STARTUP: Loaded!")
+	end
+}
+
+return setmetatable(lobbies, {
+	__index = lobbiesIndex,
 	__len = function (self)
 		local count = 0
 		for v,_ in pairs(self) do count = count + 1 end
 		return count
-	end
+	end,
+	__call = lobbiesIndex.add
 })

@@ -1,6 +1,5 @@
 local discordia = require "discordia"
 local locale = require "locale"
-local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
 local hostCheck = require "utils/hostCheck"
@@ -130,7 +129,7 @@ return function (message)
 		return channel
 	end
 	
-	local permissions = bitfield(lobbies[channels[channel.id].parent].permissions)
+	local permissions = bitfield(channels[channel.id].parent.permissions)
 	if not permissions:has(permissions.bits.moderate) then
 		message:reply(locale.badHostPermission)
 		return "Insufficient permissions"

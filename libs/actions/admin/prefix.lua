@@ -40,7 +40,7 @@ return function (message)
 			message:reply(locale.mentionInVain:format(message.author.mentionString))
 			return "Bad user permissions"
 		end
-		guilds:updatePrefix(guild.id, newPrefix)
+		guilds[guild.id]:updatePrefix(newPrefix)
 		message:reply(locale.prefixConfirm:format(newPrefix))
 		return "Set new prefix"
 	else

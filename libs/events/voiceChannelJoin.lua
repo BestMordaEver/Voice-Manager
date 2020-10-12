@@ -71,17 +71,18 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 			end
 			return
 		else	-- if no available channels - create new
-			lobby = target
-			target = client:getChannel(targetData.target) or lobby.category or lobby.guild
 			logger:log(4, "GUILD %s LOBBY %s: no available channels, delegating to %s", lobby.guild.id, lobby.id, target.id)
+			client:emit("voiceChannelJoin", member, target)
+			return
 		end
 	end
 	
 	if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
 	
 	-- determine new channel name
-	local name = lobbies[lobby.id].template or guilds[lobby.guild.id].template or "%nickname's% channel"
-	local position = lobbies:attachChild(lobby.id, true)
+	local lobbyData = lobbies[lobby.id]
+	local name = lobbyData.template or guilds[lobby.guild.id].template or "%nickname's% channel"
+	local position = lobbyData:attachChild(true)
 	local needsMove = name:match("%%counter%%") and true
 	if name:match("%%.-%%") then
 		local uname = member.user.name
@@ -106,17 +107,17 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	if newChannel then
 		member:setVoiceChannel(newChannel.id)
 		channels:add(newChannel.id, member.user.id, lobby.id, position)
-		lobbies:attachChild(lobby.id, newChannel.id, position)
+		lobbyData:attachChild(newChannel.id, position)
 		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 		newChannel:setUserLimit(lobby.userLimit)
 		
-		local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
+		local perms = bitfield(lobbyData.permissions):toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 		end
 		
 		if needsMove then
-			local children, distance = lobbies[lobby.id].children, 0
+			local children, distance = lobbyData.children, 0
 			repeat
 				distance = distance + 1
 				if children[position + distance] ~= nil and not client:getChannel(children[position + distance]) then

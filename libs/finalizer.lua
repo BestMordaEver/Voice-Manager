@@ -115,7 +115,7 @@ return {
 		},
 		function (channel)
 			guilds[channel.guild.id].lobbies:remove(channel.id)
-			lobbies:remove(channel.id)
+			lobbies[channel.id]:delete()
 		end
 	),
 	
@@ -126,7 +126,7 @@ return {
 			notLobby, badUser
 		},
 		function (channel, template)
-			lobbies:updateTemplate(channel.id, template)
+			lobbies[channel.id]:updateTemplate(template)
 		end
 	),
 	
@@ -138,7 +138,7 @@ return {
 			function (nids) return locale.selfTarget.."\n" end
 		},
 		function (channel, target)
-			lobbies:updateTarget(channel.id, target)
+			lobbies[channel.id]:updateTarget(target)
 		end
 	),
 	
@@ -158,7 +158,7 @@ return {
 		function (channel, permissions)
 			local permissionBits = bitfield(lobbies[channel.id].permissions)
 			local newPermissionBits = bitfield(permissions)
-			lobbies:updatePermissions(channel.id, newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
+			lobbies[channel.id]:updatePermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
 		end
 	)
 }

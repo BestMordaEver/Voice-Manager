@@ -29,12 +29,18 @@ return setmetatable({}, {
 			local embed = {
 				title = action:gsub("^.", string.upper, 1),	-- upper bold text
 				color = 6561661,
-				description = (action == "register" and locale.embedRegister or 
+				description = (
+					action == "register" and locale.embedRegister or 
 					action == "unregister" and locale.embedUnregister or 
 					action == "template" and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or
 					action == "target" and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or
 					action == "permissions" and (argument:has(argument.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)
-					):format(argument).."\n"..(nids > 10 and (locale.embedPage.."\n") or "")..locale.embedAll.."\n",
+				):format(argument).."\n"..(
+					nids > 10 and (locale.embedPage.."\n") or ""
+				)..(
+					((action == "template" or action == "target") and argument ~= "" or (action ~= "template" and action ~= "target")) and
+						(locale.embedAll.."\n") or ""
+				),
 				footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number
 			}
 			
@@ -59,7 +65,10 @@ return setmetatable({}, {
 			end
 			if embedData.page ~= math.modf(#embedData.ids/10)+1 then message:addReaction(reactions.right) end
 			if #embedData.ids > 10 then message:addReaction(reactions.page) end
-			if #embedData.ids > 0 then message:addReaction(reactions.all) end
+			if #embedData.ids > 0 and 
+				((embedData.action == "template" or embedData.action == "target") and embedData.argument ~= "" or (embedData.action ~= "template" and embedData.action ~= "target")) then
+				message:addReaction(reactions.all)
+			end
 			message:addReaction(reactions.stop)
 		end,
 		

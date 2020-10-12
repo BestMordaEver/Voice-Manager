@@ -35,7 +35,7 @@ return function (message)
 			return "Limitation OOB"
 		end
 		
-		guilds:updateLimitation(guild.id, limitation)
+		guilds[guild.id]:updateLimitation(limitation)
 		message:reply(locale.limitationConfirm:format(limitation))
 		return "Set new limitation"
 	else

@@ -1,6 +1,5 @@
 local discordia = require "discordia"
 local locale = require "locale"
-local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
 local hostCheck = require "utils/hostCheck"
@@ -25,7 +24,7 @@ return function (message)
 	channels:updateHost(channel.id, member.user.id)
 	local lobby = client:getChannel(channels[channel.id].parent)
 	if lobby then
-		local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
+		local perms = bitfield(channels[channel.id].parent.permissions):toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
 			channel:getPermissionOverwriteFor(oldHost):delete()
 			channel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))

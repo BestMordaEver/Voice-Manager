@@ -8,8 +8,8 @@ local guilds = require "storage/guilds"
 return function (guild) -- same but opposite
 	guilds:remove(guild.id)
 	for _,channel in pairs(guild.voiceChannels) do 
-		if channels[channel.id] then channels:remove(channel.id) end 
-		if lobbies[channel.id] then lobbies:remove(channel.id) end
+		if channels[channel.id] then channels[channel.id]:delete() end 
+		if lobbies[channel.id] then lobbies[channel.id]:delete() end
 	end
 	client:getChannel("676432067566895111"):send(guild.name.." removed me!\n")
 end
