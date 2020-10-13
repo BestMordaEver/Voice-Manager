@@ -21,18 +21,6 @@ return function (message, ids, permissions)
 			end
 		end
 		
-		--[[
-		if permissionBits.raw == 0 then
-			message:reply(locale.noPermission)
-			return "No permission was selected"
-		end
-		
-		if not (ids or permissions:match("on") or permissions:match("off")) then	-- TODO: embedded toggle
-			message:reply(locale.noToggle)
-			return "No toggle was selected"
-		end
-		--]]
-		
 		permissions = permissionBits.raw
 		ids = actionParse(message, message.content:match('"(.-)"'), "permissions", permissions)
 		if not ids[1] then return ids end -- message for logger
