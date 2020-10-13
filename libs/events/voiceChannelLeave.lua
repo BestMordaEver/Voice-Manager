@@ -24,7 +24,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 			local newHost = channel.connectedMembers:random()
 			
 			if newHost then
-				channels:updateHost(channel.id, newHost.user.id)
+				channels[channel.id]:(newHost.user.id)
 				
 				local lobby = client:getChannel(channels[channel.id].parent)
 				if lobby then
