@@ -425,6 +425,14 @@ Show stats for specific server
 	embedLobbyPermissions = [[Select a lobby to show its permissions]],
 	noPermission = [[There's no such permission]],
 	noToggle = [[No toggle found]],
+	-- capacity
+	lobbyCapacity = [[Current capacity for **`%s`** is **`%s`**]],
+	noCapacity = [[This lobby doesn't change new channels' capacity]],
+	newCapacity = [[Set a new capacity **`%s`** for:]],
+	resetCapacity = [[Reset a capacity:]],
+	embedCapacity = [[Select a lobby that will have capacity **`%s`**]],
+	embedLobbyCapacity = [[Select a lobby to show its capacity]],
+	embedResetCapacity = [[Select a lobby to reset its capacity]],
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
@@ -436,7 +444,7 @@ Show stats for specific server
 	changedName = [[Successfully changed channel name!]],
 	ratelimitRemaining = [[This action is ratelimited. You can do this **1** more time in next **%s**]],
 	ratelimitReached = [[This action is ratelimited. You will be able to perform this action after **%s**]],
-	-- capacity
+	-- resize
 	changedCapacity = [[Successfully changed channel capacity!]],
 	-- bitrate
 	changedBitrate = [[Successfully changed channel bitrate!]],
