@@ -14,7 +14,9 @@ return function (message, ids, target)
 		target = message.content:match('target%s*".-"%s*(.-)$') or message.content:match('target%s*(.-)$')
 		
 		local potentialTarget = client:getChannel(target)
-		if not potentialTarget then
+		if potentialTarget.type ~= channelType.voice and potentialTarget ~= channelType.category then
+			potentialTarget = nil
+		elseif not potentialTarget then
 			if not message.guild then
 				message:reply(locale.noID)
 				return "Template by name in dm"
