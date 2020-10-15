@@ -8,7 +8,7 @@ local bitfield = {
 		moderate = 0x04,
 		manage = 0x08,
 		name = 0x10,
-		capacity = 0x20,
+		resize = 0x20,
 		bitrate = 0x40,
 		on = 0x80
 	},
@@ -19,7 +19,7 @@ local bitfield = {
 		[0x04] = "moderate",
 		[0x08] = "manage",
 		[0x10] = "name",
-		[0x20] = "capacity",
+		[0x20] = "resize",
 		[0x40] = "bitrate",
 		[0x80] = "on"
 	},
@@ -30,7 +30,6 @@ local bitfield = {
 	
 	toDiscordia = function (self)
 		local perms = {}
-		--if self:has(self.bits.deafen) then table.insert(perms, permission.deafenMembers) end
 		if self:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
 		if self:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 		

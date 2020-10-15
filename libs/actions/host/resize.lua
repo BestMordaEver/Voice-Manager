@@ -18,17 +18,17 @@ return function (message)
 		return "Insufficient permissions"
 	end
 	
-	local capacity = tonumber(message.content:match("capacity(.-)$"))
+	local capacity = tonumber(message.content:match("resize(.-)$"))
 	if not capacity then return end
 	
 	local success, err = channel:setUserLimit(capacity)
 	if success then
 		if not message:addReaction("✅") then
-			message:reply(locale.changedCapacity)
+			message:reply(locale.channelResized)
 		end
 	else
 		message:reply(locale.hostError)
 	end
 	
-	return success and "Successfully changed channel capacity" or ("Couldn't change channel capacity: "..err)
+	return success and "Successfully resized channel" or ("Couldn't resize channel: "..err)
 end
