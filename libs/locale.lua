@@ -7,20 +7,23 @@ return {
 	helpLobby = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**register**
+**!vm register <channel name>**
 Turns a voice channel into a lobby. Entering this lobby will create a new, temporary channel
 
-**unregister**
+**!vm unregister <channel name>**
 Reverts a lobby channel back to a normal channel. Channels created by the existing lobby channel will be deleted once vacant
 
-**target**
+**!vm target "<channel name>" <category name>**
 Select a category in which new channels will be created
 
-**template**
+**!vm template "<channel name>" <template text>**
 Change the name of new channels
 
-**permissions**
-Give your users control over their new channels]],
+**!vm permissions "<channel name>" <permission list> <on/off>**
+Give your users control over their new channels
+
+**!vm capacity "<channel name>" <number between 0 and 99>**
+Change the new channels' capacity]],
 	
 	helpMatchmakingTitle = [[Help | Matchmaking commands]],
 	helpMatchmaking = [[You need a "Manage Channels" permission to use those commands!
@@ -181,7 +184,7 @@ You can grant following permissions:
 !vm permissions "759657662773330022 759213923588112406" moderate name on]],
 
 	capacity = [[You need the **Manage Channels** permission in order to use this command
-Specify the planned capacity new channels will have
+Specify the planned capacity new channels will have. By default, new channels will imitate their lobby's capacity
 
 **• Usage**
 *(Show the planned capacity for the provided channel)*
