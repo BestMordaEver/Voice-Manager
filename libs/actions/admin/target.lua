@@ -14,7 +14,7 @@ return function (message, ids, target)
 		target = message.content:match('target%s*".-"%s*(.-)$') or message.content:match('target%s*(.-)$')
 		
 		local potentialTarget = client:getChannel(target)
-		if potentialTarget.type ~= channelType.voice and potentialTarget ~= channelType.category then
+		if potentialTarget and potentialTarget.type ~= channelType.voice and potentialTarget ~= channelType.category then
 			potentialTarget = nil
 		elseif not potentialTarget then
 			if not message.guild then

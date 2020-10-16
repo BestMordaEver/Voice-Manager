@@ -30,7 +30,6 @@ local bitfield = {
 	
 	toDiscordia = function (self)
 		local perms = {}
-		--if self:has(self.bits.deafen) then table.insert(perms, permission.deafenMembers) end
 		if self:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
 		if self:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 		

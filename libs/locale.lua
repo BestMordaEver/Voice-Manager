@@ -7,20 +7,23 @@ return {
 	helpLobby = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**register**
+**!vm register <channel name>**
 Turns a voice channel into a lobby. Entering this lobby will create a new, temporary channel
 
-**unregister**
+**!vm unregister <channel name>**
 Reverts a lobby channel back to a normal channel. Channels created by the existing lobby channel will be deleted once vacant
 
-**target**
+**!vm target "<channel name>" <category name>**
 Select a category in which new channels will be created
 
-**template**
+**!vm template "<channel name>" <template text>**
 Change the name of new channels
 
-**permissions**
-Give your users control over their new channels]],
+**!vm permissions "<channel name>" <permission list> <on/off>**
+Give your users control over their new channels
+
+**!vm capacity "<channel name>" <number between 0 and 99>**
+Change the new channels' capacity]],
 	
 	helpMatchmakingTitle = [[Help | Matchmaking commands]],
 	helpMatchmaking = [[You need a "Manage Channels" permission to use those commands!
@@ -42,7 +45,7 @@ Control who can enter your channel
 **name**
 Change your channel's name
 
-**capacity**
+**resize**
 Change your channel's capacity
 
 **bitrate**
@@ -179,6 +182,24 @@ You can grant following permissions:
 !vm permissions "Join to create new channel" mute moderate manage on
 !vm permissions "759657662773330022" manage off
 !vm permissions "759657662773330022 759213923588112406" moderate name on]],
+
+	capacity = [[You need the **Manage Channels** permission in order to use this command
+Specify the planned capacity new channels will have. By default, new channels will imitate their lobby's capacity
+
+**• Usage**
+*(Show the planned capacity for the provided channel)*
+<prefix> capacity "<channel ID or name>"
+
+*(Change the planned capacity for the provided channels)*
+<prefix> capacity "<channel ID or name>" <number between 0 and 99> *OR*
+<prefix> capacity "<channel ID> [channel ID] ..." <number between 0 and 99>
+
+You can also use **<prefix> capacity <number between 0 and 99>** to be given a list of lobbies that you can change planned capacity for
+
+**• Example**
+!vm capacity "Join to connect to random party" 4
+!vm capacity "759657662773330022" 10
+!vm capacity "759657662773330022 759213923588112406" 2]],
 	
 	-- matchmaking
 	["matchmaking target"] = [[You need a **"Manage Channels"** permission to use this command!
@@ -301,16 +322,16 @@ Change your channel's name
 **• Example**
 !vm name We respect women in this chatroom]],
 	
-	capacity = [[You need to be a channel host to use this command!
-This command is enabled with permission "capacity"
+	resize = [[You need to be a channel host to use this command!
+This command is enabled with permission "resize"
 
 Change your channel's capacity
 
 **• Usage**
-<prefix> capacity <number between 0 and 99>
+<prefix> resize <number between 0 and 99>
 
 **• Example**
-!vm capacity 4]],
+!vm resize 4]],
 	
 	bitrate = [[You need to be a channel host to use this command!
 This command is enabled with permission "bitrate"
@@ -445,7 +466,7 @@ Show stats for specific server
 	ratelimitRemaining = [[This action is ratelimited. You can do this **1** more time in next **%s**]],
 	ratelimitReached = [[This action is ratelimited. You will be able to perform this action after **%s**]],
 	-- resize
-	changedCapacity = [[Successfully changed channel capacity!]],
+	channelResized = [[Successfully changed channel capacity!]],
 	-- bitrate
 	changedBitrate = [[Successfully changed channel bitrate!]],
 	-- promote
