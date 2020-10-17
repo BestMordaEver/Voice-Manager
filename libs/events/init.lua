@@ -36,6 +36,7 @@ events = {
 	
 	ready = function ()
 		lobbies:load()
+		categories:load()
 		channels:load()
 		guilds:load()
 		clock:start()
