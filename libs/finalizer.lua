@@ -160,5 +160,16 @@ return {
 			local newPermissionBits = bitfield(permissions)
 			lobbies[channel.id]:updatePermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
 		end
+	),
+	
+	capacity = new(
+		{isLobby,isUser},
+		{
+			default = function (nids, capacity) return string.format(capacity and locale.newCapacity or locale.resetCapacity, capacity).."\n" end,
+			notLobby, badUser
+		},
+		function (channel, capacity)
+			lobbies[channel.id]:updateCapacity(capacity)
+		end
 	)
 }
