@@ -35,9 +35,9 @@ local lobbyMT = {
 			if lobbies[self.id] then
 				lobbies[self.id] = nil
 				local lobby = client:getChannel(self.id)
-				if lobby and lobby.guild then
+				if lobby and lobby.guild then	-- if we initiate removal, we delete storage info first, so we have info about parent guild
 					logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, self.id)
-				else
+				else	-- otherwise we have no context of parent guild and have to investigate
 					logger:log(4, "NULL: Removed lobby %s", self.id)
 				end
 			end

@@ -32,9 +32,9 @@ local channelMT = {
 			if channels[self.id] then
 				channels[self.id] = nil
 				local channel = client:getChannel(self.id)
-				if channel and channel.guild then
+				if channel and channel.guild then	-- if we initiate removal, we delete storage info first, so we have info about parent guild
 					logger:log(4, "GUILD %s: Removed channel %s", channel.guild.id, self.id)
-				else
+				else	-- otherwise we have no context of parent guild and have to investigate
 					logger:log(4, "NULL: Removed channel %s", self.id)
 				end
 			end
