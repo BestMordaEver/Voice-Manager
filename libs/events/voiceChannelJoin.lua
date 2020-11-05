@@ -3,6 +3,7 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
+local templateInterpreter = require "utils/templateInterpreter"
 
 local client = discordia.storage.client
 local logger = discordia.storage.logger
@@ -83,23 +84,12 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	local lobbyData = lobbies[lobby.id]
 	local name = lobbyData.template or guilds[lobby.guild.id].template or "%nickname's% channel"
 	local position = lobbyData:attachChild(true)
-	local needsMove = name:match("%%counter%%") and true
+	local needsMove
+	
 	if name:match("%%.-%%") then
-		local uname = member.user.name
-		local nickname = member.nickname or uname
-		local game = (member.activity and (member.activity.type == 0 or member.activity.type == 1)) and member.activity.name or "no game"
-		
-		local rt = {
-			nickname = nickname,
-			name = uname,
-			tag = member.user.tag,
-			game = game,
-			counter = position,
-			["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
-			["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-			rename = ""
-		}
-		name = name:gsub("%%(.-)%%", rt)
+		needsMove = name:match("%%counter%%") and true
+		name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
+		if name == "" then name = templateInterpreter("%nickname's% channel", member) end
 	end
 	
 	local newChannel = target:createVoiceChannel(name)

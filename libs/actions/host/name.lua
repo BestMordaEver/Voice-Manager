@@ -4,6 +4,7 @@ local channels = require "storage/channels"
 local hostCheck = require "utils/hostCheck"
 local bitfield = require "utils/bitfield"
 local ratelimiter = require "utils/ratelimiter"
+local templateInterpreter = require "utils/templateInterpreter"
 local permission = require "discordia".enums.permission
 
 ratelimiter("channelName", 2, 60*10)
@@ -29,7 +30,8 @@ return function (message)
 		message:reply(locale.ratelimitReached:format(retryIn))
 	else
 		if channelData.parent.template and channelData.parent.template:match("%%rename%%") then
-			success, err = channel:setName(channelData.parent.template:gsub("%%rename%%", (message.content:match("name(.-)$"))))
+			success, err = channel:setName(templateInterpreter(
+				channelData.parent.template, message.guild:getMember(message.author), channelData.position, message.content:match("name(.-)$")))
 		else
 			success, err = channel:setName(message.content:match("name(.-)$"))
 		end
