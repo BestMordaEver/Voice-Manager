@@ -4,7 +4,7 @@
 -- CREATE TABLE categories(id VARCHAR PRIMARY KEY, parent VARCHAR, child VARCHAR)
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("channelsData.db")
+local sqlite = require "sqlite3".open("categoriesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
@@ -115,11 +115,6 @@ local categoriesIndex = {
 			end
 		end
 		
-		-- mark roots
-		for _, lobbyData in pairs(lobbies) do
-			if categories[lobbyData.target] then categories[lobbyData.target].isRoot = true end
-		end
-		
 		logger:log(4, "STARTUP: Loaded!")
 	end,
 	
@@ -128,7 +123,7 @@ local categoriesIndex = {
 		for categoryID, categoryData in pairs(self) do
 			local category = client:getChannel(categoryID)
 			if category then
-				if not categoryData.isRoot and #category.textChannels = 0 and #category.voiceChannels = 0 then
+				if not categoryData.isRoot and #category.textChannels == 0 and #category.voiceChannels == 0 then
 					category:delete()
 				end
 			else
