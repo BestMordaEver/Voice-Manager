@@ -17,9 +17,6 @@ return function (channel) -- and make sure there are no traces!
 		guildData.channels = guildData.channels - 1
 	end
 	if categoryData then
-		if categoryData.parent then categoryData.parent:updateChild(self.child) end
-		if categoryData.child then categoryData.child:updateParent(self.parent) end
-		
 		categoryData:delete()
 	end
 end

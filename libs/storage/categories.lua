@@ -28,6 +28,7 @@ emitter:on("remove", storageInteraction(remove, "Removed category %s", "Couldn't
 emitter:on("updateChild", storageInteraction(updateChild, "Updated child to %s for category %s", "Couldn't update child to %s for category %s"))
 emitter:on("updateParent", storageInteraction(updateParent, "Updated parent to %s for category %s", "Couldn't update parent to %s for category %s"))
 
+local roots = {}
 local categories = {}
 local categoryMT = {
 	__index = {
@@ -35,6 +36,9 @@ local categoryMT = {
 		-- if category has parent/child, they must be updated outside of here
 		delete = function (self)
 			if categories[self.id] then
+				if self.parent then self.parent:updateChild(self.child and self.child.id or nil) end
+				if self.child then self.child:updateParent(self.parent and self.parent.id or nil) end
+				
 				categories[self.id] = nil
 				local category = client:getChannel(self.id)
 				if category and category.guild then	-- if we initiate removal, we delete storage info first, so we have info about parent guild
@@ -55,7 +59,7 @@ local categoryMT = {
 			local category = client:getChannel(self.id)
 			if category and categories[self.id] then
 				self.child = childID
-				logger:log(4, "GUILD %s: Added child %s for category %s", category.guild.id, childID, self.id)
+				logger:log(4, "GUILD %s: Updated child to %s for category %s", category.guild.id, childID, self.id)
 				emitter:emit("updateChild", childID, self.id)
 			else
 				self:remove()
@@ -66,7 +70,7 @@ local categoryMT = {
 			local category = client:getChannel(self.id)
 			if category and categories[self.id] then
 				self.parent = parentID
-				logger:log(4, "GUILD %s: Added parent %s for category %s", category.guild.id, parentID, self.id)
+				logger:log(4, "GUILD %s: Updated parent to %s for category %s", category.guild.id, parentID, self.id)
 				emitter:emit("updateParent", parentID, self.id)
 			else
 				self:remove()
@@ -81,7 +85,7 @@ local categoriesIndex = {
 		if not self[categoryID] then
 			local category = client:getChannel(categoryID)
 			if category and category.guild then
-				self[categoryID] = setmetatable({id = categoryID, parent = parent, child = child}, categoryMT)
+				self[categoryID] = setmetatable({id = categoryID, parent = categories[parent], child = categories[child]}, categoryMT)
 				logger:log(4, "GUILD %s: Added category %s", category.guild.id, categoryID)
 			end
 		end
@@ -115,6 +119,10 @@ local categoriesIndex = {
 			end
 		end
 		
+		for categoryID, categoryData in pairs(self) do
+			self:getRoot(categoryData.parent.id)
+		end
+		
 		logger:log(4, "STARTUP: Loaded!")
 	end,
 	
@@ -123,13 +131,18 @@ local categoriesIndex = {
 		for categoryID, categoryData in pairs(self) do
 			local category = client:getChannel(categoryID)
 			if category then
-				if not categoryData.isRoot and #category.textChannels == 0 and #category.voiceChannels == 0 then
+				if #category.textChannels == 0 and #category.voiceChannels == 0 then
 					category:delete()
 				end
 			else
 				categoryData:delete()
 			end
 		end
+	end,
+	
+	getRoot = function (self, rootID)
+		if not roots[rootID] then roots[rootID] = {} end
+		return roots[rootID]
 	end
 }
 
