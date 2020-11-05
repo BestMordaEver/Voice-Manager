@@ -96,7 +96,8 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 			game = game,
 			counter = position,
 			["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
-			["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s")
+			["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
+			rename = ""
 		}
 		name = name:gsub("%%(.-)%%", rt)
 	end
