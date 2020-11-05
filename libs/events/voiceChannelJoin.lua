@@ -2,6 +2,7 @@ local discordia = require "discordia"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local categories = require "storage/categories"
 local bitfield = require "utils/bitfield"
 
 local client = discordia.storage.client
@@ -60,12 +61,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 			end
 		end)
 		
-		if #channels == 1 then
-			if member:setVoiceChannel(channels[1]) then
-				logger:log(4, "GUILD %s LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
-			end
-			return
-		elseif #channels > 1 then
+		if #channels > 0 then
 			if member:setVoiceChannel((matchmakers[targetData.template] or matchmakers.random)(channels)) then
 				logger:log(4, "GUILD %s LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
 			end
@@ -101,6 +97,20 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		name = name:gsub("%%(.-)%%", rt)
 	end
 	
+	while #target.voiceChannels + #target.textChannels > 48 do
+		local targetData = categories[target.id]
+		if not targetData.child then
+			local newCategory = target.guild:createCategory(target.name)
+			newCategory:moveUp(newCategory.position - target.position - 1)
+			targetData:addChild(newCategory.id)
+			logger:log(4, "GUILD %s PARENT %S: Added category %s", target.guild.id, target.id, newCategory.id)
+		end
+		target = client:getChannel(targetData.child.id)
+	end
+	
+	if target.type == channelType.category and #target.voiceChannels + #target.textChannels > 48 then
+		
+	end
 	local newChannel = target:createVoiceChannel(name)
 	
 	-- did we fail? statistics say "probably yes!"

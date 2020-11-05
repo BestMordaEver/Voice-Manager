@@ -1,6 +1,7 @@
 local discordia = require "discordia"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local categories = require "storage/categories"
 local bitfield = require "utils/bitfield"
 
 local client = discordia.storage.client
@@ -14,11 +15,17 @@ return function (member, channel) -- now remove the unwanted corpses!
 			if lobbyData then
 				lobbyData.mutex:lock()
 				channel:delete()
-				logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
+				logger:log(4, "GUILD %s: Deleted channel %s", channel.guild.id, channel.id)
 				lobbyData.mutex:unlock()
 			else
 				channel:delete()
-				logger:log(4, "GUILD %s: Deleted %s without sync, parent missing", channel.guild.id, channel.id)
+				logger:log(4, "GUILD %s: Deleted channel %s without sync, parent missing", channel.guild.id, channel.id)
+			end
+			
+			-- temporary categories must die too
+			if channel.category and categories[channel.category.id].parent and #channel.category.textChannels + #channel.category.voiceChannels == 0 then
+				channel.category:delete()
+				logger:log(4, "GUILD %s: Deleted category %s", channel.guild.id, channel.id)
 			end
 		elseif channels[channel.id].host == member.user.id then
 			local newHost = channel.connectedMembers:random()
