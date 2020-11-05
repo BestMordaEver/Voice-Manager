@@ -4,6 +4,7 @@ local channels = require "storage/channels"
 local hostCheck = require "utils/hostCheck"
 local bitfield = require "utils/bitfield"
 local ratelimiter = require "utils/ratelimiter"
+local templateInterpreter = require "utils/templateInterpreter"
 local permission = require "discordia".enums.permission
 
 ratelimiter("channelName", 2, 60*10)
@@ -14,7 +15,8 @@ return function (message)
 		return channel
 	end
 	
-	local permissions = bitfield(channels[channel.id].parent.permissions)
+	local channelData = channels[channel.id]
+	local permissions = bitfield(channelData.parent.permissions)
 	if not (message.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) or permissions:has(permissions.bits.name)) then
 		message:reply(locale.badHostPermission)
 		return "Insufficient permissions"
@@ -27,7 +29,13 @@ return function (message)
 		success, err = false, "ratelimit reached"
 		message:reply(locale.ratelimitReached:format(retryIn))
 	else
-		success, err = channel:setName(message.content:match("name(.-)$"))
+		if channelData.parent.template and channelData.parent.template:match("%%rename%%") then
+			success, err = channel:setName(templateInterpreter(
+				channelData.parent.template, message.guild:getMember(message.author), channelData.position, message.content:match("name(.-)$")))
+		else
+			success, err = channel:setName(message.content:match("name(.-)$"))
+		end
+		
 		if success then
 			message:reply(locale.changedName.."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn))
 		else
