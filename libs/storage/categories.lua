@@ -36,7 +36,13 @@ local categoryMT = {
 		-- if category has parent/child, they must be updated outside of here
 		delete = function (self)
 			if categories[self.id] then
-				if self.parent then self.parent:updateChild(self.child and self.child.id or nil) end
+				if self.parent then
+					if roots[self.id] then
+						self.parent.child = self.child
+					else
+						self.parent:updateChild(self.child and self.child.id or nil) end
+					end
+				end
 				if self.child then self.child:updateParent(self.parent and self.parent.id or nil) end
 				
 				categories[self.id] = nil
