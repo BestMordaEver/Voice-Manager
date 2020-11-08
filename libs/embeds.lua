@@ -25,6 +25,7 @@ return setmetatable({}, {
 			local reactions = self.reactions
 			local nids = #ids
 			if action == "permissions" then argument = bitfield(argument) end
+			local isComplex = action == "template" or action == "target" or action == "capacity"
 			
 			local embed = {
 				title = action:gsub("^.", string.upper, 1),	-- upper bold text
@@ -34,11 +35,12 @@ return setmetatable({}, {
 					action == "unregister" and locale.embedUnregister or 
 					action == "template" and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or
 					action == "target" and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or
-					action == "permissions" and (argument:has(argument.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)
+					action == "permissions" and (argument:has(argument.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions) or
+					action == "capacity" and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity)
 				):format(argument).."\n"..(
 					nids > 10 and (locale.embedPage.."\n") or ""
-				)..(
-					((action == "template" or action == "target") and argument ~= "" or (action ~= "template" and action ~= "target")) and
+				)..(	-- do we need asterisk? we can't learn all templates/targets/capacities at the same time
+					(isComplex and argument ~= "" or not isComplex) and
 						(locale.embedAll.."\n") or ""
 				),
 				footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number

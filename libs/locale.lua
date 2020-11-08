@@ -454,7 +454,7 @@ Show stats for specific server
 	embedCapacity = [[Select a lobby that will have capacity **`%s`**]],
 	embedLobbyCapacity = [[Select a lobby to show its capacity]],
 	embedResetCapacity = [[Select a lobby to reset its capacity]],
-	capacityOOB = [[Capacity must be a number between 0 and 99]],
+	capacityOOB = [[Capacity must be a number between 0 and 99, or -1 to use lobby's capacity]],
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],

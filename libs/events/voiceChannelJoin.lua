@@ -100,7 +100,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		channels:add(newChannel.id, member.user.id, lobby.id, position)
 		lobbyData:attachChild(newChannel.id, position)
 		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
-		newChannel:setUserLimit(lobby.userLimit)
+		newChannel:setUserLimit(lobbyData.capacity == -1 and lobby.userLimit or lobbyData.capacity)
 		
 		local perms = bitfield(lobbyData.permissions):toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then

@@ -9,7 +9,7 @@ return function (message, ids, capacity)
 	if not ids then
 		capacity = tonumber(message.content:match('capacity%s*".-"%s*(.-)$') or message.content:match("capacity%s*(.-)$"))
 		
-		if not capacity or capacity > 99 or capacity < 0 then
+		if not capacity or capacity > 99 or capacity < -1 then
 			message:reply(locale.capacityOOB)
 			return "Capacity OOB"
 		end

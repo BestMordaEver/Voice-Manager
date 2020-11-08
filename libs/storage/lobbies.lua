@@ -1,5 +1,5 @@
 -- object to store data about lobbies and interact with corresponding db
--- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR)
+-- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR, permissions INTEGER, capacity INTEGER)
 
 local discordia = require "discordia"
 local sqlite = require "sqlite3".open("lobbiesData.db")
@@ -14,18 +14,20 @@ local hollowArray = require "utils/hollowArray"
 local emitter = discordia.Emitter()
 
 -- prepared statements
-local add, remove, updateTemplate, updateTarget, updatePermissions =
-	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL, 0)"),
+local add, remove, updateTemplate, updateTarget, updatePermissions, updateCapacity =
+	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL, 0,-1)"),
 	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET permissions = ? WHERE id = ?")
+	sqlite:prepare("UPDATE lobbies SET permissions = ? WHERE id = ?"),
+	sqlite:prepare("UPDATE lobbies SET capacity = ? WHERE id = ?")
 
 emitter:on("add", storageInteraction(add, "Added lobby %s", "Couldn't add lobby %s"))
 emitter:on("remove", storageInteraction(remove, "Removed lobby %s", "Couldn't remove lobby %s"))
 emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated template to %s for lobby %s", "Couldn't update template to %s for lobby %s"))
 emitter:on("updateTarget", storageInteraction(updateTarget, "Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"))
 emitter:on("updatePermissions", storageInteraction(updatePermissions, "Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"))
+emitter:on("updateCapacity", storageInteraction(updateCapacity, "Updated capacity to %s for lobby %s", "Couldn't update capacity to %s for lobby %s"))
 
 local lobbies = {}
 local lobbyMT = {
@@ -78,6 +80,17 @@ local lobbyMT = {
 			end
 		end,
 		
+		updateCapacity = function (self, capacity)
+			local channel = client:getChannel(self.id)
+			if channel and lobbies[self.id] then
+				self.capacity = capacity
+				logger:log(4, "GUILD %s: Updated capacity for lobby %s", channel.guild.id, self.id)
+				emitter:emit("updateCapacity", capacity, self.id)
+			else
+				self:delete()
+			end
+		end,
+		
 		-- returns filled position
 		attachChild = function (self, channelID, position)
 			return self.children:fill(channelID, position)
@@ -96,7 +109,8 @@ local lobbiesIndex = {
 			local channel = client:getChannel(lobbyID)
 			if channel and channel.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, template = template, target = target, permissions = tonumber(permissions) or 0, children = hollowArray(), mutex = discordia.Mutex()
+					id = lobbyID, template = template, target = target, permissions = tonumber(permissions) or 0, capacity = tonumber(capacity) or 0,
+					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
 			end
@@ -118,7 +132,7 @@ local lobbiesIndex = {
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs[1]) do
 				if client:getChannel(lobbyID) then
-					self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil, lobbyIDs.permissions[i])
+					self:loadAdd(lobbyID, lobbyIDs.template[i], client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil, lobbyIDs.permissions[i], lobbyIDs.capacity[i])
 				else
 					emitter:emit("remove", lobbyID)
 				end

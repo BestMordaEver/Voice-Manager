@@ -8,7 +8,7 @@ return {
 	["matchmaking template"] = require "actions/admin/template",
 	template = require "actions/admin/template",
 	permissions = require "actions/admin/permissions",
-	--capacity = require "actions/admin/capacity",
+	capacity = require "actions/admin/capacity",
 	limitation = require "actions/admin/limitation",
 	prefix = require "actions/admin/prefix",
 	blacklist = require "actions/host/moderate",
