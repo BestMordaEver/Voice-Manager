@@ -93,6 +93,12 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		if not targetData.child then
 			local newCategory = target.guild:createCategory(target.name)
 			newCategory:moveUp(newCategory.position - target.position)
+			
+			-- child category has empty permissions, copy from parent
+			for _, permissionOverwrite in pairs(target.permissionOverwrites) do
+				newCategory:getPermissionOverwriteFor(permissionOverwrite:getObject()):setPermissions(permissionOverwrite.allowedPermissions, permissionOverwrite.deniedPermissions)
+			end
+			
 			if categories[target.id] then
 				targetData:addChild(newCategory.id)
 			else
@@ -104,9 +110,6 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		target = client:getChannel(targetData.child.id)
 	end
 	
-	if target.type == channelType.category and #target.voiceChannels + #target.textChannels > 48 then
-		
-	end
 	local newChannel = target:createVoiceChannel(name)
 	
 	-- did we fail? statistics say "probably yes!"
