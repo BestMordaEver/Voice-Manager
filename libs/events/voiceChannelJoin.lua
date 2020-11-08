@@ -89,12 +89,17 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	end
 	
 	while #target.voiceChannels + #target.textChannels > 48 do
-		local targetData = categories[target.id]
+		local targetData = categories[target.id] or categories:getRoot(target.id)
 		if not targetData.child then
 			local newCategory = target.guild:createCategory(target.name)
-			newCategory:moveUp(newCategory.position - target.position - 1)
-			targetData:addChild(newCategory.id)
-			logger:log(4, "GUILD %s PARENT %S: Added category %s", target.guild.id, target.id, newCategory.id)
+			newCategory:moveUp(newCategory.position - target.position)
+			if categories[target.id] then
+				targetData:addChild(newCategory.id)
+			else
+				categories(newCategory.id, target.id)
+				targetData.child = categories[newCategory.id]
+			end
+			logger:log(4, "GUILD %s PARENT %s: Added category %s", target.guild.id, target.id, newCategory.id)
 		end
 		target = client:getChannel(targetData.child.id)
 	end

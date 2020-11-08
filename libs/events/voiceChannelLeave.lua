@@ -23,7 +23,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 			end
 			
 			-- temporary categories must die too
-			if channel.category and categories[channel.category.id].parent and #channel.category.textChannels + #channel.category.voiceChannels == 0 then
+			if channel.category and categories[channel.category.id] and #channel.category.textChannels + #channel.category.voiceChannels == 0 then
 				channel.category:delete()
 				logger:log(4, "GUILD %s: Deleted category %s", channel.guild.id, channel.id)
 			end

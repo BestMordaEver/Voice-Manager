@@ -40,7 +40,7 @@ local categoryMT = {
 					if roots[self.id] then
 						self.parent.child = self.child
 					else
-						self.parent:updateChild(self.child and self.child.id or nil) end
+						self.parent:updateChild(self.child and self.child.id or nil)
 					end
 				end
 				if self.child then self.child:updateParent(self.parent and self.parent.id or nil) end
@@ -91,7 +91,7 @@ local categoriesIndex = {
 		if not self[categoryID] then
 			local category = client:getChannel(categoryID)
 			if category and category.guild then
-				self[categoryID] = setmetatable({id = categoryID, parent = categories[parent], child = categories[child]}, categoryMT)
+				self[categoryID] = setmetatable({id = categoryID, parent = parent, child = child}, categoryMT)
 				logger:log(4, "GUILD %s: Added category %s", category.guild.id, categoryID)
 			end
 		end
@@ -99,10 +99,10 @@ local categoriesIndex = {
 	
 	-- loadAdd and start interaction with db
 	-- this should only be used for root parent categories and on load
-	add = function (self, categoryID, parent, child)
-		self:loadAdd(categoryID, parent, child)
+	add = function (self, categoryID, parentID, childID)
+		self:loadAdd(categoryID, parentID, childID)
 		if self[categoryID] then
-			emitter:emit("add", categoryID, parent, child)
+			emitter:emit("add", categoryID, parentID, childID)
 			return self[categoryID]
 		end
 	end,
@@ -115,7 +115,8 @@ local categoriesIndex = {
 				local category = client:getChannel(categoryID)
 				if category then
 					if #category.textChannels > 0 or #category.voiceChannels > 0 then
-						self:loadAdd(categoryID, channelIDs.parent[i], channelIDs.child[i])
+						self:getRoot(categoryIDs.parent[i])
+						self:loadAdd(categoryID, categoryIDs.parent[i], categoryIDs.child[i])
 					else
 						category:delete()
 					end
@@ -123,10 +124,6 @@ local categoriesIndex = {
 					emitter:emit("remove", categoryID)
 				end
 			end
-		end
-		
-		for categoryID, categoryData in pairs(self) do
-			self:getRoot(categoryData.parent.id)
 		end
 		
 		logger:log(4, "STARTUP: Loaded!")

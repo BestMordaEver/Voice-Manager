@@ -4,6 +4,7 @@ local client, logger, clock = discordia.storage.client, discordia.storage.logger
 
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
+local categories = require "storage/categories"
 local guilds = require "storage/guilds"
 local status = require "utils/status"
 local safeEvent = require "utils/safeEvent"
