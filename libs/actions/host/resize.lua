@@ -13,15 +13,15 @@ return function (message)
 	end
 	
 	local permissions = bitfield(channels[channel.id].parent.permissions)
-	if not (message.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) or permissions:has(permissions.bits.capacity)) then
+	if not (message.guild:getMember(message.author):hasPermission(channel, permission.manageChannels) or permissions:has(permissions.bits.resize)) then
 		message:reply(locale.badHostPermission)
 		return "Insufficient permissions"
 	end
 	
-	local capacity = tonumber(message.content:match("resize(.-)$"))
-	if not capacity then return end
+	local resize = tonumber(message.content:match("resize(.-)$"))
+	if not resize then return end
 	
-	local success, err = channel:setUserLimit(capacity)
+	local success, err = channel:setUserLimit(resize)
 	if success then
 		if not message:addReaction("✅") then
 			message:reply(locale.channelResized)
