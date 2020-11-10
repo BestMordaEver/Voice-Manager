@@ -30,7 +30,7 @@ return function (message)
 			return "Bad user permissions"
 		end
 		limitation = tonumber(limitation)
-		if not limitation or limitation > 100000 or limitation < 1 then
+		if not limitation or limitation > 500 or limitation < 1 then
 			message:reply(locale.limitationOOB)
 			return "Limitation OOB"
 		end

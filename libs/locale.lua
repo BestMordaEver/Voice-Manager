@@ -356,14 +356,14 @@ Transfer all your host privileges to other user. Transfer happens automatically 
 	
 	-- server
 	limitation = [[You need a **"Manage Channels"** permission to use this command!
-Change how many new channels can be created in your server. Absolute maximum is 100,000
+Change how many new channels can be created in your server. Absolute maximum is 500
 
 **• Usage**
 *(Show the current channel limit in your server)*
 <prefix> limitation
 
 *(Change the current channel limit in your server)*
-<prefix> limitation [server ID] <number between 0 and 100,000>
+<prefix> limitation [server ID] <number between 0 and 500>
 
 **• Example**
 !vm limitation 20
@@ -458,7 +458,7 @@ Show stats for specific server
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
-	limitationOOB = [[Server limit must be a number between 1 and 10,000]],
+	limitationOOB = [[Server limit must be a number between 1 and 500]],
 	-- prefix
 	prefixConfirm = [[Prefix is **`%s`** now]],
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],
