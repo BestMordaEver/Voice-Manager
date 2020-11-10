@@ -29,51 +29,51 @@ Change the new channels' capacity]],
 	helpMatchmaking = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**matchmaking target**
+**!vm matchmaking target "<channel name>" <channel name>**
 Select a lobby that will be matchmade
 
-**matchmaking template**
+**!vm matchmaking template "<channel name>" <mode>**
 Select a matchmaking mode]],
 
 	helpHostTitle = [[Help | Host commands]],
 	helpHost = [[You need to be a channel host to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**whitelist** and **blacklist**
+**!vm whitelist <user mention>** and **!vm blacklist <user mention>**
 Control who can enter your channel
 
-**name**
+**!vm name <new channel name>**
 Change your channel's name
 
-**resize**
+**!vm resize <number between 0 and 99>**
 Change your channel's capacity
 
-**bitrate**
+**!vm bitrate <number between 8 and 96>**
 Change your channel's bitrate
 
-**promote**
+**!vm promote <user mention>**
 Transfer your host privileges to other user. Transfer happens automatically if you leave your channel]],
 	
 	helpServerTitle = [[Help | Server commands]],
 	helpServer = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**limitation**
+**!vm limitation <number between 1 and 500>**
 Change how many new channels can be created in your server
 
-**prefix**
+**!vm prefix <new prefix>**
 Set a new prefix. Mentioning will still work]],
 
 	helpOtherTitle = [[Help | Other commands]],
 	helpOther = [[You can learn more about each command by using `help`, for example `!vm help template`
 	
-**list**
+**!vm list**
 Lists all registered lobbies on the server
 
-**stats**
+**!vm stats [local]**
 Take a sneak peek on my performance!
 
-**support**
+**!vm support**
 Get a support server invite]],
 
 	-- lobby
