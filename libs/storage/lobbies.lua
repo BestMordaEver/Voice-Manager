@@ -109,7 +109,7 @@ local lobbiesIndex = {
 			local channel = client:getChannel(lobbyID)
 			if channel and channel.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, template = template, target = target, permissions = tonumber(permissions) or 0, capacity = tonumber(capacity) or 0,
+					id = lobbyID, template = template, target = target, permissions = tonumber(permissions) or 0, capacity = tonumber(capacity) or -1,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
