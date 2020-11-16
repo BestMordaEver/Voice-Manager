@@ -176,7 +176,7 @@ You can grant following permissions:
 **moderate** - allows to disconnect people from channel and allows use of host commands **blacklist** and **whitelist**
 **manage** - gives user "Manage Channel" permission and gives access to next three commands
 **name** - allows use of host command **name**
-**capacity** - allows use of host command **capacity**
+**resize** - allows use of host command **resize**
 **bitrate** - allows use of host command **bitrate**
 
 **• Example**
