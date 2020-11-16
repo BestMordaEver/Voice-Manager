@@ -151,6 +151,7 @@ You can customize a template by including different `%combos%` to it:
 **%tag%** - user's tag (for example **Riddles#2773**)
 **%game%** - user's currently played or streamed game ("no game" if user doesn't have a game in their status)
 **%counter%** - channel's position. The channel will be moved to fill in holes in numbering
+**%rename%** - doesn't actually change the channel name, but interacts with **!vm name**. Read **!vm help name** for more info on that
 
 **• Example**
 !vm template "Join to create new channel" %nickname's% funky place
@@ -313,6 +314,7 @@ Restrict people from talking in your lobby
 This command is enabled with permission "name"
 
 Change your channel's name
+If channel's template has %rename% combo, then only %rename% part will change
 
 **• Usage**
 <prefix> name <new name>
