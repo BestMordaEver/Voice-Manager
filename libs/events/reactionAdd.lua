@@ -1,6 +1,6 @@
 local discordia = require "discordia"
 local embeds = require "embeds"
-local actions = require "actions/init"
+local logAction = require "utils/logAction"
 
 local client = discordia.storage.client
 local logger = discordia.storage.logger
@@ -20,31 +20,15 @@ return function (reaction, userID) -- embeds processing
 		logger:log(4, "In DM USER %s on EMBED %s => added %s", userID, reaction.message.id, reactions[reaction.emojiHash])
 	end
 	
-	-- just find corresponding emoji and pass instructions to embed
-	if reaction.emojiHash == reactions.left then
-		embeds:updatePage(reaction.message, embedData.page - 1)
-	elseif reaction.emojiHash == reactions.right then
-		embeds:updatePage(reaction.message, embedData.page + 1)
-	elseif reaction.emojiHash == reactions.page then
-		reaction.message.channel:broadcastTyping()
-		local ids = {}
-		for i = embedData.page*10 - 9, embedData.page*10 do
-			if not embedData.ids[i] then break end
-			table.insert(ids, embedData.ids[i])
-		end
-		actions[embedData.action](reaction.message, ids, embedData.argument)
-	elseif reaction.emojiHash == reactions.all then
-		reaction.message.channel:broadcastTyping()
-		actions[embedData.action](reaction.message, embedData.ids, embedData.argument)
-	elseif reaction.emojiHash == reactions.stop then
-		embeds[reaction.message] = nil
-		reaction.message:delete()
-	else -- assume a number emoji
-		if embedData.action == "help" then
-			reaction:delete(userID)
-			embeds:updatePage(reaction.message, reactions[reaction.emojiHash])
-		else
-			actions[embedData.action](reaction.message, {embedData.ids[(embedData.page-1) * 10 + embeds.reactions[reaction.emojiHash]]}, embedData.argument)
-		end
+	-- call the command, log it, and all in protected call
+	reaction:delete(userID)
+	local res = embedData(reaction)
+	embedData.killIn = 10
+	
+	-- notify user if failed
+	if res then
+		logAction(reaction.message, res)
 	end
+	
+	logger:log(4, "EMBED %s - processed", reaction.message.id)
 end

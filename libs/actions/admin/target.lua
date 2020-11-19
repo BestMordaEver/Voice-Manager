@@ -6,7 +6,7 @@ local client = discordia.storage.client
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
 local actionParse = require "utils/actionParse"
-local finalizer = require "finalizer"
+local prefinalizer = require "prefinalizer"
 
 -- this function is also used by embeds, they will supply ids and target
 return function (message, ids, target)
@@ -50,14 +50,5 @@ return function (message, ids, target)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	target = target or ""
-	
-	if target == "" then
-		message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].target).name) or locale.noTarget)
-		return "Sent channel target"
-	end
-	
-	target, ids = finalizer.target(message, ids, target)
-	message:reply(target)
-	return (#ids == 0 and "Successfully applied target to all" or ("Couldn't apply target to "..table.concat(ids, " ")))
+	return prefinalizer.target(message, ids, target)
 end

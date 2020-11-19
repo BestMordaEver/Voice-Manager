@@ -8,7 +8,7 @@ return function (message)
 	end
 	
 	if command == "help" then
-		embeds:sendHelp(message)
+		embeds.embedTypes.help(message)
 	else
 		message:reply({embed = {
 			title = "Help | " .. command:gsub("^.", string.upper, 1),	-- upper bold text

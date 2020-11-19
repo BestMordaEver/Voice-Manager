@@ -22,8 +22,6 @@ events = {
 	
 	reactionAdd = require "events/reactionAdd",
 	
-	reactionRemove = require "events/reactionRemove",
-	
 	guildCreate = require "events/guildCreate",
 	
 	guildDelete = require "events/guildDelete",
@@ -46,7 +44,6 @@ events = {
 		client:on(events("messageCreate"))
 		client:on(events("messageUpdate"))
 		client:on(events("reactionAdd"))
-		client:on(events("reactionRemove"))
 		client:on(events("guildCreate"))
 		client:on(events("guildDelete"))
 		client:on(events("voiceChannelJoin"))

@@ -3,7 +3,7 @@ local embeds = require "embeds"
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
 
-local finalizer = require "finalizer"
+local prefinalizer = require "prefinalizer"
 local actionParse = require "utils/actionParse"
 local bitfield = require "utils/bitfield"
 local truePositionSorting = require "utils/truePositionSorting"
@@ -26,12 +26,5 @@ return function (message, ids, permissions)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	if permissions == 0 then
-		message:reply(locale.lobbyPermissions:format(client:getChannel(ids[1]).name, tostring(bitfield(lobbies[ids[1]].permissions))))
-		return "Sent channel permissions"
-	end
-	
-	permission, ids = finalizer.permissions(message, ids, permissions)
-	message:reply(permission)
-	return (#ids == 0 and "Successfully applied permission to all" or ("Couldn't apply permission to "..table.concat(ids, " ")))
+	return prefinalizer.permissions(message, ids, permissions)
 end

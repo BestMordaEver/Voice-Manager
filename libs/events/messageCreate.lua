@@ -44,6 +44,7 @@ return function (message)
 		return
 	end
 	
+	--[[
 	-- call the command, log it, and all in protected call
 	local res, msg = xpcall(actions[command], debug.traceback, message)
 	
@@ -51,9 +52,14 @@ return function (message)
 	if res then
 		logAction(message, msg)
 	else
-		--message:reply(locale.error)
+		message:reply(locale.error)
 		error(msg)
 	end
+	--]]
+	
+	-- [[
+	logAction(message, actions[command](message))
+	--]]
 	
 	logAction(message, command .. " action completed")
 end

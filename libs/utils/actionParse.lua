@@ -49,7 +49,7 @@ return function (message, context, command, argument)	-- action pre-processing
 			table.insert(ids, channel.id)
 		end
 		
-		local newMessage = embeds:send(message, ids, command, argument)
+		local newMessage = embeds.embedTypes.actions(message, ids, command, argument)
 		if newMessage then
 			return "Empty input, sent embed ".. newMessage.id
 		else
@@ -80,7 +80,7 @@ return function (message, context, command, argument)	-- action pre-processing
 			return "Ambiguous input, can't do embed"
 		end
 		
-		local newMessage = embeds:send(message, ids, command, argument)
+		local newMessage = embeds.embedTypes.actions(message, ids, command, argument)
 		if newMessage then 
 			newMessage:setContent(locale.ambiguousID)
 			return "Ambiguous input, sent embed "..newMessage.id

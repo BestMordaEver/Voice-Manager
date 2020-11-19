@@ -37,7 +37,7 @@ local bitfield = {
 	end
 }
 
-return setmetatable({},{
+return setmetatable(bitfield,{
 	__call = function (self, init)
 		return setmetatable({
 			raw = init or 0
