@@ -24,7 +24,10 @@ return function (message)
 	logAction(message, "=> "..message.content)
 	
 	-- cache the member object just in case
-	if message.guild then message.guild:getMember(message.author) end
+	if message.guild then
+		message.guild:getMember(message.author)
+		message.guild:getMember(client.user)
+	end
 	
 	-- find the request
 	local content = 
@@ -37,7 +40,7 @@ return function (message)
 	local command = content == "" and "help" or content:match("^(%w+)")
 	if command == "matchmaking" then command = content:match("^matchmaking (%w+)") end
 	
-	if actions[command] then 
+	if actions[command] then
 		logAction(message, command.." action invoked")
 	else
 		logAction(message, "Nothing")
