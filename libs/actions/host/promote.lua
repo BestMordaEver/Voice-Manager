@@ -21,10 +21,11 @@ return function (message)
 		return
 	end
 	
-	channels:updateHost(channel.id, member.user.id)
-	local lobby = client:getChannel(channels[channel.id].parent)
+	local channelData = channels[channel.id]
+	channelData:updateHost(member.user.id)
+	local lobby = client:getChannel(channelData.parent)
 	if lobby then
-		local perms = bitfield(channels[channel.id].parent.permissions):toDiscordia()
+		local perms = bitfield(channelData.parent.permissions):toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
 			channel:getPermissionOverwriteFor(oldHost):delete()
 			channel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))

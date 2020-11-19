@@ -145,9 +145,9 @@ return function (message)
 	
 	if actions[context][action](channel, message) then
 		message:addReaction("✅")
-		return "Sucessfully processed blacklist"
+		return "Sucessfully processed "..action
 	else
 		message:reply(locale.hostError)
-		return "Couldn't process blacklist"
+		return "Couldn't process "..action
 	end
 end
