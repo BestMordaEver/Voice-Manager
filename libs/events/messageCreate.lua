@@ -2,18 +2,10 @@ local discordia = require "discordia"
 local locale = require "locale"
 local guilds = require "storage/guilds"
 local actions = require "actions/init"
+local logAction = require "utils/logAction"
 
 local client = discordia.storage.client
 local logger = discordia.storage.logger
-
--- message is a discord object, if it doesn't have guild property - it's a DM
-local function logAction (message, logMsg)
-	if message.guild then
-		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
-	else
-		logger:log(4, "DM %s: %s", message.author.id, logMsg)
-	end
-end
 
 return function (message)
 	-- ignore non-initialized guilds
