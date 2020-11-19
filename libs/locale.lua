@@ -240,7 +240,7 @@ There are several matchmaking modes available:
 **first** - selects the first available channel
 **last** - selects the last available channel
 **max** - selects the most filled available channel
-**min - select the least filled available channel
+**min** - select the least filled available channel
 
 **• Example**
 !vm template "Join to connect to random party" random
