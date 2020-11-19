@@ -14,7 +14,11 @@ return function (reaction, userID) -- embeds processing
 	
 	local embedData = embeds[reaction.message]
 	
-	logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+	if reaction.message.guild then
+		logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+	else
+		logger:log(4, "In DM USER %s on EMBED %s => added %s", userID, reaction.message.id, reactions[reaction.emojiHash])
+	end
 	
 	-- just find corresponding emoji and pass instructions to embed
 	if reaction.emojiHash == reactions.left then
