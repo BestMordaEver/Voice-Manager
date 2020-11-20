@@ -202,12 +202,12 @@ local embedTypes = {
 					if not self.ids[i] then break end
 					table.insert(ids, self.ids[i])
 				end
-				actions[self.action](reaction.message, ids, self.argument)
+				return prefinalizer[self.action](reaction.message, ids, self.argument)
 			end,
 			
 			[reactions.all] = function (self, reaction)
 				reaction.message.channel:broadcastTyping()
-				actions[self.action](reaction.message, self.ids, self.argument)
+				return prefinalizer[self.action](reaction.message, self.ids, self.argument)
 			end,
 			
 			[reactions.stop] = function (self, reaction)
