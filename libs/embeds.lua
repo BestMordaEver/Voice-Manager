@@ -143,7 +143,7 @@ local embedTypes = {
 						action == "template" and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or
 						action == "target" and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or
 						action == "permissions" and (argument == "" and locale.embedLobbyPermissions or 
-							(bitfield(argument):has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or
+							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or
 						action == "capacity" and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
