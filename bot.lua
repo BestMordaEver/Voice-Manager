@@ -36,9 +36,5 @@ local events = require "events/init"
 -- Other events are registered in "ready"
 client:once(events("ready"))
 
--- i deserve punishment for this
-local timer = require "timer"
-timer.setTimeout(10000, client.emit, client, "ready")
-
 -- bot starts working here
 client:run('Bot '..config.token)
