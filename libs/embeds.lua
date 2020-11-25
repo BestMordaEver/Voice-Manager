@@ -179,7 +179,7 @@ local embedTypes = {
 			
 			[reactions.left] = function (self, reaction)
 				self:setContent(self.ids, self.page - 1, self.action, self.argument)
-				self.page = page
+				self.page = self.page - 1
 				
 				reaction.message:clearReactions()
 				reaction.message:setEmbed(self.embed)
@@ -188,7 +188,7 @@ local embedTypes = {
 			
 			[reactions.right] = function (self, reaction)
 				self:setContent(self.ids, self.page + 1, self.action, self.argument)
-				self.page = page
+				self.page = self.page + 1
 				
 				reaction.message:clearReactions()
 				reaction.message:setEmbed(self.embed)
