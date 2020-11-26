@@ -56,7 +56,6 @@ local embedTypes = {
 	killIn = 10
 	author = message.author
 	id = newMessage.id
-	page = 1
 	action = "help"
 ]]
 	help = setmetatable({
@@ -67,18 +66,21 @@ local embedTypes = {
 		__index = {
 			setContent = function (self, page)
 				self.embed = {
-					title = page == 1 and locale.helpLobbyTitle or
+					title =
+						page == 0 and locale.helpMenuTitle or
+						page == 1 and locale.helpLobbyTitle or
 						page == 2 and locale.helpMatchmakingTitle or
 						page == 3 and locale.helpHostTitle or
 						page == 4 and locale.helpServerTitle or
 						locale.helpOtherTitle,
 					color = 6561661,
-					description = (page == 1 and locale.helpLobby or
+					description = (
+						page == 0 and locale.helpMenu or
+						page == 1 and locale.helpLobby or
 						page == 2 and locale.helpMatchmaking or
 						page == 3 and locale.helpHost or
 						page == 4 and locale.helpServer or
-						locale.helpOther)..locale.links,
-					footer = {text = locale.embedPages:format(page,5).." | "..locale.embedDelete}
+						locale.helpOther)..locale.links
 				}
 			end,
 			
@@ -87,22 +89,27 @@ local embedTypes = {
 				reaction.message:delete()
 			end,
 			
+			[reactions.page] = function (self, reaction)
+				self:setContent(0)
+				reaction.message:setEmbed(self.embed)
+			end,
+			
 			numbers = function (self, reaction)
 				self:setContent(reactions[reaction.emojiHash])
-				self.page = page
 				reaction.message:setEmbed(self.embed)
 			end
 		}
 	},{
 		__call = function (self, message)
-			local embedData = setmetatable({action = "help", killIn = 10, page = 1, author = message.author}, self)
-			embedData:setContent(1)
+			local embedData = setmetatable({action = "help", killIn = 10, author = message.author}, self)
+			embedData:setContent(0)
 			
 			local newMessage = message:reply {embed = embedData.embed}
 			if newMessage then
 				embeds[newMessage] = embedData
 				embedData.id = newMessage.id
 				
+				newMessage:addReaction(reactions.page)
 				for i=1,5 do
 					newMessage:addReaction(reactions[i])
 				end

@@ -3,6 +3,27 @@
 
 return {
 	-- help
+	helpMenuTitle = [[Help | Table of contents]],
+	helpMenu = [[**Lobby commands** - 1️⃣
+Admin commands to setup and configure lobbies
+`register`, `unregister`, `template`, `target`, `permissions`, `capacity`
+
+**Matchmaking commands** - 2️⃣
+Admin commands to configure matchmaking features
+`matchmaking target`, `matchmaking template`
+
+**Host commands** - 3️⃣
+User commands that can be used by channel hosts
+`whitelist`, `blacklist`, `mute`, `name`, `resize`, `bitrate`, `promote`
+
+**Server commands** - 4️⃣
+Admin commands to configure global settings like prefix
+`limitation`, `prefix`
+
+**Other commands** - 5️⃣
+Miscellaneous commands that can be used by everyone
+`list`, `stats`, `support`]],
+	
 	helpLobbyTitle = [[Help | Lobby commands]],
 	helpLobby = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
@@ -37,6 +58,7 @@ Select a matchmaking mode]],
 
 	helpHostTitle = [[Help | Host commands]],
 	helpHost = [[You need to be a channel host to use those commands!
+Host commands are enabled with `permissions`, check `!vm help permissions` to learn more
 You can learn more about each command by using `help`, for example `!vm help template`
 
 **!vm whitelist <user mention>** and **!vm blacklist <user mention>**
@@ -124,10 +146,15 @@ Select the category where new channels will be created
 <prefix> target "<channel ID or name>" <category ID or name> *OR*
 <prefix> target "<channel ID> [channel ID] ..." <category ID or name>
 
-You can also use **<prefix> target <category ID or name>** to be given a list of lobbies that you can change target for
+*(Reset the target to default for the provided channels)*
+<prefix> reset target <channel ID or name> *OR*
+<prefix> reset target <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] target <category ID or name>** to be given a list of lobbies that you can change target for
 
 **• Example**
-!vm target "Join to connect to random party" Join to create new channel
+!vm target "Join to create new channel" Lobbies
+!vm reset target Join to create new channel
 !vm target "759657662773330022" 759657549745750026
 !vm target "759657662773330022 759213923588112406" 759657549745750026]],
 	
@@ -142,7 +169,11 @@ Change the name of new channels
 <prefix> template "<channel ID or name>" <template text> *OR*
 <prefix> template "<channel ID> [channel ID] ..." <template text>
 
-You can also use **<prefix> template <template text>** to be given a list of lobbies that you can change template for
+*(Reset the template to default for the provided channels)*
+<prefix> reset template <channel ID or name> *OR*
+<prefix> reset template <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] template <template text>** to be given a list of lobbies that you can change template for
 
 You can customize a template by including different `%combos%` to it:
 **%nickname%** - user's nickname (name is used if no nickname is set)
@@ -155,6 +186,7 @@ You can customize a template by including different `%combos%` to it:
 
 **• Example**
 !vm template "Join to create new channel" %nickname's% funky place
+!vm reset target Join to create new channel
 !vm template "759657662773330022" Raid room %counter%
 !vm template "759657662773330022 759213923588112406" %game% - Room %counter%]],
 	
@@ -169,7 +201,11 @@ Give your users control over their new channels
 <prefix> permissions "<channel ID or name>" <permission> [permission] ... <on/off> *OR*
 <prefix> permissions "<channel ID> [channel ID] ..." <permission> [permission] ... <on/off>
 
-You can also use **<prefix> permissions <permission> [permission] ... <on/off>** to be given a list of lobbies that you can change permissions for
+*(Reset the permissions to default for the provided channels)*
+<prefix> reset permissions <channel ID or name> *OR*
+<prefix> reset permissions <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] permissions <permission> [permission] ... <on/off>** to be given a list of lobbies that you can change permissions for
 
 You can grant following permissions:
 **mute** - allows use of host command **mute**
@@ -181,6 +217,7 @@ You can grant following permissions:
 
 **• Example**
 !vm permissions "Join to create new channel" mute moderate manage on
+!vm reset permissions Join to create new channel
 !vm permissions "759657662773330022" manage off
 !vm permissions "759657662773330022 759213923588112406" moderate name on]],
 
@@ -195,10 +232,15 @@ Specify the planned capacity new channels will have. By default, new channels wi
 <prefix> capacity "<channel ID or name>" <number between 0 and 99> *OR*
 <prefix> capacity "<channel ID> [channel ID] ..." <number between 0 and 99>
 
-You can also use **<prefix> capacity <number between 0 and 99>** to be given a list of lobbies that you can change planned capacity for
+*(Reset the capacity to default for the provided channels)*
+<prefix> reset capacity <channel ID or name> *OR*
+<prefix> reset capacity <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] capacity <number between 0 and 99>** to be given a list of lobbies that you can change planned capacity for
 
 **• Example**
 !vm capacity "Join to connect to random party" 4
+!vm reset capacity Join to connect to random party
 !vm capacity "759657662773330022" 10
 !vm capacity "759657662773330022 759213923588112406" 2]],
 	
@@ -215,10 +257,15 @@ Both matchmaking target and matchmaking lobby must be registered lobbies!
 <prefix> target "<channel ID or name>" <target channel ID or name> *OR*
 <prefix> target "<channel ID> [channel ID] ..." <target channel ID or name>
 
-You can also use **<prefix> target <target channel ID or name>** to be given a list of lobbies that you can change matchmaking target for
+*(Reset the target to default for the provided channels. This turns matchmaking lobby into a normal lobby)*
+<prefix> reset target <channel ID or name> *OR*
+<prefix> reset target <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] target <target channel ID or name>** to be given a list of lobbies that you can change matchmaking target for
 
 **• Example**
 !vm target "Join to connect to random party" Join to create new channel
+!vm target reset Join to connect to random party
 !vm target "759657662773330022" 759657549745750026
 !vm target "759657662773330022 759213923588112406" 759657549745750026]],
 	
@@ -233,10 +280,14 @@ Change matchmaking mode for matchmaking lobby. This will determine how bot will 
 <prefix> template "<channel ID or name>" <matchmaking mode> *OR*
 <prefix> template "<channel ID> [channel ID] ..." <matchmaking mode>
 
-You can also use **<prefix> template <matchmaking mode>** to be given a list of lobbies that you can change matchmaking template for
+*(Reset the matchmaking template to default for the provided channels)*
+<prefix> reset template <channel ID or name> *OR*
+<prefix> reset template <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] template <matchmaking mode>** to be given a list of lobbies that you can change matchmaking template for
 
 There are several matchmaking modes available:
-**random** - selects a random channel, default mode of operation
+**random** - selects a random channel, default mode
 **first** - selects the first available channel
 **last** - selects the last available channel
 **max** - selects the most filled available channel
@@ -244,6 +295,7 @@ There are several matchmaking modes available:
 
 **• Example**
 !vm template "Join to connect to random party" random
+!vm template reset Join to connect to random party
 !vm template "759657662773330022" max
 !vm template "759657662773330022 759213923588112406" min]],
 	
@@ -322,7 +374,7 @@ If channel's template has %rename% combo, then only %rename% part will change
 **Changing channel name is currently ratelimited by Discord!** Bots can't change channel name more often than 2 times per 10 minutes, so use this command wisely
 
 **• Example**
-!vm name We respect women in this chatroom]],
+!vm name Cozy place]],
 	
 	resize = [[You need to be a channel host to use this command!
 This command is enabled with permission "resize"
@@ -367,8 +419,12 @@ Change how many new channels can be created in your server. Absolute maximum is 
 *(Change the current channel limit in your server)*
 <prefix> limitation [server ID] <number between 0 and 500>
 
+*(Reset the channel limit to default)*
+<prefix> reset limitation [server ID]
+
 **• Example**
 !vm limitation 20
+!vm reset limitation
 !vm limitation 759657662773330022 100]],
 	
 	prefix = [[You need a **"Manage Channels"** permission to use this command!
@@ -381,8 +437,12 @@ Set a new prefix. Mentioning will still work
 *(Change the prefix in your server)*
 prefix [server ID] <new prefix>
 
+*(Reset the prefix to default)*
+<prefix> reset prefix [server ID]
+
 **• Example**
 !vm prefix vm/
+!vm reset prefix
 !vm prefix 759657662773330022 According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! Coming! Hang on a second. Hello? - Barry? - Adam? - Can you believe this is happening? - I can't. I'll pick you up. Looking sharp. Use the stairs. Your father paid good money for those. Sorry. I'm excited.]],
 	
 	-- user
