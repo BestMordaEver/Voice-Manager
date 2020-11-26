@@ -7,7 +7,7 @@ local channels = require "storage/channels"
 local client = discordia.storage.client
 
 return function (message)
-	local guildID = message.content:match("stats%s*(%d+)")
+	local guildID = message.content:match("stats%s*(.-)$")
 	local guild = guildID == "local" and message.guild or client:getGuild(guildID)
 	if guildID and not guild then
 		message:reply(locale.badServer)

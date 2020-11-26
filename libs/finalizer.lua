@@ -146,19 +146,23 @@ return {
 		{isLobby,isUser},
 		{
 			default = function (nids, permissions)
-				local permissionBits = bitfield(permissions)
-				if permissions == 0 then
-					return locale.resetPermissions.."\n"
-				else
+				if permissions then
+					local permissionBits = bitfield(permissions)
 					return string.format(permissionBits:has(permissionBits.bits.on) and locale.newPermissions or locale.revokedPermissions, tostring(permissionBits)).."\n"
+				else
+					return locale.resetPermissions.."\n"
 				end
 			end,
 			notLobby, badUser
 		},
 		function (channel, permissions)
-			local permissionBits = bitfield(lobbies[channel.id].permissions)
-			local newPermissionBits = bitfield(permissions)
-			lobbies[channel.id]:updatePermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
+			if permissions then
+				local permissionBits = bitfield(lobbies[channel.id].permissions)
+				local newPermissionBits = bitfield(permissions)
+				lobbies[channel.id]:updatePermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
+			else
+				lobbies[channel.id]:updatePermissions(0)
+			end
 		end
 	),
 	

@@ -56,7 +56,6 @@ local embedTypes = {
 	killIn = 10
 	author = message.author
 	id = newMessage.id
-	page = 1
 	action = "help"
 ]]
 	help = setmetatable({
@@ -67,18 +66,21 @@ local embedTypes = {
 		__index = {
 			setContent = function (self, page)
 				self.embed = {
-					title = page == 1 and locale.helpLobbyTitle or
+					title =
+						page == 0 and locale.helpMenuTitle or
+						page == 1 and locale.helpLobbyTitle or
 						page == 2 and locale.helpMatchmakingTitle or
 						page == 3 and locale.helpHostTitle or
 						page == 4 and locale.helpServerTitle or
 						locale.helpOtherTitle,
 					color = 6561661,
-					description = (page == 1 and locale.helpLobby or
+					description = (
+						page == 0 and locale.helpMenu or
+						page == 1 and locale.helpLobby or
 						page == 2 and locale.helpMatchmaking or
 						page == 3 and locale.helpHost or
 						page == 4 and locale.helpServer or
-						locale.helpOther)..locale.links,
-					footer = {text = locale.embedPages:format(page,5).." | "..locale.embedDelete}
+						locale.helpOther)..locale.links
 				}
 			end,
 			
@@ -87,22 +89,27 @@ local embedTypes = {
 				reaction.message:delete()
 			end,
 			
+			[reactions.page] = function (self, reaction)
+				self:setContent(0)
+				reaction.message:setEmbed(self.embed)
+			end,
+			
 			numbers = function (self, reaction)
 				self:setContent(reactions[reaction.emojiHash])
-				self.page = page
 				reaction.message:setEmbed(self.embed)
 			end
 		}
 	},{
 		__call = function (self, message)
-			local embedData = setmetatable({action = "help", killIn = 10, page = 1, author = message.author}, self)
-			embedData:setContent(1)
+			local embedData = setmetatable({action = "help", killIn = 10, author = message.author}, self)
+			embedData:setContent(0)
 			
 			local newMessage = message:reply {embed = embedData.embed}
 			if newMessage then
 				embeds[newMessage] = embedData
 				embedData.id = newMessage.id
 				
+				newMessage:addReaction(reactions.page)
 				for i=1,5 do
 					newMessage:addReaction(reactions[i])
 				end
@@ -130,7 +137,7 @@ local embedTypes = {
 		__index = {
 			setContent = function (self, ids, page)
 				local nids, action, argument = #ids, self.action, self.argument
-				if action == "permissions" and argument ~= "" then argument = bitfield(argument) end
+				if action == "permissions" and argument and argument ~= "" then argument = bitfield(argument) end
 				
 				-- this is the most compact way to relatively quickly perform all required checks
 				-- good luck
@@ -140,11 +147,11 @@ local embedTypes = {
 					description = (
 						action == "register" and locale.embedRegister or 
 						action == "unregister" and locale.embedUnregister or 
-						action == "template" and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or
-						action == "target" and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or
-						action == "permissions" and (argument == "" and locale.embedLobbyPermissions or 
-							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or
-						action == "capacity" and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity)
+						action == "template" and (argument and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or locale.embedResetTemplate) or
+						action == "target" and (argument and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or locale.embedResetTarget) or
+						action == "permissions" and (argument and (argument == "" and locale.embedLobbyPermissions or 
+							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or locale.embedResetPermissions) or
+						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
 						isProbing(action, argument) and (
