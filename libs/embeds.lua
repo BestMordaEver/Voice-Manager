@@ -130,7 +130,7 @@ local embedTypes = {
 		__index = {
 			setContent = function (self, ids, page)
 				local nids, action, argument = #ids, self.action, self.argument
-				if action == "permissions" and argument ~= "" then argument = bitfield(argument) end
+				if action == "permissions" and argument and argument ~= "" then argument = bitfield(argument) end
 				
 				-- this is the most compact way to relatively quickly perform all required checks
 				-- good luck
@@ -140,11 +140,11 @@ local embedTypes = {
 					description = (
 						action == "register" and locale.embedRegister or 
 						action == "unregister" and locale.embedUnregister or 
-						action == "template" and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or
-						action == "target" and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or
-						action == "permissions" and (argument == "" and locale.embedLobbyPermissions or 
-							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or
-						action == "capacity" and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity)
+						action == "template" and (argument and (argument == "" and locale.embedLobbyTemplate or locale.embedTemplate) or locale.embedResetTemplate) or
+						action == "target" and (argument and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or locale.embedResetTarget) or
+						action == "permissions" and (argument and (argument == "" and locale.embedLobbyPermissions or 
+							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or locale.embedResetPermissions) or
+						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
 						isProbing(action, argument) and (

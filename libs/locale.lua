@@ -443,9 +443,11 @@ Show stats for specific server
 	lobbyPermissions = [[Current lobby permissions for **`%s`** include: **`%s`**]],
 	newPermissions = [[Added new permissions **`%s`** for:]],
 	revokedPermissions = [[Revoked permissions **`%s`**:]],
+	resetPermissions = [[Reset permissions:]],
 	embedAddPermissions = [[Select a lobby that will receive listed permissions]],
 	embedRemovePermissions = [[Select a lobby that will lose listed permissions]],
 	embedLobbyPermissions = [[Select a lobby to show its permissions]],
+	embedResetPermissions = [[Select a lobby to reset its permissions]],
 	noPermission = [[There's no such permission]],
 	noToggle = [[No toggle found]],
 	-- capacity

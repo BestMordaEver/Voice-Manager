@@ -17,7 +17,7 @@ local emitter = discordia.Emitter()
 
 -- prepared statements
 local add, remove, updatePrefix, updateTemplate, updateLimitation =
-	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL, 100000)"),
+	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL, 500)"),
 	sqlite:prepare("DELETE FROM guilds WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"),
 	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"),
@@ -64,7 +64,7 @@ local guildMT = {
 local guildsIndex = {
 	-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
 	loadAdd = function (self, guildID, prefix, template, limitation)
-		self[guildID] = setmetatable({id = guildID, prefix = prefix or "!vm", template = template, limitation = limitation or 100000, lobbies = set(), channels = 0}, guildMT)
+		self[guildID] = setmetatable({id = guildID, prefix = prefix or "!vm", template = template, limitation = limitation or 500, lobbies = set(), channels = 0}, guildMT)
 		logger:log(4, "GUILD %s: Added", guildID)
 	end,
 	
@@ -83,7 +83,7 @@ local guildsIndex = {
 				if client:getGuild(guildID) then
 					self:loadAdd(guildID, guildIDs.prefix[i], guildIDs.template[i], tonumber(guildIDs.limitation[i]))
 				else
-					emitter:emit("remove", self.id)
+					emitter:emit("remove", guildID)
 				end
 			end
 		end

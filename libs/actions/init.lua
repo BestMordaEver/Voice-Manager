@@ -1,5 +1,6 @@
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return {
+	reset = require "actions/admin/reset",
 	help = require "actions/misc/help",
 	register = require "actions/admin/register",
 	unregister = require "actions/admin/unregister",
