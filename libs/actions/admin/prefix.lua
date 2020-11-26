@@ -1,8 +1,6 @@
-local discordia = require "discordia"
+local client = require "discordia".storage.client
 local guilds = require "storage/guilds"
 local prefinalizer = require "prefinalizer"
-
-local client = discordia.storage.client
 
 return function (message)
 	local prefix = message.guild and guilds[message.guild.id].prefix or nil

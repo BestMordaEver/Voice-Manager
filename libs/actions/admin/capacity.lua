@@ -1,5 +1,4 @@
 local client = require "discordia".storage.client
-local lobbies = require "storage/lobbies"
 local actionParse = require "utils/actionParse"
 local prefinalizer = require "prefinalizer"
 local locale = require "locale"
