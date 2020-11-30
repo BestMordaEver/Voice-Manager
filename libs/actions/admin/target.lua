@@ -19,7 +19,7 @@ return function (message, ids, target)
 		elseif not potentialTarget then
 			if not message.guild then
 				message:reply(locale.noID)
-				return "Template by name in dm"
+				return "Target by name in dm"
 			end
 			
 			local categories = message.guild.categories:toArray("position", function (category) return category.name:lower() == target:lower() end)

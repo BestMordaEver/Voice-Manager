@@ -36,8 +36,6 @@ return {
 	end),
 	
 	target = new("target", function (message, ids, target)
-		target = target or ""
-	
 		if target == "" then
 			message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].target).name) or locale.noTarget)
 			return "Sent channel target"
@@ -55,6 +53,13 @@ return {
 		if not capacity then
 			message:reply(lobbies[ids[1]].capacity and locale.lobbyCapacity:format(client:getChannel(ids[1]).name, lobbies[ids[1]].capacity) or locale.noCapacity)
 			return "Sent channel capacity"
+		end
+	end),
+	
+	companion = new("companion", function (message, ids, target)
+		if target == "" then
+			message:reply(lobbies[ids[1]].companion and locale.lobbyCompanion:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].companion).name) or locale.noCompanion)
+			return "Sent companion target"
 		end
 	end),
 	

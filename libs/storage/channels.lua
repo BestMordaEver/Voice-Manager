@@ -1,5 +1,5 @@
 -- object to store data about new channels and interact with corresponding db
--- CREATE TABLE channels(id VARCHAR PRIMARY KEY, parent VARCHAR, position INTEGER)
+-- CREATE TABLE channels(id VARCHAR PRIMARY KEY, parent VARCHAR, position INTEGER, companion VARCHAR)
 
 local discordia = require "discordia"
 local sqlite = require "sqlite3".open("channelsData.db")
@@ -15,7 +15,7 @@ local emitter = discordia.Emitter()
 
 -- prepared statements
 local add, remove, updateHost =
-	sqlite:prepare("INSERT INTO channels VALUES(?,?,?,?)"),
+	sqlite:prepare("INSERT INTO channels VALUES(?,?,?,?,?)"),
 	sqlite:prepare("DELETE FROM channels WHERE id = ?"),
 	sqlite:prepare("UPDATE channels SET host = ? WHERE id = ?")
 	
@@ -31,12 +31,7 @@ local channelMT = {
 		delete = function (self)
 			if channels[self.id] then
 				channels[self.id] = nil
-				local channel = client:getChannel(self.id)
-				if channel and channel.guild then
-					logger:log(4, "GUILD %s: Removed channel %s", channel.guild.id, self.id)
-				else
-					logger:log(4, "NULL: Removed channel %s", self.id)
-				end
+				logger:log(4, "CHANNEL %s: Removed", self.id)
 			end
 			emitter:emit("remove", self.id)
 		end,
@@ -56,20 +51,20 @@ local channelMT = {
 }
 local channelsIndex = {
 	-- perform checks and add channel to table
-	loadAdd = function (self, channelID, host, parent, position)
+	loadAdd = function (self, channelID, host, parent, position, companion)
 		if not self[channelID] then
 			local channel = client:getChannel(channelID)
 			if channel and channel.guild then
-				self[channelID] = setmetatable({id = channelID, host = host, parent = parent, position = position}, channelMT)
+				self[channelID] = setmetatable({id = channelID, host = host, parent = parent, position = position, companion = companion}, channelMT)
 				logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
 			end
 		end
 	end,
 	
 	-- loadAdd and start interaction with db
-	add = function (self, channelID, host, parent, position)
+	add = function (self, channelID, host, parent, position, companion)
 		if parent then parent = lobbies[parent] end
-		self:loadAdd(channelID, host, parent, position)
+		self:loadAdd(channelID, host, parent, position, companion)
 		if self[channelID] then
 			emitter:emit("add", channelID, parent.id, position, host)
 			return self[channelID]
@@ -84,7 +79,7 @@ local channelsIndex = {
 				local channel = client:getChannel(channelID)
 				if channel then
 					if #channel.connectedMembers > 0 then
-						self:loadAdd(channelID, channelIDs.host[i], lobbies[channelIDs.parent[i]], tonumber(channelIDs.position[i]))
+						self:loadAdd(channelID, channelIDs.host[i], lobbies[channelIDs.parent[i]], tonumber(channelIDs.position[i]), channelIDs.companion[i])
 						if self[channelID].parent then
 							self[channelID].parent:attachChild(channelID, tonumber(self[channelID].position))
 						end

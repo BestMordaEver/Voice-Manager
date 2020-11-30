@@ -10,6 +10,7 @@ return {
 	template = require "actions/admin/template",
 	permissions = require "actions/admin/permissions",
 	capacity = require "actions/admin/capacity",
+	companion = require "actions/admin/companion",
 	limitation = require "actions/admin/limitation",
 	prefix = require "actions/admin/prefix",
 	blacklist = require "actions/host/moderate",

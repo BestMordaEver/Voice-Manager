@@ -151,10 +151,11 @@ local embedTypes = {
 						action == "target" and (argument and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or locale.embedResetTarget) or
 						action == "permissions" and (argument and (argument == "" and locale.embedLobbyPermissions or 
 							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or locale.embedResetPermissions) or
-						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity)
+						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity) or
+						action == "companion" and (argument and (argument == "" and locale.embedLobbyCompanion or locale.embedCompanion) or locale.embedResetCompanion)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
-						isProbing(action, argument) and (
+						not isProbing(action, argument) and (
 							((nids > 10) and (locale.embedPage.."\n") or "")..(locale.embedAll.."\n")) or ""),
 					footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number
 				}
@@ -176,7 +177,7 @@ local embedTypes = {
 				end
 				if self.page ~= math.modf(#self.ids/10)+1 then message:addReaction(reactions.right) end
 				
-				if isProbing(self.action, self.argument) then
+				if not isProbing(self.action, self.argument) then
 					if #self.ids > 10 then message:addReaction(reactions.page) end
 					if #self.ids > 0 then message:addReaction(reactions.all) end
 				end
