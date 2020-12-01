@@ -6,7 +6,7 @@ return {
 	helpMenuTitle = [[Help | Table of contents]],
 	helpMenu = [[**Lobby commands** - 1️⃣
 Admin commands to setup and configure lobbies
-`register`, `unregister`, `template`, `target`, `permissions`, `capacity`
+`register`, `unregister`, `template`, `target`, `companion`, `permissions`, `capacity`
 
 **Matchmaking commands** - 2️⃣
 Admin commands to configure matchmaking features
@@ -36,6 +36,9 @@ Reverts a lobby channel back to a normal channel. Channels created by the existi
 
 **!vm target "<channel name>" <category name>**
 Select a category in which new channels will be created
+
+**!vm target "<channel name>" <category name>**
+Create private text chats alongside new channels
 
 **!vm template "<channel name>" <template text>**
 Change the name of new channels
@@ -157,6 +160,29 @@ You can also use **<prefix> [reset] target <category ID or name>** to be given a
 !vm reset target Join to create new channel
 !vm target "759657662773330022" 759657549745750026
 !vm target "759657662773330022 759213923588112406" 759657549745750026]],
+	
+	companion = [[You need the **Manage Channels** permission in order to use this command
+Create private text chats alongside new channels. Those text channels are accessible only to those currently in a corresponding voice channel
+
+**• Usage**
+*(Show where provided lobby will create companion channels)*
+<prefix> companion "<channel ID or name>"
+
+*(Change where provided lobby will create companion channels)*
+<prefix> companion "<channel ID or name>" <category ID or name> *OR*
+<prefix> companion "<channel ID> [channel ID] ..." <category ID or name>
+
+*(Disable companion channels for provided lobbies)*
+<prefix> reset companion <channel ID or name> *OR*
+<prefix> reset companion <channel ID> [channel ID] ...
+
+You can also use **<prefix> [reset] companion <category ID or name>** to be given a list of lobbies that you can change companion target for
+
+**• Example**
+!vm companion "Join to start new session" Lobbies
+!vm reset companion Join to start new session
+!vm companion "759657662773330022" 759657549745750026
+!vm companion "759657662773330022 759213923588112406" 759657549745750026]],
 	
 	template = [[You need a **"Manage Channels"** permission to use this command!
 Change the name of new channels
@@ -523,7 +549,7 @@ Show stats for specific server
 	lobbyCompanion = [[Companion channels for **`%s`** are created in category **`%s`**]],
 	noCompanion = [[This lobby doesn't create companion channels]],
 	newCompanion = [[Lobbies that will create companion channels in **`%s`**:]],
-	resetCompanion = [[Reset a companion target:]],
+	resetCompanion = [[Lobbies that will stop createing companion channels:]],
 	embedCompanion = [[Select a lobby that will create companion channels in **`%s`**]],
 	embedLobbyCompanion = [[Select a lobby to show where it creates companion channels]],
 	embedResetCompanion = [[Select a lobby to make it stop creating companion channels]],
