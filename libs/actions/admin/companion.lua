@@ -14,7 +14,7 @@ return function (message, ids, target)
 		target = message.content:match('companion%s*".-"%s*(.-)$') or message.content:match('companion%s*(.-)$')
 		
 		local potentialTarget = client:getChannel(target)
-		if potentialTarget and potentialTarget ~= channelType.category then
+		if potentialTarget and potentialTarget.type ~= channelType.category then
 			potentialTarget = nil
 		elseif not potentialTarget then
 			if not message.guild then
@@ -38,6 +38,11 @@ return function (message, ids, target)
 				message:reply(locale.badBotPermission.." "..potentialTarget.name)
 				return "Bot doesn't have permission to manage the companion target"
 			end
+		end
+		
+		if target ~= "" and not potentialTarget then
+			message:reply(locale.badCompanion)
+			return "No companion category provided"
 		end
 		
 		ids = actionParse(message, message.content:match('"(.-)"'), "companion", target)

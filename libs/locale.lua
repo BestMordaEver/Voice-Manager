@@ -553,6 +553,7 @@ Show stats for specific server
 	embedCompanion = [[Select a lobby that will create companion channels in **`%s`**]],
 	embedLobbyCompanion = [[Select a lobby to show where it creates companion channels]],
 	embedResetCompanion = [[Select a lobby to make it stop creating companion channels]],
+	badCompanion = [[Couldn't find specified category]],
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
