@@ -138,6 +138,7 @@ local embedTypes = {
 			setContent = function (self, ids, page)
 				local nids, action, argument = #ids, self.action, self.argument
 				if action == "permissions" and argument and argument ~= "" then argument = bitfield(argument) end
+				if argument and client:getChannel(argument) then argument = client:getChannel(argument).name end
 				
 				-- this is the most compact way to relatively quickly perform all required checks
 				-- good luck
@@ -155,7 +156,7 @@ local embedTypes = {
 						action == "companion" and (argument and (argument == "" and locale.embedLobbyCompanion or locale.embedCompanion) or locale.embedResetCompanion)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
-						not isProbing(action, argument) and (
+						isProbing(action, argument) and (
 							((nids > 10) and (locale.embedPage.."\n") or "")..(locale.embedAll.."\n")) or ""),
 					footer = {text = (nids > 10 and (locale.embedPages:format(page, math.ceil(nids/10)).." | ") or "")..locale.embedDelete}	-- page number
 				}
@@ -177,7 +178,7 @@ local embedTypes = {
 				end
 				if self.page ~= math.modf(#self.ids/10)+1 then message:addReaction(reactions.right) end
 				
-				if not isProbing(self.action, self.argument) then
+				if isProbing(self.action, self.argument) then
 					if #self.ids > 10 then message:addReaction(reactions.page) end
 					if #self.ids > 0 then message:addReaction(reactions.all) end
 				end
