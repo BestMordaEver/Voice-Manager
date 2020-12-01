@@ -15,17 +15,6 @@ local clock = discordia.Clock()
 -- those instances will be used everywhere, they will be stored in discordia.storage for easy access
 discordia.storage = {client = client, clock = clock, logger = discordia.Logger(4, '%F %T')}
 
---[[ storage for access tokens
-return {
-	token = "your_discord_bot_token",
-	tokens = {
-		["discordbotlist.com"] = "token",
-		["top.gg"] = "token",
-		...
-	}
-}
-]]
-
 --[[ 
 holds all the event methods and logic
 notice that metametod call of the table produces two values
