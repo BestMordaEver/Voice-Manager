@@ -1,7 +1,8 @@
 local mercy = require "mercy"
+local config = require "config"
 
 return function (message)	-- hearbeat check
-	if message.author.id == "601347755046076427" and message.channel.id == "676791988518912020" then
+	if message.author.id == config.id and message.channel.id == config.hearbeatChannel then
 		mercy:reset()
 		return
 	end

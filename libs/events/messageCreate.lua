@@ -3,6 +3,7 @@ local locale = require "locale"
 local guilds = require "storage/guilds"
 local actions = require "actions/init"
 local logAction = require "utils/logAction"
+local config = require "config"
 
 local client = discordia.storage.client
 local logger = discordia.storage.logger
@@ -32,8 +33,7 @@ return function (message)
 	-- find the request
 	local content = 
 	prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or
-		message.content:match("^<@.?601347755046076427>%s*(.-)$") or
-		message.content:match("^<@.?676787135650463764>%s*(.-)$") or	-- stop discriminating LabRat
+		message.content:match("^<@.?"..config.id..">%s*(.-)$") or
 		message.content
 		
 	-- what command is it?

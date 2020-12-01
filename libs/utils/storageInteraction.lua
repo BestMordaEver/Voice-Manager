@@ -1,6 +1,7 @@
 -- any interaction with database comes through here
 -- it ensures that no statement is used by two threads at the same time 
 local discordia = require "discordia"
+local config = require "config"
 local Mutex = discordia.Mutex
 local logger = discordia.storage.logger
 local mutexes = {}
@@ -24,7 +25,9 @@ return function (statement, success, failure)
 			logger:log(4, "MEMORY: "..success, ...)
 		else
 			logger:log(2, "%s", string.format("MEMORY: "..failure, ...) .. ": " .. msg)
-			client:getChannel("686261668522491980"):send(string.format(failure, ...) .. ": " .. msg)
+			if config.stderr then
+				client:getChannel(config.stderr):send(string.format(failure, ...) .. ": " .. msg)
+			end
 		end
 	end
 end

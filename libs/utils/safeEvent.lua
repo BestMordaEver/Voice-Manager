@@ -1,4 +1,5 @@
 local discordia = require "discordia"
+local config = require "config"
 local client, logger = discordia.storage.client, discordia.storage.logger
 
 return function (name, func)
@@ -8,7 +9,9 @@ return function (name, func)
 		local success, err = xpcall(func, debug.traceback, ...)
 		if not success then
 			logger:log(1, "Error on %s: %s", name, err)
-			client:getChannel("686261668522491980"):sendf("Error on %s: %s", name, err)
+			if config.stderr then
+				client:getChannel(config.stderr):sendf("Error on %s: %s", name, err)
+			end
 		end
 	end
 end

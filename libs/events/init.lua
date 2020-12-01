@@ -7,6 +7,7 @@ local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
 local status = require "utils/status"
 local safeEvent = require "utils/safeEvent"
+local config = require "config"
 
 --[[
 events are listed by name here, discordia events may differ from OG discord events for sake of convenience
@@ -39,7 +40,9 @@ events = {
 		clock:start()
 		
 		client:setGame(status())
-		client:getChannel("676432067566895111"):send("I'm listening")
+		if config.guildFeed then
+			client:getChannel(config.guildFeed):send("I'm listening")
+		end
 		
 		client:on(events("messageCreate"))
 		client:on(events("messageUpdate"))
@@ -50,7 +53,8 @@ events = {
 		client:on(events("voiceChannelLeave"))
 		client:on(events("channelDelete"))
 		clock:on(events("min"))
-		clock:on(events("hour"))
+		
+		if config.sendStats then clock:on(events("hour")) end
 	end,
 
 	min = require "events/min",

@@ -3,6 +3,6 @@
 *.log
 *.db
 *.dll
-config.lua
+token.lua
 dbedit.lua
 testSuite.lua

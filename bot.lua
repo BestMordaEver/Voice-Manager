@@ -25,7 +25,6 @@ return {
 	}
 }
 ]]
-local config = require "./config.lua"
 
 --[[ 
 holds all the event methods and logic
@@ -37,4 +36,4 @@ local events = require "events/init"
 client:once(events("ready"))
 
 -- bot starts working here
-client:run('Bot '..config.token)
+client:run('Bot '..require "token".token)
