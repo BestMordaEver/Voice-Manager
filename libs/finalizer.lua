@@ -133,7 +133,7 @@ return {
 	target = new(
 		{isLobby,isUser, function (author, channel, argument) return channel ~= client:getChannel(argument) end},
 		{
-			default = function (nids, target) return string.format(target and locale.newTarget or locale.resetTarget, client:getChannel(target).name).."\n" end,
+			default = function (nids, target) return (target and locale.newTarget:format(client:getChannel(target).name) or locale.resetTarget).."\n" end,
 			notLobby, badUser, 
 			function (nids) return locale.selfTarget.."\n" end
 		},
@@ -174,6 +174,17 @@ return {
 		},
 		function (channel, capacity)
 			lobbies[channel.id]:updateCapacity(capacity)
+		end
+	),
+	
+	companion = new(
+		{isLobby,isUser},
+		{
+			default = function (nids, target) return (target and locale.newCompanion:format(client:getChannel(target).name) or locale.resetCompanion).."\n" end,
+			notLobby, badUser
+		},
+		function (channel, target)
+			lobbies[channel.id]:updateCompanion(target)
 		end
 	)
 }

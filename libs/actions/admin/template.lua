@@ -1,8 +1,6 @@
 local client = require "discordia".storage.client
-local lobbies = require "storage/lobbies"
 local actionParse = require "utils/actionParse"
 local prefinalizer = require "prefinalizer"
-local locale = require "locale"
 
 -- this function is also used by embeds, they will supply ids and template
 return function (message, ids, template)

@@ -1,14 +1,7 @@
-local discordia = require "discordia"
-local embeds = require "embeds"
-local locale = require "locale"
-local lobbies = require "storage/lobbies"
-
-local prefinalizer = require "prefinalizer"
+local client = require "discordia".storage.client
 local actionParse = require "utils/actionParse"
+local prefinalizer = require "prefinalizer"
 local bitfield = require "utils/bitfield"
-local truePositionSorting = require "utils/truePositionSorting"
-local client = discordia.storage.client
-local permission = discordia.enums.permission
 
 return function (message, ids, permissions)
 	if not ids then

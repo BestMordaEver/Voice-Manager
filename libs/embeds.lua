@@ -138,6 +138,7 @@ local embedTypes = {
 			setContent = function (self, ids, page)
 				local nids, action, argument = #ids, self.action, self.argument
 				if action == "permissions" and argument and argument ~= "" then argument = bitfield(argument) end
+				if argument and client:getChannel(argument) then argument = client:getChannel(argument).name end
 				
 				-- this is the most compact way to relatively quickly perform all required checks
 				-- good luck
@@ -151,7 +152,8 @@ local embedTypes = {
 						action == "target" and (argument and (argument == "" and locale.embedLobbyTarget or locale.embedTarget) or locale.embedResetTarget) or
 						action == "permissions" and (argument and (argument == "" and locale.embedLobbyPermissions or 
 							(argument:has(bitfield.bits.on) and locale.embedAddPermissions or locale.embedRemovePermissions)) or locale.embedResetPermissions) or
-						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity)
+						action == "capacity" and (argument and (argument == "" and locale.embedLobbyCapacity or locale.embedCapacity) or locale.embedResetCapacity) or
+						action == "companion" and (argument and (argument == "" and locale.embedLobbyCompanion or locale.embedCompanion) or locale.embedResetCompanion)
 					):format(argument).."\n"..(
 					-- probing actions don't need asterisk and page, we can't learn several templates/targets...
 						isProbing(action, argument) and (

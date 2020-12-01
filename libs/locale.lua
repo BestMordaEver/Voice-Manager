@@ -490,7 +490,7 @@ Show stats for specific server
 	embedTarget = [[Select a lobby that will have target **`%s`**]],
 	embedLobbyTarget = [[Select a lobby to show its target]],
 	embedResetTarget = [[Select a lobby to reset its target]],
-	badTarget = [[Couldn't find the target specified target]],
+	badTarget = [[Couldn't find specified target]],
 	-- template
 	lobbyTemplate = [[Current template for **`%s`** is **`%s`**]],
 	noTemplate = [[This lobby doesn't have a custom template]],
@@ -519,6 +519,14 @@ Show stats for specific server
 	embedLobbyCapacity = [[Select a lobby to show its capacity]],
 	embedResetCapacity = [[Select a lobby to reset its capacity]],
 	capacityOOB = [[Capacity must be a number between 0 and 99, or -1 to use lobby's capacity]],
+	-- companion
+	lobbyCompanion = [[Companion channels for **`%s`** are created in category **`%s`**]],
+	noCompanion = [[This lobby doesn't create companion channels]],
+	newCompanion = [[Lobbies that will create companion channels in **`%s`**:]],
+	resetCompanion = [[Reset a companion target:]],
+	embedCompanion = [[Select a lobby that will create companion channels in **`%s`**]],
+	embedLobbyCompanion = [[Select a lobby to show where it creates companion channels]],
+	embedResetCompanion = [[Select a lobby to make it stop creating companion channels]],
 	-- limitation
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],

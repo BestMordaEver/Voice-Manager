@@ -97,13 +97,33 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
 		member:setVoiceChannel(newChannel.id)
-		channels:add(newChannel.id, member.user.id, lobby.id, position)
+		local perms = bitfield(lobbyData.permissions):toDiscordia()
+		local companion
+		
+		if lobbyData.companion then
+			local companionTarget = client:getChannel(lobbyData.companion)
+			if companionTarget then
+				companion = companionTarget:createTextChannel("Private chat")
+				if companion then
+					companion:getPermissionOverwriteFor(lobby.guild.defaultRole):denyPermissions(permission.readMessages)
+					companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+					if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+						companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+					end
+				else
+					logger:log(2, "GUILD %s LOBBY %s: Couldn't create companion channel for %s", lobby.guild.id, lobby.id, newChannel.id)
+				end
+			else
+				logger:log(2, "GUILD %s LOBBY %s: No companion target for %s available", lobby.guild.id, lobby.id, newChannel.id)
+			end
+		end
+		
+		channels:add(newChannel.id, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(newChannel.id, position)
 		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 		newChannel:setUserLimit(lobbyData.capacity == -1 and lobby.userLimit or lobbyData.capacity)
 		
-		local perms = bitfield(lobbyData.permissions):toDiscordia()
-		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
+		if #perms ~= 0 and lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 		end
 		
@@ -124,11 +144,18 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 	end
 end
 
-return function (member, lobby)
-	if lobby and lobbies[lobby.id] then
-		lobbies[lobby.id].mutex:lock()
-		local ok, err = xpcall(voiceChannelJoin, debug.traceback, member, lobby)
-		lobbies[lobby.id].mutex:unlock()
-		if not ok then error(err) end	-- no ignoring!
+return function (member, channel)
+	if channel then 
+		if lobbies[channel.id] then
+			lobbies[channel.id].mutex:lock()
+			local ok, err = xpcall(voiceChannelJoin, debug.traceback, member, channel)
+			lobbies[channel.id].mutex:unlock()
+			if not ok then error(err) end	-- no ignoring!
+		elseif channels[channel.id] then
+			local companion = client:getChannel(channels[channel.id].companion)
+			if companion then
+				companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+			end
+		end
 	end
 end
