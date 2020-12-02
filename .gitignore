@@ -6,3 +6,4 @@
 config.lua
 dbedit.lua
 testSuite.lua
+token.lua

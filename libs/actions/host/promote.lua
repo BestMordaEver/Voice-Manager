@@ -23,7 +23,7 @@ return function (message)
 	
 	local channelData = channels[channel.id]
 	channelData:updateHost(member.user.id)
-	local lobby = client:getChannel(channelData.parent)
+	local lobby = client:getChannel(channelData.parent.id)
 	if lobby then
 		local perms = bitfield(channelData.parent.permissions):toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
