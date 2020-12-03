@@ -1,6 +1,6 @@
 local client = require "discordia".storage.client
-local actionParse = require "utils/actionParse"
-local prefinalizer = require "prefinalizer"
+local commandParse = require "commands/commandParse"
+local commandFinalize = require "commands/commandFinalize"
 local locale = require "locale"
 
 -- this function is also used by embeds, they will supply ids and capacity value
@@ -13,9 +13,9 @@ return function (message, ids, capacity)
 			return "Capacity OOB"
 		end
 		
-		ids = actionParse(message, message.content:match('"(.-)"'), "capacity", capacity)
+		ids = commandParse(message, message.content:match('"(.-)"'), "capacity", capacity)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	return prefinalizer.capacity(message, ids, capacity)
+	return commandFinalize.capacity(message, ids, capacity)
 end

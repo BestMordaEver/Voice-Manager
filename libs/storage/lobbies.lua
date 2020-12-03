@@ -6,7 +6,7 @@ local sqlite = require "sqlite3".open("lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
-local storageInteraction = require "utils/storageInteraction"
+local storageInteraction = require "storage/storageInteraction"
 local hollowArray = require "utils/hollowArray"
 
 -- used to start storageInteractionEvent as async process

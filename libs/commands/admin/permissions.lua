@@ -1,6 +1,6 @@
 local client = require "discordia".storage.client
-local actionParse = require "utils/actionParse"
-local prefinalizer = require "prefinalizer"
+local commandParse = require "commands/commandParse"
+local commandFinalize = require "commands/commandFinalize"
 local bitfield = require "utils/bitfield"
 
 return function (message, ids, permissions)
@@ -15,9 +15,9 @@ return function (message, ids, permissions)
 		end
 		
 		permissions = permissionBits.raw
-		ids = actionParse(message, message.content:match('"(.-)"'), "permissions", permissions)
+		ids = commandParse(message, message.content:match('"(.-)"'), "permissions", permissions)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	return prefinalizer.permissions(message, ids, permissions)
+	return commandFinalize.permissions(message, ids, permissions)
 end

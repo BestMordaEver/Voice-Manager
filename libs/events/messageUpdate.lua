@@ -1,4 +1,4 @@
-local mercy = require "mercy"
+local mercy = require "utils/mercy"
 local config = require "config"
 
 return function (message)	-- hearbeat check

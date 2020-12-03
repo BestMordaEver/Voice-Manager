@@ -1,5 +1,5 @@
 local locale = require "locale"
-local embeds = require "embeds"
+local embeds = require "utils/embeds"
 
 return function (message)
 	local command = (message.content:match("help%s*(.-)$") or "help"):lower()

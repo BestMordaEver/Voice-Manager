@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
-local embeds = require "embeds"
+local embeds = require "utils/embeds"
 
 local client = discordia.storage.client
 local permission = discordia.enums.permission

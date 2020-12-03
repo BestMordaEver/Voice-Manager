@@ -1,14 +1,14 @@
-local actionParse = require "utils/actionParse"
-local prefinalizer = require "prefinalizer"
+local commandParse = require "commands/commandParse"
+local commandFinalize = require "commands/commandFinalize"
 
 -- this function is also used by embeds, they will supply ids and target
 return function (message, ids)
 	local msg
 	
 	if not ids then
-		ids = actionParse(message, message.content:match("unregister%s*(.-)$"), "unregister")
+		ids = commandParse(message, message.content:match("unregister%s*(.-)$"), "unregister")
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	return prefinalizer.unregister(message, ids)
+	return commandFinalize.unregister(message, ids)
 end

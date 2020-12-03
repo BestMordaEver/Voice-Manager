@@ -1,5 +1,5 @@
-local actionParse = require "utils/actionParse"
-local prefinalizer = require "prefinalizer"
+local commandParse = require "commands/commandParse"
+local commandFinalize = require "commands/commandFinalize"
 
 -- this function is NOT used by embeds, they will call corresponding functions with nil value
 return function (message)
@@ -20,7 +20,7 @@ return function (message)
 			context = client:getGuild(context)
 		end
 
-		prefinalizer.limitation(message, context, 500)
+		commandFinalize.limitation(message, context, 500)
 	elseif action == "prefix" then
 		if context == "" then
 			context = message.guild
@@ -28,13 +28,13 @@ return function (message)
 			context = client:getGuild(context)
 		end
 		
-		prefinalizer.prefix(message, context, "!vm")
+		commandFinalize.prefix(message, context, "!vm")
 	end
 	
-	if prefinalizer[action] then
-		ids = actionParse(message, context, action)
+	if commandFinalize[action] then
+		ids = commandParse(message, context, action)
 		if not ids[1] then return ids end -- message for logger
 		
-		return prefinalizer[action](message, ids)
+		return commandFinalize[action](message, ids)
 	end
 end

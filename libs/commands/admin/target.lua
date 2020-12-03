@@ -5,8 +5,8 @@ local lobbies = require "storage/lobbies"
 local client = discordia.storage.client
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
-local actionParse = require "utils/actionParse"
-local prefinalizer = require "prefinalizer"
+local commandParse = require "commands/commandParse"
+local commandFinalize = require "commands/commandFinalize"
 
 -- this function is also used by embeds, they will supply ids and target
 return function (message, ids, target)
@@ -46,9 +46,9 @@ return function (message, ids, target)
 			end
 		end
 		
-		ids = actionParse(message, message.content:match('"(.-)"'), "target", target)
+		ids = commandParse(message, message.content:match('"(.-)"'), "target", target)
 		if not ids[1] then return ids end -- message for logger
 	end
 	
-	return prefinalizer.target(message, ids, target)
+	return commandFinalize.target(message, ids, target)
 end

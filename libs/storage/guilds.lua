@@ -8,7 +8,7 @@ local client, logger = discordia.storage.client, discordia.storage.logger
 
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
-local storageInteraction = require "utils/storageInteraction"
+local storageInteraction = require "storage/storageInteraction"
 local set = require "utils/set"
 
 -- used to start storageInteractionEvent as async process

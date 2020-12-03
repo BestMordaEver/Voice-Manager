@@ -7,7 +7,7 @@ local sqlite = require "sqlite3".open("channelsData.db")
 local client, logger = discordia.storage.client, discordia.storage.logger
 
 local lobbies = require "storage/lobbies"
-local storageInteraction = require "utils/storageInteraction"
+local storageInteraction = require "storage/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
