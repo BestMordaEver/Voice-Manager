@@ -1,4 +1,5 @@
 local prefinalizer = require "prefinalizer"
+local client = require "discordia".storage.client
 
 return function (message)
 	local guild, limitation = message.content:match("limitation%s*(%d*)%s*(%d*)$")
