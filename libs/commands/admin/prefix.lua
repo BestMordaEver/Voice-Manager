@@ -1,6 +1,5 @@
 local client = require "discordia".storage.client
 local guilds = require "storage/guilds"
-local prefinalizer = require "prefinalizer"
 
 return function (message)
 	local prefix = message.guild and guilds[message.guild.id].prefix or nil
@@ -23,5 +22,26 @@ return function (message)
 			message.content:match("^<@.?676787135650463764>%s*prefix%s*(.-)$") or
 			message.content:match("^%s*prefix%s*(.-)$"))
 	
-	prefinalizer.prefix(message, guild, prefix)
+	if not guild then
+		message:reply(locale.badServer)
+		return "Didn't find the guild"
+	end
+	
+	if guild and not guild:getMember(message.author) then
+		message:reply(locale.notMember)
+		return "Not a member"
+	end
+	
+	if prefix and prefix ~= "" then
+		if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
+			message:reply(locale.mentionInVain:format(message.author.mentionString))
+			return "Bad user permissions"
+		end
+		guilds[guild.id]:updatePrefix(prefix)
+		message:reply(locale.prefixConfirm:format(prefix))
+		return "Set new prefix"
+	else
+		message:reply(locale.prefixThis:format(guilds[guild.id].prefix))
+		return "Sent current prefix"
+	end
 end

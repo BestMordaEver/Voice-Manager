@@ -1,43 +1,21 @@
 local discordia = require "discordia"
 local locale = require "locale"
 
-local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
+local guilds = require "storage/guilds"
+
 local bitfield = require "utils/bitfield"
 
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client
 
---[=[
-@ conditionsToPass
-t table of functions (author, channel)
-
-{
-	function (author, channel)
-		return channel.type == channelType.voice
-	end
-}
-
-@ messageConstructors
-t table of functions (nids)
-
-{
-	default = function (nids)
-		return string.format(nids == 1 and locale.registeredOne or locale.registeredMany, nids).."\n"
-	end,
-	
-	function (nids)
-		return (nids == 1 and locale.badChannel or locale.badChannels).."\n"
-	end
-}
-
-@ action
-t function (channel)
-]=]
-
-local function new (conditionsToPass, messageConstructors, action)
+local function new (conditionsToPass, messageConstructors, actionName, probing)
 	return function (message, ids, argument)
+		if probing then 
+			local res = probing(message, ids, argument)
+			if res then return res end
+		end
+		
 		local failed = {final = {}}
 		
 		for i,conditionToPass in ipairs(conditionsToPass) do
@@ -76,7 +54,8 @@ local function new (conditionsToPass, messageConstructors, action)
 			end
 		end
 		
-		return msg, failed.final
+		message:reply(msg)
+		return (#failed.final == 0 and "Successfully completed action for all" or ("Couldn't complete action for "..table.concat(failed.final, " ")))
 	end
 end
 
@@ -127,6 +106,12 @@ return {
 		},
 		function (channel, template)
 			lobbies[channel.id]:updateTemplate(template)
+		end, 
+		function (message, ids, template)
+			if template == "" then
+				message:reply(lobbies[ids[1]].template and locale.lobbyTemplate:format(client:getChannel(ids[1]).name, lobbies[ids[1]].template) or locale.noTemplate)
+				return "Sent channel template"
+			end
 		end
 	),
 	
@@ -139,6 +124,12 @@ return {
 		},
 		function (channel, target)
 			lobbies[channel.id]:updateTarget(target)
+		end,
+		function (message, ids, target)
+			if target == "" then
+				message:reply(lobbies[ids[1]].target and locale.lobbyTarget:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].target).name) or locale.noTarget)
+				return "Sent channel target"
+			end
 		end
 	),
 	
@@ -163,6 +154,12 @@ return {
 			else
 				lobbies[channel.id]:updatePermissions(0)
 			end
+		end,
+		function (message, ids, permissions)
+			if permissions == 0 then
+				message:reply(locale.lobbyPermissions:format(client:getChannel(ids[1]).name, tostring(bitfield(lobbies[ids[1]].permissions))))
+				return "Sent channel permissions"
+			end
 		end
 	),
 	
@@ -174,6 +171,12 @@ return {
 		},
 		function (channel, capacity)
 			lobbies[channel.id]:updateCapacity(capacity)
+		end,
+		function (message, ids, capacity)
+			if not capacity then
+				message:reply(lobbies[ids[1]].capacity and locale.lobbyCapacity:format(client:getChannel(ids[1]).name, lobbies[ids[1]].capacity) or locale.noCapacity)
+				return "Sent channel capacity"
+			end
 		end
 	),
 	
@@ -185,6 +188,12 @@ return {
 		},
 		function (channel, target)
 			lobbies[channel.id]:updateCompanion(target)
+		end,
+		function (message, ids, target)
+			if target == "" then
+				message:reply(lobbies[ids[1]].companion and locale.lobbyCompanion:format(client:getChannel(ids[1]).name, client:getChannel(lobbies[ids[1]].companion).name) or locale.noCompanion)
+				return "Sent companion target"
+			end
 		end
 	)
 }

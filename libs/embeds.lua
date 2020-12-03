@@ -9,7 +9,7 @@ local discordia = require "discordia"
 local client, sqlite, logger = discordia.storage.client, discordia.storage.sqlite, discordia.storage.logger
 
 local locale = require "locale"
-local prefinalizer = require "prefinalizer"
+local actionFinalize = require "actionFinalize"
 local bitfield = require "utils/bitfield"
 local isComplex = require "utils/isComplex"
 
@@ -211,12 +211,12 @@ local embedTypes = {
 					if not self.ids[i] then break end
 					table.insert(ids, self.ids[i])
 				end
-				return prefinalizer[self.action](reaction.message, ids, self.argument)
+				return actionFinalize[self.action](reaction.message, ids, self.argument)
 			end,
 			
 			[reactions.all] = function (self, reaction)
 				reaction.message.channel:broadcastTyping()
-				return prefinalizer[self.action](reaction.message, self.ids, self.argument)
+				return actionFinalize[self.action](reaction.message, self.ids, self.argument)
 			end,
 			
 			[reactions.stop] = function (self, reaction)
@@ -225,7 +225,7 @@ local embedTypes = {
 			end,
 			
 			numbers = function (self, reaction)
-				return prefinalizer[self.action](reaction.message, {self.ids[(self.page-1) * 10 + reactions[reaction.emojiHash]]}, self.argument)
+				return actionFinalize[self.action](reaction.message, {self.ids[(self.page-1) * 10 + reactions[reaction.emojiHash]]}, self.argument)
 			end
 		}
 	},{
