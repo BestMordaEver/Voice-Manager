@@ -1,8 +1,14 @@
 -- object to store data about guilds and interact with corresponding db
--- CREATE TABLE guilds(id VARCHAR PRIMARY KEY, prefix VARCHAR, template VARCHAR, limitation INTEGER)
+--[[
+CREATE TABLE guilds(
+	id VARCHAR PRIMARY KEY,
+	prefix VARCHAR NOT NULL,	/* mutable, default "vm!" */
+	limit INTEGER NOT NULL,	/* mutable, default 500 */
+	permissions INTEGER NOT NULL	/* mutable, default 0 */
+)]]
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("guildsData.db")
+local guildsData = require "sqlite3".open("guildsData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
@@ -15,56 +21,86 @@ local set = require "utils/set"
 -- because fuck data preservation, we need dat speed
 local emitter = discordia.Emitter()
 
--- prepared statements
-local add, remove, updatePrefix, updateTemplate, updateLimitation =
-	sqlite:prepare("INSERT INTO guilds VALUES(?,'!vm',NULL, 500)"),
-	sqlite:prepare("DELETE FROM guilds WHERE id = ?"),
-	sqlite:prepare("UPDATE guilds SET prefix = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE guilds SET template = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE guilds SET limitation = ? WHERE id = ?")
+local storageStatements = {
+	add = {
+		"INSERT INTO guilds VALUES(?,'vm!', 500, 0)",
+		"Added guild %s", "Couldn't add guild %s"
+	},
+	
+	remove = {
+		"DELETE FROM guilds WHERE id = ?",
+		"Removed guild %s", "Couldn't remove guild %s"
+	},
+	
+	setPrefix = {
+		"UPDATE guilds SET prefix = ? WHERE id = ?",
+		"Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"
+	},
+	
+	setLimit = {
+		"UPDATE guilds SET prefix = ? WHERE id = ?",
+		"Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"
+	},
+	
+	setPermissions = {
+		"UPDATE guilds SET permissions = ? WHERE id = ?",
+		"Updated permissions to %s for guild %s", "Couldn't update permissions to %s for guild %s"
+	}
+}
 
-emitter:on("add", storageInteraction(add, "Added guild %s", "Couldn't add guild %s"))
-emitter:on("remove", storageInteraction(remove, "Removed guild %s", "Couldn't remove guild %s"))
-emitter:on("updatePrefix", storageInteraction(updatePrefix, "Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"))
-emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated template to %s for guild %s", "Couldn't update template to %s for guild %s"))
-emitter:on("updateLimitation", storageInteraction(updateLimitation, "Updated limitation to %s for guild %s", "Couldn't update limitation to %s for guild %s"))
+for name, statement in pairs(storageStatements) do
+	emitter:on(name, storageInteraction(guildsData:prepare(statement[1]), statement[2], statement[3]))
+end
 
 local guilds = {}
-local guildMT = {
-	__index = {
-		-- no granular control, if it goes away, it does so everywhere
-		delete = function (self)
+local guildMethods = {
+	delete = function (self)
+		if guilds[self.id] then
 			guilds[self.id] = nil
 			logger:log(4, "GUILD %s: Removed", self.id)
-			emitter:emit("remove", self.id)
-		end,
-		
-		-- there should be enough checks to ensure that guild and prefix are valid
-		updatePrefix = function (self, prefix)
-			self.prefix = prefix
-			logger:log(4, "GUILD %s: Updated prefix", self.id)
-			emitter:emit("updatePrefix", prefix, self.id)
-		end,
-		
-		-- there should be enough checks to ensure that guild and template are valid
-		updateTemplate = function (self, template)
-			self.template = template
-			logger:log(4, "GUILD %s: Updated template", self.id)
-			emitter:emit("updateTemplate", template, self.id)
-		end,
-		
-		updateLimitation = function (self, limitation)
-			self.limitation = limitation
-			logger:log(4, "GUILD %s: Updated limitation", self.id)
-			emitter:emit("updateLimitation", limitation, self.id)
 		end
-	},
+		emitter:emit("remove", self.id)
+	end,
+	
+	setPrefix = function (self, prefix)
+		self.prefix = prefix
+		logger:log(4, "GUILD %s: Updated prefix to %s", self.id, prefix)
+		emitter:emit("setPrefix", prefix, self.id)
+	end,
+	
+	setLimit = function (self, limit)
+		self.limit = limit
+		logger:log(4, "GUILD %s: Updated limit to %d", self.id, limit)
+		emitter:emit("setLimit", limit, self.id)
+	end,
+	
+	setPermissions = function (self, permissions)
+		self.permissions = permissions
+		logger:log(4, "GUILD %s: Updated permissions to %d", self.id)
+		emitter:emit("setPermissions", permissions, self.id)
+	end
+}
+
+local guildMT = {
+	__index = function (self, index)
+		if index == "delete" or (client:getGuild(self.id) and guilds[self.id]) then
+			return guildMethods[index]
+		else
+			self:delete()
+		end
+	end,
 	__tostring = function (self) return string.format("GuildData: %s", self.id) end
 }
+
 local guildsIndex = {
 	-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
-	loadAdd = function (self, guildID, prefix, template, limitation)
-		self[guildID] = setmetatable({id = guildID, prefix = prefix or "!vm", template = template, limitation = limitation or 500, lobbies = set(), channels = 0}, guildMT)
+	loadAdd = function (self, guildID, prefix, limit, permissions)
+		self[guildID] = setmetatable({
+			id = guildID,
+			prefix = prefix or "vm!",
+			limitation = limitation or 500,
+			permissions = permissions or 0,
+			lobbies = set(), channels = 0}, guildMT)
 		logger:log(4, "GUILD %s: Added", guildID)
 	end,
 	
@@ -77,11 +113,11 @@ local guildsIndex = {
 	
 	load = function (self)
 		logger:log(4, "STARTUP: Loading guilds from save")
-		local guildIDs = sqlite:exec("SELECT * FROM guilds")
+		local guildIDs = guildsData:exec("SELECT * FROM guilds")
 		if guildIDs then
 			for i, guildID in ipairs(guildIDs.id) do
 				if client:getGuild(guildID) then
-					self:loadAdd(guildID, guildIDs.prefix[i], guildIDs.template[i], tonumber(guildIDs.limitation[i]))
+					self:loadAdd(guildID, guildIDs.prefix[i], tonumber(guildIDs.limitation[i]), tonumber(guildIDs.permissions[i])
 				else
 					emitter:emit("remove", guildID)
 				end

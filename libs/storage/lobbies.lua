@@ -1,8 +1,17 @@
 -- object to store data about lobbies and interact with corresponding db
--- CREATE TABLE lobbies(id VARCHAR PRIMARY KEY, template VARCHAR, target VARCHAR, permissions INTEGER, capacity INTEGER, companion VARCHAR)
+--[[
+CREATE TABLE lobbies(
+	id VARCHAR PRIMARY KEY,
+	template VARCHAR,	/* mutable, default NULL */
+	companionTemplate VARCHAR,	/* mutable, default NULL */
+	target VARCHAR,	/* mutable, default NULL */
+	companionTarget VARCHAR,	/* mutable, default NULL */
+	permissions INTEGER NOT NULL,	/* mutable, default 0 */
+	capacity INTEGER	/* mutable, default NULL */
+)]]
 
 local discordia = require "discordia"
-local sqlite = require "sqlite3".open("lobbiesData.db")
+local lobbiesData = require "sqlite3".open("lobbiesData.db")
 
 local client, logger = discordia.storage.client, discordia.storage.logger
 
@@ -13,116 +22,136 @@ local hollowArray = require "utils/hollowArray"
 -- because fuck data preservation, we need dat speed
 local emitter = discordia.Emitter()
 
--- prepared statements
-local add, remove, updateTemplate, updateTarget, updatePermissions, updateCapacity, updateCompanion =
-	sqlite:prepare("INSERT INTO lobbies VALUES(?,NULL,NULL, 0,-1,NULL)"),
-	sqlite:prepare("DELETE FROM lobbies WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET template = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET target = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET permissions = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET capacity = ? WHERE id = ?"),
-	sqlite:prepare("UPDATE lobbies SET companion = ? WHERE id = ?")
+local storageStatements = {
+	add = {
+		"INSERT INTO lobbies VALUES(?,NULL,NULL,NULL,NULL,0,-1)",
+		"Added lobby %s", "Couldn't add lobby %s"
+	},
+	
+	remove = {
+		"DELETE FROM lobbies WHERE id = ?",
+		"Removed lobby %s", "Couldn't remove lobby %s"
+	},
+	
+	setTemplate = {
+		"UPDATE lobbies SET template = ? WHERE id = ?",
+		"Updated template to %s for lobby %s", "Couldn't update template to %s for lobby %s"
+	},
+	
+	setCompanionTemplate = {
+		"UPDATE lobbies SET companionTemplate = ? WHERE id = ?",
+		"Updated companion template to %s for lobby %s", "Couldn't update c`ompanionTemplate to %s for lobby %s"
+	},
+	
+	setTarget = {
+		"UPDATE lobbies SET target = ? WHERE id = ?",
+		"Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"
+	},
+	
+	setCompanionTarget = {
+		"UPDATE lobbies SET companionTarget = ? WHERE id = ?",
+		"Updated companion target to %s for lobby %s", "Couldn't update companion target to %s for lobby %s"
+	},
+	
+	setPermissions = {
+		"UPDATE lobbies SET permissions = ? WHERE id = ?",
+		"Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"
+	},
+	
+	setCapacity = {
+		"UPDATE lobbies SET capacity = ? WHERE id = ?",
+		"Updated capacity to %s for lobby %s", "Couldn't update capacity to %s for lobby %s"
+	}
+}
 
-emitter:on("add", storageInteraction(add, "Added lobby %s", "Couldn't add lobby %s"))
-emitter:on("remove", storageInteraction(remove, "Removed lobby %s", "Couldn't remove lobby %s"))
-emitter:on("updateTemplate", storageInteraction(updateTemplate, "Updated template to %s for lobby %s", "Couldn't update template to %s for lobby %s"))
-emitter:on("updateTarget", storageInteraction(updateTarget, "Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"))
-emitter:on("updatePermissions", storageInteraction(updatePermissions, "Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"))
-emitter:on("updateCapacity", storageInteraction(updateCapacity, "Updated capacity to %s for lobby %s", "Couldn't update capacity to %s for lobby %s"))
-emitter:on("updateCompanion", storageInteraction(updateCompanion, "Updated companion target to %s for lobby %s", "Couldn't update companion target to %s for lobby %s"))
+for name, statement in pairs(storageStatements) do
+	emitter:on(name, storageInteraction(lobbiesData:prepare(statement[1]), statement[2], statement[3]))
+end
 
 local lobbies = {}
-local lobbyMT = {
-	__index = {
-		-- no granular control, if it goes away, it does so everywhere
-		delete = function (self)
-			if lobbies[self.id] then
-				lobbies[self.id] = nil
-				local lobby = client:getChannel(self.id)
-				if lobby and lobby.guild then
-					logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, self.id)
-				else
-					logger:log(4, "NULL: Removed lobby %s", self.id)
-				end
-			end
-			emitter:emit("remove", self.id)
-		end,
-		
-		-- there should be enough checks to ensure that lobby and template are valid
-		updateTemplate = function (self, template)
-			local channel = client:getChannel(self.id)
-			if channel and lobbies[self.id] then
-				self.template = template
-				logger:log(4, "GUILD %s: Updated template for lobby %s", channel.guild.id, self.id)
-				emitter:emit("updateTemplate", template, self.id)
+local lobbyMethods = {
+	delete = function (self)
+		if lobbies[self.id] then
+			lobbies[self.id] = nil
+			local lobby = client:getChannel(self.id)
+			if lobby and lobby.guild then
+				logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, self.id)
 			else
-				self:delete()
+				logger:log(4, "LOBBY %s: Removed", self.id)
 			end
-		end,
-		
-		updateTarget = function (self, target)
-			local channel = client:getChannel(self.id)
-			if channel and lobbies[self.id] then
-				self.target = target
-				logger:log(4, "GUILD %s: Updated target for lobby %s", channel.guild.id, self.id)
-				emitter:emit("updateTarget", target, self.id)
-			else
-				self:delete()
-			end
-		end,
-		
-		updatePermissions = function (self, permissions)
-			local channel = client:getChannel(self.id)
-			if channel and lobbies[self.id] then
-				self.permissions = permissions
-				logger:log(4, "GUILD %s: Updated permissions for lobby %s", channel.guild.id, self.id)
-				emitter:emit("updatePermissions", permissions, self.id)
-			else
-				self:delete()
-			end
-		end,
-		
-		updateCapacity = function (self, capacity)
-			local channel = client:getChannel(self.id)
-			if channel and lobbies[self.id] then
-				self.capacity = capacity
-				logger:log(4, "GUILD %s: Updated capacity for lobby %s", channel.guild.id, self.id)
-				emitter:emit("updateCapacity", capacity, self.id)
-			else
-				self:delete()
-			end
-		end,
-		
-		updateCompanion = function (self, target)
-			local channel = client:getChannel(self.id)
-			if channel and lobbies[self.id] then
-				self.companion = target
-				logger:log(4, "GUILD %s: Updated companion target for lobby %s", channel.guild.id, self.id)
-				emitter:emit("updateCompanion", target, self.id)
-			else
-				self:delete()
-			end
-		end,
-		
-		-- returns filled position
-		attachChild = function (self, channelID, position)
-			return self.children:fill(channelID, position)
-		end,
-		
-		detachChild = function (self, position)
-			self.children:drain(position)
 		end
-	},
+		emitter:emit("remove", self.id)
+	end,
+	
+	setTemplate = function (self, template)
+		self.template = template
+		logger:log(4, "GUILD %s: Updated template for lobby %s", self.guildID, self.id)
+		emitter:emit("setTemplate", template, self.id)
+	end,
+	
+	setCompanionTemplate = function (self, companionTemplate)
+		self.companionTemplate = companionTemplate
+		logger:log(4, "GUILD %s: Updated companion template for lobby %s", self.guildID, self.id)
+		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
+	end,
+	
+	setTarget = function (self, target)
+		self.target = target
+		logger:log(4, "GUILD %s: Updated target for lobby %s", self.guildID, self.id)
+		emitter:emit("setTarget", target, self.id)
+	end,
+
+	setCompanionTarget = function (self, companionTarget)
+		self.companionTarget = companionTarget
+		logger:log(4, "GUILD %s: Updated companion target for lobby %s", self.guildID, self.id)
+		emitter:emit("setCompanionTarget", companionTarget, self.id)
+	end,
+	
+	setPermissions = function (self, permissions)
+		self.permissions = permissions
+		logger:log(4, "GUILD %s: Updated permissions for lobby %s", self.guildID, self.id)
+		emitter:emit("setPermissions", permissions, self.id)
+	end,
+	
+	setCapacity = function (self, capacity)
+		self.capacity = capacity
+		logger:log(4, "GUILD %s: Updated capacity for lobby %s", self.guildID, self.id)
+		emitter:emit("setCapacity", capacity, self.id)
+	end,
+	
+	-- returns filled position
+	attachChild = function (self, channelID, position)
+		return self.children:fill(channelID, position)
+	end,
+	
+	detachChild = function (self, position)
+		self.children:drain(position)
+	end
+}
+
+local nonSetters = {delete = true, attachChild = true, detachChild = true}
+local lobbyMT = {
+	__index = function (self, index)
+		if nonSetters[index] or (client:getChannel(self.id) and lobbies[self.id]) then
+			return lobbyMethods[index]
+		else
+			self:delete()
+		end
+	end,
 	__tostring = function (self) return string.format("LobbyData: %s", self.id) end
 }
+
 local lobbiesIndex = {
 	-- perform checks and add lobby to table
-	loadAdd = function (self, lobbyID, template, target, permissions, capacity, companion)	-- additional parameter are used upon startup to prevent unnecessary checks
+	-- additional parameter are used upon startup to prevent unnecessary checks
+	loadAdd = function (self, lobbyID, template, companionTemplate, target, companionTarget, permissions, capacity)
 		if not self[lobbyID] then
 			local channel = client:getChannel(lobbyID)
 			if channel and channel.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, template = template, target = target, companion = companion,
+					id = lobbyID, guildID = channel.guild.id,
+					template = template, companionTemplate = companionTemplate,
+					target = target, companionTarget = companionTarget,
 					permissions = tonumber(permissions) or 0, capacity = tonumber(capacity) or -1,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
@@ -142,13 +171,14 @@ local lobbiesIndex = {
 	
 	load = function (self)
 		logger:log(4, "STARTUP: Loading lobbies")
-		local lobbyIDs = sqlite:exec("SELECT * FROM lobbies")
+		local lobbyIDs = lobbiesData:exec("SELECT * FROM lobbies")
 		if lobbyIDs then
-			for i, lobbyID in ipairs(lobbyIDs[1]) do
+			for i, lobbyID in ipairs(lobbyIDs.id) do
 				if client:getChannel(lobbyID) then
-					self:loadAdd(lobbyID, lobbyIDs.template[i], 
-						client:getChannel(lobbyIDs.target[i]) and lobbyIDs.target[i] or nil,
-						lobbyIDs.permissions[i], lobbyIDs.capacity[i], lobbyIDs.companion[i])
+					self:loadAdd(lobbyID, 
+						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
+						lobbyIDs.target[i], lobbyIDs.companionTarget[i],
+						lobbyIDs.permissions[i], lobbyIDs.capacity[i])
 				else
 					emitter:emit("remove", lobbyID)
 				end
