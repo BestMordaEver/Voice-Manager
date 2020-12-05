@@ -3,7 +3,7 @@
 CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
 	prefix VARCHAR NOT NULL,	/* mutable, default "vm!" */
-	limit INTEGER NOT NULL,	/* mutable, default 500 */
+	cLimit INTEGER NOT NULL,	/* mutable, default 500 */
 	permissions INTEGER NOT NULL	/* mutable, default 0 */
 )]]
 
@@ -38,8 +38,8 @@ local storageStatements = {
 	},
 	
 	setLimit = {
-		"UPDATE guilds SET prefix = ? WHERE id = ?",
-		"Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"
+		"UPDATE guilds SET cLimit = ? WHERE id = ?",
+		"Updated limit to %s for guild %s", "Couldn't update limit to %s for guild %s"
 	},
 	
 	setPermissions = {

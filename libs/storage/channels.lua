@@ -93,7 +93,7 @@ local channelsIndex = {
 	
 	load = function (self)
 		logger:log(4, "STARTUP: Loading channels")
-		local channelIDs = sqlite:exec("SELECT * FROM channels")
+		local channelIDs = channelsData:exec("SELECT * FROM channels")
 		
 		if channelIDs then
 			for i, channelID in ipairs(channelIDs[1]) do
