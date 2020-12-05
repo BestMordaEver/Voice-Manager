@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
-local embeds = require "utils/embeds"
+local commandEmbed = require "embeds/commands"
 
 local client = discordia.storage.client
 local permission = discordia.enums.permission
@@ -49,7 +49,7 @@ return function (message, context, command, argument)	-- action pre-processing
 			table.insert(ids, channel.id)
 		end
 		
-		local newMessage = embeds.embedTypes.actions(message, ids, command, argument)
+		local newMessage = commandEmbed(message, ids, command, argument)
 		if newMessage then
 			return "Empty input, sent embed ".. newMessage.id
 		else
@@ -80,7 +80,7 @@ return function (message, context, command, argument)	-- action pre-processing
 			return "Ambiguous input, can't do embed"
 		end
 		
-		local newMessage = embeds.embedTypes.actions(message, ids, command, argument)
+		local newMessage = commandEmbed(message, ids, command, argument)
 		if newMessage then 
 			newMessage:setContent(locale.ambiguousID)
 			return "Ambiguous input, sent embed "..newMessage.id
