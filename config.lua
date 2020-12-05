@@ -8,4 +8,5 @@ return {
 	heartbeatMessage = "692117540838703114",	-- message that will be edited every minute
 	dailyreboot = false,						-- bot will reboot whenever there are no active users, once per day
 	sendStats = true,
+	embedColor = 6561661
 }

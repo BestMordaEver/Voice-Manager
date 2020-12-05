@@ -1,3 +1,4 @@
+local config = require "config"
 local embeds = require "libs/embeds/embeds"
 local reactions = embeds.reactions
 
@@ -16,7 +17,7 @@ function helpEmbed:setContent(page)
 			page == 3 and locale.helpHostTitle or
 			page == 4 and locale.helpServerTitle or
 			locale.helpOtherTitle,
-		color = 6561661,
+		color = config.embedColor,
 		description = (
 			page == 0 and locale.helpMenu or
 			page == 1 and locale.helpLobby or

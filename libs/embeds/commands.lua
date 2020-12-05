@@ -1,4 +1,5 @@
 local client = require "discordia".storage.client
+local config = require "config"
 
 local locale = require "locale"
 local commandFinalize = require "commands/commandFinalize"
@@ -27,7 +28,7 @@ function commandEmbed:setContent(ids, page)
 	-- good luck
 	self.embed = {
 		title = action:gsub("^.", string.upper, 1),	-- upper bold text
-		color = 6561661,
+		color = config.embedColor,
 		description = (
 			action == "register" and locale.embedRegister or 
 			action == "unregister" and locale.embedUnregister or 
