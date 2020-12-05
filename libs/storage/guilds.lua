@@ -117,7 +117,7 @@ local guildsIndex = {
 		if guildIDs then
 			for i, guildID in ipairs(guildIDs.id) do
 				if client:getGuild(guildID) then
-					self:loadAdd(guildID, guildIDs.prefix[i], tonumber(guildIDs.limitation[i]), tonumber(guildIDs.permissions[i])
+					self:loadAdd(guildID, guildIDs.prefix[i], tonumber(guildIDs.limitation[i]), tonumber(guildIDs.permissions[i]))
 				else
 					emitter:emit("remove", guildID)
 				end

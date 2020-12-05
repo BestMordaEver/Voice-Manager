@@ -1,7 +1,7 @@
 local client = require "discordia".storage.client
 
 local locale = require "locale"
-local commandFinalize = require "commandFinalize"
+local commandFinalize = require "commands/commandFinalize"
 local bitfield = require "utils/bitfield"
 local isComplex = require "utils/isComplex"
 

@@ -1,6 +1,6 @@
 local discordia = require "discordia"
 local channels = require "storage/channels"
-local embeds = require "utils/embeds"
+local embeds = require "embeds/embeds"
 local mercy = require "utils/mercy"
 local status = require "utils/status"
 local config = require "config"

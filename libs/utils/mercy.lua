@@ -1,9 +1,9 @@
 local heroesNeverDie = require "discordia".Emitter()
-local actions = require "actions"
+local commands = require "commands/init"
 
 local aliveTracker = 5
 
-heroesNeverDie:on("shutdown", actions.shutdown)
+heroesNeverDie:on("shutdown", commands.shutdown)
 
 local shutdown = function () heroesNeverDie:emit("shutdown") end -- ensures graceful shutdown
 

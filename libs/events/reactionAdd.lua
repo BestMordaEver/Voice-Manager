@@ -1,5 +1,5 @@
 local discordia = require "discordia"
-local embeds = require "utils/embeds"
+local embeds = require "embeds/embeds"
 local logAction = require "utils/logAction"
 
 local client = discordia.storage.client

@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local locale = require "locale"
 local guilds = require "storage/guilds"
-local actions = require "actions/init"
+local commands = require "commands/init"
 local logAction = require "utils/logAction"
 local config = require "config"
 
@@ -40,7 +40,7 @@ return function (message)
 	local command = content == "" and "help" or content:match("^(%w+)")
 	if command == "matchmaking" then command = content:match("^matchmaking (%w+)") end
 	
-	if actions[command] then
+	if commands[command] then
 		logAction(message, command.." action invoked")
 	else
 		logAction(message, "Nothing")
@@ -49,7 +49,7 @@ return function (message)
 	
 	--[[
 	-- call the command, log it, and all in protected call
-	local res, msg = xpcall(actions[command], debug.traceback, message)
+	local res, msg = xpcall(commands[command], debug.traceback, message)
 	
 	-- notify user if failed
 	if res then
@@ -61,7 +61,7 @@ return function (message)
 	--]]
 	
 	-- [[
-	logAction(message, actions[command](message))
+	logAction(message, commands[command](message))
 	--]]
 	
 	logAction(message, command .. " action completed")
