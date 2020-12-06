@@ -83,6 +83,7 @@ local guildMethods = {
 
 local guildMT = {
 	__index = function (self, index)
+		print(index, self.id, client:getGuild(self.id), guilds[self.id])
 		if index == "delete" or (client:getGuild(self.id) and guilds[self.id]) then
 			return guildMethods[index]
 		else
@@ -142,7 +143,7 @@ local guildsIndex = {
 	end
 }
 
-return setmetatable({}, {
+return setmetatable(guilds, {
 	__index = guildsIndex,
 	__call = guildsIndex.add
 })

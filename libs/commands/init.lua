@@ -13,6 +13,9 @@ return {
 	companion = require "commands/admin/companion",
 	limitation = require "commands/admin/limitation",
 	prefix = require "commands/admin/prefix",
+	
+	server = require "commands/intermediate/server",
+	
 	blacklist = require "commands/host/moderate",
 	whitelist = require "commands/host/moderate",
 	mute = require "commands/host/mute",

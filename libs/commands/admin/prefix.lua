@@ -1,6 +1,8 @@
-local client = require "discordia".storage.client
+local discordia = require "discordia"
+local client, permission = discordia.storage.client, discordia.enums.permission
 local guilds = require "storage/guilds"
 local config = require "config"
+local locale = require "locale"
 
 return function (message)
 	local prefix = message.guild and guilds[message.guild.id].prefix or nil
@@ -36,7 +38,8 @@ return function (message)
 			message:reply(locale.mentionInVain:format(message.author.mentionString))
 			return "Bad user permissions"
 		end
-		guilds[guild.id]:updatePrefix(prefix)
+		
+		guilds[guild.id]:setPrefix(prefix)
 		message:reply(locale.prefixConfirm:format(prefix))
 		return "Set new prefix"
 	else

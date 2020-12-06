@@ -6,7 +6,6 @@ return function (message, guild)
 	message:reply({embed = {
 		title = "Server info | " .. guild.name,
 		color = config.embedColor,
-		description = "sexy goblin???",
-		footer = {text = command ~= "help" and locale.embedTip or nil}
+		description = "**• Prefix:** lr!\n**• Permissions:** manage, name\n**• Lobbies:** 2\n**• Active users:** 69\n**• Channels:** 20\n**• Limit:** 500"
 	}})
 end
