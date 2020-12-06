@@ -105,7 +105,7 @@ return {
 			notLobby, badUser
 		},
 		function (channel, template)
-			lobbies[channel.id]:updateTemplate(template)
+			lobbies[channel.id]:setTemplate(template)
 		end, 
 		function (message, ids, template)
 			if template == "" then
@@ -123,7 +123,7 @@ return {
 			function (nids) return locale.selfTarget.."\n" end
 		},
 		function (channel, target)
-			lobbies[channel.id]:updateTarget(target)
+			lobbies[channel.id]:setTarget(target)
 		end,
 		function (message, ids, target)
 			if target == "" then
@@ -150,9 +150,9 @@ return {
 			if permissions then
 				local permissionBits = bitfield(lobbies[channel.id].permissions)
 				local newPermissionBits = bitfield(permissions)
-				lobbies[channel.id]:updatePermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
+				lobbies[channel.id]:setPermissions(newPermissionBits:has(newPermissionBits.bits.on) and (permissionBits + newPermissionBits) or (permissionBits - newPermissionBits))
 			else
-				lobbies[channel.id]:updatePermissions(0)
+				lobbies[channel.id]:setPermissions(0)
 			end
 		end,
 		function (message, ids, permissions)
@@ -170,7 +170,7 @@ return {
 			notLobby, badUser
 		},
 		function (channel, capacity)
-			lobbies[channel.id]:updateCapacity(capacity)
+			lobbies[channel.id]:setCapacity(capacity)
 		end,
 		function (message, ids, capacity)
 			if not capacity then
@@ -187,7 +187,7 @@ return {
 			notLobby, badUser
 		},
 		function (channel, target)
-			lobbies[channel.id]:updateCompanion(target)
+			lobbies[channel.id]:setCompanionTarget(target)
 		end,
 		function (message, ids, target)
 			if target == "" then
