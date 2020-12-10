@@ -4,16 +4,16 @@ local commandFinalize = require "commands/commandFinalize"
 -- this function is NOT used by embeds, they will call corresponding functions with nil value
 return function (message)
 	
-	local action, context = message.content:match('reset%s*(%a*)%s*"(.-)"')
-	if not action then
-		action, context = message.content:match("reset%s*(%a*)%s*(.-)$")
+	local command, context = message.content:match('reset%s*(%a*)%s*"(.-)"')
+	if not command then
+		command, context = message.content:match("reset%s*(%a*)%s*(.-)$")
 	end
 	
-	if action == "register" then
-		action = "unregister"
-	elseif action == "unregister" then
-		action = "register"
-	elseif action == "limitation" then
+	if command == "register" then
+		command = "unregister"
+	elseif command == "unregister" then
+		command = "register"
+	elseif command == "limitation" then
 		if context == "" then
 			context = message.guild
 		else
@@ -21,7 +21,7 @@ return function (message)
 		end
 
 		commandFinalize.limitation(message, context, 500)
-	elseif action == "prefix" then
+	elseif command == "prefix" then
 		if context == "" then
 			context = message.guild
 		else
@@ -31,10 +31,10 @@ return function (message)
 		commandFinalize.prefix(message, context, "!vm")
 	end
 	
-	if commandFinalize[action] then
-		ids = commandParse(message, context, action)
+	if commandFinalize[command] then
+		ids = commandParse(message, context, command)
 		if not ids[1] then return ids end -- message for logger
 		
-		return commandFinalize[action](message, ids)
+		return commandFinalize[command](message, ids)
 	end
 end

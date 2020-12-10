@@ -5,7 +5,7 @@ local channels = require "storage/channels"
 return function (message)
 	if not message.guild then
 		message:reply(locale.noID)
-		return "Host action in DMs"
+		return "Host command in DMs"
 	end
 	
 	local channel = message.guild:getMember(message.author).voiceChannel

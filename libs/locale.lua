@@ -100,7 +100,16 @@ Take a sneak peek on my performance!
 
 **!vm support**
 Get a support server invite]],
-
+	
+	-- server
+	serverInfoTitle = [[Server info | %s]],
+	serverInfo = [[**• Prefix:** %s
+**• Permissions:** %s
+**• Lobbies:** %d
+**• Active users:** %d
+**• Channels:** %d
+**• Limit:** %d]],
+	
 	-- lobby
 	register = [[You need the **Manage Channels** permission in order to use this command
 
@@ -563,8 +572,8 @@ Show stats for specific server
 	prefixThis = [[My prefix is **`%s`** or you can mention me]],
 	-- name
 	changedName = [[Successfully changed channel name!]],
-	ratelimitRemaining = [[This action is ratelimited. You can do this **1** more time in next **%s**]],
-	ratelimitReached = [[This action is ratelimited. You will be able to perform this action after **%s**]],
+	ratelimitRemaining = [[This command is ratelimited. You can do this **1** more time in next **%s**]],
+	ratelimitReached = [[This command is ratelimited. You will be able to perform this command after **%s**]],
 	-- resize
 	channelResized = [[Successfully changed channel capacity!]],
 	-- bitrate
@@ -593,7 +602,7 @@ Show stats for specific server
 	badServer = [[Couldn't find the specified server]],
 	ambiguousID = [[There are several channels with this name]],
 	gimmeReaction = [[I can process that, but I need "Manage Messages" and "Add Reactions" permissions for that]],
-	badArgument = [[You didn't specify the action]],
+	badArgument = [[You didn't specify the command]],
 	
 	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
 	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],
@@ -606,7 +615,7 @@ Show stats for specific server
 	notMember = [[You're not a member of this server]],
 	noID = [[I can't process this input in DMs]],
 	notHost = [[You're not a channel host]],
-	badHostPermission = [[You're not permitted to perform this action]],
+	badHostPermission = [[You're not permitted to perform this command]],
 	hostError = [[Something went wrong. *And it's probably not my fault*. Poke your admins if this continues to happen]],
 	error = [[Something went wrong. *I'm sowwy*. The issue is reported, a fix will arrive soon
 https://discord.gg/tqj6jvT]]

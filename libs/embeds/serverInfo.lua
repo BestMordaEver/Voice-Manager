@@ -1,11 +1,17 @@
 local config = require "config"
 local locale = require "locale"
 
+local guilds = require "storage/guilds"
+local channels = require "storage/channels"
+local bitfield = require "utils/bitfield"
+
 -- no embed data is saved, since this is non-interactive embed
 return function (message, guild)
+	local guildData = guilds[guild.id]
+	
 	message:reply({embed = {
-		title = "Server info | " .. guild.name,
+		title = locale.serverInfoTitle:format(guild.name),
 		color = config.embedColor,
-		description = "**• Prefix:** lr!\n**• Permissions:** manage, name\n**• Lobbies:** 2\n**• Active users:** 69\n**• Channels:** 20\n**• Limit:** 500"
+		description = locale.serverInfo:format(guildData.prefix, bitfield(guildData.permissions), #guildData.lobbies, channels:people(guild.id), guildData.channels, guildData.limit)
 	}})
 end

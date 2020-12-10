@@ -41,7 +41,7 @@ return function (message)
 	if command == "matchmaking" then command = content:match("^matchmaking (%w+)") end
 	
 	if commands[command] then
-		logAction(message, command.." action invoked")
+		logAction(message, command.." command invoked")
 	else
 		logAction(message, "Nothing")
 		return
@@ -64,5 +64,5 @@ return function (message)
 	logAction(message, commands[command](message))
 	--]]
 	
-	logAction(message, command .. " action completed")
+	logAction(message, command .. " command completed")
 end

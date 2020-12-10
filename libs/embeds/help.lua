@@ -58,7 +58,7 @@ local metaHelp = {
 }
 
 return function (message)
-	local embedData = setmetatable({action = "help", killIn = 10, author = message.author}, metaHelp)
+	local embedData = setmetatable({command = "help", killIn = 10, author = message.author}, metaHelp)
 	embedData:setContent(0)
 	
 	local newMessage = message:reply {embed = embedData.embed}

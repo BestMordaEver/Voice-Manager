@@ -99,7 +99,7 @@ local guildsIndex = {
 		self[guildID] = setmetatable({
 			id = guildID,
 			prefix = prefix or "vm!",
-			limitation = limitation or 500,
+			limit = limit or 500,
 			permissions = permissions or 0,
 			lobbies = set(), channels = 0}, guildMT)
 		logger:log(4, "GUILD %s: Added", guildID)

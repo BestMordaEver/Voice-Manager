@@ -37,7 +37,7 @@ local function new (conditionsToPass, messageConstructors, actionName, probing)
 			for _, channelID in ipairs(ids) do
 				local channel = client:getChannel(channelID)
 				msg = msg..string.format(locale.channelNameCategory, channel.name, channel.category and channel.category.name or "no category").."\n"
-				action(channel, argument)
+				command(channel, argument)
 			end
 		end
 		
@@ -55,7 +55,7 @@ local function new (conditionsToPass, messageConstructors, actionName, probing)
 		end
 		
 		message:reply(msg)
-		return (#failed.final == 0 and "Successfully completed action for all" or ("Couldn't complete action for "..table.concat(failed.final, " ")))
+		return (#failed.final == 0 and "Successfully completed command for all" or ("Couldn't complete command for "..table.concat(failed.final, " ")))
 	end
 end
 

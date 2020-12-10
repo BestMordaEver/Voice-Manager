@@ -1,6 +1,7 @@
 local locale = require "locale"
 local client = require "discordia".storage.client
 local serverInfoEmbed = require "embeds/serverInfo"
+local dialogue = require "utils/dialogue"
 
 return function (message)
 	local guild = message.content:match("server%s*(.-)$")
@@ -22,4 +23,6 @@ return function (message)
 	end
 	
 	serverInfoEmbed(message, guild)
+	
+	dialogue(message.author.id, "server", guild.id)
 end

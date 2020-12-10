@@ -48,14 +48,14 @@ return function (message)
 		return "Insufficient permissions"
 	end
 	
-	local action = message.content:match("mute%s*(%a*)"):lower()
+	local command = message.content:match("mute%s*(%a*)"):lower()
 	if message.content:lower():match("unmute") then
-		action = "remove"
-	elseif not actions[action] then
-		action = "add"
+		command = "remove"
+	elseif not actions[command] then
+		command = "add"
 	end
 	
-	if actions[action](channel, message) then
+	if actions[command](channel, message) then
 		message:addReaction("✅")
 		return "Sucessfully processed mute"
 	else

@@ -6,4 +6,4 @@ local complex = {
 	companion = true
 }
 
-return function (action) return complex[action] end
+return function (command) return complex[command] end

@@ -7,7 +7,7 @@ local client = discordia.storage.client
 local permission = discordia.enums.permission
 local truePositionSorting = require "utils/truePositionSorting"
 
-return function (message, context, command, argument)	-- action pre-processing
+return function (message, context, command, argument)	-- command pre-processing
 	local ids, nameDuplicates = {}, false
 	if context then
 		context = context:lower()

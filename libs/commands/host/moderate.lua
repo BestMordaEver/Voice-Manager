@@ -138,16 +138,16 @@ return function (message)
 	local context = message.content:match("blacklist") or message.content:match("whitelist")
 	if context then context = context:lower() else return end
 	
-	local action = message.content:match(context.."%s*(%a*)")
-	if not actions[context][action] then
-		action = "add"
+	local command = message.content:match(context.."%s*(%a*)")
+	if not actions[context][command] then
+		command = "add"
 	end
 	
-	if actions[context][action](channel, message) then
+	if actions[context][command](channel, message) then
 		message:addReaction("✅")
-		return "Sucessfully processed "..action
+		return "Sucessfully processed "..command
 	else
 		message:reply(locale.hostError)
-		return "Couldn't process "..action
+		return "Couldn't process "..command
 	end
 end
