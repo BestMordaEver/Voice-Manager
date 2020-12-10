@@ -78,7 +78,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		end
 	end
 	
-	if guilds[lobby.guild.id].limitation <= guilds[lobby.guild.id].channels then return end
+	if guilds[lobby.guild.id].limit <= guilds[lobby.guild.id].channels then return end
 	
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]

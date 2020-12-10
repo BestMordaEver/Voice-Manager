@@ -11,7 +11,7 @@ return {
 	permissions = require "commands/admin/permissions",
 	capacity = require "commands/admin/capacity",
 	companion = require "commands/admin/companion",
-	limitation = require "commands/admin/limitation",
+	limit = require "commands/admin/limit",
 	prefix = require "commands/admin/prefix",
 	
 	server = require "commands/intermediate/server",

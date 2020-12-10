@@ -18,7 +18,7 @@ User commands that can be used by channel hosts
 
 **Server commands** - 4️⃣
 Admin commands to configure global settings like prefix
-`limitation`, `prefix`
+`limit`, `prefix`
 
 **Other commands** - 5️⃣
 Miscellaneous commands that can be used by everyone
@@ -83,7 +83,7 @@ Transfer your host privileges to other user. Transfer happens automatically if y
 	helpServer = [[You need a "Manage Channels" permission to use those commands!
 You can learn more about each command by using `help`, for example `!vm help template`
 
-**!vm limitation <number between 1 and 500>**
+**!vm limit <number between 1 and 500>**
 Change how many new channels can be created in your server
 
 **!vm prefix <new prefix>**
@@ -444,23 +444,23 @@ Transfer all your host privileges to other user. Transfer happens automatically 
 !vm promote @atrustworthysnail]],
 	
 	-- server
-	limitation = [[You need a **"Manage Channels"** permission to use this command!
+	limit = [[You need a **"Manage Channels"** permission to use this command!
 Change how many new channels can be created in your server. Absolute maximum is 500
 
 **• Usage**
 *(Show the current channel limit in your server)*
-<prefix> limitation
+<prefix> limit
 
 *(Change the current channel limit in your server)*
-<prefix> limitation [server ID] <number between 0 and 500>
+<prefix> limit [server ID] <number between 0 and 500>
 
 *(Reset the channel limit to default)*
-<prefix> reset limitation [server ID]
+<prefix> reset limit [server ID]
 
 **• Example**
-!vm limitation 20
-!vm reset limitation
-!vm limitation 759657662773330022 100]],
+!vm limit 20
+!vm reset limit
+!vm limit 759657662773330022 100]],
 	
 	prefix = [[You need a **"Manage Channels"** permission to use this command!
 Set a new prefix. Mentioning will still work
@@ -563,7 +563,7 @@ Show stats for specific server
 	embedLobbyCompanion = [[Select a lobby to show where it creates companion channels]],
 	embedResetCompanion = [[Select a lobby to make it stop creating companion channels]],
 	badCompanion = [[Couldn't find specified category]],
-	-- limitation
+	-- limit
 	limitationConfirm = [[Your server limit is **`%d`** now]],
 	limitationThis = [[Your server limit is **`%d`**]],
 	limitationOOB = [[Server limit must be a number between 1 and 500]],

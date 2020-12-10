@@ -13,14 +13,14 @@ return function (message)
 		command = "unregister"
 	elseif command == "unregister" then
 		command = "register"
-	elseif command == "limitation" then
+	elseif command == "limit" then
 		if context == "" then
 			context = message.guild
 		else
 			context = client:getGuild(context)
 		end
 
-		commandFinalize.limitation(message, context, 500)
+		commandFinalize.limit(message, context, 500)
 	elseif command == "prefix" then
 		if context == "" then
 			context = message.guild

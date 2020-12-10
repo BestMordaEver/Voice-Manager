@@ -2,10 +2,10 @@ local client = require "discordia".storage.client
 local guilds = require "storage/guilds"
 
 return function (message)
-	local guild, limitation = message.content:match("limitation%s*(%d*)%s*(%d*)$")
+	local guild, limit = message.content:match("limit%s*(%d*)%s*(%d*)$")
 	
-	if limitation == "" then
-		limitation, guild = guild, message.guild
+	if limit == "" then
+		limit, guild = guild, message.guild
 	else
 		guild = client:getGuild(guild)
 	end
@@ -20,23 +20,23 @@ return function (message)
 		return "Not a member"
 	end
 
-	if limitation ~= "" then
+	if limit ~= "" then
 		if not guild:getMember(message.author):hasPermission(permission.manageChannels) then
 			message:reply(locale.mentionInVain:format(message.author.mentionString))
 			return "Bad user permissions"
 		end
 		
-		limitation = tonumber(limitation)
-		if not limitation or limitation > 500 or limitation < 1 then
+		limit = tonumber(limit)
+		if not limit or limit > 500 or limit < 1 then
 			message:reply(locale.limitationOOB)
-			return "Limitation OOB"
+			return "limit OOB"
 		end
 		
-		guilds[guild.id]:updateLimitation(limitation)
-		message:reply(locale.limitationConfirm:format(limitation))
-		return "Set new limitation"
+		guilds[guild.id]:updateLimitation(limit)
+		message:reply(locale.limitationConfirm:format(limit))
+		return "Set new limit"
 	else
-		message:reply(locale.limitationThis:format(guilds[guild.id].limitation))
-		return "Sent current limitation"
+		message:reply(locale.limitationThis:format(guilds[guild.id].limit))
+		return "Sent current limit"
 	end
 end
