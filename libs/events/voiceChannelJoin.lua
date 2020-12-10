@@ -56,7 +56,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		
 		local channels = lobby.guild.voiceChannels:toArray("position", function (channel)
 			if channels[channel.id] then
-				local parent = client:getChannel(channels[channel.id].parent)
+				local parent = client:getChannel(channels[channel.id].parent.id)
 				return (parent == target) and (parent.userLimit == 0 or #parent.connectedMembers < parent.userLimit) and member:hasPermission(parent, permission.connect)
 			end
 		end)
