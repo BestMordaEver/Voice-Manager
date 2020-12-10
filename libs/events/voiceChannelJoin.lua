@@ -56,7 +56,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 		
 		local channels = lobby.guild.voiceChannels:toArray("position", function (channel)
 			if channels[channel.id] then
-				local parent = client:getChannel(channels[channel.id].parent)
+				local parent = client:getChannel(channels[channel.id].parent.id)
 				return (parent == target) and (parent.userLimit == 0 or #parent.connectedMembers < parent.userLimit) and member:hasPermission(parent, permission.connect)
 			end
 		end)
@@ -105,6 +105,7 @@ local voiceChannelJoin = function (member, lobby)  -- your purpose!
 			if companionTarget then
 				companion = companionTarget:createTextChannel("Private chat")
 				if companion then
+					companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
 					companion:getPermissionOverwriteFor(lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 					companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 					if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then

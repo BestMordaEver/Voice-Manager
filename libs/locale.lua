@@ -37,7 +37,7 @@ Reverts a lobby channel back to a normal channel. Channels created by the existi
 **!vm target "<channel name>" <category name>**
 Select a category in which new channels will be created
 
-**!vm target "<channel name>" <category name>**
+**!vm companion "<channel name>" <category name>**
 Create private text chats alongside new channels
 
 **!vm template "<channel name>" <template text>**

@@ -9,10 +9,7 @@ local client = discordia.storage.client
 return function (message)
 	local guildID = message.content:match("stats%s*(.-)$")
 	local guild = guildID == "local" and message.guild or client:getGuild(guildID)
-	if guildID and not guild then
-		message:reply(locale.badServer)
-		return "Didn't find the guild"
-	end
+	
 	if guild and not guild:getMember(message.author) then
 		message:reply(locale.notMember)
 		return "Not a member"
