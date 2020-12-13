@@ -1,4 +1,5 @@
 local config = require "config"
+local locale = require "locale"
 local embeds = require "libs/embeds/embeds"
 local reactions = embeds.reactions
 

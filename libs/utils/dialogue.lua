@@ -18,3 +18,5 @@ local dialogues = setmetatable({},{
 	__index = dialoguesIndex,
 	__call = dialoguesIndex.new
 })
+
+return dialogues

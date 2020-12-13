@@ -1,5 +1,7 @@
 local locale = require "locale"
 local client = require "discordia".storage.client
+local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
+local dialogue = require "utils/dialogue"
 
 return function (message)
 	local guild = message.content:match("lobbies%s*(.-)$")
@@ -19,4 +21,8 @@ return function (message)
 		message:reply(locale.notMember)
 		return "Not a member"
 	end
+	
+	lobbiesInfoEmbed(message, guild)
+	
+	dialogue(message.author.id, "lobbies", guild.id)
 end

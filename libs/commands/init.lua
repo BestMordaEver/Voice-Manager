@@ -15,6 +15,9 @@ return {
 	prefix = require "commands/admin/prefix",
 	
 	server = require "commands/intermediate/server",
+	lobbies = require "commands/intermediate/lobbies",
+	matchmaking = require "commands/intermediate/matchmaking",
+	companions = require "commands/intermediate/companions",
 	
 	blacklist = require "commands/host/moderate",
 	whitelist = require "commands/host/moderate",

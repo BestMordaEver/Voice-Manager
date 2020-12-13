@@ -9,7 +9,7 @@ local bitfield = require "utils/bitfield"
 local channelType, permission = discordia.enums.channelType, discordia.enums.permission
 local client = discordia.storage.client
 
-local function new (conditionsToPass, messageConstructors, actionName, probing)
+local function new (conditionsToPass, messageConstructors, command, probing)
 	return function (message, ids, argument)
 		if probing then 
 			local res = probing(message, ids, argument)

@@ -103,12 +103,41 @@ Get a support server invite]],
 	
 	-- server
 	serverInfoTitle = [[Server info | %s]],
-	serverInfo = [[**• Prefix:** %s
-**• Permissions:** %s
-**• Lobbies:** %d
-**• Active users:** %d
-**• Channels:** %d
-**• Limit:** %d]],
+	serverInfo = [[**Prefix:** %s
+**Permissions:** %s
+**Lobbies:** %d
+**Active users:** %d
+**Channels:** %d
+**Limit:** %d]],
+	
+	-- lobbies
+	lobbiesInfoTitle = [[Lobbies info | %s]],
+	lobbiesNoInfo = [[There are no registered lobbies
+You can register a lobby with `register`]],
+	lobbiesInfo = [[Select lobbies to change their settings]],
+	lobbiesField = [[**Target:** %s
+**Template:** %s
+**Permissions:** %s
+**Capacity:** %d
+**Companion:** %s
+**Channels:** %d]],
+
+	-- matchmaking
+	matchmakingInfoTitle = [[Matchmaking info | %s]],
+	matchmakingNoInfo = [[There are not registered matchmaking lobbies
+You can create a matchmaking lobby with `match`]],
+	matchmakingField = [[**Target:** %s
+**Mode:** %s
+**Channels:** %d]],
+
+	-- companion
+	companionInfoTitle = [[Companion settings | %s]],
+	companionNoInfo = [[There are no lobbies with enabled companion channels
+You can enable companion channels with `companion`]],
+	companionField = [[**Target:** %s
+**Template:** %s
+**Permissions:** %s
+**Companion channels:** %d]],
 	
 	-- lobby
 	register = [[You need the **Manage Channels** permission in order to use this command
