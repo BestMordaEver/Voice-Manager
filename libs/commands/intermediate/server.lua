@@ -1,5 +1,5 @@
 local locale = require "locale"
-local client = require "discordia".storage.client
+local client = require "client"
 local serverInfoEmbed = require "embeds/serverInfo"
 local dialogue = require "utils/dialogue"
 

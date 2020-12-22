@@ -1,4 +1,4 @@
-local client = require "discordia".storage.client
+local client = require "client"
 local guilds = require "storage/guilds"
 local config = require "config"
 

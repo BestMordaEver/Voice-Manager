@@ -1,6 +1,6 @@
 local config = require "config"
 local locale = require "locale"
-local client = require "discordia".storage.client
+local client = require "client"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"

@@ -11,9 +11,11 @@ local discordia = require "discordia"
 discordia.extensions.table()
 
 local client = discordia.Client()
-local clock = discordia.Clock()
--- those instances will be used everywhere, they will be stored in discordia.storage for easy access
-discordia.storage = {client = client, clock = clock, logger = discordia.Logger(4, '%F %T')}
+
+-- creating stubs for require to easily access all relevant bits without making them global
+package.loaded.client = client
+package.loaded.clock = discordia.Clock()
+package.loaded.logger = discordia.Logger(4, '%F %T')
 
 --[[ 
 holds all the event methods and logic

@@ -5,8 +5,9 @@ local json = require "json"
 
 local token = require "token"
 local config = require "config"
-local discordia = require "discordia"
-local client, logger, emitter = discordia.storage.client, discordia.storage.logger, discordia.Emitter()
+local client = require "client"
+local logger = require "logger"
+local emitter = require "discordia".Emitter()
 
 local function send (name, server)	
 	if token.tokens[name] then

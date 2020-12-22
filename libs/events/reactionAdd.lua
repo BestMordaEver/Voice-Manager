@@ -1,9 +1,8 @@
-local discordia = require "discordia"
+local client = require "client"
+local logger = require "logger"
 local embeds = require "embeds/embeds"
 local logAction = require "utils/logAction"
 
-local client = discordia.storage.client
-local logger = discordia.storage.logger
 local reactions = embeds.reactions
 
 return function (reaction, userID) -- embeds processing

@@ -1,4 +1,4 @@
-local client = require "discordia".storage.client
+local client = require "client"
 local commandParse = require "commands/commandParse"
 local commandFinalize = require "commands/commandFinalize"
 local bitfield = require "utils/bitfield"

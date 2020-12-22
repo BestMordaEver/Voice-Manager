@@ -1,11 +1,10 @@
-local discordia = require "discordia"
+local client = require "client"
+local logger = require "logger"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
 
-local client = discordia.storage.client
-local logger = discordia.storage.logger
-local permission = discordia.enums.permission
+local permission = require "discordia".enums.permission
 
 return function (member, channel) -- now remove the unwanted corpses!
 	if channel and channels[channel.id] then

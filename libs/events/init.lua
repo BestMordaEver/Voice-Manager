@@ -1,6 +1,7 @@
 -- all event preprocessing happens here
-local discordia = require "discordia"
-local client, logger, clock = discordia.storage.client, discordia.storage.logger, discordia.storage.clock
+local client = require "client"
+local logger = require "logger"
+local clock = require "clock"
 
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"

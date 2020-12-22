@@ -1,5 +1,5 @@
 local locale = require "locale"
-local client = require "discordia".storage.client
+local client = require "client"
 
 return function (message)
 	local guild = message.content:match("matchmaking%s*(.-)$")

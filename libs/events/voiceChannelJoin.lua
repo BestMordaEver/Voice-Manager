@@ -1,12 +1,12 @@
 local discordia = require "discordia"
+local client = require "client"
+local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
 local templateInterpreter = require "utils/templateInterpreter"
 
-local client = discordia.storage.client
-local logger = discordia.storage.logger
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
 

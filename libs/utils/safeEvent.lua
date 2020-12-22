@@ -1,6 +1,6 @@
-local discordia = require "discordia"
 local config = require "config"
-local client, logger = discordia.storage.client, discordia.storage.logger
+local client = require "client"
+local logger = require "logger"
 
 return function (name, func)
 	-- will be sent to emitter:on() style function

@@ -1,11 +1,10 @@
-local discordia = require "discordia"
+local client = require "client"
+local logger = require "logger"
 local channels = require "storage/channels"
 local embeds = require "embeds/embeds"
 local mercy = require "utils/mercy"
 local status = require "utils/status"
 local config = require "config"
-
-local client = discordia.storage.client
 
 return function (date)
 	channels:cleanup()

@@ -1,5 +1,4 @@
-local discordia = require "discordia"
-local client = discordia.storage.client
+local client = require "client"
 
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"

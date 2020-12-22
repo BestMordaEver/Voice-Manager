@@ -1,12 +1,11 @@
-local discordia = require "discordia"
+local client = require "client"
+local logger = require "logger"
 local locale = require "locale"
 local guilds = require "storage/guilds"
 local commands = require "commands/init"
 local logAction = require "utils/logAction"
 local config = require "config"
 
-local client = discordia.storage.client
-local logger = discordia.storage.logger
 
 return function (message)
 	-- ignore non-initialized guilds
