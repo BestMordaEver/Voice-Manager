@@ -25,7 +25,7 @@ local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {
-		"INSERT INTO lobbies VALUES(?,NULL,NULL,NULL,NULL,0,-1)",
+		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,0,NULL)",
 		"Added lobby %s", "Couldn't add lobby %s"
 	},
 	

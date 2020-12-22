@@ -28,7 +28,7 @@ channelsData:exec([[
 CREATE TABLE channels(
 	id VARCHAR PRIMARY KEY,
 	host VARCHAR NOT NULL,	/* mutable */
-	parent VARCHAR NOT NULL,	/* immutable */
+	parent VARCHAR,	/* immutable */
 	position INTEGER NOT NULL,	/* immutable */
 	companion VARCHAR	/* immutable */
 )]])
