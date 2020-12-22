@@ -15,4 +15,8 @@ return function (channel) -- and make sure there are no traces!
 		channelData:delete()
 		guildData.channels = guildData.channels - 1
 	end
+	for lobbyData,_ in pairs(guildData.lobbies) do
+		if lobbyData.target == channel.id then lobbyData:setTarget() end
+		if lobbyData.companionTarget == channel.id then lobbyData:setCompanionTarget() end
+	end
 end
