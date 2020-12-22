@@ -7,19 +7,20 @@ CREATE TABLE guilds(
 	permissions INTEGER NOT NULL	/* mutable, default 0 */
 )]]
 
-local discordia = require "discordia"
 local guildsData = require "sqlite3".open("guildsData.db")
 
-local client, logger = discordia.storage.client, discordia.storage.logger
+local client = require "client"
+local logger = require "logger"
 
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+
 local storageInteraction = require "storage/storageInteraction"
 local set = require "utils/set"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
-local emitter = discordia.Emitter()
+local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {

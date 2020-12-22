@@ -2,6 +2,7 @@
 --[[
 CREATE TABLE lobbies(
 	id VARCHAR PRIMARY KEY,
+	isMatchmaking BOOL	/* mutable, default FALSE */
 	template VARCHAR,	/* mutable, default NULL */
 	companionTemplate VARCHAR,	/* mutable, default NULL */
 	target VARCHAR,	/* mutable, default NULL */
@@ -10,17 +11,17 @@ CREATE TABLE lobbies(
 	capacity INTEGER	/* mutable, default NULL */
 )]]
 
-local discordia = require "discordia"
 local lobbiesData = require "sqlite3".open("lobbiesData.db")
 
-local client, logger = discordia.storage.client, discordia.storage.logger
+local client = require "client"
+local logger = require "logger"
 
 local storageInteraction = require "storage/storageInteraction"
 local hollowArray = require "utils/hollowArray"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
-local emitter = discordia.Emitter()
+local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {
@@ -31,6 +32,11 @@ local storageStatements = {
 	remove = {
 		"DELETE FROM lobbies WHERE id = ?",
 		"Removed lobby %s", "Couldn't remove lobby %s"
+	},
+	
+	setMatchmaking = {
+		"UPDATE lobbies SET isMatchmaking = ? WHERE id = ?",
+		"Updated matchmaking status to %s for lobby %s", "Couldn't update matchmaking status to %s for lobby %s"
 	},
 	
 	setTemplate = {
@@ -81,6 +87,12 @@ local lobbyMethods = {
 			end
 		end
 		emitter:emit("remove", self.id)
+	end,
+	
+	setMatchmaking = function (self, matchmakingStatus)
+		self.isMatchmaking = matchmakingStatus
+		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s", self.guildID, self.id)
+		emitter:emit("setMatchmaking", matchmakingStatus, self.id)
 	end,
 	
 	setTemplate = function (self, template)
@@ -144,15 +156,15 @@ local lobbyMT = {
 local lobbiesIndex = {
 	-- perform checks and add lobby to table
 	-- additional parameter are used upon startup to prevent unnecessary checks
-	loadAdd = function (self, lobbyID, template, companionTemplate, target, companionTarget, permissions, capacity)
+	loadAdd = function (self, lobbyID, isMatchmaking, template, companionTemplate, target, companionTarget, permissions, capacity)
 		if not self[lobbyID] then
 			local channel = client:getChannel(lobbyID)
 			if channel and channel.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, guildID = channel.guild.id,
+					id = lobbyID, guildID = channel.guild.id, isMatchmaking = isMatchmaking,
 					template = template, companionTemplate = companionTemplate,
 					target = target, companionTarget = companionTarget,
-					permissions = tonumber(permissions) or 0, capacity = tonumber(capacity) or -1,
+					permissions = tonumber(permissions) or 0, capacity = tonumber(capacity),
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
@@ -175,7 +187,7 @@ local lobbiesIndex = {
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs.id) do
 				if client:getChannel(lobbyID) then
-					self:loadAdd(lobbyID, 
+					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i],
 						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
 						lobbyIDs.target[i], lobbyIDs.companionTarget[i],
 						lobbyIDs.permissions[i], lobbyIDs.capacity[i])

@@ -8,17 +8,18 @@ CREATE TABLE channels(
 	companion VARCHAR	/* immutable */
 )]]
 
-local discordia = require "discordia"
 local channelsData = require "sqlite3".open("channelsData.db")
 
-local client, logger = discordia.storage.client, discordia.storage.logger
+local client = require "client"
+local logger = require "logger"
 
 local lobbies = require "storage/lobbies"
+
 local storageInteraction = require "storage/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
-local emitter = discordia.Emitter()
+local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {
