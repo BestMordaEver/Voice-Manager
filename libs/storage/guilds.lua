@@ -17,6 +17,7 @@ local channels = require "storage/channels"
 
 local storageInteraction = require "storage/storageInteraction"
 local set = require "utils/set"
+local botPermissions = require "utils/botPermissions"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -101,7 +102,7 @@ local guildsIndex = {
 			id = guildID,
 			prefix = prefix or "vm!",
 			limit = limit or 500,
-			permissions = permissions or 0,
+			permissions = botPermissions(permissions or 0),
 			lobbies = set(), channels = 0}, guildMT)
 		logger:log(4, "GUILD %s: Added", guildID)
 	end,

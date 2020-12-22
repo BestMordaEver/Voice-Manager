@@ -18,6 +18,7 @@ local logger = require "logger"
 
 local storageInteraction = require "storage/storageInteraction"
 local hollowArray = require "utils/hollowArray"
+local botPermissions = require "utils/botPermissions"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -164,7 +165,7 @@ local lobbiesIndex = {
 					id = lobbyID, guildID = channel.guild.id, isMatchmaking = isMatchmaking,
 					template = template, companionTemplate = companionTemplate,
 					target = target, companionTarget = companionTarget,
-					permissions = tonumber(permissions) or 0, capacity = tonumber(capacity),
+					permissions = botPermissions(permissions or 0), capacity = capacity,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
@@ -190,7 +191,7 @@ local lobbiesIndex = {
 					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i],
 						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
 						lobbyIDs.target[i], lobbyIDs.companionTarget[i],
-						lobbyIDs.permissions[i], lobbyIDs.capacity[i])
+						tonumber(lobbyIDs.permissions[i]), tonumber(lobbyIDs.capacity[i]))
 				else
 					emitter:emit("remove", lobbyID)
 				end
