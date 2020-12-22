@@ -1,9 +1,8 @@
 local timer = require "timer"
 
-local discordia = require "discordia"
-local Time = discordia.Time
-local logger = discordia.storage.logger
-local safeEvent = require "utils/safeEvent"
+local Time = require "discordia".Time
+local logger = require "logger"
+local safeEvent = require "funcs/safeEvent"
 
 local ratelimiter = {}
 
