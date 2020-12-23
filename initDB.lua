@@ -7,7 +7,7 @@ local channelsData = sqlite.open("channelsData.db")
 guildsData:exec([[
 CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
-	prefix VARCHAR NOT NULL,	/* mutable, default "vm!" */
+	role VARCHAR,	/* mutable, default NULL */
 	cLimit INTEGER NOT NULL,	/* mutable, default 500 */
 	permissions INTEGER NOT NULL	/* mutable, default 0 */
 )]])
@@ -20,6 +20,7 @@ CREATE TABLE lobbies(
 	companionTemplate VARCHAR,	/* mutable, default NULL */
 	target VARCHAR,	/* mutable, default NULL */
 	companionTarget VARCHAR,	/* mutable, default NULL */
+	role VARCHAR,	/* mutable, default NULL */
 	permissions INTEGER NOT NULL,	/* mutable, default 0 */
 	capacity INTEGER	/* mutable, default NULL */
 )]])

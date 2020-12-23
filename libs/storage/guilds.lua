@@ -2,7 +2,7 @@
 --[[
 CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
-	prefix VARCHAR NOT NULL,	/* mutable, default "vm!" */
+	role VARCHAR,	/* mutable, default NULL */
 	cLimit INTEGER NOT NULL,	/* mutable, default 500 */
 	permissions INTEGER NOT NULL	/* mutable, default 0 */
 )]]
@@ -25,7 +25,7 @@ local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {
-		"INSERT INTO guilds VALUES(?,'vm!', 500, 0)",
+		"INSERT INTO guilds VALUES(?,NULL, 500, 0)",
 		"Added guild %s", "Couldn't add guild %s"
 	},
 	
@@ -34,9 +34,9 @@ local storageStatements = {
 		"Removed guild %s", "Couldn't remove guild %s"
 	},
 	
-	setPrefix = {
-		"UPDATE guilds SET prefix = ? WHERE id = ?",
-		"Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"
+	setRole = {
+		"UPDATE guilds SET role = ? WHERE id = ?",
+		"Updated managed role to %s for guild %s", "Couldn't update managed role to %s for guild %s"
 	},
 	
 	setLimit = {
@@ -64,10 +64,10 @@ local guildMethods = {
 		emitter:emit("remove", self.id)
 	end,
 	
-	setPrefix = function (self, prefix)
-		self.prefix = prefix
-		logger:log(4, "GUILD %s: Updated prefix to %s", self.id, prefix)
-		emitter:emit("setPrefix", prefix, self.id)
+	setRole = function (self, role)
+		self.role = role
+		logger:log(4, "GUILD %s: Updated managed role to %d", self.id, role)
+		emitter:emit("setLimit", role, self.id)
 	end,
 	
 	setLimit = function (self, limit)
@@ -97,10 +97,10 @@ local guildMT = {
 
 local guildsIndex = {
 	-- no safety needed, it's either loading time or new guild time, whoever spams invites can go to hell
-	loadAdd = function (self, guildID, prefix, limit, permissions)
+	loadAdd = function (self, guildID, role, limit, permissions)
 		self[guildID] = setmetatable({
 			id = guildID,
-			prefix = prefix or "vm!",
+			role = role,
 			limit = limit or 500,
 			permissions = botPermissions(permissions or 0),
 			lobbies = set(), channels = 0}, guildMT)
@@ -120,7 +120,7 @@ local guildsIndex = {
 		if guildIDs then
 			for i, guildID in ipairs(guildIDs.id) do
 				if client:getGuild(guildID) then
-					self:loadAdd(guildID, guildIDs.prefix[i], tonumber(guildIDs.cLimit[i]), tonumber(guildIDs.permissions[i]))
+					self:loadAdd(guildID, guildIDs.role[i], tonumber(guildIDs.cLimit[i]), tonumber(guildIDs.permissions[i]))
 				else
 					emitter:emit("remove", guildID)
 				end

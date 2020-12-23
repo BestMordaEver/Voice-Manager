@@ -3,7 +3,7 @@ local logger = require "logger"
 local locale = require "locale"
 local guilds = require "storage/guilds"
 local commands = require "commands/init"
-local logAction = require "utils/logAction"
+local logAction = require "funcs/logAction"
 local config = require "config"
 
 

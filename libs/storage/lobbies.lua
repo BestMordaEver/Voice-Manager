@@ -7,6 +7,7 @@ CREATE TABLE lobbies(
 	companionTemplate VARCHAR,	/* mutable, default NULL */
 	target VARCHAR,	/* mutable, default NULL */
 	companionTarget VARCHAR,	/* mutable, default NULL */
+	role VARCHAR,	/* mutable, default NULL */
 	permissions INTEGER NOT NULL,	/* mutable, default 0 */
 	capacity INTEGER	/* mutable, default NULL */
 )]]
@@ -60,6 +61,11 @@ local storageStatements = {
 		"Updated companion target to %s for lobby %s", "Couldn't update companion target to %s for lobby %s"
 	},
 	
+	setRole = {
+		"UPDATE lobbies SET role = ? WHERE id = ?",
+		"Updated managed role to %s for lobby %s", "Couldn't update managed role to %s for lobby %s"
+	},
+	
 	setPermissions = {
 		"UPDATE lobbies SET permissions = ? WHERE id = ?",
 		"Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"
@@ -92,43 +98,49 @@ local lobbyMethods = {
 	
 	setMatchmaking = function (self, matchmakingStatus)
 		self.isMatchmaking = matchmakingStatus
-		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, matchmakingStatus)
 		emitter:emit("setMatchmaking", matchmakingStatus, self.id)
 	end,
 	
 	setTemplate = function (self, template)
 		self.template = template
-		logger:log(4, "GUILD %s: Updated template for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated template for lobby %s to %s", self.guildID, self.id, template)
 		emitter:emit("setTemplate", template, self.id)
 	end,
 	
 	setCompanionTemplate = function (self, companionTemplate)
 		self.companionTemplate = companionTemplate
-		logger:log(4, "GUILD %s: Updated companion template for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated companion template for lobby %s to %s", self.guildID, self.id, companionTemplate)
 		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
 	end,
 	
 	setTarget = function (self, target)
 		self.target = target
-		logger:log(4, "GUILD %s: Updated target for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated target for lobby %s to %s", self.guildID, self.id, target)
 		emitter:emit("setTarget", target, self.id)
 	end,
 
 	setCompanionTarget = function (self, companionTarget)
 		self.companionTarget = companionTarget
-		logger:log(4, "GUILD %s: Updated companion target for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated companion target for lobby %s to %s", self.guildID, self.id, companionTarget)
 		emitter:emit("setCompanionTarget", companionTarget, self.id)
+	end,
+	
+	setRole = function (self, role)
+		self.role = role
+		logger:log(4, "GUILD %s: Updated managed role for lobby %s to %s", self.guildID, self.id, role)
+		emitter:emit("setRole", role, self.id)
 	end,
 	
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
-		logger:log(4, "GUILD %s: Updated permissions for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated permissions for lobby %s to %s", self.guildID, self.id, permissions)
 		emitter:emit("setPermissions", permissions, self.id)
 	end,
 	
 	setCapacity = function (self, capacity)
 		self.capacity = capacity
-		logger:log(4, "GUILD %s: Updated capacity for lobby %s", self.guildID, self.id)
+		logger:log(4, "GUILD %s: Updated capacity for lobby %s to %s", self.guildID, self.id, capacity)
 		emitter:emit("setCapacity", capacity, self.id)
 	end,
 	
@@ -157,7 +169,7 @@ local lobbyMT = {
 local lobbiesIndex = {
 	-- perform checks and add lobby to table
 	-- additional parameter are used upon startup to prevent unnecessary checks
-	loadAdd = function (self, lobbyID, isMatchmaking, template, companionTemplate, target, companionTarget, permissions, capacity)
+	loadAdd = function (self, lobbyID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity)
 		if not self[lobbyID] then
 			local channel = client:getChannel(lobbyID)
 			if channel and channel.guild then
@@ -165,7 +177,7 @@ local lobbiesIndex = {
 					id = lobbyID, guildID = channel.guild.id, isMatchmaking = isMatchmaking,
 					template = template, companionTemplate = companionTemplate,
 					target = target, companionTarget = companionTarget,
-					permissions = botPermissions(permissions or 0), capacity = capacity,
+					role = role, permissions = botPermissions(permissions or 0), capacity = capacity,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)

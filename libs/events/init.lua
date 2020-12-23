@@ -7,7 +7,7 @@ local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
 local status = require "utils/status"
-local safeEvent = require "utils/safeEvent"
+local safeEvent = require "funcs/safeEvent"
 local config = require "config"
 
 --[[
