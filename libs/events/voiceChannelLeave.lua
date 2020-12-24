@@ -9,11 +9,6 @@ local permission = require "discordia".enums.permission
 return function (member, channel) -- now remove the unwanted corpses!
 	if channel and channels[channel.id] then
 		if #channel.connectedMembers == 0 then
-			local companion = client:getChannel(channels[channel.id].companion)
-			if companion then
-				companion:delete()
-			end
-			
 			local lobbyData = channels[channel.id].parent
 			if lobbyData then
 				lobbyData.mutex:lock()
@@ -39,7 +34,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 					
 					local lobby = client:getChannel(channels[channel.id].parent.id)
 					if lobby then
-						local perms = bitfield(lobbies[lobby.id].permissions):toDiscordia()
+						local perms = lobbies[lobby.id].permissions:toDiscordia()
 						if #perms ~= 0 and lobby.guild.me:getPermissions(lobby):has(permission.manageRoles, table.unpack(perms)) then
 							channel:getPermissionOverwriteFor(member):delete()
 							channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))

@@ -15,7 +15,7 @@ local logger = require "logger"
 
 local lobbies = require "storage/lobbies"
 
-local storageInteraction = require "storage/storageInteraction"
+local storageInteraction = require "funcs/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
@@ -83,11 +83,10 @@ local channelsIndex = {
 	end,
 	
 	-- loadAdd and start interaction with db
-	add = function (self, channelID, host, parent, position, companion)
-		if parent then parent = lobbies[parent] end
-		self:loadAdd(channelID, host, parent, position, companion)
+	add = function (self, channelID, host, parentID, position, companion)
+		self:loadAdd(channelID, host, lobbies[parentID], position, companion)
 		if self[channelID] then
-			emitter:emit("add", channelID, parent.id, position, host)
+			emitter:emit("add", channelID, parentID, position, host, companion)
 			return self[channelID]
 		end
 	end,
@@ -110,6 +109,8 @@ local channelsIndex = {
 						channel:delete()
 					end
 				else
+					local companion = client:getChannel(channelIDs.companion[i])
+					if companion then companion:delete() end
 					emitter:emit("remove", channelID)
 				end
 			end

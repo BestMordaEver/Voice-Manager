@@ -17,17 +17,18 @@ local lobbiesData = require "sqlite3".open("lobbiesData.db")
 local client = require "client"
 local logger = require "logger"
 
-local storageInteraction = require "storage/storageInteraction"
+local storageInteraction = require "funcs/storageInteraction"
 local hollowArray = require "utils/hollowArray"
 local botPermissions = require "utils/botPermissions"
 
 -- used to start storageInteractionEvent as async process
 -- because fuck data preservation, we need dat speed
-local emitter = require "discordia".Emitter()
+local discordia = require "discordia"
+local emitter = discordia.Emitter()
 
 local storageStatements = {
 	add = {
-		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,0,NULL)",
+		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL)",
 		"Added lobby %s", "Couldn't add lobby %s"
 	},
 	
@@ -85,6 +86,10 @@ local lobbies = {}
 local lobbyMethods = {
 	delete = function (self)
 		if lobbies[self.id] then
+			for _, childData in pairs(lobbies[self.id].children) do
+				childData.parent = true	-- you still have to die, kiddo
+			end
+		
 			lobbies[self.id] = nil
 			local lobby = client:getChannel(self.id)
 			if lobby and lobby.guild then
@@ -97,8 +102,8 @@ local lobbyMethods = {
 	end,
 	
 	setMatchmaking = function (self, matchmakingStatus)
-		self.isMatchmaking = matchmakingStatus
-		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, matchmakingStatus)
+		self.isMatchmaking = matchmakingStatus == 1
+		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, matchmakingStatus == 1)
 		emitter:emit("setMatchmaking", matchmakingStatus, self.id)
 	end,
 	
@@ -200,9 +205,9 @@ local lobbiesIndex = {
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs.id) do
 				if client:getChannel(lobbyID) then
-					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i],
+					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i] == 1,
 						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
-						lobbyIDs.target[i], lobbyIDs.companionTarget[i],
+						lobbyIDs.target[i], lobbyIDs.companionTarget[i], lobbyIDs.role[i],
 						tonumber(lobbyIDs.permissions[i]), tonumber(lobbyIDs.capacity[i]))
 				else
 					emitter:emit("remove", lobbyID)

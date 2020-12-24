@@ -3,7 +3,7 @@ local logger = require "logger"
 local channels = require "storage/channels"
 local embeds = require "embeds/embeds"
 local mercy = require "utils/mercy"
-local status = require "utils/status"
+local status = require "funcs/status"
 local config = require "config"
 
 return function (date)

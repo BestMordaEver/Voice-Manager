@@ -15,7 +15,7 @@ local logger = require "logger"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local storageInteraction = require "storage/storageInteraction"
+local storageInteraction = require "funcs/storageInteraction"
 local set = require "utils/set"
 local botPermissions = require "utils/botPermissions"
 

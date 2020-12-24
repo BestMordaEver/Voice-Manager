@@ -1,3 +1,4 @@
+local client = require "client"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
@@ -11,7 +12,9 @@ return function (channel) -- and make sure there are no traces!
 		lobbyData:delete()
 	end
 	if channelData then
-		channelData.parent:detachChild(channels[channel.id].position)
+		local companion = client:getChannel(channelData.companion)
+		if companion then companion:delete() end
+		if type(channelData.parent) == "table" then channelData.parent:detachChild(channelData.position) end
 		channelData:delete()
 		guildData.channels = guildData.channels - 1
 	end

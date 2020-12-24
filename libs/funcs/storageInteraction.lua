@@ -1,9 +1,9 @@
 -- any interaction with database comes through here
--- it ensures that no statement is used by two threads at the same time 
-local discordia = require "discordia"
+-- it ensures that no statement is used by two threads at the same time
 local config = require "config"
-local Mutex = discordia.Mutex
-local logger = discordia.storage.logger
+local client = require "client"
+local Mutex = require "discordia".Mutex
+local logger = require "logger"
 local mutexes = {}
 
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end
