@@ -9,7 +9,8 @@ CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
 	role VARCHAR,	/* mutable, default NULL */
 	cLimit INTEGER NOT NULL,	/* mutable, default 500 */
-	permissions INTEGER NOT NULL	/* mutable, default 0 */
+	permissions INTEGER NOT NULL,	/* mutable, default 0 */
+	prefix VARCHAR NOT NULL	/* mutable, default vm! */
 )]])
 
 lobbiesData:exec([[
