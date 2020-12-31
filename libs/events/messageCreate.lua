@@ -37,7 +37,6 @@ return function (message)
 		
 	-- what command is it?
 	local command = content == "" and "help" or content:match("^(%w+)")
-	if command == "matchmaking" then command = content:match("^matchmaking (%w+)") end
 	
 	if commands[command] then
 		logAction(message, command.." command invoked")
@@ -46,7 +45,6 @@ return function (message)
 		return
 	end
 	
-	--[[
 	-- call the command, log it, and all in protected call
 	local res, msg = xpcall(commands[command], debug.traceback, message)
 	
@@ -57,11 +55,6 @@ return function (message)
 		message:reply(locale.error)
 		error(msg)
 	end
-	--]]
-	
-	-- [[
-	logAction(message, commands[command](message))
-	--]]
 	
 	logAction(message, command .. " command completed")
 end
