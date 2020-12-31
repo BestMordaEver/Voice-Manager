@@ -2,12 +2,19 @@ local client = require "client"
 local logger = require "logger"
 local locale = require "locale"
 local Dialogue = require "utils/dialogue"
+local commandHelpEmbed = require "embeds/commandHelp"
 local lookForChannel = require "funcs/lookForChannel"
 local channelType = require "discordia".enums.channelType
 
 return function (message)
 	local dialogue = Dialogue(message.author.id, message.guild)
-	local channel = lookForChannel(message.content:match("select%s*(.-)$"))
+	local argument = message.content:match("select%s*(.-)$")
+	if argument == "" then
+		commandHelpEmbed(message, "select")
+		return "Sent help for select"
+	end
+	
+	local channel = lookForChannel(argument)
 	
 	if channel then
 		dialogue.selected = channel.id

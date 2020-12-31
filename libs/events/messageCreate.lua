@@ -8,8 +8,12 @@ local config = require "config"
 
 
 return function (message)
-	-- ignore non-initialized guilds
-	if message.guild and not guilds[message.guild.id] or not message.content then return end
+	-- ignore non-initialized guilds and dms
+	if not message.guild then
+		return
+	elseif not guilds[message.guild.id] or not message.content then
+		return
+	end
 	
 	local prefix = message.guild and guilds[message.guild.id].prefix or nil
 	

@@ -6,8 +6,8 @@ local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
 
 -- no embed data is saved, since this is non-interactive embed
-return function (message, guild)
-	local guildData = guilds[guild.id]
+return function (message)
+	local guildData = guilds[message.guild.id]
 	
 	message:reply({embed = {
 		title = locale.serverInfoTitle:format(guild.name),
