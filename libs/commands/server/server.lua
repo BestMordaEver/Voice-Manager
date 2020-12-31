@@ -1,5 +1,6 @@
 local commandHelpEmbed = require "embeds/commandHelp"
 local serverInfoEmbed = require "embeds/serverInfo"
+local permission = require "discordia".enums.permission
 
 local subcommands = {
 	role = require "commands/server/role",
@@ -9,6 +10,11 @@ local subcommands = {
 }
 
 return function (message)
+	if not message.member:hasPermission(permission.manageChannels) then
+		message:reply(locale.badPermissions)
+		return "Bad user permissions"
+	end
+	
 	local subcommand, argument = message.content:match("server%s*(.-)%s*(.-)$")
 	
 	if subcommand == "" then
