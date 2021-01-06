@@ -20,8 +20,7 @@ return function (message)
 	-- good luck with this one :3
 	if message.author.bot or ( -- ignore bots
 		not message.mentionedUsers:find(function(user) return user == client.user end) and -- find mentions
-		not (prefix and message.content:find(prefix, 1, true)) and 	-- find prefix
-		message.guild) then	-- of just roll with it if dm
+		not (prefix and message.content:find(prefix, 1, true))) then 	-- find prefix
 		return
 	end
 	

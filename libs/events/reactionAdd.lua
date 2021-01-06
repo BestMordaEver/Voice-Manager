@@ -1,7 +1,7 @@
 local client = require "client"
 local logger = require "logger"
 local embeds = require "embeds/embeds"
-local logAction = require "utils/logAction"
+local logAction = require "funcs/logAction"
 
 local reactions = embeds.reactions
 

@@ -1,3 +1,8 @@
-return function (message)
-	
+local locale = require "locale"
+local guilds = require "storage/guilds"
+
+return function (message, prefix)
+	guilds[message.guild.id]:setPrefix(prefix)
+	message:reply(locale.prefixConfirm:format(prefix))
+	return "Set new prefix "..prefix
 end

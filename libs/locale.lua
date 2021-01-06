@@ -122,6 +122,14 @@ You can register a lobby with `register`]],
 **Companion:** %s
 **Channels:** %d]],
 
+	limitBadInput = [[Limit must be a number between 0 and 500]],
+	limitConfirm = [[New limit set!]],
+	roleBadInput = [[Couldn't find the specified role]],
+	roleConfirm = [[New managed role set!]],
+	permissionsBadInput = [[Unknown permission: %s]],
+	permissionsConfirm = [[New permissions set!]],
+	prefixConfirm = [[New prefix set: %s]],
+	
 	-- matchmaking
 	matchmakingInfoTitle = [[Matchmaking info | %s]],
 	matchmakingNoInfo = [[There are not registered matchmaking lobbies
@@ -632,6 +640,10 @@ Show stats for specific server
 	ambiguousID = [[There are several channels with this name]],
 	gimmeReaction = [[I can process that, but I need "Manage Messages" and "Add Reactions" permissions for that]],
 	badArgument = [[You didn't specify the command]],
+	
+	-- errors
+	badPermissions = [[You don't have required permissions]],
+	badSubcommand = [[Unknown subcommand]],
 	
 	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
 	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],

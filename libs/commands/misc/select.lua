@@ -7,7 +7,6 @@ local lookForChannel = require "funcs/lookForChannel"
 local channelType = require "discordia".enums.channelType
 
 return function (message)
-	local dialogue = Dialogue(message.author.id, message.guild)
 	local argument = message.content:match("select%s*(.-)$")
 	if argument == "" then
 		commandHelpEmbed(message, "select")
@@ -17,8 +16,8 @@ return function (message)
 	local channel = lookForChannel(argument)
 	
 	if channel then
-		dialogue.selected = channel.id
-		if channel.type = channelType.voice then
+		Dialogue(message.author.id, channel.id)
+		if channel.type == channelType.voice then
 			message:reply(locale.selectVoice)
 			return "Selected voice channel "..channel.id
 		else

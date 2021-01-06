@@ -140,7 +140,7 @@ local lobbyMethods = {
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
 		logger:log(4, "GUILD %s: Updated permissions for lobby %s to %s", self.guildID, self.id, permissions)
-		emitter:emit("setPermissions", permissions, self.id)
+		emitter:emit("setPermissions", permissions.bifield.value, self.id)
 	end,
 	
 	setCapacity = function (self, capacity)

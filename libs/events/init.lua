@@ -6,7 +6,7 @@ local clock = require "clock"
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
-local status = require "utils/status"
+local status = require "funcs/status"
 local safeEvent = require "funcs/safeEvent"
 local config = require "config"
 

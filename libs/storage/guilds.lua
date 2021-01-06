@@ -84,8 +84,8 @@ local guildMethods = {
 	
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
-		logger:log(4, "GUILD %s: Updated permissions to %d", self.id)
-		emitter:emit("setPermissions", permissions, self.id)
+		logger:log(4, "GUILD %s: Updated permissions to %d", self.id, permissions.bitfield.value)
+		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 	end,
 	
 	setPrefix = function (self, prefix)
@@ -97,7 +97,6 @@ local guildMethods = {
 
 local guildMT = {
 	__index = function (self, index)
-		print(index, self.id, client:getGuild(self.id), guilds[self.id])
 		if index == "delete" or (client:getGuild(self.id) and guilds[self.id]) then
 			return guildMethods[index]
 		else
