@@ -4,31 +4,34 @@ local client = require "client"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
-local bitfield = require "utils/bitfield"
+local tps = require "funcs/truePositionSorting"
 
 -- no embed data is saved, since this is non-interactive embed
-return function (message, guild)
-	local guildData = guilds[guild.id]
+return function (message)
+	local guildData = guilds[message.guild.id]
 	
 	local embed = {
-		title = locale.lobbiesInfoTitle:format(guild.name),
+		title = locale.lobbiesInfoTitle:format(message.guild.name),
 		color = config.embedColor,
 		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
 	
-	for lobbyData, _ in pairs(guildData.lobbies) do
-		lobbyData = lobbies[lobbyData]
+	local sortedLobbies = table.sorted(message.guild.voiceChannels:toArray(function(voiceChannel) return lobbies[voiceChannel.id] end), tps)
+	local sortedLobbyData = {}
+	for i, lobby in ipairs(sortedLobbies) do table.insert(sortedLobbyData, lobbies[lobby.id]) end
+	
+	for _, lobbyData in pairs(sortedLobbyData) do
 		if not lobbyData.isMatchmaking then
+			local target = client:getChannel(lobbyData.target)
 			table.insert(embed.fields, {
 				name = client:getChannel(lobbyData.id).name,
 				value = locale.lobbiesField:format(
-					client:getChannel(lobbyData.target),
-					lobbyData.template,
+					target and target.name or "default",
+					lobbyData.template or "%nickname's% room",
 					tostring(lobbyData.permissions),
-					lobbyData.capacity,
-					lobbyData.companionCategory and "Enabled" or "Disabled",
+					lobbyData.capacity or "default",
+					lobbyData.companionTarget and "enabled" or "disabled",
 					#lobbyData.children
 				),
 				inline = true

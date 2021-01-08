@@ -54,18 +54,19 @@ local function lobbyJoin (member, lobby)
 		member:setVoiceChannel()
 	end
 	
-	if guilds[lobby.guild.id].limit <= guilds[lobby.guild.id].channels then return end
+	if guilds[lobby.guild.id].limit <= channels:inGuild(lobby.guild.id) then return end
 	
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]
-	local name = lobbyData.template or "%nickname's% channel"
+	local name = lobbyData.template or "%nickname's% room"
+	-- potential position may change in process of name generation, so rather than query lobby for position several times, reservation is made and used throughout
 	local position = lobbyData:attachChild(true)
 	local needsMove
 	
 	if name:match("%%.-%%") then
 		needsMove = name:match("%%counter%%") and true
 		name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
-		if name == "" then name = templateInterpreter("%nickname's% channel", member) end
+		if name == "" then name = templateInterpreter("%nickname's% room", member) end
 	end
 	
 	local newChannel = target:createVoiceChannel(name)
@@ -76,6 +77,7 @@ local function lobbyJoin (member, lobby)
 		
 		local companion
 		if lobbyData.companionTarget then
+			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or newChannel.guild) or client:getChannel(lobbyData.companionTarget)
 			local name = lobbyData.companionTemplate or "Private chat"
 		
 			if name:match("%%.-%%") then
@@ -83,12 +85,11 @@ local function lobbyJoin (member, lobby)
 				if name == "" then name = "Private chat" end
 			end
 			
-			companion = client:getChannel(lobbyData.companionTarget):createTextChannel(name)
+			companion = companionTarget:createTextChannel(name)
 		end
 		
 		channels:add(newChannel.id, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(newChannel.id, position)
-		guilds[lobby.guild.id].channels = guilds[lobby.guild.id].channels + 1
 		newChannel:setUserLimit(lobbyData.capacity or lobby.userLimit)
 		
 		local perms = lobbyData.permissions:toDiscordia()

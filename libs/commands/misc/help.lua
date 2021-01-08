@@ -1,6 +1,5 @@
 local locale = require "locale"
 local helpEmbed = require "embeds/help"
-local commandHelpEmbed = require "embeds/commandHelp"
 
 return function (message)
 	local command = (message.content:match("help%s*(.-)$") or "help"):lower()
@@ -10,8 +9,6 @@ return function (message)
 	
 	if command == "help" then
 		helpEmbed(message)
-	else
-		commandHelpEmbed(message, command)
 	end
 	
 	return command.." help message"

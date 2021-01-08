@@ -110,25 +110,31 @@ Get a support server invite]],
 **Channels:** %d
 **Limit:** %d]],
 	
-	-- lobbies
-	lobbiesInfoTitle = [[Lobbies info | %s]],
-	lobbiesNoInfo = [[There are no registered lobbies
-You can register a lobby with `register`]],
-	lobbiesInfo = [[Select lobbies to change their settings]],
-	lobbiesField = [[**Target:** %s
-**Template:** %s
-**Permissions:** %s
-**Capacity:** %d
-**Companion:** %s
-**Channels:** %d]],
-
 	limitBadInput = [[Limit must be a number between 0 and 500]],
 	limitConfirm = [[New limit set!]],
 	roleBadInput = [[Couldn't find the specified role]],
 	roleConfirm = [[New managed role set!]],
-	permissionsBadInput = [[Unknown permission: %s]],
-	permissionsConfirm = [[New permissions set!]],
 	prefixConfirm = [[New prefix set: %s]],
+	
+	-- lobbies
+	lobbiesInfoTitle = [[Lobbies info | %s]],
+	lobbiesNoInfo = [[There are no registered lobbies
+You can add a lobby with `vm!lobbies add`]],
+	lobbiesInfo = [[Select lobbies to change their settings]],
+	lobbiesField = [[**Target category:** %s
+**Name template:** %s
+**Permissions:** %s
+**Capacity:** %s
+**Companion:** %s
+**Channels:** %d]],
+	
+	addConfirm = [[Added new lobby %s]],
+	removeConfirm = [[Removed lobby %s]],
+	capacityOOB = [[Capacity must be a number between 0 and 99]],
+	capacityConfirm = [[Changed rooms' capacity to %d]],
+	categoryConfirm = [[Changed lobby's target category to %s]],
+	companionToggle = [[Companion chats are now %sd for this lobby]],
+	nameConfirm = [[Name template is %s]],
 	
 	-- matchmaking
 	matchmakingInfoTitle = [[Matchmaking info | %s]],
@@ -146,6 +152,13 @@ You can enable companion channels with `companion`]],
 **Template:** %s
 **Permissions:** %s
 **Companion channels:** %d]],
+	
+	permissionsBadInput = [[Unknown permission: %s]],
+	permissionsConfirm = [[New permissions set!]],
+	
+	-- select
+	selectVoice = [[Selected lobby %s]],
+	selectCategory = [[Selected category %s]],
 	
 	-- lobby
 	register = [[You need the **Manage Channels** permission in order to use this command
@@ -642,19 +655,14 @@ Show stats for specific server
 	badArgument = [[You didn't specify the command]],
 	
 	-- errors
-	badPermissions = [[You don't have required permissions]],
+	badBotPermissions = [[Bot doesn't have sufficient permissions]],
+	badUserPermissions = [[You don't have sufficient permissions]],
 	badSubcommand = [[Unknown subcommand]],
+	noLobbySelected = [[You didn't select a lobby]],
+	noCategorySelected = [[You didn't select a category]],
+	badChannel = [[Couldn't find the specified channel]],
 	
-	badBotPermission = [[Bot doesn't have permissions to manage this channel:]],
-	badBotPermissions = [[Bot doesn't have permissions to manage those channels:]],
-	badUserPermission = [[You're not permitted to manage this channel:]],
-	badUserPermissions = [[You're not permitted to manage those channels:]],
 	notLobby = [[This channel is not a lobby:]],
-	notLobbies = [[Those channels are not lobbies:]],
-	badChannel = [[This channel is not valid:]],
-	badChannels = [[Those channels are not valid:]],
-	notMember = [[You're not a member of this server]],
-	noID = [[I can't process this input in DMs]],
 	notHost = [[You're not a channel host]],
 	badHostPermission = [[You're not permitted to perform this command]],
 	hostError = [[Something went wrong. *And it's probably not my fault*. Poke your admins if this continues to happen]],

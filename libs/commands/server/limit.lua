@@ -11,5 +11,5 @@ return function (message, limit)
 	
 	guilds[message.guild.id]:setLimit(limit)
 	message:reply(locale.limitConfirm)
-	return "Set limit to "..limit
+	return "Server limit set"
 end

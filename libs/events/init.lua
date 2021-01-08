@@ -35,9 +35,9 @@ events = {
 	channelDelete = require "events/channelDelete",
 	
 	ready = function ()
+		guilds:load()
 		lobbies:load()
 		channels:load()
-		guilds:load()
 		clock:start()
 		
 		client:setGame(status())

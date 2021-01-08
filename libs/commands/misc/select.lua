@@ -1,9 +1,7 @@
-local client = require "client"
-local logger = require "logger"
 local locale = require "locale"
-local Dialogue = require "utils/dialogue"
-local commandHelpEmbed = require "embeds/commandHelp"
+local dialogue = require "utils/dialogue"
 local lookForChannel = require "funcs/lookForChannel"
+local permissionsCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
 
 return function (message)
@@ -13,16 +11,21 @@ return function (message)
 		return "Sent help for select"
 	end
 	
-	local channel = lookForChannel(argument)
+	local channel = lookForChannel(message, argument)
 	
 	if channel then
-		Dialogue(message.author.id, channel.id)
-		if channel.type == channelType.voice then
-			message:reply(locale.selectVoice)
-			return "Selected voice channel "..channel.id
+		local isPermitted, msg = permissionsCheck(message, channel)
+		if isPermitted then
+			dialogue(message.author.id, channel.id)
+			if channel.type == channelType.voice then
+				message:reply(locale.selectVoice:format(channel.name))
+				return "Selected voice channel "..channel.id
+			else
+				message:reply(locale.selectCategory:format(channel.name))
+				return "Selected category "..channel.id
+			end
 		else
-			message:reply(locale.selectCategory)
-			return "Selected category "..channel.id
+			return msg
 		end
 	else
 		message:reply(locale.selectFailed)

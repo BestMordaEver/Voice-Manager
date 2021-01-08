@@ -1,5 +1,4 @@
 local locale = require "locale"
-local commandHelpEmbed = require "embeds/commandHelp"
 local serverInfoEmbed = require "embeds/serverInfo"
 local permission = require "discordia".enums.permission
 
@@ -18,19 +17,14 @@ return function (message)
 	
 	local subcommand, argument = message.content:match("server%s*(%a*)%s*(.-)$")
 	
-	if subcommand == "" then
+	if subcommand == "" or argument == "" then
 		serverInfoEmbed(message)
 		return "Sent server info"
 	end
 	
 	
 	if subcommands[subcommand] then
-		if argument == "" then
-			commandHelpEmbed(message, "server"..subcommand)
-			return "Sent server "..subcommand.." help"
-		else
-			return subcommands[subcommand](message, argument)
-		end
+		return subcommands[subcommand](message, argument)
 	else
 		message:reply(locale.badSubcommand)
 		return "Bad server subcommand"

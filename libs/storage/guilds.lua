@@ -13,9 +13,6 @@ local guildsData = require "sqlite3".open("guildsData.db")
 local client = require "client"
 local logger = require "logger"
 
-local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
-
 local storageInteraction = require "funcs/storageInteraction"
 local set = require "utils/set"
 local botPermissions = require "utils/botPermissions"
@@ -115,7 +112,7 @@ local guildsIndex = {
 			limit = limit or 500,
 			permissions = botPermissions(permissions or 0),
 			prefix = prefix or "vm!",
-			lobbies = set(), channels = 0}, guildMT)
+			lobbies = set()}, guildMT)
 		logger:log(4, "GUILD %s: Added", guildID)
 	end,
 	
@@ -142,15 +139,6 @@ local guildsIndex = {
 		logger:log(4, "STARTUP: Loading guilds from client")
 		for _, guild in pairs(client.guilds) do
 			if not self[guild.id] then self:add(guild.id) end
-		end
-		
-		for lobbyID, _ in pairs(lobbies) do
-			self[client:getChannel(lobbyID).guild.id].lobbies:add(lobbyID)
-		end
-		
-		for channelID, _ in pairs(channels) do
-			local guild = self[client:getChannel(channelID).guild.id]
-			guild.channels = guild.channels + 1
 		end
 		
 		logger:log(4, "STARTUP: Loaded!")

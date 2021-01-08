@@ -1,8 +1,8 @@
 local locale = require "locale"
-local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
 local botPermissions = require "utils/botPermissions"
 
-return function (message, permissions)
+return function (message, channel, permissions)
 	local permissionBits = botPermissions()
 	
 	for permission in permissions:gmatch("%a+") do
@@ -14,14 +14,14 @@ return function (message, permissions)
 		end
 	end
 	
-	local guildData = guilds[message.guild.id]
+	local lobbyData = lobbies[channel.id]
 	if message.content:match("allow") then
-		permissionBits = guildData.permissions + permissionBits
+		permissionBits = lobbyData.permissions + permissionBits
 	elseif message.content:match("deny") then
-		permissionBits = guildData.permissions - permissionBits
+		permissionBits = lobbyData.permissions - permissionBits
 	end
 	
-	guildData:setPermissions(permissionBits)
+	lobbyData:setPermissions(permissionBits)
 	message:reply(locale.permissionsConfirm)
-	return "Server permissions set"
+	return "Lobby permissions set"
 end

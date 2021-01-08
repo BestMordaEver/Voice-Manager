@@ -10,5 +10,5 @@ return function (message, role)
 	
 	guilds[message.guild.id]:setRole(role.id)
 	message:reply(locale.roleConfirm)
-	return "Set new managed role to "..role.id
+	return "Server managed role set"
 end

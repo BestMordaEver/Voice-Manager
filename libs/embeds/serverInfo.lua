@@ -12,6 +12,6 @@ return function (message)
 	message:reply({embed = {
 		title = locale.serverInfoTitle:format(message.guild.name),
 		color = config.embedColor,
-		description = locale.serverInfo:format(guildData.prefix, guildData.permissions, #guildData.lobbies, channels:people(message.guild.id), guildData.channels, guildData.limit)
+		description = locale.serverInfo:format(guildData.prefix, guildData.permissions, #guildData.lobbies, channels:people(message.guild.id), channels:inGuild(message.guild.id), guildData.limit)
 	}})
 end

@@ -17,6 +17,8 @@ local lobbiesData = require "sqlite3".open("lobbiesData.db")
 local client = require "client"
 local logger = require "logger"
 
+local guilds = require "storage/guilds"
+
 local storageInteraction = require "funcs/storageInteraction"
 local hollowArray = require "utils/hollowArray"
 local botPermissions = require "utils/botPermissions"
@@ -89,22 +91,21 @@ local lobbyMethods = {
 			for _, childData in pairs(lobbies[self.id].children) do
 				childData.parent = true	-- you still have to die, kiddo
 			end
-		
+			
 			lobbies[self.id] = nil
 			local lobby = client:getChannel(self.id)
-			if lobby and lobby.guild then
-				logger:log(4, "GUILD %s: Removed lobby %s", lobby.guild.id, self.id)
-			else
-				logger:log(4, "LOBBY %s: Removed", self.id)
+			if lobby then
+				guilds[self.guildID].lobbies:remove(self)
+				logger:log(4, "GUILD %s: Removed lobby %s", self.guildID, self.id)
 			end
 		end
 		emitter:emit("remove", self.id)
 	end,
 	
-	setMatchmaking = function (self, matchmakingStatus)
-		self.isMatchmaking = matchmakingStatus == 1
-		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, matchmakingStatus == 1)
-		emitter:emit("setMatchmaking", matchmakingStatus, self.id)
+	setMatchmaking = function (self, isMatchmaking)
+		self.isMatchmaking = isMatchmaking
+		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, isMatchmaking)
+		emitter:emit("setMatchmaking", isMatchmaking and 1 or 0, self.id)
 	end,
 	
 	setTemplate = function (self, template)
@@ -114,7 +115,7 @@ local lobbyMethods = {
 	end,
 	
 	setCompanionTemplate = function (self, companionTemplate)
-		self.companionTemplate = companionTemplate
+		self.companionTemplate = companionTemplate == "true" or companionTemplate
 		logger:log(4, "GUILD %s: Updated companion template for lobby %s to %s", self.guildID, self.id, companionTemplate)
 		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
 	end,
@@ -140,7 +141,7 @@ local lobbyMethods = {
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
 		logger:log(4, "GUILD %s: Updated permissions for lobby %s to %s", self.guildID, self.id, permissions)
-		emitter:emit("setPermissions", permissions.bifield.value, self.id)
+		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 	end,
 	
 	setCapacity = function (self, capacity)
@@ -176,16 +177,17 @@ local lobbiesIndex = {
 	-- additional parameter are used upon startup to prevent unnecessary checks
 	loadAdd = function (self, lobbyID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity)
 		if not self[lobbyID] then
-			local channel = client:getChannel(lobbyID)
-			if channel and channel.guild then
+			local lobby = client:getChannel(lobbyID)
+			if lobby and lobby.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, guildID = channel.guild.id, isMatchmaking = isMatchmaking,
+					id = lobbyID, guildID = lobby.guild.id, isMatchmaking = isMatchmaking,
 					template = template, companionTemplate = companionTemplate,
 					target = target, companionTarget = companionTarget,
 					role = role, permissions = botPermissions(permissions or 0), capacity = capacity,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
-				logger:log(4, "GUILD %s: Added lobby %s", channel.guild.id, lobbyID)
+				guilds[lobby.guild.id].lobbies:add(self[lobbyID])
+				logger:log(4, "GUILD %s: Added lobby %s", lobby.guild.id, lobbyID)
 			end
 		end
 	end,
@@ -204,16 +206,20 @@ local lobbiesIndex = {
 		local lobbyIDs = lobbiesData:exec("SELECT * FROM lobbies")
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs.id) do
-				if client:getChannel(lobbyID) then
+				local lobby = client:getChannel(lobbyID)
+				if lobby then
 					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i] == 1,
 						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
-						lobbyIDs.target[i], lobbyIDs.companionTarget[i], lobbyIDs.role[i],
+						lobbyIDs.target[i], lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i],
+						lobbyIDs.role[i],
 						tonumber(lobbyIDs.permissions[i]), tonumber(lobbyIDs.capacity[i]))
+					guilds[lobby.guild.id].lobbies:add(self[lobbyID])
 				else
 					emitter:emit("remove", lobbyID)
 				end
 			end
 		end
+		
 		logger:log(4, "STARTUP: Loaded!")
 	end
 }

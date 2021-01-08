@@ -16,7 +16,6 @@ return function (channel) -- and make sure there are no traces!
 		if companion then companion:delete() end
 		if type(channelData.parent) == "table" then channelData.parent:detachChild(channelData.position) end
 		channelData:delete()
-		guildData.channels = guildData.channels - 1
 	end
 	for lobbyData,_ in pairs(guildData.lobbies) do
 		if lobbyData.target == channel.id then lobbyData:setTarget() end

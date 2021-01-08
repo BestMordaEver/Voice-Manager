@@ -13,6 +13,7 @@ local channelsData = require "sqlite3".open("channelsData.db")
 local client = require "client"
 local logger = require "logger"
 
+local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 
 local storageInteraction = require "funcs/storageInteraction"
@@ -115,6 +116,9 @@ local channelsIndex = {
 				end
 			end
 		end
+		
+		
+		
 		logger:log(4, "STARTUP: Loaded!")
 	end,
 	
@@ -142,6 +146,14 @@ local channelsIndex = {
 			else
 				channelData:delete()
 			end
+		end
+		return p
+	end,
+	
+	inGuild = function (self, guildID)
+		local p = 0
+		for lobbyData, _ in pairs(guilds[guildID].lobbies) do
+			p = p + #lobbyData.children
 		end
 		return p
 	end
