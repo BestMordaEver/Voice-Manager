@@ -11,14 +11,14 @@ return function (message)
 	local guildData = guilds[message.guild.id]
 	
 	local embed = {
-		title = locale.lobbiesInfoTitle:format(message.guild.name),
+		title = locale.matchmakingInfoTitle:format(message.guild.name),
 		color = config.embedColor,
-		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or locale.lobbiesInfo,
+		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or locale.matchmakingInfo,
 		fields = {}
 	}
 	
 	local sortedLobbies = table.sorted(message.guild.voiceChannels:toArray(function(voiceChannel)
-		return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
+		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].isMatchmaking
 	end), tps)
 	
 	local sortedLobbyData = {}
@@ -28,13 +28,9 @@ return function (message)
 		local target = client:getChannel(lobbyData.target)
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
-			value = locale.lobbiesField:format(
+			value = locale.matchmakingField:format(
 				target and target.name or "default",
-				lobbyData.template or "%nickname's% room",
-				tostring(lobbyData.permissions),
-				lobbyData.capacity or "default",
-				lobbyData.companionTarget and "enabled" or "disabled",
-				#lobbyData.children
+				lobbyData.template or "random"
 			),
 			inline = true
 		})

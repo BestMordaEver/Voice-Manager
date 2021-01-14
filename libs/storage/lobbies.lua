@@ -51,7 +51,7 @@ local storageStatements = {
 	
 	setCompanionTemplate = {
 		"UPDATE lobbies SET companionTemplate = ? WHERE id = ?",
-		"Updated companion template to %s for lobby %s", "Couldn't update c`ompanionTemplate to %s for lobby %s"
+		"Updated companion template to %s for lobby %s", "Couldn't update companionTemplate to %s for lobby %s"
 	},
 	
 	setTarget = {
@@ -115,9 +115,9 @@ local lobbyMethods = {
 	end,
 	
 	setCompanionTemplate = function (self, companionTemplate)
-		self.companionTemplate = companionTemplate == "true" or companionTemplate
+		self.companionTemplate = companionTemplate
 		logger:log(4, "GUILD %s: Updated companion template for lobby %s to %s", self.guildID, self.id, companionTemplate)
-		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
+		emitter:emit("setCompanionTemplate", companionTemplate == true and "true" or companionTemplate, self.id)
 	end,
 	
 	setTarget = function (self, target)

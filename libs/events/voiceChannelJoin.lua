@@ -4,44 +4,11 @@ local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
 
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
-
-local matchmakers = {
-	random = function (channels)
-		return channels[math.random(#channels)]
-	end,
-	
-	max = function (channels)
-		local max = channels[1]
-		for i, channel in pairs(channels) do
-			if #max.connectedMembers < #channel.connectedMembers then
-				max = channel
-			end
-		end
-		return max
-	end,
-	
-	min = function (channels)
-		local min = channels[1]
-		for i, channel in pairs(channels) do
-			if #min.connectedMembers > #channel.connectedMembers then
-				min = channel
-			end
-		end
-		return min
-	end,
-	
-	first = function (channels)
-		return channels[1]
-	end,
-	
-	last = function (channels)
-		return channels[#channels]
-	end
-}
 
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
@@ -130,28 +97,28 @@ local function matchmakingJoin (member, lobby)
 	
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category
 	if target then
-		local channels
+		local children
 		
 		if target.type == channelType.voice then
-			channels = lobby.guild.voiceChannels:toArray("position", function (channel)
+			children = lobby.guild.voiceChannels:toArray("position", function (channel)
 				if channels[channel.id] then
 					local parent = client:getChannel(channels[channel.id].parent.id)
 					return (parent == target) and (channel.userLimit == 0 or #channel.connectedMembers < channel.userLimit) and member:hasPermission(channel, permission.connect)
 				end
 			end)
 		else
-			channels = target.voiceChannels:toArray("position", function (channel)
+			children = target.voiceChannels:toArray("position", function (channel)
 				return (channel ~= lobby) and (channel.userLimit == 0 or #channel.connectedMembers < channel.userLimit) and member:hasPermission(channel, permission.connect)
 			end)
 		end
 		
-		if #channels == 1 then
-			if member:setVoiceChannel(channels[1]) then
+		if #children == 1 then
+			if member:setVoiceChannel(children[1]) then
 				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
 			end
 			return
-		elseif #channels > 1 then
-			if member:setVoiceChannel((matchmakers[lobbies[lobby.id].template] or matchmakers.random)(channels)) then
+		elseif #children > 1 then
+			if member:setVoiceChannel((matchmakers[lobbies[lobby.id].template] or matchmakers.random)(children)) then
 				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
 			end
 			return
