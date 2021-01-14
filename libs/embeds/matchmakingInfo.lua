@@ -5,6 +5,7 @@ local client = require "client"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
+local channelType = require "discordia".enums.channelType
 
 -- no embed data is saved, since this is non-interactive embed
 return function (message)
@@ -25,12 +26,13 @@ return function (message)
 	for i, lobby in ipairs(sortedLobbies) do table.insert(sortedLobbyData, lobbies[lobby.id]) end
 	
 	for _, lobbyData in pairs(sortedLobbyData) do
-		local target = client:getChannel(lobbyData.target)
+		local target, pool = client:getChannel(lobbyData.target), 0
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.matchmakingField:format(
 				target and target.name or "default",
-				lobbyData.template or "random"
+				lobbyData.template or "random",
+				target.type == channelType.category and #target.voiceChannels or #lobbies[target.id].children
 			),
 			inline = true
 		})

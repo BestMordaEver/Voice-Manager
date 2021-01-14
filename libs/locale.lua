@@ -141,7 +141,8 @@ You can add a lobby with `vm!lobbies add`]],
 	matchmakingNoInfo = [[There are not registered matchmaking lobbies
 You can create a matchmaking lobby with `match`]],
 	matchmakingField = [[**Target:** %s
-**Mode:** %s]],
+**Mode:** %s
+**Matchmaking pool:** %d channels]],
 	
 	matchmakingAddConfirm = [[Added new matchmaking lobby %s]],
 	matchmakingRemoveConfirm = [[Removed matchmaking lobby %s]],
@@ -153,9 +154,8 @@ You can create a matchmaking lobby with `match`]],
 	companionInfoTitle = [[Companion settings | %s]],
 	companionNoInfo = [[There are no lobbies with enabled companion channels
 You can enable companion channels with `companion`]],
-	companionField = [[**Target:** %s
-**Template:** %s
-**Permissions:** %s
+	companionField = [[**Category:** %s
+**Name:** %s
 **Companion channels:** %d]],
 	
 	permissionsBadInput = [[Unknown permission: %s]],
