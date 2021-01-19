@@ -1,3 +1,4 @@
+local client = require "client"
 local config = require "config"
 local locale = require "locale"
 local embeds = require "libs/embeds/embeds"
@@ -8,6 +9,22 @@ local helpEmbed = {}
 local tostring = function (self)
 	return "HelpEmbed: "..self.id
 end
+
+-- event is sent when embed is formed and delivered
+-- only relevant for interactive embeds
+client:on("embedSent", function (type, message, embed)
+	if type ~= "help" then return end
+	local embedData = setmetatable({command = "help", killIn = 10, author = message.author, embed = embed}, metaHelp)
+	
+	embeds[message] = embedData
+	embedData.id = message.id
+	
+	message:addReaction(reactions.page)
+	for i=1,5 do
+		message:addReaction(reactions[i])
+	end
+	message:addReaction(reactions.stop)
+end)
 
 function helpEmbed:setContent(page)
 	self.embed = {
@@ -58,21 +75,6 @@ local metaHelp = {
 	__index = helpEmbed
 }
 
-return function (message)
-	local embedData = setmetatable({command = "help", killIn = 10, author = message.author}, metaHelp)
-	embedData:setContent(0)
-	
-	local newMessage = message:reply {embed = embedData.embed}
-	if newMessage then
-		embeds[newMessage] = embedData
-		embedData.id = newMessage.id
-		
-		newMessage:addReaction(reactions.page)
-		for i=1,5 do
-			newMessage:addReaction(reactions[i])
-		end
-		newMessage:addReaction(reactions.stop)
-		
-		return newMessage
-	end
-end
+embeds:new("help", function (message)
+	return {title = locale.helpMenuTitle, color = config.embedColor, description = locale.helpMenu..locale.links}
+end)

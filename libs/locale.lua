@@ -172,7 +172,9 @@ You can enable companion channels with `companion`]],
 	embedTip = [[<> - required, [] - optional, "" - include those in message]],
 	embedPage = [[Click :page_facing_up: to select the whole page]],
 	embedAll = [[Click :asterisk: to select all available channels]],
-	links = "\n\n"..[[**Links**
+	links = [[
+	
+**Links**
 [Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
 [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
 [How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID)

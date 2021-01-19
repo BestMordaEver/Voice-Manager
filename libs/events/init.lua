@@ -45,6 +45,10 @@ events = {
 			client:getChannel(config.guildFeed):send("I'm listening")
 		end
 		
+		-- initializing all embed types
+		-- really gotta think about a more elegant solution
+		require "embeds/init"
+		
 		client:on(events("messageCreate"))
 		client:on(events("messageUpdate"))
 		client:on(events("reactionAdd"))

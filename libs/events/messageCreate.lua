@@ -53,7 +53,8 @@ return function (message)
 	-- notify user if failed
 	if res then
 		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
-		message:reply(embeds(msgType, msg))
+		local embed = embeds(msgType, msg)
+		client:emit("embedSent", msgType, message:reply(embed), embed)
 	else
 		message:reply(embeds("error"))
 		error(logMsg)

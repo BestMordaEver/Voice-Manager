@@ -1,0 +1,5 @@
+require "embeds/companionInfo"
+require "embeds/help"
+require "embeds/lobbiesInfo"
+require "embeds/matchmakingInfo"
+require "embeds/serverInfo"

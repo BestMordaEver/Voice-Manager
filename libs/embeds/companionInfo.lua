@@ -2,12 +2,13 @@ local config = require "config"
 local locale = require "locale"
 local client = require "client"
 
+local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
 
 -- no embed data is saved, since this is non-interactive embed
-return function (message)
+embeds("companionInfo", function (message)
 	local guildData = guilds[message.guild.id]
 	
 	local embed = {
@@ -36,5 +37,5 @@ return function (message)
 		})
 	end
 	
-	message:reply({embed = embed})
-end
+	return embed
+end)
