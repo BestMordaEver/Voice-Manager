@@ -1,3 +1,8 @@
+local function invite (message)
+	message:reply("https://discord.gg/tqj6jvT")
+	return "Sent support invite"
+end
+
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return {
 	help = require "commands/misc/help",
@@ -9,8 +14,6 @@ return {
 	room = require "commands/room/room",
 	chat = require "commands/chat/chat",
 	shutdown = require "commands/misc/shutdown",
-	support = function (message)
-		message:reply("https://discord.gg/tqj6jvT")
-		return "Sent support invite"
-	end
+	support = invite,
+	invite = invite
 }
