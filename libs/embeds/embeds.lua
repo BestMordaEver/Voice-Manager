@@ -27,6 +27,18 @@ return setmetatable({}, {
 					self[message] = nil
 				end
 			end
+		end,
+		
+		new = function (self, name, embedFactory)
+			self[name] = embedFactory
 		end
-	}
+	},
+	
+	__call = function (self, type, ...)
+		if self[type] then
+			return {embed = self[type](...)}
+		else
+			error("Invalid embed type: "..type)
+		end
+	end
 })

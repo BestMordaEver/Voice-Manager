@@ -1,11 +1,10 @@
 local client = require "client"
 local logger = require "logger"
 local locale = require "locale"
+local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
 local commands = require "commands/init"
-local logAction = require "funcs/logAction"
 local config = require "config"
-
 
 return function (message)
 	-- ignore non-initialized guilds and dms
@@ -24,7 +23,7 @@ return function (message)
 		return
 	end
 	
-	logAction(message, "=> "..message.content)
+	logger:log(4, "GUILD %s USER %s => %s", message.guild.id, message.author.id, message.content)
 	
 	-- cache the member object just in case
 	if message.guild then
@@ -42,22 +41,23 @@ return function (message)
 	local command = content == "" and "help" or content:match("^(%w+)")
 	
 	if commands[command] then
-		logAction(message, command.." command invoked")
+		logger:log(4, "GUILD %s USER %s: %s command invoked", message.guild.id, message.author.id, command)
 	else
-		logAction(message, "Nothing")
+		logger:log(4, "GUILD %s USER %s: Nothing", message.guild.id, message.author.id)
 		return
 	end
 	
 	-- call the command, log it, and all in protected call
-	local res, msg = xpcall(commands[command], debug.traceback, message)
+	local res, logMsg, msgType, msg  = xpcall(commands[command], debug.traceback, message)
 	
 	-- notify user if failed
 	if res then
-		logAction(message, msg)
+		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
+		message:reply(embeds(msgType, msg))
 	else
-		message:reply(locale.error)
-		error(msg)
+		message:reply(embeds("error"))
+		error(logMsg)
 	end
 	
-	logAction(message, command .. " command completed")
+	logger:log(4, "GUILD %s USER %s: %s command completed", message.guild.id, message.author.id, command)
 end
