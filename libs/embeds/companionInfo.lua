@@ -13,7 +13,7 @@ embeds:new("companionInfo", function (guild)
 	
 	local embed = {
 		title = locale.companionInfoTitle:format(guild.name),
-		color = 0x00ffd5,
+		color = 6561661,
 		description = #guildData.lobbies == 0 and locale.companionNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}

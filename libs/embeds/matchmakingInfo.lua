@@ -14,7 +14,7 @@ embeds:new("matchmakingInfo", function (guild)
 	
 	local embed = {
 		title = locale.matchmakingInfoTitle:format(guild.name),
-		color = 0x00ffd5,
+		color = 6561661,
 		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or locale.matchmakingInfo,
 		fields = {}
 	}
