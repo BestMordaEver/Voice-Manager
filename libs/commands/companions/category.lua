@@ -6,17 +6,15 @@ local channelType = require "discordia".enums.channelType
 
 return function (message, channel, input)
 	local category = lookForChannel(message, input)
-	if not category or category.type ~= channelType.category then 
-		message:reply(locale.badCategory)
-		return "Couldn't find target category"
+	if not category or category.type ~= channelType.category then
+		return "Couldn't find target category", "warning", locale.badCategory
 	end
 	
-	local isPermitted, msg = permissionsCheck(message, category)
+	local isPermitted, logMsg, msg = permissionsCheck(message, category)
 	if isPermitted then
 		lobbies[channel.id]:setCompanionTarget(category.id)
-		message:reply(locale.categoryConfirm:format(category.name))
-		return "Companion target category set"
+		return "Companion target category set", "ok", locale.categoryConfirm:format(category.name)
 	else
-		return msg
+		return logMsg, "warning", msg
 	end
 end

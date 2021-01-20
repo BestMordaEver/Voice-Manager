@@ -9,8 +9,7 @@ return function (message, permissions)
 		if permissionBits.bits[permission] then
 			permissionBits.bitfield = permissionBits.bitfield + permissionBits.bits[permission]
 		elseif not (permission == "allow" or permission == "deny") then
-			message:reply(locale.permissionsBadInput:format(permission))
-			return "Unknown permission provided"
+			return "Unknown permission provided", "warning", locale.permissionsBadInput:format(permission)
 		end
 	end
 	
@@ -22,6 +21,5 @@ return function (message, permissions)
 	end
 	
 	guildData:setPermissions(permissionBits)
-	message:reply(locale.permissionsConfirm)
-	return "Server permissions set"
+	return "Server permissions set", "warning", locale.permissionsConfirm
 end

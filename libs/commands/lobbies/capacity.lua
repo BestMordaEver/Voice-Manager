@@ -4,11 +4,9 @@ local lobbies = require "storage/lobbies"
 return function (message, channel, capacity)
 	capacity = tonumber(capacity)
 	if capacity < 0 or capacity > 99 then
-		message:reply(locale.capacityOOB)
-		return "Capacity OOB"
+		return "Capacity OOB", "warning", locale.capacityOOB
 	else
 		lobbies[channel.id]:setCapacity(capacity)
-		message:reply(locale.capacityConfirm:format(capacity))
-		return "Lobby capacity set"
+		return "Lobby capacity set", "ok", locale.capacityConfirm:format(capacity)
 	end
 end

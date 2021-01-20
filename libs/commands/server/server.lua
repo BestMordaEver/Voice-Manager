@@ -1,5 +1,4 @@
 local locale = require "locale"
-local serverInfoEmbed = require "embeds/serverInfo"
 local permission = require "discordia".enums.permission
 
 local subcommands = {
@@ -11,22 +10,19 @@ local subcommands = {
 
 return function (message)
 	if not message.member:hasPermission(permission.manageChannels) then
-		message:reply(locale.badPermissions)
-		return "Bad user permissions"
+		return "Bad user permissions", "warning", locale.badPermissions
 	end
 	
 	local subcommand, argument = message.content:match("server%s*(%a*)%s*(.-)$")
 	
 	if subcommand == "" or argument == "" then
-		serverInfoEmbed(message)
-		return "Sent server info"
+		return "Sent server info", "serverInfo", message.guild
 	end
 	
 	
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, argument)
 	else
-		message:reply(locale.badSubcommand)
-		return "Bad server subcommand"
+		return "Bad server subcommand", "warning", locale.badSubcommand
 	end
 end

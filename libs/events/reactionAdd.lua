@@ -1,7 +1,6 @@
 local client = require "client"
 local logger = require "logger"
 local embeds = require "embeds/embeds"
-local logAction = require "funcs/logAction"
 
 local reactions = embeds.reactions
 
@@ -13,21 +12,11 @@ return function (reaction, userID) -- embeds processing
 	
 	local embedData = embeds[reaction.message]
 	
-	if reaction.message.guild then
-		logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
-	else
-		logger:log(4, "In DM USER %s on EMBED %s => added %s", userID, reaction.message.id, reactions[reaction.emojiHash])
-	end
+	logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 	
-	-- call the command, log it, and all in protected call
 	reaction:delete(userID)
-	local res = embedData(reaction)
+	embedData(reaction)
 	embedData.killIn = 10
-	
-	-- notify user if failed
-	if res then
-		logAction(reaction.message, res)
-	end
 	
 	logger:log(4, "EMBED %s - processed", reaction.message.id)
 end

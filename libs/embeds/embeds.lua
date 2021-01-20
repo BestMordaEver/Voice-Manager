@@ -7,6 +7,7 @@ https://discord.com/developers/docs/resources/channel#embed-object
 
 return setmetatable({}, {
 	__index = {
+		types = {},
 		-- all relevant emojis
 		reactions = {
 			"1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟",
@@ -30,13 +31,13 @@ return setmetatable({}, {
 		end,
 		
 		new = function (self, name, embedFactory)
-			self[name] = embedFactory
+			self.types[name] = embedFactory
 		end
 	},
 	
 	__call = function (self, type, ...)
-		if self[type] then
-			return {embed = self[type](...)}
+		if self.types[type] then
+			return {embed = self.types[type](...)}
 		else
 			error("Invalid embed type: "..type)
 		end

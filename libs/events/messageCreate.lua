@@ -54,7 +54,7 @@ return function (message)
 	if res then
 		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
 		local embed = embeds(msgType, msg)
-		client:emit("embedSent", msgType, message:reply(embed), embed)
+		client:emit("embedSent", msgType, message, message:reply(embed), embed)
 	else
 		message:reply(embeds("error"))
 		error(logMsg)

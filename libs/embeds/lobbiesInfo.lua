@@ -8,17 +8,17 @@ local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
 
 -- no embed data is saved, since this is non-interactive embed
-embeds("lobbiesInfo", function (message)
-	local guildData = guilds[message.guild.id]
+embeds:new("lobbiesInfo", function (guild)
+	local guildData = guilds[guild.id]
 	
 	local embed = {
-		title = locale.lobbiesInfoTitle:format(message.guild.name),
-		color = config.embedColor,
+		title = locale.lobbiesInfoTitle:format(guild.name),
+		color = 0x00ffd5,
 		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
 	
-	local sortedLobbies = table.sorted(message.guild.voiceChannels:toArray(function(voiceChannel)
+	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
 		return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
 	end), tps)
 	

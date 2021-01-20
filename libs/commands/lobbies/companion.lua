@@ -5,6 +5,5 @@ return function (message, channel, toggle)
 	if toggle ~= "enable" then toggle = "disable" end
 
 	lobbies[channel.id]:setCompanionTarget(toggle == "enable" and true or nil)
-	message:reply(locale.companionToggle:format(toggle))
-	return "Lobby companion "..toggle.."d"
+	return "Lobby companion "..toggle.."d", "ok", locale.companionToggle:format(toggle)
 end

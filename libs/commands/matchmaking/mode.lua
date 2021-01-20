@@ -5,10 +5,8 @@ local matchmakers = require "utils/matchmakers"
 return function (message, channel, name)
 	if matchmakers[name] then
 		lobbies[channel.id]:setTemplate(name)
-		message:reply(locale.modeConfirm:format(name))
-		return "Lobby name template set"
+		return "Matchmaking mode set", "ok", locale.modeConfirm:format(name)
 	else
-		message:reply(locale.modeBadInput:format(name))
-		return "Lobby name template set"
+		return "Bad matchmaking mode", "warning", locale.modeBadInput:format(name)
 	end
 end

@@ -9,17 +9,17 @@ local tps = require "funcs/truePositionSorting"
 local channelType = require "discordia".enums.channelType
 
 -- no embed data is saved, since this is non-interactive embed
-embeds("matchmakingInfo", function (message)
-	local guildData = guilds[message.guild.id]
+embeds:new("matchmakingInfo", function (guild)
+	local guildData = guilds[guild.id]
 	
 	local embed = {
-		title = locale.matchmakingInfoTitle:format(message.guild.name),
-		color = config.embedColor,
+		title = locale.matchmakingInfoTitle:format(guild.name),
+		color = 0x00ffd5,
 		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or locale.matchmakingInfo,
 		fields = {}
 	}
 	
-	local sortedLobbies = table.sorted(message.guild.voiceChannels:toArray(function(voiceChannel)
+	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
 		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].isMatchmaking
 	end), tps)
 	

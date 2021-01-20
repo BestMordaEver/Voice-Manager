@@ -5,11 +5,9 @@ return function (message, limit)
 	limit = tonumber(limit)
 	
 	if not limit or limit > 500 or limit < 0 then
-		message:reply(locale.limitBadInput)
-		return "Invalid limit value"
+		return "Invalid limit value", "warning", locale.limitBadInput
 	end
 	
 	guilds[message.guild.id]:setLimit(limit)
-	message:reply(locale.limitConfirm)
-	return "Server limit set"
+	return "Server limit set", "ok", locale.limitConfirm
 end

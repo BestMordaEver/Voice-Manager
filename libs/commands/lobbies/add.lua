@@ -3,6 +3,5 @@ local lobbies = require "storage/lobbies"
 
 return function (message, channel)
 	lobbies(channel.id)
-	message:reply(locale.addConfirm:format(channel.name))
-	return "New lobby added"
+	return "New lobby added", "ok", locale.addConfirm:format(channel.name)
 end

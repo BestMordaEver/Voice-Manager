@@ -3,6 +3,5 @@ local lobbies = require "storage/lobbies"
 
 return function (message, channel)
 	lobbies[channel.id]:delete()
-	message:reply(locale.matchmakingRemoveConfirm:format(channel.name))
-	return "Matchmaking lobby removed"
+	return "Matchmaking lobby removed", "ok", locale.matchmakingRemoveConfirm:format(channel.name)
 end

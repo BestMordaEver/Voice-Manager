@@ -1,7 +1,6 @@
 local client = require "client"
 local locale = require "locale"
 local dialogue = require "utils/dialogue"
-local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
 local channelType = require "discordia".enums.channelType
 
 local subcommands = {
@@ -18,8 +17,7 @@ return function (message)
 	local subcommand, argument = message.content:match("lobbies%s*(%a*)%s*(.-)$")
 	
 	if subcommand == "" or argument == "" then
-		lobbiesInfoEmbed(message)
-		return "Sent lobbies info"
+		return "Sent lobbies info", "lobbiesInfo", message.guild
 	end
 	
 	if subcommand == "add" or subcommand == "remove" then
@@ -30,8 +28,7 @@ return function (message)
 		end
 		
 		if not channel then 
-			message:reply(locale.badChannel)
-			return "Couldn't find channel to add"
+			return "Couldn't find channel to add", "warning", locale.badChannel
 		end
 		
 		dialogue(message.author.id, channel.id)
@@ -39,14 +36,12 @@ return function (message)
 
 	local lobby = client:getChannel(dialogue[message.author.id])
 	if not lobby or lobby.type ~= channelType.voice then
-		message:reply(locale.noLobbySelected)
-		return "No lobby selected"
+		return "No lobby selected", "warning", locale.noLobbySelected
 	end
 	
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, lobby, argument)
 	else
-		message:reply(locale.badSubcommand)
-		return "Bad lobbies subcommand"
+		return "Bad lobbies subcommand", "warning", locale.badSubcommand
 	end
 end
