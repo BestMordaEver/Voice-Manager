@@ -309,9 +309,7 @@ You can enable companion channels with `companion`]],
 	
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",
-	error = [[*%s*
-The issue was reported and is already being fixed. Contact us if you need additional help
-https://discord.gg/tqj6jvT]],
+	error = "*%s*\nThe issue was reported and is already being fixed. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
 		"I'm sowwy",
 		"There go my evening plans",

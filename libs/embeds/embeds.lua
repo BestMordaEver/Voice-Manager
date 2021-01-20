@@ -31,7 +31,11 @@ return setmetatable({}, {
 		end,
 		
 		new = function (self, name, embedFactory)
-			self.types[name] = embedFactory
+			if self.types[name] then
+				error("Embed type "..name.." already exists")
+			else
+				self.types[name] = embedFactory
+			end
 		end
 	},
 	
