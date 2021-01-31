@@ -26,5 +26,9 @@ local events = require "events/init"
 -- Other events are registered in "ready"
 client:once(events("ready"))
 
+-- initializing all embed types
+-- really gotta think about a more elegant solution
+require "embeds/init"
+
 -- bot starts working here
 client:run('Bot '..require "token".token)

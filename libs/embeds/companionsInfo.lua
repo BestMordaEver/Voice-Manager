@@ -8,13 +8,13 @@ local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
 
 -- no embed data is saved, since this is non-interactive embed
-embeds:new("companionInfo", function (guild)
+embeds:new("companionsInfo", function (guild)
 	local guildData = guilds[guild.id]
 	
 	local embed = {
-		title = locale.companionInfoTitle:format(guild.name),
+		title = locale.companionsInfoTitle:format(guild.name),
 		color = 6561661,
-		description = #guildData.lobbies == 0 and locale.companionNoInfo or locale.lobbiesInfo,
+		description = #guildData.lobbies == 0 and locale.companionsNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
 	
@@ -31,7 +31,8 @@ embeds:new("companionInfo", function (guild)
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.companionsField:format(
 				target and target.name or "default",
-				lobbyData.companionTemplate or "private-chat"
+				lobbyData.companionTemplate or "private-chat",
+				#lobbyData.children
 			),
 			inline = true
 		})

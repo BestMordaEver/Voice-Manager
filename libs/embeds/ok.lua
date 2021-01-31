@@ -5,7 +5,7 @@ local embeds = require "embeds/embeds"
 embeds:new("ok", function (msg)
 	return {
 		title = locale.embedOK,
-		color = 0x6157634,
+		color = 0x08d43f,
 		description = msg
 	}
 end)

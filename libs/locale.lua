@@ -23,7 +23,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 Companion chats are enabled with `vm!lobbies companion`
 Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 		"Most room commands are used by a room host - user who created the room. Those commands can be enabled by admins",
-		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins","","",
+		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins","",""
 	},
 	
 	helpFieldNames = {
@@ -66,10 +66,10 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!room bitrate <8-96>",
 			"vm!room mute/unmute <user mention>",
 			"vm!room kick <user mention>",
-			"vm!room block add/remove <user mention>",
-			"vm!room reserve add/remove <user mention>",
-			"vm!room reserve lock",
-			"vm!room block/reserve clear",
+			"vm!room blocklist add/remove <user mention>",
+			"vm!room reservations add/remove <user mention>",
+			"vm!room reservations lock",
+			"vm!room blocklist/reservations clear",
 			"vm!room promote <user mention>",
 			"vm!room host",
 			"vm!room invite [user mention]"
@@ -105,7 +105,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"Allow users to moderate and configure their rooms - `vm!room`",
 			"Allow users to moderate and configure their private chats - `vm!chat`",
 			"Additional settings like prefix - `vm!server`",
-			"Different helpful commands for users and administrators",
+			"Different helpful commands for users and administrators"
 		},
 		{
 			"Show current lobbies",
@@ -184,7 +184,7 @@ You can show chat to people that are not in the room]],
 		},
 		{
 			"Show server info",
-			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @ everyone",
+			"Change the default role that's used to inflict restrictions in room and chat commands. Default is everyone",
 			[[Set the global limit of channels created by the bot
 Discord limits you to 50 channels per category and 500 channels per server]],
 			"Acts similarly to lobby permissions and allows use of room commands in *any* voice channel",
@@ -239,10 +239,14 @@ You can add a lobby with `vm!lobbies add`]],
 	addConfirm = "Added new lobby %s",
 	removeConfirm = "Removed lobby %s",
 	capacityOOB = "Capacity must be a number between 0 and 99",
-	capacityConfirm = "Changed rooms' capacity to %d",
+	capacityConfirm = "Changed capacity to %d",
+	bitrateOOB = "Bitrate must be a number between 8 and 96",
+	bitrateConfirm = "Changed bitrate to %d",
 	categoryConfirm = "Changed lobby's target category to %s",
 	companionToggle = "Companion chats are now %sd for this lobby",
-	nameConfirm = "Name template is %s",
+	nameConfirm = "Changed name to %s",
+	permissionsBadInput = "Unknown permission: %s",
+	permissionsConfirm = "New permissions set!",
 	
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
@@ -259,15 +263,41 @@ You can create a matchmaking lobby with `match`]],
 	modeConfirm = "Changed matchmaking mode to %s",
 	
 	-- companion
-	companionInfoTitle = "Companion settings | %s",
-	companionNoInfo = [[There are no lobbies with enabled companion channels
+	companionsInfoTitle = "Companion settings | %s",
+	companionsNoInfo = [[There are no lobbies with enabled companion channels
 You can enable companion channels with `companion`]],
-	companionField = [[**Category:** %s
+	companionsField = [[**Category:** %s
 **Name:** %s
 **Companion channels:** %d]],
 	
-	permissionsBadInput = "Unknown permission: %s",
-	permissionsConfirm = "New permissions set!",
+	-- room
+	roomInfoTitle = "Room info | %s",
+	roomInfo = [[**Reserved:** %s
+**Blocked:** %s
+**Muted:** %s
+
+**Available commands:** %s]],
+	notInRoom = "You can't use this command outside of a room",
+	none = "none",
+	muteConfirm = "Muted %s",
+	unmuteConfirm = "Unmuted %s",
+	kickConfirm = "Kicked %s",
+	blockConfirm = "Blocked %s",
+	unblockConfirm = "Unblocked %s",
+	reserveConfirm = "Added %s to reservations",
+	unreserveConfirm = "Removed %s from reservations",
+	inviteConfirm = "Invited %s",
+	hostConfirm = "Promoted %s to host",
+	badNewHost = "Can't promote users outside of the room",
+	hostIdentify = "%s is a room host",
+	badHost = "Can't identify the host",
+	
+	-- chat
+	
+	
+	notHost = "You're not a channel host",
+	badHostPermission = "You're not permitted to perform this command",
+	hostError = "Bot wasn't able to perform this action. Contact your administrators if issue persists",
 	
 	-- select
 	selectVoice = "Selected lobby %s",
@@ -283,20 +313,8 @@ You can enable companion channels with `companion`]],
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
 	
-	-- name
-	changedName = "Successfully changed channel name!",
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
-	-- resize
-	channelResized = "Successfully changed channel capacity!",
-	-- bitrate
-	changedBitrate = "Successfully changed channel bitrate!",
-	-- promote
-	newHost = "New host assigned",
-	noMember = "No such user in your channel",
-	-- list
-	noLobbies = "No lobbies registered yet!",
-	someLobbies = "Registered lobbies on this server:",
 	
 	-- errors
 	badBotPermissions = "Bot doesn't have sufficient permissions",
@@ -307,9 +325,7 @@ You can enable companion channels with `companion`]],
 	badChannel = "Couldn't find the specified channel",
 	badCategory = "Couldn't find the specified category",
 	
-	notHost = "You're not a channel host",
-	badHostPermission = "You're not permitted to perform this command",
-	error = "*%s*\nThe issue was reported and is already being fixed. Contact us if you need additional help - https://discord.gg/tqj6jvT",
+	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
 		"I'm sowwy",
 		"There go my evening plans",

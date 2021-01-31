@@ -2,6 +2,7 @@
 --[[
 CREATE TABLE channels(
 	id VARCHAR PRIMARY KEY,
+	isPersistent BOOL, /* immutable */
 	host VARCHAR NOT NULL,	/* mutable */
 	parent VARCHAR NOT NULL,	/* immutable */
 	position INTEGER NOT NULL,	/* immutable */
@@ -16,6 +17,7 @@ local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 
+local set = require "utils/set"
 local storageInteraction = require "funcs/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
@@ -24,7 +26,7 @@ local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {
-		"INSERT INTO channels VALUES(?,?,?,?,?)",
+		"INSERT INTO channels VALUES(?,?,?,?,?,?)",
 		"Added channel %s", "Couldn't add channel %s"
 	},
 	
@@ -71,12 +73,12 @@ local channelMT = {
 
 local channelsIndex = {
 	-- perform checks and add channel to table
-	loadAdd = function (self, channelID, host, parent, position, companion)
+	loadAdd = function (self, channelID, isPersistent, host, parent, position, companion)
 		if not self[channelID] then
 			local channel = client:getChannel(channelID)
 			if channel and channel.guild then
 				self[channelID] = setmetatable({
-					id = channelID, host = host, parent = parent, position = position, companion = companion
+					id = channelID, guildID = channel.guild.id, isPersistent = isPersistent, host = host, parent = parent, position = position, companion = companion
 				}, channelMT)
 				logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
 			end
@@ -84,10 +86,10 @@ local channelsIndex = {
 	end,
 	
 	-- loadAdd and start interaction with db
-	add = function (self, channelID, host, parentID, position, companion)
-		self:loadAdd(channelID, host, lobbies[parentID], position, companion)
+	add = function (self, channelID, isPersistent, host, parentID, position, companion)
+		self:loadAdd(channelID, isPersistent, host, lobbies[parentID], position, companion)
 		if self[channelID] then
-			emitter:emit("add", channelID, parentID, position, host, companion)
+			emitter:emit("add", channelID, isPersistent and 1 or 0, host, parentID, position, companion)
 			return self[channelID]
 		end
 	end,
@@ -102,12 +104,17 @@ local channelsIndex = {
 				if channel then
 					if #channel.connectedMembers > 0 then
 						self:loadAdd(channelID, 
-							channelIDs.host[i], lobbies[channelIDs.parent[i]], tonumber(channelIDs.position[i]), channelIDs.companion[i])
-						if self[channelID].parent then
+							channelIDs.isPersistent[i] == 1, channelIDs.host[i], lobbies[channelIDs.parent[i]],
+							tonumber(channelIDs.position[i]), channelIDs.companion[i])
+						if lobbies[channelIDs.parent[i]] then
 							self[channelID].parent:attachChild(channelID, tonumber(self[channelID].position))
 						end
 					else
-						channel:delete()
+						if channelData.isPersistent then
+							channelData:delete()
+						else
+							channel:delete()
+						end
 					end
 				else
 					local companion = client:getChannel(channelIDs.companion[i])
@@ -116,8 +123,6 @@ local channelsIndex = {
 				end
 			end
 		end
-		
-		
 		
 		logger:log(4, "STARTUP: Loaded!")
 	end,
@@ -128,9 +133,15 @@ local channelsIndex = {
 			local channel = client:getChannel(channelID)
 			if channel then
 				if #channel.connectedMembers == 0 then
-					channel:delete()
+					if channelData.isPersistent then
+						channelData:delete()
+					else
+						channel:delete()
+					end
 				end
 			else
+				local companion = client:getChannel(channelData.companion)
+				if companion then companion:delete() end
 				channelData:delete()
 			end
 		end
@@ -151,11 +162,9 @@ local channelsIndex = {
 	end,
 	
 	inGuild = function (self, guildID)
-		local p = 0
-		for lobbyData, _ in pairs(guilds[guildID].lobbies) do
-			p = p + #lobbyData.children
-		end
-		return p
+		local count = 0
+		for _,channelData in pairs(self) do if channelData.guildID == guildID then count = count + 1 end end
+		return count
 	end
 }
 

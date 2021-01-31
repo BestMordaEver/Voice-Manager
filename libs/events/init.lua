@@ -32,6 +32,8 @@ events = {
 	
 	voiceChannelLeave = require "events/voiceChannelLeave",
 	
+	channelUpdate = require "events/channelUpdate",
+	
 	channelDelete = require "events/channelDelete",
 	
 	ready = function ()
@@ -45,10 +47,6 @@ events = {
 			client:getChannel(config.guildFeed):send("I'm listening")
 		end
 		
-		-- initializing all embed types
-		-- really gotta think about a more elegant solution
-		require "embeds/init"
-		
 		client:on(events("messageCreate"))
 		client:on(events("messageUpdate"))
 		client:on(events("reactionAdd"))
@@ -56,6 +54,7 @@ events = {
 		client:on(events("guildDelete"))
 		client:on(events("voiceChannelJoin"))
 		client:on(events("voiceChannelLeave"))
+		client:on(events("channelUpdate"))
 		client:on(events("channelDelete"))
 		clock:on(events("min"))
 		

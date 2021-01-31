@@ -12,7 +12,7 @@ return function (message)
 	local subcommand, argument = message.content:match("companions%s*(%a*)%s*(.-)$")
 	
 	if subcommand == "" or argument == "" then
-		return "Sent matchmaking info", "companionsInfo", message.guild
+		return "Sent companions info", "companionsInfo", message.guild
 	end
 	
 	if subcommand == "add" or subcommand == "remove" then
@@ -37,6 +37,6 @@ return function (message)
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, lobby, argument)
 	else
-		return "Bad matchmaking subcommand", "warning", locale.badSubcommand
+		return "Bad companions subcommand", "warning", locale.badSubcommand
 	end
 end

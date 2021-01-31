@@ -1,4 +1,3 @@
-local client = require "client"
 local locale = require "locale"
 local channels = require "storage/channels"
 
@@ -6,8 +5,8 @@ local subcommands = {
 	rename = require "commands/room/rename",
 	resize = require "commands/room/resize",
 	bitrate = require "commands/room/bitrate",
-	block = require "commands/room/block",
-	reserve = require "commands/room/reserve",
+	blocklist = require "commands/room/blocklist",
+	reservations = require "commands/room/reservations",
 	kick = require "commands/room/kick",
 	invite = require "commands/room/invite",
 	mute = require "commands/room/mute",
@@ -19,21 +18,17 @@ local subcommands = {
 return function (message)
 	local subcommand, argument = message.content:match("room%s*(%a*)%s*(.-)$")
 	
-	local room = message.member.voiceChannel and channels[message.member.voiceChannel.id]
-	if not room then
-		message:reply(locale.notInRoom)
-		return "User not in room"
+	if not (message.member.voiceChannel and channels[message.member.voiceChannel.id]) then
+		return "User not in room", "warning", locale.notInRoom
 	end
 	
 	if subcommand == "" then
-		roomInfoEmbed(message)
-		return "Sent room info"
+		return "Sent room info", "roomInfo", message.member.voiceChannel
 	end
 	
 	if subcommands[subcommand] then
-		return subcommands[subcommand](message, room, argument)
+		return subcommands[subcommand](message, argument)
 	else
-		message:reply(locale.badSubcommand)
-		return "Bad room subcommand"
+		return "Bad room subcommand", "warning", locale.badSubcommand
 	end
 end

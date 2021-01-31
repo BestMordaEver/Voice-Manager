@@ -29,8 +29,9 @@ CREATE TABLE lobbies(
 channelsData:exec([[
 CREATE TABLE channels(
 	id VARCHAR PRIMARY KEY,
+	isPersistent BOOL NOT NULL, /* immutable */
 	host VARCHAR NOT NULL,	/* mutable */
-	parent VARCHAR,	/* immutable */
+	parent VARCHAR NOT NULL,	/* immutable */
 	position INTEGER NOT NULL,	/* immutable */
 	companion VARCHAR	/* immutable */
 )]])

@@ -6,9 +6,12 @@ local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
+local enforceReservations = require "funcs/enforceReservations"
 
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
+
+local processing = {}
 
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
@@ -40,6 +43,8 @@ local function lobbyJoin (member, lobby)
 	
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
+		processing[newChannel.id] = true
+		
 		member:setVoiceChannel(newChannel.id)
 		
 		local companion
@@ -55,7 +60,7 @@ local function lobbyJoin (member, lobby)
 			companion = companionTarget:createTextChannel(name)
 		end
 		
-		channels:add(newChannel.id, member.user.id, lobby.id, position, companion and companion.id or nil)
+		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(newChannel.id, position)
 		newChannel:setUserLimit(lobbyData.capacity or lobby.userLimit)
 		
@@ -135,8 +140,10 @@ local function matchmakingJoin (member, lobby)
 	end
 end
 
-local function channelJoin (member, channel)
-	logger:log(4, "GUILD %s CHANNEL %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
+local function roomJoin (member, channel)
+	logger:log(4, "GUILD %s ROOM %s: %s joined", channel.guild.id, channel.id, member.user.id)
+	
+	enforceReservations(channel)
 	
 	local companion = client:getChannel(channels[channel.id].companion)
 	if companion then
@@ -144,8 +151,33 @@ local function channelJoin (member, channel)
 	end
 end
 
+local function channelJoin (member, channel)
+	logger:log(4, "GUILD %s CHANNEL %s: %s joined", channel.guild.id, channel.id, member.user.id)
+	
+	--[[ TODO
+	local name = templateInterpreter(guilds[channel.guild.id].template, member, position):match("^%s*(.-)%s*$")
+		
+	local position = #(channel.category and 
+		channel.category.voiceChannels:toArray("position", function (vchannel) return vchannel.position <= channel.position end)
+			or
+		channel.guild.voiceChannels:toArray("position", function (vchannel) return not vchannel.category and vchannel.position <= channel.position end))
+	]]
+	
+	channels:add(channel.id, true, member.user.id, channel.guild.id, 0, nil)
+
+	local perms = guilds[channel.guild.id].permissions:toDiscordia()
+	if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+		channel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+	end
+end
+
 return function (member, channel)
 	if channel then
+		if processing[channel.id] then
+			processing[channel.id] = nil
+			return
+		end
+		
 		local lobbyData = lobbies[channel.id]
 		if lobbyData then
 			if lobbyData.isMatchmaking then
@@ -153,10 +185,12 @@ return function (member, channel)
 			else
 				lobbyData.mutex:lock()
 				local ok, err = xpcall(lobbyJoin, debug.traceback, member, channel)
-				lobbyData.mutex:unlock()	-- no fucking clue
+				lobbyData.mutex:unlock()
 				if not ok then error(err) end	-- no ignoring!
 			end
 		elseif channels[channel.id] then
+			roomJoin(member, channel)
+		else
 			channelJoin(member, channel)
 		end
 	end
