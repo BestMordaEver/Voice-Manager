@@ -129,7 +129,7 @@ local lobbyMethods = {
 	setCompanionTarget = function (self, companionTarget)
 		self.companionTarget = companionTarget
 		logger:log(4, "GUILD %s: Updated companion target for lobby %s to %s", self.guildID, self.id, companionTarget)
-		emitter:emit("setCompanionTarget", companionTarget, self.id)
+		emitter:emit("setCompanionTarget", tostring(companionTarget), self.id)
 	end,
 	
 	setRole = function (self, role)

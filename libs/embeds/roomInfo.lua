@@ -26,22 +26,22 @@ embeds:new("roomInfo", function (room)
 	
 	for _,overwrite in pairs(overwrites) do
 		if Permissions(overwrite.allowedPermissions):has(permission.connect) then
-			reservations = reservations..member.user.mentionString.." ,"
+			reservations = reservations..overwrite:getObject().user.mentionString.." "
 		end
 		if Permissions(overwrite.deniedPermissions):has(permission.connect) then
-			blocklist = blocklist..member.user.mentionString.." ,"
+			blocklist = blocklist..overwrite:getObject().user.mentionString.." "
 		end
 		if Permissions(overwrite.deniedPermissions):has(permission.speak) then
-			muted = muted..member.user.mentionString.." ,"
+			muted = muted..overwrite:getObject().user.mentionString.." "
 		end
 	end
 	for name, _ in pairs(parent.permissions.bits) do
 		if parent.permissions:has(name) then commands = commands..roomCommands[name]..", " end
 	end
 	
-	reservations = reservations == "" and locale.none or reservations:sub(1,-3)
-	blocklist = blocklist == "" and locale.none or blocklist:sub(1,-3)
-	muted = muted == "" and locale.none or muted:sub(1,-3)
+	if reservations == "" then reservations = locale.none end
+	if blocklist == "" then blocklist = locale.none end
+	if muted == "" then muted = locale.none end
 	commands = commands == "" and locale.none or commands:sub(1,-3)
 	
 	local embed = {
