@@ -293,7 +293,13 @@ You can enable companion channels with `companion`]],
 	badHost = "Can't identify the host",
 	
 	-- chat
-	
+	chatInfoTitle = "Room info | %s",
+	chatInfo = [[**Visible to:** %s
+**Hidden from:** %s
+**Muted:** %s
+
+**Available commands:** %s]],
+	noCompanion = "Your room doesn't have companion chat",
 	
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",
