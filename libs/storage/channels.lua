@@ -110,11 +110,13 @@ local channelsIndex = {
 							self[channelID].parent:attachChild(channelID, tonumber(self[channelID].position))
 						end
 					else
-						if channelData.isPersistent then
-							channelData:delete()
+						if channelIDs.isPersistent[i] == 1 then
+							emitter:emit("remove", channelID)
 						else
 							channel:delete()
 						end
+						local companion = client:getChannel(channelIDs.companion[i])
+						if companion then companion:delete() end
 					end
 				else
 					local companion = client:getChannel(channelIDs.companion[i])
