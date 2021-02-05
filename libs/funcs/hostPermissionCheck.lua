@@ -5,7 +5,6 @@ local permission = require "discordia".enums.permission
 
 local perms = {
 	mute = "moderate",
-	unmute = "moderate",
 	moderate = "moderate",
 	rename = "manage",
 	resize = "manage",
