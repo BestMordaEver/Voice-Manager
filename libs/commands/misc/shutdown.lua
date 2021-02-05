@@ -1,5 +1,6 @@
-local discordia = require "discordia"
-local client, clock, logger = discordia.storage.client, discordia.storage.clock, discordia.storage.logger
+local client = require "client"
+local clock = require "clock"
+local logger = require "logger"
 local config = require "config"
 
 return function (message)
