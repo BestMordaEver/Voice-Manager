@@ -300,6 +300,9 @@ You can enable companion channels with `companion`]],
 
 **Available commands:** %s]],
 	noCompanion = "Your room doesn't have companion chat",
+	hideConfirm = "Chat is now hidden from %s",
+	showConfirm = "Chat is now visible to %s",
+	clearConfirm = "Deleted %d messages",
 	
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",

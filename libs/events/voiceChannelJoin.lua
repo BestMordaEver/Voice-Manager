@@ -146,7 +146,7 @@ local function roomJoin (member, channel)
 	enforceReservations(channel)
 	
 	local companion = client:getChannel(channels[channel.id].companion)
-	if companion then
+	if companion and not companion:getPermissionOverwriteFor(member):getDeniedPermissions():has(permission.readMessages) then
 		companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 	end
 end
