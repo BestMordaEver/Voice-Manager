@@ -92,7 +92,8 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!help [lobbies/matchmaking/companions/room/chat/server/other]",
 			"vm!invite or vm!support",
 			"vm!select <lobby or category ID or name>",
-			"vm!create voice/text [top/bottom] <1-50> <name>",
+			"vm!create voice/text <1-50> <name>",
+			"vm!create voice/text <start index> <end index> <name>",
 			"vm!delete voice/text top/bottom <1-50> [force]"
 		}
 	},
@@ -196,9 +197,14 @@ Discord limits you to 50 channels per category and 500 channels per server]],
 You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
 			"Select a lobby or a category to change their settings",
-			[[Create a certain amount of channels in selected category
-Insert `%counter%` to include channel index in the name, include `top` or `bottom` to determine direction]],
-			[[Delete a certain amount of empty channels in selected category starting from the top/bottom
+			[[🛠 Command is temporarily disabled 🛠
+Create a certain amount of channels in selected category
+Use `%counter%` to include channel number in the name]],
+			[[🛠 Command is temporarily disabled 🛠
+Create a certain amount of channels in selected category
+`%counter%` will be sequentially replaced with numbers between start and end index]],
+			[[🛠 Command is temporarily disabled 🛠
+Delete a certain amount of empty channels in selected category starting from the top/bottom
 If `force` is added in the end, non-empty channels are also deleted]]
 		}
 	},
@@ -322,6 +328,7 @@ You can enable companion channels with `companion`]],
 	embedOK = "✅ OK",
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
+	unfinishedCommand = "🛠 Command is temporarily disabled 🛠",
 	
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
@@ -334,6 +341,10 @@ You can enable companion channels with `companion`]],
 	noCategorySelected = "You didn't select a category",
 	badChannel = "Couldn't find the specified channel",
 	badCategory = "Couldn't find the specified category",
+	badType = "Unknown channel type",
+	amountNotANumber = "Channels amount must be a number between 1 and 50",
+	amountOOB = "There can be only 50 channels per category",
+	emptyName = "Given input will result in an empty name",
 	
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
