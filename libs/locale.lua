@@ -79,7 +79,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!chat rename <new name>",
 			"vm!chat mute/unmute <user mention>",
 			"vm!chat hide/show <user mention>",
-			"vm!chat clear"
+			"vm!chat clear [amount]"
 		},
 		{
 			"vm!server",
@@ -180,7 +180,8 @@ Default Discord formatting rules will be applied automatically]],
 			"Restrict/allow mentioned users to write in chat",
 			[[Hide/show the chat to mentioned users
 You can show chat to people that are not in the room]],
-			"Fully clear the chat"
+			[[Delete messages in the chat
+By default, deletes all messages]]
 		},
 		{
 			"Show server info",
