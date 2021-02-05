@@ -3,7 +3,6 @@ local locale = require "locale"
 
 local hostCheck = require "funcs/hostCheck"
 local hostPermissionCheck = require "funcs/hostPermissionCheck"
-local enforceReservations = require "funcs/enforceReservations"
 local permission = require "discordia".enums.permission
 
 return function (message, argument)
