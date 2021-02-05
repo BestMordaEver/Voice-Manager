@@ -27,10 +27,8 @@ return function (message, name)
 		return "Ratelimit reached", "warning", locale.ratelimitReached:format(retryIn)
 	else
 		local channelData, guildData = channels[channel.id], guilds[channel.guild.id]
-		if channelData.parent then
-			if channelData.parent.template and channelData.parent.template:match("%%rename%%") then
-				success, err = channel:setName(templateInterpreter(channelData.parent.template, message.member, channelData.position, name))
-			end
+		if channelData.parent and channelData.parent.template and channelData.parent.template:match("%%rename%%") then
+			success, err = channel:setName(templateInterpreter(channelData.parent.template, message.member, channelData.position, name))
 		elseif guildData.template and guildData.template:match("%%rename%%") then
 			success, err = channel:setName(templateInterpreter(guildData.template, message.member, channelData.position, name))
 		else

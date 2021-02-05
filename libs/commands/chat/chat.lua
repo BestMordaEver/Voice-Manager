@@ -8,6 +8,7 @@ local subcommands = {
 	show = require "commands/chat/show",
 	mute = require "commands/chat/mute",
 	unmute = require "commands/chat/unmute",
+	clear = require "commands/chat/clear",
 	--save = require "commands/chat/save"
 }
 
@@ -18,7 +19,8 @@ return function (message)
 		return "User not in room", "warning", locale.notInRoom
 	end
 	
-	if not channels[message.member.voiceChannel.id].companion then
+	local chat = client:getChannel(channels[message.member.voiceChannel.id].companion)
+	if not chat then
 		return "Room doesn't have a chat", "warning", locale.noCompanion
 	end
 	
@@ -27,7 +29,7 @@ return function (message)
 	end
 	
 	if subcommands[subcommand] then
-		return subcommands[subcommand](message, argument)
+		return subcommands[subcommand](message, chat, argument)
 	else
 		return "Bad chat subcommand", "warning", locale.badSubcommand
 	end

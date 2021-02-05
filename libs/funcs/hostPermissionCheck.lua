@@ -5,11 +5,15 @@ local permission = require "discordia".enums.permission
 
 local perms = {
 	mute = "moderate",
+	unmute = "moderate",
+	hide = "moderate",
+	show = "moderate",
 	moderate = "moderate",
-	manage = "manage",
-	name = "manage",
+	rename = "manage",
 	resize = "manage",
-	bitrate = "manage"
+	bitrate = "manage",
+	clear = "manage",
+	manage = "manage"
 }
 
 return function (member, channel, permissionName)
