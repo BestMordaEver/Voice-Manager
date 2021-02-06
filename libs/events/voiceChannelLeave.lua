@@ -32,6 +32,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 			enforceReservations(channel)
 			
 			local channelData = channels[channel.id]
+			if not channelData then return end 
 			local companion = client:getChannel(channelData.companion)
 			if companion then
 				companion:getPermissionOverwriteFor(member):denyPermissions(permission.readMessages)
