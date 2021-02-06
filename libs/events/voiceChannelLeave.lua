@@ -41,7 +41,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 				
 				if newHost then
 					logger:log(4, "GUILD %s СHANNEL %s: Migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
-					channels[channel.id]:updateHost(newHost.user.id)
+					channels[channel.id]:setHost(newHost.user.id)
 					
 					local lobby = client:getChannel(channels[channel.id].parent.id)
 					if lobby then
