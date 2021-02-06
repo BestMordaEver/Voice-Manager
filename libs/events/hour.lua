@@ -33,32 +33,32 @@ end)
 
 local statservers = {
 	["discordbotlist.com"] = {
-		endpoint = "https://discordbotlist.com/api/bots/"..config.id.."/stats",
+		endpoint = "https://discordbotlist.com/api/bots/"..client.user.id.."/stats",
 		body = "guilds"
 	},
 	
 	["top.gg"] = {
-		endpoint = "https://top.gg/api/bots/"..config.id.."/stats",
+		endpoint = "https://top.gg/api/bots/"..client.user.id.."/stats",
 		body = "server_count"
 	},
 	
 	["botsfordiscord.com"] = {
-		endpoint = "https://botsfordiscord.com/api/bot/"..config.id,
+		endpoint = "https://botsfordiscord.com/api/bot/"..client.user.id,
 		body = "server_count"
 	},
 	
 	["discord.boats"] = {
-		endpoint = "https://discord.boats/api/bot/"..config.id,
+		endpoint = "https://discord.boats/api/bot/"..client.user.id,
 		body = "server_count"
 	},
 	
 	["bots.ondiscord.xyz"] = {
-		endpoint = "https://bots.ondiscord.xyz/bot-api/bots/"..config.id.."/guilds",
+		endpoint = "https://bots.ondiscord.xyz/bot-api/bots/"..client.user.id.."/guilds",
 		body = "guildCount"
 	},
 	
 	["discord.bots.gg"] = {
-		endpoint = "https://discord.bots.gg/api/v1/bots/"..config.id.."/stats",
+		endpoint = "https://discord.bots.gg/api/v1/bots/"..client.user.id.."/stats",
 		body = "guildCount"
 	}
 }

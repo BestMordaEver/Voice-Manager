@@ -1,5 +1,4 @@
 return {
-	id = "676787135650463764",					-- bot id
 	ownerID = "188731184501620736",
 	guildFeed = "676432067566895111",			-- channel that will list all guilds, that invite the bot; can be nil
 	stderr = "686261668522491980",				-- channel than will post error messages; can be nil
