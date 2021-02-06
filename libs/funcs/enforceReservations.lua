@@ -9,7 +9,7 @@ return function (channel)
 		return permissionOverwrite.type == "member" and
 			permissionOverwrite:getObject().voiceChannel ~= channel and
 			permissionOverwrite:getAllowedPermissions():has(permission.connect)
-	end) >= channel.userLimit - channel.connectedMembers then
+	end) >= channel.userLimit - #channel.connectedMembers then
 		if not roleOverwrite:getDeniedPermissions():has(permission.connect) then
 			roleOverwrite:denyPermissions(permission.connect)
 		end

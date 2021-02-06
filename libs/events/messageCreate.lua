@@ -4,7 +4,6 @@ local locale = require "locale"
 local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
 local commands = require "commands/init"
-local config = require "config"
 
 return function (message)
 	-- ignore non-initialized guilds and dms
@@ -34,7 +33,7 @@ return function (message)
 	-- find the request
 	local content = 
 	prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or
-		message.content:match("^<@.?"..config.id..">%s*(.-)$") or
+		message.content:match("^<@.?"..client.user.id..">%s*(.-)$") or
 		message.content
 		
 	-- what command is it?
