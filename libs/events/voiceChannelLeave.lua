@@ -31,22 +31,22 @@ return function (member, channel) -- now remove the unwanted corpses!
 		else
 			enforceReservations(channel)
 			
-			local companion = client:getChannel(channels[channel.id].companion)
+			local channelData = channels[channel.id]
+			local companion = client:getChannel(channelData.companion)
 			if companion then
 				companion:getPermissionOverwriteFor(member):denyPermissions(permission.readMessages)
 			end
 			
-			if channels[channel.id].host == member.user.id then
+			if channelData.host == member.user.id then
 				local newHost = channel.connectedMembers:random()
 				
 				if newHost then
 					logger:log(4, "GUILD %s СHANNEL %s: Migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
-					channels[channel.id]:setHost(newHost.user.id)
+					channelData:setHost(newHost.user.id)
 					
-					local lobby = client:getChannel(channels[channel.id].parent.id)
-					if lobby then
-						local perms = lobbies[lobby.id].permissions:toDiscordia()
-						if #perms ~= 0 and lobby.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+					if channelData.parent and client:getChannel(channelData.parent.id) then
+						local perms = lobbies[channelData.parent.id].permissions:toDiscordia()
+						if #perms ~= 0 and client:getChannel(channelData.parent.id).guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
 							channel:getPermissionOverwriteFor(member):delete()
 							channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
 						end
