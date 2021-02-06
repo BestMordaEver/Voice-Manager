@@ -316,6 +316,7 @@ You can enable companion channels with `companion`]],
 	hostError = "Bot wasn't able to perform this action. Contact your administrators if issue persists",
 	
 	-- select
+	selectFailed = "Couldn't find a lobby or category",
 	selectVoice = "Selected lobby %s",
 	selectCategory = "Selected category %s",
 	

@@ -1,4 +1,4 @@
-## Voice Manager v3.0.5
+## Voice Manager v3.0.6
 
 [Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [Support and news Discord server](https://discord.gg/tqj6jvT)
 
