@@ -58,12 +58,12 @@ events = {
 		client:on(events("channelDelete"))
 		clock:on(events("min"))
 		
+		events.hour = require "events/hour"
+		
 		if config.sendStats then clock:on(events("hour")) end
 	end,
 
 	min = require "events/min",
-	
-	hour = require "events/hour"
 }
 
 return setmetatable(events, {__call = function (self, name)
