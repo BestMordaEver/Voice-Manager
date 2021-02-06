@@ -94,7 +94,7 @@ local lobbyMethods = {
 			
 			lobbies[self.id] = nil
 			local lobby = client:getChannel(self.id)
-			if lobby then
+			if lobby and guilds[self.guildID] then
 				guilds[self.guildID].lobbies:remove(self)
 				logger:log(4, "GUILD %s: Removed lobby %s", self.guildID, self.id)
 			end
