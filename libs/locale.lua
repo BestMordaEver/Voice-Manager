@@ -123,7 +123,7 @@ You can put different `%combos%` in the name to customize it
 `%tag%` - user's tag (for example **Riddles#2773**)
 `%game%` - user's currently played or streamed game (**no game** if user's not playing anything)
 `%counter%` - room position. Keeps rooms ordered
-`%rename%` - blank by default, but interacts with `vm!room rename`]],
+`%rename%` - blank when room is created. When host uses `vm!room rename`, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
 			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby",
 			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
