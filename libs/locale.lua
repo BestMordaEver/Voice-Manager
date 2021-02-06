@@ -143,7 +143,7 @@ You can put different `%combos%` in the name to customize it
 **If target is a lobby**, then matchmaking pool is rooms that are created by that lobby. If no room is available, a new one is created using that lobby's settings
 **If target is a category**, then matchmaking pool is its voice channels. If no channel is available, user is kicked from matchmaking lobby]],
 			[[Select the matchmaking mode. All modes respect channel capacity and blocklists/reservations
-`random` - selects a random available channnel
+`random` - selects a random available channel
 `max` - selects a most filled channel
 `min` - selects a least filled channel
 `first` - selects the first available channel
