@@ -55,7 +55,7 @@ local metaHelp = {
 -- event is sent when embed is formed and delivered
 -- only relevant for interactive embeds
 client:on("embedSent", function (type, message, newMessage, embed)
-	if type ~= "help" then return end
+	if type ~= "help" or not newMessage then return end
 	local embedData = setmetatable({command = "help", killIn = 10, author = message.author, embed = embed}, metaHelp)
 	
 	embeds[newMessage] = embedData
