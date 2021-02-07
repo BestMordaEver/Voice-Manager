@@ -19,5 +19,5 @@ return function (member, channel, permissionName)
 	
 	return member:hasPermission(channel, permission.administrator) or (
 		channels[channel.id].host == member.user.id and (
-			permissions.bitfield:has(permissions.bits[permissionName]) or permissions.bitfield:has(permissions.bits[perms[permissionName]])))
+			permissions:has(permissionName) or permissions:has(perms[permissionName])))
 end

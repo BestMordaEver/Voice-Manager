@@ -10,7 +10,7 @@ local botPermissionsMT = {
 			mute = 0x02,
 			moderate = 0x04,
 			manage = 0x08,
-			name = 0x10,
+			rename = 0x10,
 			resize = 0x20,
 			bitrate = 0x40
 		},
