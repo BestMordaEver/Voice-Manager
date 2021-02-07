@@ -61,7 +61,7 @@ local function lobbyJoin (member, lobby)
 		end
 		
 		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
-		lobbyData:attachChild(newChannel.id, position)
+		lobbyData:attachChild(channels[newChannel.id], position)
 		newChannel:setUserLimit(lobbyData.capacity or lobby.userLimit)
 		
 		local perms = lobbyData.permissions:toDiscordia()

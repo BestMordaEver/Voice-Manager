@@ -107,7 +107,7 @@ local channelsIndex = {
 							channelIDs.isPersistent[i] == 1, channelIDs.host[i], lobbies[channelIDs.parent[i]],
 							tonumber(channelIDs.position[i]), channelIDs.companion[i])
 						if lobbies[channelIDs.parent[i]] then
-							self[channelID].parent:attachChild(channelID, tonumber(self[channelID].position))
+							self[channelID].parent:attachChild(self[channelID], tonumber(self[channelID].position))
 						end
 					else
 						if channelIDs.isPersistent[i] == 1 then
