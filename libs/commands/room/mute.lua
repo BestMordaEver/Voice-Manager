@@ -17,8 +17,8 @@ return function (message, mentionString)
 	end
 	
 	local silentRoom
-	if guild.afkChannel then
-		silentRoom = guild.afkChannel
+	if channel.guild.afkChannel then
+		silentRoom = channel.guild.afkChannel
 	else
 		silentRoom = channel.category:createVoiceChannel("Silent room")
 		if not silentRoom then
@@ -30,7 +30,7 @@ return function (message, mentionString)
 	mentionString = ""
 	for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 		mentionString = mentionString .. user.mentionString .. " "
-		local member = message.guild:getMember(user)
+		local member = channel.guild:getMember(user)
 		channel:getPermissionOverwriteFor(member):denyPermissions(permission.speak)
 		if member.voiceChannel == channel then
 			member:setVoiceChannel(silentRoom)
