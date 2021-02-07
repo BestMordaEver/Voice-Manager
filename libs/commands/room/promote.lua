@@ -14,8 +14,8 @@ return function (message, newHost)
 	
 	if newHost then
 		if message.guild:getMember(newHost).voiceChannel == channel then
-			channels[channel.id]:setHost(host.id)
-			return "Promoted a new host", "ok", locale.hostConfirm:format(host.mentionString)
+			channels[channel.id]:setHost(newHost.id)
+			return "Promoted a new host", "ok", locale.hostConfirm:format(newHost.mentionString)
 		else
 			return "Can't promote person not in a room", "warning", locale.badNewHost
 		end
