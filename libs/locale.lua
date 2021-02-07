@@ -335,6 +335,8 @@ You can enable companion channels with `companion`]],
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 	
 	-- errors
+	lobbyDupe = "This channel is already registered as a lobby",
+	channelDupe = "Can't register a room as a lobby",
 	badBotPermissions = "Bot doesn't have sufficient permissions",
 	badUserPermissions = "You don't have sufficient permissions",
 	badSubcommand = "Unknown subcommand",
