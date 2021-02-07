@@ -38,11 +38,11 @@ return function (message, argument)
 		end
 		return "Cleared reservations", "ok", locale.unreserveConfirm:format(mentionString)
 	elseif subcommand == "lock" then
-		for _, members in pairs(channel.connectedMembers) do
+		for _, member in pairs(channel.connectedMembers) do
 			mentionString = mentionString .. member.user.mentionString .. " "
 			channel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
 		end
-		return "Cleared reservations", "ok", locale.reserveConfirm:format(mentionString)
+		return "Locked the room", "ok", locale.reserveConfirm:format(mentionString)
 	else
 		return "No subcommand", "warning", locale.badSubcommand
 	end
