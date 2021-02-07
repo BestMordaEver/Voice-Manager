@@ -25,13 +25,6 @@ local botPermissionsMT = {
 			[0x40] = "bitrate"
 		},
 		
-		chatCommands = {
-			mute = "mute, unmute",
-			moderate = "mute, unmute, hide, show, clear",
-			rename = "rename",
-			manage = "rename"
-		},
-		
 		toDiscordia = function (self)
 			local perms = {}
 			if self.bitfield:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end

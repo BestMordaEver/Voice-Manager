@@ -36,7 +36,7 @@ embeds:new("roomInfo", function (room)
 		end
 	end
 	for name, _ in pairs(parent.permissions.bits) do
-		if parent.permissions:has(name) then commands = commands..roomCommands[name]..", " end
+		if parent.permissions:has(name) and not commands:match(roomCommands[name]) then commands = commands..roomCommands[name]..", " end
 	end
 	
 	if reservations == "" then reservations = locale.none end

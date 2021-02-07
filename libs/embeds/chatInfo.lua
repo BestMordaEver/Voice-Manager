@@ -33,7 +33,7 @@ embeds:new("chatInfo", function (room)
 		end
 	end
 	for name, _ in pairs(parent.permissions.bits) do
-		if chatCommands[name] and parent.permissions:has(name) then commands = commands..chatCommands[name]..", " end
+		if chatCommands[name] and parent.permissions:has(name) and not commands:match(chatCommands[name]) then commands = commands..chatCommands[name]..", " end
 	end
 	
 	if hidden == "" then hidden = locale.none end
