@@ -35,7 +35,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 			if not channelData then return end 
 			local companion = client:getChannel(channelData.companion)
 			if companion then
-				companion:getPermissionOverwriteFor(member):denyPermissions(permission.readMessages)
+				companion:getPermissionOverwriteFor(member):clearPermissions(permission.readMessages)
 			end
 			
 			if channelData.host == member.user.id then
