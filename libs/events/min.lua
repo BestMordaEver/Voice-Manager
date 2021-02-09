@@ -11,7 +11,7 @@ return function (date)
 	embeds:tick()
 	client:setGame(status())
 	
-	if config.hearbeat then
+	if config.heartbeat then
 		-- hearbeat happens
 		client:getChannel(config.hearbeatChannel):getMessage(config.hearbeatMessage):setContent(os.date())
 		-- hearbeat is partial? stop it!
