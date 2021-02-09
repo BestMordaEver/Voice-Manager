@@ -1,4 +1,8 @@
-## Voice Manager v3.0.9
+## Voice Manager v3.0.10
+
+<a href="https://top.gg/bot/601347755046076427">
+    <img src="https://top.gg/api/widget/status/601347755046076427.svg" alt="Voice Manager" />
+</a>
 
 [Setup guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [Support and news Discord server](https://discord.gg/tqj6jvT)
 
@@ -13,10 +17,6 @@ Voice Manager is highly customizable!
 - Create private text chats, that are visible only to those, who enter your channel!
 - Matchmaking lobbies! Nobody knows how they work but they are extremely cool!
 
-<a href="https://discordbotlist.com/bots/601347755046076427">
-	<img 
-		width="380" 
-		height="140" 
-		src="https://discordbotlist.com/bots/601347755046076427/widget" 
-		alt="Voice Manager stats on Discord Bot List">
+<a href="https://top.gg/bot/601347755046076427">
+    <img src="https://top.gg/api/widget/601347755046076427.svg" alt="Voice Manager" />
 </a>
