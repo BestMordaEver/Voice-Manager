@@ -64,7 +64,7 @@ local channelMT = {
 				logger:log(4, "GUILD %s: Updated host for channel %s", channel.guild.id, self.id)
 				emitter:emit("setHost", hostID, self.id)
 			else
-				self:remove()
+				self:delete()
 			end
 		end
 	},
