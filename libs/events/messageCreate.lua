@@ -22,8 +22,6 @@ return function (message)
 		return
 	end
 	
-	logger:log(4, "GUILD %s USER %s => %s", message.guild.id, message.author.id, message.content)
-	
 	-- cache the member object just in case
 	if message.guild then
 		message.guild:getMember(message.author)
@@ -38,6 +36,8 @@ return function (message)
 	-- what command is it?
 	if not content then return end
 	local command = content == "" and "help" or content:match("^(%w+)")
+	
+	logger:log(4, "GUILD %s USER %s => %s", message.guild.id, message.author.id, message.content)
 	
 	if commands[command] then
 		logger:log(4, "GUILD %s USER %s: %s command invoked", message.guild.id, message.author.id, command)
