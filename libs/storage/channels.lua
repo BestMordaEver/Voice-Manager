@@ -156,8 +156,6 @@ local channelsIndex = {
 			local channel = client:getChannel(channelID)
 			if channel then
 				if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
-			else
-				channelData:delete()
 			end
 		end
 		return p

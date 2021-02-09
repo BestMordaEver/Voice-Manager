@@ -13,7 +13,7 @@ return function (date)
 	
 	if config.heartbeat then
 		-- hearbeat happens
-		client:getChannel(config.hearbeatChannel):getMessage(config.hearbeatMessage):setContent(os.date())
+		client:getChannel(config.heartbeatChannel):getMessage(config.heartbeatMessage):setContent(os.date())
 		-- hearbeat is partial? stop it!
 		if mercy:tick() 
 		-- uncomment next line to allow bot to reboot daily
