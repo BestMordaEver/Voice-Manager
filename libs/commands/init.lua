@@ -1,6 +1,7 @@
+local embeds = require "embeds/embeds"
+
 local function invite (message)
-	message:reply("https://discord.gg/tqj6jvT")
-	return "Sent support invite"
+	return "Sent support invite", "invite", "https://discord.gg/tqj6jvT"
 end
 
 -- all possible bot commands are processed in corresponding files, should return message for logger
