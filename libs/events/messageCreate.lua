@@ -13,12 +13,12 @@ return function (message)
 		return
 	end
 	
-	local prefix = message.guild and guilds[message.guild.id].prefix or nil
+	local prefix = guilds[message.guild.id].prefix
 	
 	-- good luck with this one :3
-	if message.author.bot or ( -- ignore bots
-		not message.mentionedUsers:find(function(user) return user == client.user end) and -- find mentions
-		not (prefix and message.content:find(prefix, 1, true))) then 	-- find prefix
+	if message.author.bot or not ( -- ignore bots
+		message.mentionedUsers:find(function(user) return user == client.user end) or -- find mentions
+		message.content:find(prefix, 1, true)) then 	-- find prefix
 		return
 	end
 	
@@ -32,11 +32,11 @@ return function (message)
 	
 	-- find the request
 	local content = 
-	prefix and message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or
-		message.content:match("^<@.?"..client.user.id..">%s*(.-)$") or
-		message.content
+		message.content:match("^"..prefix:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1").."%s*(.-)$") or
+		message.content:match("^<@.?"..client.user.id..">%s*(.-)$")
 		
 	-- what command is it?
+	if not content then return end
 	local command = content == "" and "help" or content:match("^(%w+)")
 	
 	if commands[command] then
