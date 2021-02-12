@@ -88,10 +88,6 @@ local lobbies = {}
 local lobbyMethods = {
 	delete = function (self)
 		if lobbies[self.id] then
-			for _, childData in pairs(lobbies[self.id].children) do
-				childData.parent = true	-- you still have to die, kiddo
-			end
-			
 			lobbies[self.id] = nil
 			local lobby = client:getChannel(self.id)
 			if lobby and guilds[self.guildID] then
