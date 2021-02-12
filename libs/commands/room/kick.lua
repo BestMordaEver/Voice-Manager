@@ -1,3 +1,4 @@
+local client = require "client"
 local locale = require "locale"
 
 local hostCheck = require "funcs/hostCheck"
