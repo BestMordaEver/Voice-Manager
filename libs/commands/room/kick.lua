@@ -9,7 +9,7 @@ return function (message, mentionString)
 		return "Not a host", "warning", locale.notHost
 	end
 	
-	local isPermitted = hostPermissionCheck(message.member, channel, "kick")
+	local isPermitted = hostPermissionCheck(message.member, channel, "moderate")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
