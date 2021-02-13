@@ -13,7 +13,7 @@ local perms = {
 }
 
 return function (member, channel, permissionName)
-	if config.owners[message.author.id] then return true end
+	if config.owners[member.user.id] then return true end
 	
 	local permissions = channels[channel.id].parent and channels[channel.id].parent.permissions or guilds[channel.guild.id].permissions
 	
