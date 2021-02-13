@@ -2,7 +2,7 @@ return {
 	owners = {
 		["188731184501620736"] = true,	-- Riddles
 		["272093076778909707"] = true,	-- SosnoviyBor
-	}
+	},
 	guildFeed = "676432067566895111",			-- channel that will list all guilds, that invite the bot; can be nil
 	stderr = "686261668522491980",				-- channel than will post error messages; can be nil
 	heartbeat = true,							-- perform heartbeat check?
