@@ -21,8 +21,8 @@ return function (message, bitrate)
 	
 	local success, err = channel:setBitrate(bitrate * 1000)
 	if success then
-		return "Successfully changed channel bitrate", "ok", locale.bitrateConfirm:format(bitrate)
+		return "Successfully changed room bitrate", "ok", locale.bitrateConfirm:format(bitrate)
 	else
-		return "Couldn't change channel bitrate: "..err, "warning", locale.hostError
+		return "Couldn't change room bitrate: "..err, "warning", locale.hostError
 	end
 end

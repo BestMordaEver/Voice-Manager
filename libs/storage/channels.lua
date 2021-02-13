@@ -52,7 +52,7 @@ local channelMT = {
 		delete = function (self)
 			if channels[self.id] then
 				channels[self.id] = nil
-				logger:log(4, "CHANNEL %s: Removed", self.id)
+				logger:log(4, "ROOM %s: Removed", self.id)
 			end
 			emitter:emit("remove", self.id)
 		end,
@@ -61,7 +61,7 @@ local channelMT = {
 			local channel = client:getChannel(self.id)
 			if channel and channels[self.id] then
 				self.host = hostID
-				logger:log(4, "GUILD %s: Updated host for channel %s", channel.guild.id, self.id)
+				logger:log(4, "GUILD %s: Updated host for room %s", channel.guild.id, self.id)
 				emitter:emit("setHost", hostID, self.id)
 			else
 				self:delete()
@@ -80,7 +80,7 @@ local channelsIndex = {
 				self[channelID] = setmetatable({
 					id = channelID, guildID = channel.guild.id, isPersistent = isPersistent, host = host, parent = parent, position = position, companion = companion
 				}, channelMT)
-				logger:log(4, "GUILD %s: Added channel %s", channel.guild.id, channelID)
+				logger:log(4, "GUILD %s: Added room %s", channel.guild.id, channelID)
 			end
 		end
 	end,
@@ -95,7 +95,7 @@ local channelsIndex = {
 	end,
 	
 	load = function (self)
-		logger:log(4, "STARTUP: Loading channels")
+		logger:log(4, "STARTUP: Loading rooms")
 		local channelIDs = channelsData:exec("SELECT * FROM channels")
 		
 		if channelIDs then

@@ -95,7 +95,7 @@ local function lobbyJoin (member, lobby)
 			end
 		end
 	else
-		logger:log(2, "GUILD %s LOBBY %s: Couldn't create new channel for %s", lobby.guild.id, lobby.id, member.user.id)
+		logger:log(2, "GUILD %s LOBBY %s: Couldn't create new room for %s", lobby.guild.id, lobby.id, member.user.id)
 	end
 end
 
@@ -131,10 +131,10 @@ local function matchmakingJoin (member, lobby)
 			return
 		else	-- if no available channels - create new or kick
 			if target.type == channelType.voice then
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available channels, delegating to %s", lobby.guild.id, lobby.id, target.id)
+				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available room, delegating to %s", lobby.guild.id, lobby.id, target.id)
 				client:emit("voiceChannelJoin", member, target)
 			else
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available channels, gtfo", lobby.guild.id, lobby.id)
+				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available room, gtfo", lobby.guild.id, lobby.id)
 				member:setVoiceChannel()
 			end
 			return

@@ -21,8 +21,8 @@ return function (message, size)
 	
 	local success, err = channel:setUserLimit(size)
 	if success then
-		return "Successfully changed channel capacity", "ok", locale.capacityConfirm:format(size)
+		return "Successfully changed room capacity", "ok", locale.capacityConfirm:format(size)
 	else
-		return "Couldn't change channel capacity: "..err, "warning", locale.hostError
+		return "Couldn't change room capacity: "..err, "warning", locale.hostError
 	end
 end

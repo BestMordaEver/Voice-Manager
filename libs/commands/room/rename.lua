@@ -37,8 +37,8 @@ return function (message, name)
 	end
 	
 	if success then
-		return "Successfully changed channel name", "ok", locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn)
+		return "Successfully changed room name", "ok", locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn)
 	else
-		return "Couldn't change channel name: "..err, "warning", locale.hostError
+		return "Couldn't change room name: "..err, "warning", locale.hostError
 	end
 end
