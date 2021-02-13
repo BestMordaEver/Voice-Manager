@@ -43,7 +43,7 @@ return setmetatable({}, {
 		if self.types[type] then
 			return {embed = self.types[type](...)}
 		else
-			error("Invalid embed type: "..type)
+			error("Invalid embed type: "..tostring(type))
 		end
 	end
 })
