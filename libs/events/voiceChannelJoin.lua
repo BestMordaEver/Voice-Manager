@@ -64,6 +64,8 @@ local function lobbyJoin (member, lobby)
 		lobbyData:attachChild(channels[newChannel.id], position)
 		newChannel:setUserLimit(lobbyData.capacity or lobby.userLimit)
 		
+		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect)
+		
 		local perms = lobbyData.permissions:toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
