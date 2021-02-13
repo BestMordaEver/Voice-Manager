@@ -1,5 +1,6 @@
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 
 return function (message, channel)
 	if lobbies[channel.id] then
@@ -9,6 +10,5 @@ return function (message, channel)
 	else
 		lobbies(channel.id):setMatchmaking(true)
 	end
-	
 	return "New matchmaking lobby added", "ok", locale.matchmakingAddConfirm:format(channel.name)
 end

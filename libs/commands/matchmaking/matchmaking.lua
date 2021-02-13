@@ -21,7 +21,7 @@ return function (message)
 		local channel = client:getChannel(argument)
 		if not (channel and channel.guild == message.guild) then
 			argument = argument:lower()
-			channel = message.guild.voiceChannels:find(function(voiceChannel) return voiceChannel.name == argument end)
+			channel = message.guild.voiceChannels:find(function(voiceChannel) return voiceChannel.name:lower() == argument end)
 		end
 		
 		if not channel then 

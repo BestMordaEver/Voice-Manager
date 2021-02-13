@@ -14,20 +14,6 @@ return function (message)
 	if subcommand == "" or argument == "" then
 		return "Sent companions info", "companionsInfo", message.guild
 	end
-	
-	if subcommand == "add" or subcommand == "remove" then
-		local channel = client:getChannel(argument)
-		if not (channel and channel.guild == message.guild) then
-			argument = argument:lower()
-			channel = message.guild.voiceChannels:find(function(voiceChannel) return voiceChannel.name == argument end)
-		end
-		
-		if not channel then
-			return "Couldn't find channel to add", "warning", locale.badChannel
-		end
-		
-		dialogue(message.author.id, channel.id)
-	end
 
 	local lobby = client:getChannel(dialogue[message.author.id])
 	if not lobby or lobby.type ~= channelType.voice then
