@@ -10,7 +10,7 @@ return function (message, input)
 	input = input:lower()
 	for lobbyData,_ in pairs(guilds[message.guild.id].lobbies) do
 		channel = client:getChannel(lobbyData.id)
-		if channel and channel.name == input then return channel end
+		if channel and channel.name:lower() == input then return channel end
 	end
 	for _, channel in pairs(message.guild.categories) do
 		if channel.name == input then return channel end
