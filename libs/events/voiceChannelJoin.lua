@@ -43,7 +43,8 @@ local function lobbyJoin (member, lobby)
 	
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
-		processing[newChannel.id] = true
+		processing[newChannel.id] = discordia.Mutex()
+		processing[newChannel.id]:lock()
 		
 		member:setVoiceChannel(newChannel.id)
 		
@@ -94,6 +95,8 @@ local function lobbyJoin (member, lobby)
 				newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
 			end
 		end
+		processing[newChannel.id]:unlock()
+		processing[newChannel.id] = nil
 	else
 		logger:log(2, "GUILD %s LOBBY %s: Couldn't create new room for %s", lobby.guild.id, lobby.id, member.user.id)
 	end
@@ -175,9 +178,9 @@ end
 
 return function (member, channel)
 	if channel then
-		if processing[channel.id] then
-			processing[channel.id] = nil
-			return
+		local processMutex = processing[channel.id]
+		if processMutex then
+			processMutex:lock()
 		end
 		
 		local lobbyData = lobbies[channel.id]
@@ -194,6 +197,10 @@ return function (member, channel)
 			roomJoin(member, channel)
 		else
 			channelJoin(member, channel)
+		end
+		
+		if processMutex then
+			processMutex:unlock()
 		end
 	end
 end

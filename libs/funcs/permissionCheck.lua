@@ -7,7 +7,7 @@ return function (message, channel)
 		return false, "Bad user permissions", locale.badBotPermissions
 	end
 
-	if message.author.id == config.ownerID then return true end -- unlimited power
+	if config.owners[message.author.id] then return true end
 	
 	if not message.member:hasPermission(channel, permission.manageChannels) then
 		return false, "Bad user permissions", locale.badUserPermissions

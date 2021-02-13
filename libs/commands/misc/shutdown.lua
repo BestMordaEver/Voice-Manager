@@ -5,7 +5,7 @@ local config = require "config"
 
 return function (message)
 	if message then
-		if message.author.id ~= config.ownerID then return end
+		if not config.owners[message.author.id] then return "Not owner", "warning", "You're not my father" end
 		message:reply("Shutting down gracefully")
 	end
 	

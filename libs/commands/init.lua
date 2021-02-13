@@ -1,4 +1,5 @@
 local embeds = require "embeds/embeds"
+local config = require "config"
 
 local function invite (message)
 	return "Sent support invite", "asIs", "https://discord.gg/tqj6jvT"
@@ -29,7 +30,7 @@ return {
 	support = invite,
 	invite = invite,
 	exec = function (message)
-		if message.author ~= message.client.owner then return end
+		if not config.owners[message.author.id] then return "Not owner", "warning", "You're not my father" end
 		
 		local fn, syntaxError = load(message.content:match("exec%s*(.-)$"), "Bot", "t", sandbox)
 		if not fn then return "Syntax error", "warning", code(syntaxError) end
