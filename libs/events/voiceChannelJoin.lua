@@ -51,14 +51,16 @@ local function lobbyJoin (member, lobby)
 		local companion
 		if lobbyData.companionTarget then
 			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or newChannel.guild) or client:getChannel(lobbyData.companionTarget)
-			local name = lobbyData.companionTemplate or "Private chat"
+			local name = lobbyData.companionTemplate or "private-chat"
 		
-			if name:match("%%.-%%") then
-				name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
-				if name == "" then name = "Private chat" end
-			end
+			if companionTarget then
+				if name:match("%%.-%%") then
+					name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
+					if name == "" then name = "private-chat" end
+				end
 			
-			companion = companionTarget:createTextChannel(name)
+				companion = companionTarget:createTextChannel(name)
+			end
 		end
 		
 		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
