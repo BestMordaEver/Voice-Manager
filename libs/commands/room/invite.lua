@@ -14,7 +14,7 @@ return function (message, mentionString)
 	if invite then
 		invite = "https://discord.gg/"..invite.code
 		if #message.mentionedUsers == 0 then
-			return "Created invite in room", "invite", invite
+			return "Created invite in room", "asIs", invite
 		else
 			for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 				mentionString = mentionString .. user.mentionString .. " "
