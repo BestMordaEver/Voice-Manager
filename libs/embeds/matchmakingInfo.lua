@@ -27,11 +27,11 @@ embeds:new("matchmakingInfo", function (guild)
 	for i, lobby in ipairs(sortedLobbies) do table.insert(sortedLobbyData, lobbies[lobby.id]) end
 	
 	for _, lobbyData in pairs(sortedLobbyData) do
-		local target, pool = client:getChannel(lobbyData.target), 0
+		local target = client:getChannel(lobbyData.target) or client:getChannel(lobbyData.id).category
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.matchmakingField:format(
-				target and target.name or "default",
+				target.name,
 				lobbyData.template or "random",
 				target.type == channelType.category and #target.voiceChannels or #lobbies[target.id].children
 			),
