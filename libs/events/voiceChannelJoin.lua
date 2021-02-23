@@ -196,7 +196,7 @@ return function (member, channel)
 				if not ok then error(err) end	-- no ignoring!
 			end
 		elseif channels[channel.id] then
-			roomJoin(member, channel)
+			if channels[channel.id].host ~= member.user.id then roomJoin(member, channel) end
 		else
 			channelJoin(member, channel)
 		end
