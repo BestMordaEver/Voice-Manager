@@ -6,7 +6,7 @@ local guilds = require "storage/guilds"
 local config = require "config"
 
 return function (guild) -- same but opposite
-	guilds[guild.id]:delete()
+	if guilds[guild.id] then guilds[guild.id]:delete() end
 	for _,channel in pairs(guild.voiceChannels) do 
 		if channels[channel.id] then channels[channel.id]:delete() end 
 		if lobbies[channel.id] then lobbies[channel.id]:delete() end
