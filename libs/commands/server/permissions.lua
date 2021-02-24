@@ -21,5 +21,5 @@ return function (message, permissions)
 	end
 	
 	guildData:setPermissions(permissionBits)
-	return "Server permissions set", "warning", locale.permissionsConfirm
+	return "Server permissions set", "ok", locale.permissionsConfirm
 end
