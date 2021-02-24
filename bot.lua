@@ -30,5 +30,9 @@ client:once(events("ready"))
 -- really gotta think about a more elegant solution
 require "embeds/init"
 
+-- yep, it's permanent now
+local timer = require "timer"
+timer.setTimeout(20000, client.emit, client, "ready")
+
 -- bot starts working here
 client:run('Bot '..require "token".token)
