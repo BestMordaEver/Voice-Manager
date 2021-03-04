@@ -1,4 +1,5 @@
 local locale = require "locale"
+local permissionCheck = require "funcs/permissionCheck"
 local permission = require "discordia".enums.permission
 
 local subcommands = {
@@ -19,6 +20,10 @@ return function (message)
 		return "Sent server info", "serverInfo", message.guild
 	end
 	
+	local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
+	if not isPermitted then
+		return logMsg, "warning", userMsg
+	end
 	
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, argument)
