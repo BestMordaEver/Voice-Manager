@@ -17,10 +17,12 @@ return function (message, mentionString)
 			return "Created invite in room", "asIs", invite
 		else
 			for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
-				mentionString = mentionString .. user.mentionString .. " "
+				if user:getPrivateChannel() then
+					mentionString = mentionString .. user.mentionString .. " "
 					user:getPrivateChannel():send(invite)
-				if tryReservation then
-					channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect)
+					if tryReservation then
+						channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect)
+					end
 				end
 			end
 		end
