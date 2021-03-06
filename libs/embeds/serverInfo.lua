@@ -13,6 +13,13 @@ embeds:new("serverInfo", function (guild)
 	return {
 		title = locale.serverInfoTitle:format(guild.name),
 		color = 6561661,
-		description = locale.serverInfo:format(guildData.prefix, guildData.permissions, #guildData.lobbies, channels:people(guild.id), channels:inGuild(guild.id), guildData.limit)
+		description = locale.serverInfo:format(
+			guildData.prefix,
+			guildData.permissions,
+			#guildData.lobbies,
+			channels:people(guild.id),
+			channels:inGuild(guild.id),
+			guildData.limit
+		)
 	}
 end)

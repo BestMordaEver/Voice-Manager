@@ -28,6 +28,9 @@ embeds:new("matchmakingInfo", function (guild)
 	
 	for _, lobbyData in pairs(sortedLobbyData) do
 		local target = client:getChannel(lobbyData.target) or client:getChannel(lobbyData.id).category
+			or {name = client:getGuild(lobbyData.guildID).name,
+				type = channelType.category,
+				voiceChannels = client:getGuild(lobbyData.guildID).voiceChannels:toArray(function (vc) return not vc.category end)}
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.matchmakingField:format(
