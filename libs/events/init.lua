@@ -43,8 +43,8 @@ events = {
 		clock:start()
 		
 		client:setGame(status())
-		if config.guildFeed then
-			client:getChannel(config.guildFeed):send("I'm listening")
+		if config.wakeUpFeed then
+			client:getChannel(config.wakeUpFeed):send("I'm listening")
 		end
 		
 		client:on(events("messageCreate"))
@@ -57,15 +57,16 @@ events = {
 		client:on(events("channelUpdate"))
 		client:on(events("channelDelete"))
 		clock:on(events("min"))
+		clock:on(events("hour"))
 		
-		events.hour = require "events/hour"
-		
-		if config.sendStats then clock:on(events("hour")) end
+		if config.sendStats then clock:on(events("hour", require "events/stats")) end
 	end,
 
 	min = require "events/min",
+	
+	hour = require "events/hour",
 }
 
-return setmetatable(events, {__call = function (self, name)
-	return safeEvent(name, self[name])
+return setmetatable(events, {__call = function (self, name, fn)
+	return safeEvent(name, fn or self[name])
 end})
