@@ -4,6 +4,7 @@ local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local embeds = require "embeds/embeds"
 local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
 local enforceReservations = require "funcs/enforceReservations"
@@ -83,6 +84,9 @@ local function lobbyJoin (member, lobby)
 			if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 			end
+			
+			companion:send(embeds("help", 4))
+			companion:send(embeds("help", 5))
 		end
 		
 		if needsMove then
