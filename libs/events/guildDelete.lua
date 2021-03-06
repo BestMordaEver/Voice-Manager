@@ -11,7 +11,7 @@ return function (guild) -- same but opposite
 		if channels[channel.id] then channels[channel.id]:delete() end 
 		if lobbies[channel.id] then lobbies[channel.id]:delete() end
 	end
-	if config.guildFeed then
+	if config.guildFeed and guild.name then
 		client:getChannel(config.guildFeed):send(guild.name.." removed me!\n")
 	end
 end
