@@ -277,6 +277,8 @@ You can enable companion channels with `companion`]],
 **Name:** %s
 **Companion channels:** %d]],
 	
+	greetingConfirm = "Set new greeting!",
+	
 	-- room
 	roomInfoTitle = "Room info | %s",
 	roomInfo = [[**Reserved:** %s

@@ -6,7 +6,8 @@ local channelType = require "discordia".enums.channelType
 
 local subcommands = {
 	category = require "commands/companions/category",
-	name = require "commands/companions/name"
+	name = require "commands/companions/name",
+	greeting = require "commands/companions/greeting"
 }
 
 return function (message)

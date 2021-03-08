@@ -114,6 +114,7 @@ local function lobbyJoin (member, lobby)
 			
 			companion:send(embeds("help", 4))
 			companion:send(embeds("help", 5))
+			if lobbyData.greeting then companion:send(lobbyData.greeting) end
 		end
 		
 		processing[newChannel.id]:unlock()
