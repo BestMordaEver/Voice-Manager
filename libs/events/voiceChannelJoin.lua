@@ -60,13 +60,7 @@ local function lobbyJoin (member, lobby)
 		bitrate = bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
 		position = needsMove and client:getChannel(children[position + distance]).position or nil,
-		parent_id = target.id,
-		lockPermissions = true,
-		permission_overwrites = lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) and
-		{
-			{id = client.user.id, type = 1, allow = tostring(Permissions.fromMany(permission.connect).value), deny = "0"},
-			{id = member.user.id, type = 1, allow = tostring(Permissions.fromMany(table.unpack(perms)).value), deny = "0"}
-		} or nil
+		parent_id = target.id
 	})
 	
 	-- did we fail? statistics say "probably yes!"
@@ -90,19 +84,7 @@ local function lobbyJoin (member, lobby)
 				companion = lobby.guild:createChannel({
 					name = name,
 					type = channelType.text,
-					parent_id = companionTarget.id,
-					lockPermissions = true,
-					permission_overwrites = lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) and
-					{
-						{id = client.user.id, type = 1, allow = tostring(Permissions.fromMany(permission.readMessages).value), deny = "0"},
-						{id = member.user.id, type = 1, allow = tostring(Permissions.fromMany(permission.readMessages, table.unpack(perms)).value), deny = "0"},
-						{
-							id = (lobby.guild:getRole(lobbyData.role) or lobby.guild.defaultRole).id,
-							type = 1,
-							allow = "0",
-							deny = tostring(Permissions.fromMany(permission.readMessages, table.unpack(perms)).value)
-						}
-					} or nil
+					parent_id = companionTarget.id
 				})
 			end
 		end
@@ -110,7 +92,22 @@ local function lobbyJoin (member, lobby)
 		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(channels[newChannel.id], position)
 		
+		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect)
+		
+		local perms = lobbyData.permissions:toDiscordia()
+		if #perms ~= 0 and lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) then
+			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+		end
+		
 		if companion then
+			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
+			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
+			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+			
+			if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+			end
+			
 			companion:send(embeds("help", 4))
 			companion:send(embeds("help", 5))
 		end
