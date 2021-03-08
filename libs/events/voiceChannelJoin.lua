@@ -50,6 +50,10 @@ local function lobbyJoin (member, lobby)
 				children:drain(position + distance)
 			end
 		until children[position + distance] ~= nil or position + distance > children.max
+		
+		if position + distance > children.max then
+			needsMove = nil
+		end
 	end
 	
 	local perms = lobbyData.permissions:toDiscordia()
