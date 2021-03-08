@@ -211,7 +211,7 @@ local lobbiesIndex = {
 	
 	-- loadAdd and start interaction with db
 	add = function (self, lobbyID)
-		self:loadAdd({id = lobbyID})
+		self:loadAdd({id = lobbyID, isMatchmaking = false, permissions = botPermissions(0)})
 		if self[lobbyID] then
 			emitter:emit("add", lobbyID)
 			return self[lobbyID]
