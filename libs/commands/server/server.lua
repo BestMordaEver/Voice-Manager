@@ -1,5 +1,4 @@
 local locale = require "locale"
-local permissionCheck = require "funcs/permissionCheck"
 local permission = require "discordia".enums.permission
 
 local subcommands = {
@@ -21,8 +20,10 @@ return function (message)
 	end
 	
 	local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
-	if not isPermitted then
-		return logMsg, "warning", userMsg
+	if  then return true end
+	
+	if not (message.member:hasPermission(channel, permission.manageChannels) or config.owners[message.author.id]) then
+		return false, "Bad user permissions", locale.badUserPermissions
 	end
 	
 	if subcommands[subcommand] then
