@@ -59,7 +59,7 @@ local function lobbyJoin (member, lobby)
 		type = channelType.voice,
 		bitrate = bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
-		position = needsMove and client:getChannel(children[position + distance]).position or nil,
+		position = needsMove and client:getChannel(lobbyData.children[position + distance]).position or nil,
 		parent_id = target.id
 	})
 	
