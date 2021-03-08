@@ -46,7 +46,7 @@ local function lobbyJoin (member, lobby)
 		local children = lobbyData.children
 		repeat
 			distance = distance + 1
-			if not (children[position + distance] == nil or client:getChannel(children[position + distance])) then
+			if not (children[position + distance] == nil or client:getChannel(children[position + distance].id)) then
 				children:drain(position + distance)
 			end
 		until children[position + distance] ~= nil or position + distance > children.max
@@ -63,7 +63,7 @@ local function lobbyJoin (member, lobby)
 		type = channelType.voice,
 		bitrate = bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
-		position = needsMove and client:getChannel(lobbyData.children[position + distance]).position or nil,
+		position = needsMove and client:getChannel(lobbyData.children[position + distance].id).position - 1 or nil,
 		parent_id = target.id
 	})
 	
