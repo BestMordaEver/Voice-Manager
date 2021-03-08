@@ -23,7 +23,8 @@ CREATE TABLE lobbies(
 	companionTarget VARCHAR,	/* mutable, default NULL */
 	role VARCHAR,	/* mutable, default NULL */
 	permissions INTEGER NOT NULL,	/* mutable, default 0 */
-	capacity INTEGER	/* mutable, default NULL */
+	capacity INTEGER,	/* mutable, default NULL */
+	bitrate INTEGER	/* mutable, default NULL */
 )]])
 
 channelsData:exec([[

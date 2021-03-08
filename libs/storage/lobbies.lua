@@ -9,7 +9,8 @@ CREATE TABLE lobbies(
 	companionTarget VARCHAR,	/* mutable, default NULL */
 	role VARCHAR,	/* mutable, default NULL */
 	permissions INTEGER NOT NULL,	/* mutable, default 0 */
-	capacity INTEGER	/* mutable, default NULL */
+	capacity INTEGER,	/* mutable, default NULL */
+	bitrate INTEGER	/* mutable, default NULL */
 )]]
 
 local lobbiesData = require "sqlite3".open("lobbiesData.db")
@@ -30,7 +31,7 @@ local emitter = discordia.Emitter()
 
 local storageStatements = {
 	add = {
-		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL)",
+		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL)",
 		"Added lobby %s", "Couldn't add lobby %s"
 	},
 	
@@ -77,6 +78,11 @@ local storageStatements = {
 	setCapacity = {
 		"UPDATE lobbies SET capacity = ? WHERE id = ?",
 		"Updated capacity to %s for lobby %s", "Couldn't update capacity to %s for lobby %s"
+	},
+	
+	setBitrate = {
+		"UPDATE lobbies SET bitrate = ? WHERE id = ?",
+		"Updated bitrate to %s for lobby %s", "Couldn't update bitrate to %s for lobby %s"
 	}
 }
 
@@ -146,6 +152,12 @@ local lobbyMethods = {
 		emitter:emit("setCapacity", capacity, self.id)
 	end,
 	
+	setBitrate = function (self, bitrate)
+		self.bitrate = bitrate
+		logger:log(4, "GUILD %s: Updated bitrate for lobby %s to %s", self.guildID, self.id, bitrate)
+		emitter:emit("setBitrate", bitrate, self.id)
+	end,
+	
 	-- returns filled position
 	attachChild = function (self, channelID, position)
 		return self.children:fill(channelID, position)
@@ -171,15 +183,18 @@ local lobbyMT = {
 local lobbiesIndex = {
 	-- perform checks and add lobby to table
 	-- additional parameter are used upon startup to prevent unnecessary checks
-	loadAdd = function (self, lobbyID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity)
+	loadAdd = function (self, lobbyID,
+		isMatchmaking, role, permissions,
+		template, capacity, bitrate, target,
+		companionTarget, companionTemplate)
 		if not self[lobbyID] then
 			local lobby = client:getChannel(lobbyID)
 			if lobby and lobby.guild then
 				self[lobbyID] = setmetatable({
-					id = lobbyID, guildID = lobby.guild.id, isMatchmaking = isMatchmaking,
-					template = template, companionTemplate = companionTemplate,
-					target = target, companionTarget = companionTarget,
-					role = role, permissions = botPermissions(permissions or 0), capacity = capacity,
+					id = lobbyID, guildID = lobby.guild.id,
+					isMatchmaking = isMatchmaking, role = role, permissions = botPermissions(permissions or 0),
+					template = template, capacity = capacity, bitrate = bitrate, target = target,
+					companionTarget = companionTarget, companionTemplate = companionTemplate,
 					children = hollowArray(), mutex = discordia.Mutex()
 				}, lobbyMT)
 				guilds[lobby.guild.id].lobbies:add(self[lobbyID])
@@ -204,11 +219,10 @@ local lobbiesIndex = {
 			for i, lobbyID in ipairs(lobbyIDs.id) do
 				local lobby = client:getChannel(lobbyID)
 				if lobby then
-					self:loadAdd(lobbyID, lobbyIDs.isMatchmaking[i] == 1,
-						lobbyIDs.template[i], lobbyIDs.companionTemplate[i],
-						lobbyIDs.target[i], lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i],
-						lobbyIDs.role[i],
-						tonumber(lobbyIDs.permissions[i]), tonumber(lobbyIDs.capacity[i]))
+					self:loadAdd(lobbyID,
+						lobbyIDs.isMatchmaking[i] == 1, lobbyIDs.role[i], tonumber(lobbyIDs.permissions[i]),
+						lobbyIDs.template[i], tonumber(lobbyIDs.capacity[i]), tonumber(lobbyIDs.bitrate[i]), lobbyIDs.target[i],
+						lobbyIDs.companionTemplate[i], lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i])
 					guilds[lobby.guild.id].lobbies:add(self[lobbyID])
 				else
 					emitter:emit("remove", lobbyID)

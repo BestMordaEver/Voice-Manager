@@ -61,7 +61,7 @@ local function lobbyJoin (member, lobby)
 	local newChannel = lobby.guild:createChannel({
 		name = name,
 		type = channelType.voice,
-		bitrate = bitrate,
+		bitrate = lobbyData.bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
 		position = needsMove and client:getChannel(lobbyData.children[position + distance].id).position - 1 or nil,
 		parent_id = target.id

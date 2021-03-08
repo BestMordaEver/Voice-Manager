@@ -10,6 +10,7 @@ local subcommands = {
 	category = require "commands/lobbies/category",
 	name = require "commands/lobbies/name",
 	capacity = require "commands/lobbies/capacity",
+	bitrate = require "commands/lobbies/bitrate",
 	companion = require "commands/lobbies/companion",
 	permissions = require "commands/lobbies/permissions",
 }
