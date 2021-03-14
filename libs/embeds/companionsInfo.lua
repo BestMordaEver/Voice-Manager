@@ -32,7 +32,7 @@ embeds:new("companionsInfo", function (guild)
 			value = locale.companionsField:format(
 				target and target.name or "default",
 				lobbyData.companionTemplate or "private-chat",
-				#lobbyData.children
+				lobbyData.greeting or locale.none
 			),
 			inline = true
 		})

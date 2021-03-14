@@ -58,6 +58,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!companions",
 			"vm!companions category <category ID or name>",
 			"vm!companions name <new companion name>",
+			"vm!companions greeting <greeting text>"
 		},
 		{
 			"vm!room",
@@ -115,7 +116,6 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"Select a category, in which users' rooms will be created. By default, rooms are created in the same category as the lobby",
 			[[Configure what name a room will have when it's created
 Default name is `%nickname's% room`
-
 You can put different `%combos%` in the name to customize it
 `%name%` - user's name
 `%nickname%` - user's nickname (name is used if nickname is not set)
@@ -153,7 +153,15 @@ You can put different `%combos%` in the name to customize it
 			"Show all lobies that have companion enabled",
 			"Select a category in which chats will be created",
 			[[Configure what name a chat will have when it's created. Default is `private-chat`
-Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]]
+Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
+			[[Configure a message that will be automatically sent to chat when it's created
+You can put different `%combos%` in the name to customize it
+`%roomname%` - name of the room chat belongs to
+`%chatname%` - name of the chat
+`%commands%` - formatted list of `vm!room` and `vm!chat` commands
+`%roomcommands%` - raw list of `vm!room` commands
+`%chatcommands%` - raw list of `vm!chat` commands
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `vm!lobbies name`]]
 		},
 		{
 			"Show room info and available commands",
@@ -275,9 +283,12 @@ You can create a matchmaking lobby with `match`]],
 You can enable companion channels with `companion`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
-**Companion channels:** %d]],
+**Greeting:**
+%s]],
 	
 	greetingConfirm = "Set new greeting!",
+	roomCommands = "Available `vm!room` commands: ",
+	chatCommands = "Available `vm!chat` commands: ",
 	
 	-- room
 	roomInfoTitle = "Room info | %s",
