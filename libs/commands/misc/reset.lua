@@ -60,6 +60,6 @@ return function (message)
 			return logMsg, "warning", userMsg
 		end
 		
-		return subcommands[subcommand](message, lobby)
+		return commands[command][subcommand](message, lobby)
 	end
 end

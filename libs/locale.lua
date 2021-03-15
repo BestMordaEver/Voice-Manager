@@ -241,7 +241,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	limitReset = "Limit is reset to 500",
 	roleBadInput = "Couldn't find the specified role",
 	roleConfirm = "New managed role set!",
-	roleReset = "Managed role is reset to @everyone"
+	roleReset = "Managed role is reset to @everyone",
 	prefixConfirm = "New prefix set: %s",
 	prefixReset = "Prefix is reset to `vm!`",
 	
