@@ -26,7 +26,9 @@ local function lobbyJoin (member, lobby)
 		member:setVoiceChannel()
 	end
 	
-	if guilds[lobby.guild.id].limit <= channels:inGuild(lobby.guild.id) then return end
+	local guildData = guilds[lobby.guild.id]
+	
+	if guildData.limit <= channels:inGuild(guildData.id) then return end
 	
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]
@@ -105,8 +107,8 @@ local function lobbyJoin (member, lobby)
 		
 		if companion then
 			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
-			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 			
 			if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
