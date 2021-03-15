@@ -12,7 +12,6 @@ return function (message, channel, bitrate)
 	for _,feature in ipairs(message.guild.features) do
 		if feature == "VIP_REGIONS" then tier = 3 end
 	end
-	print(message.guild.premiumTier, tier)
 	
 	if not bitrate or bitrate < 8 or bitrate > tierRate[tier] then
 		return "Bitrate OOB", "warning", locale[tierLocale[tier]]
