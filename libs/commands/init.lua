@@ -20,6 +20,7 @@ local sandbox = setmetatable({
 return {
 	help = require "commands/misc/help",
 	select = require "commands/misc/select",
+	reset = require "commands/misc/reset",
 	server = require "commands/server/server",
 	lobbies = require "commands/lobbies/lobbies",
 	companions = require "commands/companions/companions",
