@@ -1,11 +1,13 @@
 local client = require "client"
 local locale = require "locale"
 local dialogue = require "utils/dialogue"
+local permissionCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
 
 local subcommands = {
 	category = require "commands/companions/category",
-	name = require "commands/companions/name"
+	name = require "commands/companions/name",
+	greeting = require "commands/companions/greeting"
 }
 
 return function (message)
@@ -18,6 +20,11 @@ return function (message)
 	local lobby = client:getChannel(dialogue[message.author.id])
 	if not lobby or lobby.type ~= channelType.voice then
 		return "No lobby selected", "warning", locale.noLobbySelected
+	end
+	
+	local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
+	if not isPermitted then
+		return logMsg, "warning", userMsg
 	end
 	
 	if subcommands[subcommand] then

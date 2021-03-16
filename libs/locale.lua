@@ -45,7 +45,8 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!lobbies capacity <0-99>",
 			"vm!lobbies bitrate <8-96>",
 			"vm!lobbies companion enable/disable",
-			"vm!lobbies permissions <permission> [permission] allow/deny"
+			"vm!lobbies permissions <permission> [permission] allow/deny",
+			"vm!lobbies role <role mention>"
 		},
 		{
 			"vm!matchmaking",
@@ -58,6 +59,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!companions",
 			"vm!companions category <category ID or name>",
 			"vm!companions name <new companion name>",
+			"vm!companions greeting <greeting text>"
 		},
 		{
 			"vm!room",
@@ -83,7 +85,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 		},
 		{
 			"vm!server",
-			"vm!server role <role mention or ID>",
+			"vm!server role <role mention>",
 			"vm!server limit <0-500>",
 			"vm!server permissions <permission> [permission] allow/deny",
 			"vm!server prefix <new prefix>"
@@ -92,6 +94,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!help [lobbies/matchmaking/companions/room/chat/server/other]",
 			"vm!invite or vm!support",
 			"vm!select <lobby or category ID or name>",
+			"vm!reset <command> <subcommand>",
 			"vm!create voice/text <1-50> <name>",
 			"vm!create voice/text <start index> <end index> <name>",
 			"vm!delete voice/text top/bottom <1-50> [force]"
@@ -115,7 +118,6 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"Select a category, in which users' rooms will be created. By default, rooms are created in the same category as the lobby",
 			[[Configure what name a room will have when it's created
 Default name is `%nickname's% room`
-
 You can put different `%combos%` in the name to customize it
 `%name%` - user's name
 `%nickname%` - user's nickname (name is used if nickname is not set)
@@ -133,7 +135,8 @@ You can put different `%combos%` in the name to customize it
 `bitrate` - allows use of `vm!room bitrate`
 `manage` - all of the above, plus gives host **Manage Channels** permission in their room
 `mute` - allows use of `vm!room mute/unmute` and `vm!chat mute/unmute`
-`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `vm!room kick`, `vm!room block/reserve` and `vm!chat hide/show`]]
+`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `vm!room kick`, `vm!room block/reserve` and `vm!chat hide/show`]],
+			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 		},
 		{
 			"Show current matchmaking lobbies",
@@ -153,7 +156,15 @@ You can put different `%combos%` in the name to customize it
 			"Show all lobies that have companion enabled",
 			"Select a category in which chats will be created",
 			[[Configure what name a chat will have when it's created. Default is `private-chat`
-Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]]
+Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
+			[[Configure a message that will be automatically sent to chat when it's created
+You can put different `%combos%` in the name to customize it
+`%roomname%` - name of the room chat belongs to
+`%chatname%` - name of the chat
+`%commands%` - formatted list of `vm!room` and `vm!chat` commands
+`%roomcommands%` - raw list of `vm!room` commands
+`%chatcommands%` - raw list of `vm!chat` commands
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `vm!lobbies name`]]
 		},
 		{
 			"Show room info and available commands",
@@ -186,7 +197,7 @@ By default, deletes all messages]]
 		},
 		{
 			"Show server info",
-			"Change the default role that's used to inflict restrictions in room and chat commands. Default is everyone",
+			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 			[[Set the global limit of channels created by the bot
 Discord limits you to 50 channels per category and 500 channels per server]],
 			"Acts similarly to lobby permissions and allows use of room commands in *any* voice channel",
@@ -197,6 +208,8 @@ Discord limits you to 50 channels per category and 500 channels per server]],
 You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
 			"Select a lobby or a category to change their settings",
+			[[Reset any setting to its default value
+Example: `vm!reset companions greeting`]],
 			[[🛠 Command is temporarily disabled 🛠
 Create a certain amount of channels in selected category
 Use `%counter%` to include channel number in the name]],
@@ -220,6 +233,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	serverInfoTitle = "Server info | %s",
 	serverInfo = [[**Prefix:** %s
 **Permissions:** %s
+**Managed role:** %s
 **Lobbies:** %d
 **Active users:** %d
 **Channels:** %d
@@ -227,9 +241,12 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	
 	limitBadInput = "Limit must be a number between 0 and 500",
 	limitConfirm = "New limit set!",
+	limitReset = "Limit is reset to 500",
 	roleBadInput = "Couldn't find the specified role",
 	roleConfirm = "New managed role set!",
+	roleReset = "Managed role is reset to @everyone",
 	prefixConfirm = "New prefix set: %s",
+	prefixReset = "Prefix is reset to `vm!`",
 	
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
@@ -239,6 +256,7 @@ You can add a lobby with `vm!lobbies add`]],
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
 **Permissions:** %s
+**Managed role:** %s
 **Capacity:** %s
 **Companion:** %s
 **Channels:** %d]],
@@ -247,13 +265,19 @@ You can add a lobby with `vm!lobbies add`]],
 	removeConfirm = "Removed lobby %s",
 	capacityOOB = "Capacity must be a number between 0 and 99",
 	capacityConfirm = "Changed capacity to %d",
+	capacityReset = "Capacity is reset, rooms will copy capacity from their lobby",
 	bitrateOOB = "Bitrate must be a number between 8 and 96",
+	bitrateOOB1 = "Bitrate must be a number between 8 and 128",
+	bitrateOOB2 = "Bitrate must be a number between 8 and 256",
+	bitrateOOB3 = "Bitrate must be a number between 8 and 384",
 	bitrateConfirm = "Changed bitrate to %d",
 	categoryConfirm = "Changed lobby's target category to %s",
+	categoryReset = "Category is reset to default",
 	companionToggle = "Companion chats are now %sd for this lobby",
 	nameConfirm = "Changed name to %s",
 	permissionsBadInput = "Unknown permission: %s",
 	permissionsConfirm = "New permissions set!",
+	permissionsReset = "All permissions were disabled!",
 	
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
@@ -266,6 +290,7 @@ You can create a matchmaking lobby with `match`]],
 	matchmakingAddConfirm = "Added new matchmaking lobby %s",
 	matchmakingRemoveConfirm = "Removed matchmaking lobby %s",
 	targetConfirm = "Changed matchmaking target to %s",
+	targetReset = "Matchmaking target is reset, lobby will matchmake for its current category",
 	modeBadInput = "Unknown matchmaking mode: %s",
 	modeConfirm = "Changed matchmaking mode to %s",
 	
@@ -275,7 +300,13 @@ You can create a matchmaking lobby with `match`]],
 You can enable companion channels with `companion`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
-**Companion channels:** %d]],
+**Greeting:**
+%s]],
+	
+	greetingConfirm = "Set new greeting!",
+	greetingReset = "Disabled the greeting",
+	roomCommands = "Available `vm!room` commands: ",
+	chatCommands = "Available `vm!chat` commands: ",
 	
 	-- room
 	roomInfoTitle = "Room info | %s",

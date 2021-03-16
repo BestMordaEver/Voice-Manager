@@ -70,7 +70,7 @@ local guildMethods = {
 	setRole = function (self, role)
 		self.role = role
 		logger:log(4, "GUILD %s: Updated managed role to %d", self.id, role)
-		emitter:emit("setLimit", role, self.id)
+		emitter:emit("setRole", role, self.id)
 	end,
 	
 	setLimit = function (self, limit)

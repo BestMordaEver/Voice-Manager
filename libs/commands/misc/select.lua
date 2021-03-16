@@ -1,7 +1,7 @@
 local locale = require "locale"
 local dialogue = require "utils/dialogue"
 local lookForChannel = require "funcs/lookForChannel"
-local permissionsCheck = require "funcs/permissionCheck"
+local permissionCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
 
 return function (message)
@@ -10,7 +10,7 @@ return function (message)
 	local channel = lookForChannel(message, argument)
 	
 	if channel then
-		local isPermitted, logMsg, msg = permissionsCheck(message, channel)
+		local isPermitted, logMsg, msg = permissionCheck(message, channel)
 		if isPermitted then
 			dialogue(message.author.id, channel.id)
 			if channel.type == channelType.voice then

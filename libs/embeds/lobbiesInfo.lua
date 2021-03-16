@@ -27,12 +27,15 @@ embeds:new("lobbiesInfo", function (guild)
 	
 	for _, lobbyData in pairs(sortedLobbyData) do
 		local target = client:getChannel(lobbyData.target)
+		if not guild:getRole(lobbyData.role) then lobbyData:setRole(guild.defaultRole.id) end
+		
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.lobbiesField:format(
 				target and target.name or "default",
 				lobbyData.template or "%nickname's% room",
-				tostring(lobbyData.permissions),
+				lobbyData.permissions,
+				guild:getRole(lobbyData.role).mentionString,
 				lobbyData.capacity or "default",
 				lobbyData.companionTarget and "enabled" or "disabled",
 				#lobbyData.children

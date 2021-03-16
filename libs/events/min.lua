@@ -1,6 +1,6 @@
 local client = require "client"
-local logger = require "logger"
 local channels = require "storage/channels"
+local lobbies = require "storage/lobbies"
 local embeds = require "embeds/embeds"
 local mercy = require "utils/mercy"
 local status = require "funcs/status"
@@ -15,9 +15,6 @@ return function (date)
 		-- hearbeat happens
 		client:getChannel(config.heartbeatChannel):getMessage(config.heartbeatMessage):setContent(os.date())
 		-- hearbeat is partial? stop it!
-		if mercy:tick() 
-		-- uncomment next line to allow bot to reboot daily
-		-- or (channels:people() == 0 and os.clock() > 86000) 
-		then mercy:kill() end
+		if mercy:tick() or (dailyreboot and channels:people() == 0 and os.clock() > 86000) then mercy:kill() end
 	end
 end

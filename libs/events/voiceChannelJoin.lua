@@ -4,10 +4,12 @@ local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+local embeds = require "embeds/embeds"
 local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
 local enforceReservations = require "funcs/enforceReservations"
 
+local Permissions = discordia.Permissions
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
 
@@ -24,7 +26,9 @@ local function lobbyJoin (member, lobby)
 		member:setVoiceChannel()
 	end
 	
-	if guilds[lobby.guild.id].limit <= channels:inGuild(lobby.guild.id) then return end
+	local guildData = guilds[lobby.guild.id]
+	
+	if guildData.limit <= channels:inGuild(guildData.id) then return end
 	
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]
@@ -39,7 +43,31 @@ local function lobbyJoin (member, lobby)
 		if name == "" then name = templateInterpreter("%nickname's% room", member) end
 	end
 	
-	local newChannel = target:createVoiceChannel(name)
+	local distance = 0
+	if needsMove then
+		local children = lobbyData.children
+		repeat
+			distance = distance + 1
+			if not (children[position + distance] == nil or client:getChannel(children[position + distance].id)) then
+				children:drain(position + distance)
+			end
+		until children[position + distance] ~= nil or position + distance > children.max
+		
+		if position + distance > children.max then
+			needsMove = nil
+		end
+	end
+	
+	local perms = lobbyData.permissions:toDiscordia()
+	
+	local newChannel = lobby.guild:createChannel({
+		name = name,
+		type = channelType.voice,
+		bitrate = lobbyData.bitrate,
+		user_limit = lobbyData.capacity or lobby.userLimit,
+		position = needsMove and client:getChannel(lobbyData.children[position + distance].id).position - 1 or nil,
+		parent_id = target.id
+	})
 	
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
@@ -59,13 +87,16 @@ local function lobbyJoin (member, lobby)
 					if name == "" then name = "private-chat" end
 				end
 			
-				companion = companionTarget:createTextChannel(name)
+				companion = lobby.guild:createChannel({
+					name = name,
+					type = channelType.text,
+					parent_id = companionTarget.id
+				})
 			end
 		end
 		
 		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(channels[newChannel.id], position)
-		newChannel:setUserLimit(lobbyData.capacity or lobby.userLimit)
 		
 		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect)
 		
@@ -76,27 +107,16 @@ local function lobbyJoin (member, lobby)
 		
 		if companion then
 			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
-			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 			
-			local perms = lobbyData.permissions:toDiscordia()
 			if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 			end
+			
+			if lobbyData.greeting then companion:send(embeds("greeting", newChannel)) end
 		end
 		
-		if needsMove then
-			local children, distance = lobbyData.children, 0
-			repeat
-				distance = distance + 1
-				if children[position + distance] ~= nil and not client:getChannel(children[position + distance]) then
-					children:drain(position + distance)
-				end
-			until children[position + distance] ~= nil or position + distance > children.max
-			if position + distance <= children.max then
-				newChannel:moveUp(newChannel.position - client:getChannel(children[position + distance]).position)
-			end
-		end
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
 	else

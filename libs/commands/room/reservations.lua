@@ -23,7 +23,7 @@ return function (message, argument)
 	if subcommand == "add" then
 		for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 			mentionString = mentionString .. user.mentionString .. " "
-			channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect)
+			channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect, permission.readMessages)
 		end
 		enforceReservations(channel)
 		return "Reserved mentioned members", "ok", locale.reserveConfirm:format(mentionString)
@@ -31,7 +31,7 @@ return function (message, argument)
 	elseif subcommand == "remove" then
 		for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 			mentionString = mentionString .. user.mentionString .. " "
-			channel:getPermissionOverwriteFor(channel.guild:getMember(user)):clearPermissions(permission.connect)
+			channel:getPermissionOverwriteFor(channel.guild:getMember(user)):clearPermissions(permission.connect, permission.readMessages)
 		end
 		enforceReservations(channel)
 		return "Unreserved mentioned members", "ok", locale.unreserveConfirm:format(mentionString)
@@ -41,7 +41,7 @@ return function (message, argument)
 			return permissionOverwrite.type == "member" and permissionOverwrite:getObject() ~= permissionOverwrite.guild.me
 		end)) do
 			mentionString = mentionString .. permissionOverwrite:getObject().user.mentionString .. " "
-			permissionOverwrite:clearPermissions(permission.connect)
+			permissionOverwrite:clearPermissions(permission.connect, permission.readMessages)
 		end
 		enforceReservations(channel)
 		return "Cleared reservations", "ok", locale.unreserveConfirm:format(mentionString)
@@ -49,7 +49,7 @@ return function (message, argument)
 	elseif subcommand == "lock" then
 		for _, member in pairs(channel.connectedMembers) do
 			mentionString = mentionString .. member.user.mentionString .. " "
-			channel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
+			channel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
 		end
 		enforceReservations(channel)
 		return "Locked the room", "ok", locale.reserveConfirm:format(mentionString)

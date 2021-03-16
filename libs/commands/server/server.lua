@@ -19,6 +19,9 @@ return function (message)
 		return "Sent server info", "serverInfo", message.guild
 	end
 	
+	if not (message.member:hasPermission(channel, permission.manageChannels) or config.owners[message.author.id]) then
+		return false, "Bad user permissions", locale.badUserPermissions
+	end
 	
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, argument)
