@@ -231,6 +231,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	serverInfoTitle = "Server info | %s",
 	serverInfo = [[**Prefix:** %s
 **Permissions:** %s
+**Managed role:** %s
 **Lobbies:** %d
 **Active users:** %d
 **Channels:** %d
@@ -253,6 +254,7 @@ You can add a lobby with `vm!lobbies add`]],
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
 **Permissions:** %s
+**Managed role:** %s
 **Capacity:** %s
 **Companion:** %s
 **Channels:** %d]],

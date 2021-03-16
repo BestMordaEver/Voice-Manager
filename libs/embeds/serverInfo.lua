@@ -9,6 +9,7 @@ local bitfield = require "utils/bitfield"
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("serverInfo", function (guild)
 	local guildData = guilds[guild.id]
+	if not guild:getRole(guildData.role) then guildData:setRole(guild.defaultRole.id) end
 	
 	return {
 		title = locale.serverInfoTitle:format(guild.name),
@@ -16,6 +17,7 @@ embeds:new("serverInfo", function (guild)
 		description = locale.serverInfo:format(
 			guildData.prefix,
 			guildData.permissions,
+			guild:getRole(guildData.role).mentionString,
 			#guildData.lobbies,
 			channels:people(guild.id),
 			channels:inGuild(guild.id),

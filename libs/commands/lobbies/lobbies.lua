@@ -13,6 +13,7 @@ local subcommands = {
 	bitrate = require "commands/lobbies/bitrate",
 	companion = require "commands/lobbies/companion",
 	permissions = require "commands/lobbies/permissions",
+	role = require "commands/lobbies/role"
 }
 
 return function (message)
