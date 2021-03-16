@@ -45,7 +45,8 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!lobbies capacity <0-99>",
 			"vm!lobbies bitrate <8-96>",
 			"vm!lobbies companion enable/disable",
-			"vm!lobbies permissions <permission> [permission] allow/deny"
+			"vm!lobbies permissions <permission> [permission] allow/deny",
+			"vm!lobbies role <role mention>"
 		},
 		{
 			"vm!matchmaking",
@@ -84,7 +85,7 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 		},
 		{
 			"vm!server",
-			"vm!server role <role mention or ID>",
+			"vm!server role <role mention>",
 			"vm!server limit <0-500>",
 			"vm!server permissions <permission> [permission] allow/deny",
 			"vm!server prefix <new prefix>"
@@ -134,7 +135,8 @@ You can put different `%combos%` in the name to customize it
 `bitrate` - allows use of `vm!room bitrate`
 `manage` - all of the above, plus gives host **Manage Channels** permission in their room
 `mute` - allows use of `vm!room mute/unmute` and `vm!chat mute/unmute`
-`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `vm!room kick`, `vm!room block/reserve` and `vm!chat hide/show`]]
+`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `vm!room kick`, `vm!room block/reserve` and `vm!chat hide/show`]],
+			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 		},
 		{
 			"Show current matchmaking lobbies",
@@ -195,7 +197,7 @@ By default, deletes all messages]]
 		},
 		{
 			"Show server info",
-			"Change the default role that's used to inflict restrictions in room and chat commands. Default is everyone",
+			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 			[[Set the global limit of channels created by the bot
 Discord limits you to 50 channels per category and 500 channels per server]],
 			"Acts similarly to lobby permissions and allows use of room commands in *any* voice channel",
