@@ -21,7 +21,7 @@ return function (message, mentionString)
 					mentionString = mentionString .. user.mentionString .. " "
 					user:getPrivateChannel():send(invite)
 					if tryReservation then
-						channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect)
+						channel:getPermissionOverwriteFor(channel.guild:getMember(user)):allowPermissions(permission.connect, permission.readMessages)
 					end
 				end
 			end
