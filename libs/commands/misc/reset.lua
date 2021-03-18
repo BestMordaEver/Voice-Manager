@@ -14,7 +14,8 @@ local commands = {
 		category = require "commands/lobbies/category",
 		companion = require "commands/lobbies/companion",
 		name = require "commands/lobbies/name",
-		permissions = require "commands/lobbies/permissions"
+		permissions = require "commands/lobbies/permissions",
+		role = require "commands/lobbies/role"
 	},
 	
 	matchmaking = {
