@@ -1,4 +1,5 @@
 local locale = require "locale"
+local client = require "client"
 
 local embeds = require "embeds/embeds"
 local channels = require "storage/channels"
