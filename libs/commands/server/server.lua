@@ -20,7 +20,7 @@ return function (message)
 	end
 	
 	if not (message.member:hasPermission(channel, permission.manageChannels) or config.owners[message.author.id]) then
-		return "Bad user permissions", "warning" locale.badUserPermissions
+		return "Bad user permissions", "warning", locale.badUserPermissions
 	end
 	
 	if subcommands[subcommand] then
