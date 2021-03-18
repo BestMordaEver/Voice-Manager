@@ -9,18 +9,14 @@ local subcommands = {
 }
 
 return function (message)
-	if not message.member:hasPermission(permission.manageChannels) then
-		return "Bad user permissions", "warning", locale.badPermissions
+	if not (message.member:hasPermission(channel, permission.manageChannels) or config.owners[message.author.id]) then
+		return "Bad user permissions", "warning", locale.badUserPermissions
 	end
-	
+
 	local subcommand, argument = message.content:match("server%s*(%a*)%s*(.-)$")
 	
 	if subcommand == "" or argument == "" then
 		return "Sent server info", "serverInfo", message.guild
-	end
-	
-	if not (message.member:hasPermission(channel, permission.manageChannels) or config.owners[message.author.id]) then
-		return "Bad user permissions", "warning", locale.badUserPermissions
 	end
 	
 	if subcommands[subcommand] then
