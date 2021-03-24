@@ -1,7 +1,9 @@
 -- all event preprocessing happens here
+local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
 local clock = require "clock"
+local timer = require "timer"
 
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
@@ -37,6 +39,7 @@ events = {
 	channelDelete = require "events/channelDelete",
 	
 	ready = function ()
+		timer.clearInterval(discordia.storage.killswitch)
 		guilds:load()
 		lobbies:load()
 		channels:load()

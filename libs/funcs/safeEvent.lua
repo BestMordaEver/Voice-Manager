@@ -12,6 +12,9 @@ return function (name, func)
 			if config.stderr then
 				client:getChannel(config.stderr):sendf("Error on %s: %s", name, err)
 			end
+			if name == "ready" then
+				process:exit()
+			end
 		end
 	end
 end

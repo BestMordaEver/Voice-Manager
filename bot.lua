@@ -32,7 +32,7 @@ require "embeds/init"
 
 -- yep, it's permanent now
 local timer = require "timer"
--- timer.setTimeout(60000, client.emit, client, "ready")
+discordia.storage.killswitch = timer.setTimeout(60000, process.exit, process)
 
 -- bot starts working here
 client:run('Bot '..require "token".token)
