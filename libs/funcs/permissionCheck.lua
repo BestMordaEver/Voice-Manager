@@ -9,7 +9,7 @@ return function (message, channel)
 
 	if config.owners[message.author.id] then return true end
 	
-	if message.member.guild ~= channel.guild or not message.member:hasPermission(channel, permission.manageChannels) then
+	if message.member.guild ~= channel.guild or not message.member:hasPermission(channel.id, permission.manageChannels) then
 		return false, "Bad user permissions", locale.badUserPermissions
 	end
 	
