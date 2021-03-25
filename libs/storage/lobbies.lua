@@ -31,69 +31,33 @@ local discordia = require "discordia"
 local emitter = discordia.Emitter()
 
 local storageStatements = {
-	add = {
-		"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL)",
-		"Added lobby %s", "Couldn't add lobby %s"
-	},
+	add = {"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL)", "ADD LOBBY %s"},
 	
-	remove = {
-		"DELETE FROM lobbies WHERE id = ?",
-		"Removed lobby %s", "Couldn't remove lobby %s"
-	},
+	remove = {"DELETE FROM lobbies WHERE id = ?", "DELETE LOBBY %s"},
 	
-	setMatchmaking = {
-		"UPDATE lobbies SET isMatchmaking = ? WHERE id = ?",
-		"Updated matchmaking status to %s for lobby %s", "Couldn't update matchmaking status to %s for lobby %s"
-	},
+	setMatchmaking = {"UPDATE lobbies SET isMatchmaking = ? WHERE id = ?","SET MATCHMAKING %s => LOBBY %s"},
 	
-	setRole = {
-		"UPDATE lobbies SET role = ? WHERE id = ?",
-		"Updated managed role to %s for lobby %s", "Couldn't update managed role to %s for lobby %s"
-	},
+	setRole = {"UPDATE lobbies SET role = ? WHERE id = ?","SET ROLE %s => LOBBY %s"},
 	
-	setPermissions = {
-		"UPDATE lobbies SET permissions = ? WHERE id = ?",
-		"Updated permissions to %s for lobby %s", "Couldn't update permissions to %s for lobby %s"
-	},
+	setPermissions = {"UPDATE lobbies SET permissions = ? WHERE id = ?","SET PERMISSIONS %s => LOBBY %s"},
 	
-	setTemplate = {
-		"UPDATE lobbies SET template = ? WHERE id = ?",
-		"Updated template to %s for lobby %s", "Couldn't update template to %s for lobby %s"
-	},
+	setTemplate = {"UPDATE lobbies SET template = ? WHERE id = ?","SET TEMPLATE %s => LOBBY %s"},
 	
-	setTarget = {
-		"UPDATE lobbies SET target = ? WHERE id = ?",
-		"Updated target to %s for lobby %s", "Couldn't update target to %s for lobby %s"
-	},
+	setTarget = {"UPDATE lobbies SET target = ? WHERE id = ?","SET TARGET %s => LOBBY %s"},
 	
-	setCapacity = {
-		"UPDATE lobbies SET capacity = ? WHERE id = ?",
-		"Updated capacity to %s for lobby %s", "Couldn't update capacity to %s for lobby %s"
-	},
+	setCapacity = {"UPDATE lobbies SET capacity = ? WHERE id = ?","SET CAPACITY %s => LOBBY %s"},
 	
-	setBitrate = {
-		"UPDATE lobbies SET bitrate = ? WHERE id = ?",
-		"Updated bitrate to %s for lobby %s", "Couldn't update bitrate to %s for lobby %s"
-	},
+	setBitrate = {"UPDATE lobbies SET bitrate = ? WHERE id = ?","SET BITRATE %s => LOBBY %s"},
 	
-	setCompanionTemplate = {
-		"UPDATE lobbies SET companionTemplate = ? WHERE id = ?",
-		"Updated companion template to %s for lobby %s", "Couldn't update companionTemplate to %s for lobby %s"
-	},
+	setCompanionTemplate = {"UPDATE lobbies SET companionTemplate = ? WHERE id = ?","SET COMPANION TEMPLATE %s => LOBBY %s"},
 	
-	setCompanionTarget = {
-		"UPDATE lobbies SET companionTarget = ? WHERE id = ?",
-		"Updated companion target to %s for lobby %s", "Couldn't update companion target to %s for lobby %s"
-	},
+	setCompanionTarget = {"UPDATE lobbies SET companionTarget = ? WHERE id = ?","SET COMPANION TARGET %s => LOBBY %s"},
 	
-	setGreeting = {
-		"UPDATE lobbies SET greeting = ? WHERE id = ?",
-		"Updated greeting to %s for lobby %s", "Couldn't update greeting to %s for lobby %s"
-	}
+	setGreeting = {"UPDATE lobbies SET greeting = ? WHERE id = ?","SET GREETING %s => LOBBY %s"}
 }
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageInteraction(lobbiesData:prepare(statement[1]), statement[2], statement[3]))
+	emitter:on(name, storageInteraction(lobbiesData:prepare(statement[1]), statement[2]))
 end
 
 local lobbies = {}
@@ -104,7 +68,7 @@ local lobbyMethods = {
 			local lobby = client:getChannel(self.id)
 			if lobby and guilds[self.guildID] then
 				guilds[self.guildID].lobbies:remove(self)
-				logger:log(4, "GUILD %s: Removed lobby %s", self.guildID, self.id)
+				logger:log(6, "GUILD %s LOBBY %s: deleted", self.guildID, self.id)
 			end
 		end
 		emitter:emit("remove", self.id)
@@ -112,61 +76,61 @@ local lobbyMethods = {
 	
 	setMatchmaking = function (self, isMatchmaking)
 		self.isMatchmaking = isMatchmaking
-		logger:log(4, "GUILD %s: Updated matchmaking status for lobby %s to %s", self.guildID, self.id, isMatchmaking)
+		logger:log(6, "GUILD %s LOBBY %s: updated matchmaking status to %s", self.guildID, self.id, isMatchmaking)
 		emitter:emit("setMatchmaking", isMatchmaking and 1 or 0, self.id)
 	end,
 	
 	setRole = function (self, role)
 		self.role = role
-		logger:log(4, "GUILD %s: Updated managed role for lobby %s to %s", self.guildID, self.id, role)
+		logger:log(6, "GUILD %s LOBBY %s: updated managed role to %s", self.guildID, self.id, role)
 		emitter:emit("setRole", role, self.id)
 	end,
 	
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
-		logger:log(4, "GUILD %s: Updated permissions for lobby %s to %s", self.guildID, self.id, permissions)
+		logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guildID, self.id, permissions)
 		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 	end,
 	
 	setTemplate = function (self, template)
 		self.template = template
-		logger:log(4, "GUILD %s: Updated template for lobby %s to %s", self.guildID, self.id, template)
+		logger:log(6, "GUILD %s LOBBY %s: updated template to %s", self.guildID, self.id, template)
 		emitter:emit("setTemplate", template, self.id)
 	end,
 	
 	setTarget = function (self, target)
 		self.target = target
-		logger:log(4, "GUILD %s: Updated target for lobby %s to %s", self.guildID, self.id, target)
+		logger:log(6, "GUILD %s LOBBY %s: updated target to %s", self.guildID, self.id, target)
 		emitter:emit("setTarget", target, self.id)
 	end,
 	
 	setCapacity = function (self, capacity)
 		self.capacity = capacity
-		logger:log(4, "GUILD %s: Updated capacity for lobby %s to %s", self.guildID, self.id, capacity)
+		logger:log(6, "GUILD %s LOBBY %s: updated capacity to %s", self.guildID, self.id, capacity)
 		emitter:emit("setCapacity", capacity, self.id)
 	end,
 	
 	setBitrate = function (self, bitrate)
 		self.bitrate = bitrate
-		logger:log(4, "GUILD %s: Updated bitrate for lobby %s to %s", self.guildID, self.id, bitrate)
+		logger:log(6, "GUILD %s LOBBY %s: updated bitrate to %s", self.guildID, self.id, bitrate)
 		emitter:emit("setBitrate", bitrate, self.id)
 	end,
 
 	setCompanionTarget = function (self, companionTarget)
 		self.companionTarget = companionTarget
-		logger:log(4, "GUILD %s: Updated companion target for lobby %s to %s", self.guildID, self.id, companionTarget)
+		logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guildID, self.id, companionTarget)
 		emitter:emit("setCompanionTarget", tostring(companionTarget), self.id)
 	end,
 	
 	setCompanionTemplate = function (self, companionTemplate)
 		self.companionTemplate = companionTemplate
-		logger:log(4, "GUILD %s: Updated companion template for lobby %s to %s", self.guildID, self.id, companionTemplate)
+		logger:log(6, "GUILD %s LOBBY %s: updated companion template to %s", self.guildID, self.id, companionTemplate)
 		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
 	end,
 	
 	setGreeting = function (self, greeting)
 		self.greeting = greeting
-		logger:log(4, "GUILD %s: Updated greeting for lobby %s to %s", self.guildID, self.id, greeting)
+		logger:log(6, "GUILD %s LOBBY %s: updated greeting to %s", self.guildID, self.id, greeting)
 		emitter:emit("setGreeting", greeting, self.id)
 	end,
 	
@@ -204,7 +168,7 @@ local lobbiesIndex = {
 				data.children = hollowArray()
 				data.mutex = discordia.Mutex()
 				guilds[lobby.guild.id].lobbies:add(self[data.id])
-				logger:log(4, "GUILD %s: Added lobby %s", lobby.guild.id, data.id)
+				logger:log(6, "GUILD %s LOBBY %s: added", lobby.guild.id, data.id)
 			end
 		end
 	end,

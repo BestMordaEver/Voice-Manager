@@ -17,12 +17,12 @@ return function (channel)
 	
 	if reservations >= channel.userLimit - #channel.connectedMembers then
 		if not roleOverwrite:getDeniedPermissions():has(permission.connect) then
-			logger:log(4, "GUILD %s ROOM %s: Locked", channel.guild.id, channel.id)
+			logger:log(4, "GUILD %s ROOM %s: locked", channel.guild.id, channel.id)
 			roleOverwrite:denyPermissions(permission.connect)
 		end
 	else
 		if roleOverwrite:getDeniedPermissions():has(permission.connect) then
-			logger:log(4, "GUILD %s ROOM %s: Unlocked", channel.guild.id, channel.id)
+			logger:log(4, "GUILD %s ROOM %s: unlocked", channel.guild.id, channel.id)
 			roleOverwrite:clearPermissions(permission.connect)
 		end
 	end

@@ -18,13 +18,14 @@ local storageInteractionEvent = function (statement, ...)
 	if not ok then error(msg) end
 end
 
-return function (statement, success, failure)
+return function (statement, logMsg)
+	local success, failure = logMsg..": completed", logMsg..": failed"
 	return function (...)
 		local ok, msg = xpcall(storageInteractionEvent, debug.traceback, statement, ...)
 		if ok then
-			logger:log(4, "MEMORY: "..success, ...)
+			logger:log(5, success, ...)
 		else
-			logger:log(2, "%s", string.format("MEMORY: "..failure, ...) .. ": " .. msg)
+			logger:log(2, "%s", string.format(failure, ...) .. ": " .. msg)
 			if config.stderr then
 				client:getChannel(config.stderr):send(string.format(failure, ...) .. ": " .. msg)
 			end

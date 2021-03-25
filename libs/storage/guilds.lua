@@ -22,39 +22,21 @@ local botPermissions = require "utils/botPermissions"
 local emitter = require "discordia".Emitter()
 
 local storageStatements = {
-	add = {
-		"INSERT INTO guilds VALUES(?,NULL, 500, 0, 'vm!')",
-		"Added guild %s", "Couldn't add guild %s"
-	},
+	add = {"INSERT INTO guilds VALUES(?,NULL, 500, 0, 'vm!')", "ADD GUILD %s"},
 	
-	remove = {
-		"DELETE FROM guilds WHERE id = ?",
-		"Removed guild %s", "Couldn't remove guild %s"
-	},
+	remove = {"DELETE FROM guilds WHERE id = ?", "DELETE GUILD %s"},
 	
-	setRole = {
-		"UPDATE guilds SET role = ? WHERE id = ?",
-		"Updated managed role to %s for guild %s", "Couldn't update managed role to %s for guild %s"
-	},
+	setRole = {"UPDATE guilds SET role = ? WHERE id = ?", "SET ROLE %s => GUILD %s"},
 	
-	setLimit = {
-		"UPDATE guilds SET cLimit = ? WHERE id = ?",
-		"Updated limit to %s for guild %s", "Couldn't update limit to %s for guild %s"
-	},
+	setLimit = {"UPDATE guilds SET cLimit = ? WHERE id = ?", "SET LIMIT %s => GUILD %s"},
 	
-	setPermissions = {
-		"UPDATE guilds SET permissions = ? WHERE id = ?",
-		"Updated permissions to %s for guild %s", "Couldn't update permissions to %s for guild %s"
-	},
+	setPermissions = {"UPDATE guilds SET permissions = ? WHERE id = ?", "SET PERMISSIONS %s => GUILD %s"},
 	
-	setPrefix = {
-		"UPDATE guilds SET prefix = ? WHERE id = ?",
-		"Updated prefix to %s for guild %s", "Couldn't update prefix to %s for guild %s"
-	}
+	setPrefix = {"UPDATE guilds SET prefix = ? WHERE id = ?", "SET PREFIX %s => GUILD %s"}
 }
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageInteraction(guildsData:prepare(statement[1]), statement[2], statement[3]))
+	emitter:on(name, storageInteraction(guildsData:prepare(statement[1]), statement[2]))
 end
 
 local guilds = {}
@@ -62,32 +44,32 @@ local guildMethods = {
 	delete = function (self)
 		if guilds[self.id] then
 			guilds[self.id] = nil
-			logger:log(4, "GUILD %s: Removed", self.id)
+			logger:log(4, "GUILD %s: deleted", self.id)
 		end
 		emitter:emit("remove", self.id)
 	end,
 	
 	setRole = function (self, role)
 		self.role = role
-		logger:log(4, "GUILD %s: Updated managed role to %d", self.id, role)
+		logger:log(4, "GUILD %s: updated managed role to %d", self.id, role)
 		emitter:emit("setRole", role, self.id)
 	end,
 	
 	setLimit = function (self, limit)
 		self.limit = limit
-		logger:log(4, "GUILD %s: Updated limit to %d", self.id, limit)
+		logger:log(4, "GUILD %s: updated limit to %d", self.id, limit)
 		emitter:emit("setLimit", limit, self.id)
 	end,
 	
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
-		logger:log(4, "GUILD %s: Updated permissions to %d", self.id, permissions.bitfield.value)
+		logger:log(4, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
 		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 	end,
 	
 	setPrefix = function (self, prefix)
 		self.prefix = prefix
-		logger:log(4, "GUILD %s: Updated prefix to %s", self.id, prefix)
+		logger:log(4, "GUILD %s: updated prefix to %s", self.id, prefix)
 		emitter:emit("setPrefix", prefix, self.id)
 	end
 }
@@ -113,7 +95,7 @@ local guildsIndex = {
 			permissions = botPermissions(permissions or 0),
 			prefix = prefix or "vm!",
 			lobbies = set()}, guildMT)
-		logger:log(4, "GUILD %s: Added", guildID)
+		logger:log(4, "GUILD %s: added", guildID)
 	end,
 	
 	-- loadAdd and start interaction with db

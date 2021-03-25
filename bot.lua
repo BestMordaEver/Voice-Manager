@@ -15,7 +15,7 @@ local client = discordia.Client()
 -- creating stubs for require to easily access all relevant bits without making them global
 package.loaded.client = client
 package.loaded.clock = discordia.Clock()
-package.loaded.logger = discordia.Logger(4, '%F %T')
+package.loaded.logger = discordia.Logger(6, '%F %T')
 
 --[[ 
 holds all the event methods and logic

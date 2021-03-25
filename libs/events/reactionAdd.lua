@@ -12,11 +12,11 @@ return function (reaction, userID) -- embeds processing
 	
 	local embedData = embeds[reaction.message]
 	
-	logger:log(4, "GUILD %s USER %s on EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
+	logger:log(4, "GUILD %s USER %s EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
 	
 	reaction:delete(userID)
 	embedData(reaction)
 	embedData.killIn = 10
 	
-	logger:log(4, "EMBED %s - processed", reaction.message.id)
+	logger:log(4, "GUILD %s USER %s EMBED %s: processed", reaction.message.guild.id, userID, reaction.message.id)
 end

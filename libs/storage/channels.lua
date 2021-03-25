@@ -25,24 +25,15 @@ local storageInteraction = require "funcs/storageInteraction"
 local emitter = require "discordia".Emitter()
 
 local storageStatements = {
-	add = {
-		"INSERT INTO channels VALUES(?,?,?,?,?,?)",
-		"Added channel %s", "Couldn't add channel %s"
-	},
+	add = {"INSERT INTO channels VALUES(?,?,?,?,?,?)", "ADD CHANNEL %s"},
 	
-	remove = {
-		"DELETE FROM channels WHERE id = ?",
-		"Removed channel %s", "Couldn't remove channel %s"
-	},
+	remove = {"DELETE FROM channels WHERE id = ?", "DELETE CHANNEL %s"},
 	
-	setHost = {
-		"UPDATE channels SET host = ? WHERE id = ?",
-		"Updated host to %s for channel %s", "Couldn't update host to %s for channel %s"
-	}
+	setHost = {"UPDATE channels SET host = ? WHERE id = ?", "SET HOST %s => CHANNEL %s"}
 }
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageInteraction(channelsData:prepare(statement[1]), statement[2], statement[3]))
+	emitter:on(name, storageInteraction(channelsData:prepare(statement[1]), statement[2]))
 end
 
 local channels = {}
@@ -52,7 +43,7 @@ local channelMT = {
 		delete = function (self)
 			if channels[self.id] then
 				channels[self.id] = nil
-				logger:log(4, "ROOM %s: Removed", self.id)
+				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end
 			emitter:emit("remove", self.id)
 		end,
@@ -61,7 +52,7 @@ local channelMT = {
 			local channel = client:getChannel(self.id)
 			if channel and channels[self.id] then
 				self.host = hostID
-				logger:log(4, "GUILD %s: Updated host for room %s", channel.guild.id, self.id)
+				logger:log(6, "GUILD %s ROOM %s: updated host to %s", channel.guild.id, self.id, hostID)
 				emitter:emit("setHost", hostID, self.id)
 			else
 				self:delete()
@@ -80,7 +71,7 @@ local channelsIndex = {
 				self[channelID] = setmetatable({
 					id = channelID, guildID = channel.guild.id, isPersistent = isPersistent, host = host, parent = parent, position = position, companion = companion
 				}, channelMT)
-				logger:log(4, "GUILD %s: Added room %s", channel.guild.id, channelID)
+				logger:log(6, "GUILD %s ROOM %s: added", channel.guild.id, channelID)
 			end
 		end
 	end,

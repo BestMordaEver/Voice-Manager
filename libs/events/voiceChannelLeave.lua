@@ -16,16 +16,17 @@ return function (member, channel) -- now remove the unwanted corpses!
 				for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
 					if permissionOverwrite.type == "member" then permissionOverwrite:delete() end
 				end
+				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)
 			else
 				local parent = channels[channel.id].parent
 				if parent then
 					parent.mutex:lock()
 					channel:delete()
-					logger:log(4, "GUILD %s: Deleted %s", channel.guild.id, channel.id)
+					logger:log(4, "GUILD %s ROOM %s: deleted", channel.guild.id, channel.id)
 					parent.mutex:unlock()
 				else
 					channel:delete()
-					logger:log(4, "GUILD %s: Deleted %s without sync, parent missing", channel.guild.id, channel.id)
+					logger:log(4, "GUILD %s ROOM %s: deleted without sync, parent missing", channel.guild.id, channel.id)
 				end
 			end
 		else
@@ -42,7 +43,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 				local newHost = channel.connectedMembers:random()
 				
 				if newHost then
-					logger:log(4, "GUILD %s СHANNEL %s: Migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
+					logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
 					channelData:setHost(newHost.user.id)
 					
 					if channelData.parent and client:getChannel(channelData.parent.id) then

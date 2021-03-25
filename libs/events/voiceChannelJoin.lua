@@ -16,7 +16,7 @@ local channelType = discordia.enums.channelType
 local processing = {}
 
 local function lobbyJoin (member, lobby)
-	logger:log(4, "GUILD %s LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
+	logger:log(4, "GUILD %s LOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 	
 	-- parent to which a new channel will be attached
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
@@ -120,12 +120,12 @@ local function lobbyJoin (member, lobby)
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
 	else
-		logger:log(2, "GUILD %s LOBBY %s: Couldn't create new room for %s", lobby.guild.id, lobby.id, member.user.id)
+		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room", lobby.guild.id, lobby.id, member.user.id)
 	end
 end
 
 local function matchmakingJoin (member, lobby)
-	logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: %s joined", lobby.guild.id, lobby.id, member.user.id)
+	logger:log(4, "GUILD %s mLOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 	
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category
 	if target then
@@ -146,20 +146,20 @@ local function matchmakingJoin (member, lobby)
 		
 		if #children == 1 then
 			if member:setVoiceChannel(children[1]) then
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
+				logger:log(4, "GUILD %s mLOBBY %s USER %s: matchmade", lobby.guild.id, lobby.id, target.id)
 			end
 			return
 		elseif #children > 1 then
 			if member:setVoiceChannel((matchmakers[lobbies[lobby.id].template] or matchmakers.random)(children)) then
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: matchmade for %s", lobby.guild.id, lobby.id, target.id)
+				logger:log(4, "GUILD %s mLOBBY %s USER %s: matchmade", lobby.guild.id, lobby.id, target.id)
 			end
 			return
 		else	-- if no available channels - create new or kick
 			if target.type == channelType.voice then
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available room, delegating to %s", lobby.guild.id, lobby.id, target.id)
+				logger:log(4, "GUILD %s mLOBBY %s: no available room, delegating to LOBBY %s", lobby.guild.id, lobby.id, target.id)
 				client:emit("voiceChannelJoin", member, target)
 			else
-				logger:log(4, "GUILD %s MATCHMAKING LOBBY %s: no available room, gtfo", lobby.guild.id, lobby.id)
+				logger:log(4, "GUILD %s mLOBBY %s: no available room, gtfo", lobby.guild.id, lobby.id)
 				member:setVoiceChannel()
 			end
 			return
@@ -168,7 +168,7 @@ local function matchmakingJoin (member, lobby)
 end
 
 local function roomJoin (member, channel)
-	logger:log(4, "GUILD %s ROOM %s: %s joined", channel.guild.id, channel.id, member.user.id)
+	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 	
 	enforceReservations(channel)
 	
@@ -179,7 +179,7 @@ local function roomJoin (member, channel)
 end
 
 local function channelJoin (member, channel)
-	logger:log(4, "GUILD %s CHANNEL %s: %s joined", channel.guild.id, channel.id, member.user.id)
+	logger:log(4, "GUILD %s CHANNEL %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 	
 	--[[ TODO
 	local name = templateInterpreter(guilds[channel.guild.id].template, member, position):match("^%s*(.-)%s*$")

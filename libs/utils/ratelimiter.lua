@@ -22,12 +22,12 @@ return setmetatable(ratelimiter,{
 				self[name][point] = {remaining = self[name].limit - 1, resetAfter = os.time() + self[name].timer}
 				limitPoint = self[name][point]
 				timer.setTimeout(self[name].timer * 1000, reset, name, point)
-				logger:log(4, "Ratelimiting event %s endpoint %s for %s, %s tries left", name, point, Time.fromSeconds(self[name].timer):toString(), limitPoint.remaining)
+				logger:log(4, "EVENT %s ENDPOINT %s: ratelimiting for %s, %s tries left", name, point, Time.fromSeconds(self[name].timer):toString(), limitPoint.remaining)
 			elseif limitPoint.remaining > 0 then
 				limitPoint.remaining = limitPoint.remaining - 1
-				logger:log(4, "Ratelimiting event %s endpoint %s for %s, %s tries left", name, point, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString(), limitPoint.remaining)
+				logger:log(4, "EVENT %s ENDPOINT %s: ratelimiting for %s, %s tries left", name, point, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString(), limitPoint.remaining)
 			else
-				logger:log(4, "Ratelimit hit on event %s endpoint %s for %s", name, point, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString())
+				logger:log(4, "EVENT %s ENDPOINT %s: ratelimit hit for %s", name, point, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString())
 				return -1, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString()
 			end
 			

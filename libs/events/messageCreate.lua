@@ -42,7 +42,7 @@ return function (message)
 	if commands[command] then
 		logger:log(4, "GUILD %s USER %s: %s command invoked", message.guild.id, message.author.id, command)
 	else
-		logger:log(4, "GUILD %s USER %s: Nothing", message.guild.id, message.author.id)
+		logger:log(4, "GUILD %s USER %s: nothing", message.guild.id, message.author.id)
 		return
 	end
 	
