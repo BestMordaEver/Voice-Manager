@@ -31,7 +31,7 @@ return function (message)
 			lobby = message.guild.voiceChannels:find(function(voiceChannel) return voiceChannel.name:lower() == argument end)
 		end
 		
-		if not lobby then 
+		if not lobby then
 			return "Couldn't find channel to add", "warning", locale.badChannel
 		end
 		
