@@ -8,7 +8,11 @@ local availableCommands = require "funcs/availableCommands"
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("greeting", function (room)
 	local channelData = channels[room.id]
+	if not channelData then return end
+	
 	local companion = client:getChannel(channelData.companion)
+	if not companion then return end
+	
 	local roomC, chatC = availableCommands(room)
 	
 	local member = room.guild:getMember(channelData.host)
