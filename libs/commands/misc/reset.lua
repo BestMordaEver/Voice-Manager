@@ -46,7 +46,7 @@ return function (message)
 	local lobbyData, guildData = lobbies[dialogue[message.author.id]], guilds[message.guild.id]
 	
 	if command == "server" then
-		if not message.member:hasPermission(permission.manageChannels) then
+		if not message.member:hasPermission("manageChannels") then
 			return "Bad user permissions", "warning", locale.badUserPermissions
 		end
 		return commands.server[subcommand](message)
