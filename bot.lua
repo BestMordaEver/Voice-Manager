@@ -24,7 +24,7 @@ notice that metametod call of the table produces two values
 local events = require "events/init"
 
 -- Other events are registered in "ready"
-client:once(events("ready"))
+client:once(events("init"))
 
 -- initializing all embed types
 -- really gotta think about a more elegant solution
@@ -32,7 +32,7 @@ require "embeds/init"
 
 -- yep, it's permanent now
 local timer = require "timer"
-discordia.storage.killswitch = timer.setTimeout(60000, process.exit, process)
+timer.setTimeout(60000, client.emit, client, "init")
 
 -- bot starts working here
 client:run('Bot '..require "token".token)

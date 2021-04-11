@@ -187,21 +187,31 @@ local lobbiesIndex = {
 		local lobbyIDs = lobbiesData:exec("SELECT * FROM lobbies")
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs.id) do
+				self:loadAdd({id = lobbyID,
+					isMatchmaking = lobbyIDs.isMatchmaking[i] == 1, role = lobbyIDs.role[i], permissions = botPermissions(tonumber(lobbyIDs.permissions[i]) or 0),
+					template = lobbyIDs.template[i], capacity = tonumber(lobbyIDs.capacity[i]), bitrate = tonumber(lobbyIDs.bitrate[i]), target = lobbyIDs.target[i],
+					companionTemplate = lobbyIDs.companionTemplate[i],
+						companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i], greeting = lobbyIDs.greeting[i]})
+
 				local lobby = client:getChannel(lobbyID)
 				if lobby then
-					self:loadAdd({id = lobbyID,
-						isMatchmaking = lobbyIDs.isMatchmaking[i] == 1, role = lobbyIDs.role[i], permissions = botPermissions(tonumber(lobbyIDs.permissions[i]) or 0),
-						template = lobbyIDs.template[i], capacity = tonumber(lobbyIDs.capacity[i]), bitrate = tonumber(lobbyIDs.bitrate[i]), target = lobbyIDs.target[i],
-						companionTemplate = lobbyIDs.companionTemplate[i],
-							companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i], greeting = lobbyIDs.greeting[i]})
 					guilds[lobby.guild.id].lobbies:add(self[lobbyID])
-				else
-					emitter:emit("remove", lobbyID)
 				end
 			end
 		end
 		
 		logger:log(4, "STARTUP: Loaded!")
+	end,
+	
+	cleanup = function (self)
+		for lobbyID, lobbyData in pairs(self) do
+			local lobby = client:getChannel(lobbyID)
+			if lobby then
+				guilds[lobby.guild.id].lobbies:add(self[lobbyID])
+			else
+				emitter:emit("remove", lobbyID)
+			end
+		end
 	end
 }
 

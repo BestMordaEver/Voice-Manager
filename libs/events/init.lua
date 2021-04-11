@@ -1,5 +1,4 @@
 -- all event preprocessing happens here
-local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
 local clock = require "clock"
@@ -38,8 +37,8 @@ events = {
 	
 	channelDelete = require "events/channelDelete",
 	
-	ready = function ()
-		timer.clearInterval(discordia.storage.killswitch)
+	init = function ()
+		print("init")
 		guilds:load()
 		lobbies:load()
 		channels:load()
@@ -63,6 +62,14 @@ events = {
 		clock:on(events("day"))
 		
 		if config.sendStats then clock:on(events("hour", require "events/stats")) end
+	end,
+	
+	ready = function ()
+		print("ready")
+		client:emit("init")
+		guilds:cleanup()
+		lobbies:cleanup()
+		channels:cleanup()
 	end,
 
 	min = require "events/min",

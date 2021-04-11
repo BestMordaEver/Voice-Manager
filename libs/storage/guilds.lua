@@ -110,11 +110,7 @@ local guildsIndex = {
 		local guildIDs = guildsData:exec("SELECT * FROM guilds")
 		if guildIDs then
 			for i, guildID in ipairs(guildIDs.id) do
-				if client:getGuild(guildID) then
-					self:loadAdd(guildID, guildIDs.role[i], tonumber(guildIDs.cLimit[i]), tonumber(guildIDs.permissions[i]), guildIDs.prefix[i])
-				else
-					emitter:emit("remove", guildID)
-				end
+				self:loadAdd(guildID, guildIDs.role[i], tonumber(guildIDs.cLimit[i]), tonumber(guildIDs.permissions[i]), guildIDs.prefix[i])
 			end
 		end
 		
@@ -124,6 +120,14 @@ local guildsIndex = {
 		end
 		
 		logger:log(4, "STARTUP: Loaded!")
+	end,
+	
+	cleanup = function (self)
+		for guildID, _ in pairs(self) do
+			if not client:getChannel(guildID) then
+				emitter:emit("remove", guildID)
+			end
+		end
 	end
 }
 
