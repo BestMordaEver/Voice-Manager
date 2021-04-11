@@ -38,7 +38,6 @@ events = {
 	channelDelete = require "events/channelDelete",
 	
 	init = function ()
-		print("init")
 		guilds:load()
 		lobbies:load()
 		channels:load()
@@ -65,7 +64,6 @@ events = {
 	end,
 	
 	ready = function ()
-		print("ready")
 		client:emit("init")
 		guilds:cleanup()
 		lobbies:cleanup()
