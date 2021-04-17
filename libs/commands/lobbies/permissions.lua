@@ -4,10 +4,9 @@ local botPermissions = require "utils/botPermissions"
 
 return function (message, channel, permissions)
 	local lobbyData = lobbies[channel.id]
+	local permissionBits = botPermissions()
 	
 	if permissions then
-		local permissionBits = botPermissions()
-		
 		for permission in permissions:gmatch("%a+") do
 			if permissionBits.bits[permission] then
 				permissionBits.bitfield = permissionBits.bitfield + permissionBits.bits[permission]
