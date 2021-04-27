@@ -1,8 +1,23 @@
 local discordia = require "discordia"
+local token = require "token"
 local client = require "client"
 local emitter = discordia.Emitter()
 local safeEvent = require "funcs/safeEvent"
-local json = require "json"
+local https = require "coro-http"
+
+local function tohex (char)
+	return string.format('%%%02X', string.byte(char))
+end
+
+local function send (name, text)	
+	if token.pastebin then
+		local res, body = https.request("POST","https://pastebin.com/api/api_post.php/",{{'Content-Type','application/x-www-form-urlencoded'}},
+			string.format("api_dev_key=%s&api_paste_name=%s&api_paste_code=%s&api_option=paste&api_paste_private=1&api_paste_expire_date=1M",
+				token.pastebin, name:gsub("%W", tohex), text:gsub("%W", tohex)))
+		
+		return res.code, body
+	end
+end
 
 local function logEmbed (embed)
 	return "[[ Embed\r\n{"..json.encode(embed).."}\r\n"
@@ -18,7 +33,7 @@ local function logAttachments(attachments)
 end
 
 local logWriter = {}
-local files = {}
+local logs = {}
 local actions = {
 	mesageCreate = function (message)
 		local file = files[message.channel.id]
@@ -105,9 +120,7 @@ end
 emitter:on(safeEvent("resume", logWriter))
 
 function logWriter.start(channel, isFull)
-	local file = io.open(channel.id..channel.name.."chatlog.txt", "w")
-	files[channel.id] = file
-	file:write(string.format("Chat log of channel \"%s\" in server \"%s\"\r\nTimestamps correspond to bot's time (GMT+2 by default)\r\n", channel.name, channel.guild.name)
+	logs[channel.id] = {string.format("Chat log of channel \"%s\" in server \"%s\"\r\nTimestamps use UTC time\r\n", channel.name, channel.guild.name)}
 end
 
 function logWriter.finish()
