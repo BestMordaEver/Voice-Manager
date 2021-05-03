@@ -27,11 +27,13 @@ embeds:new("companionsInfo", function (guild)
 	
 	for _, lobbyData in pairs(sortedLobbyData) do
 		local target = client:getChannel(lobbyData.companionTarget)
+		local logChannel = client:getChannel(lobbyData.companionLog)
 		table.insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.companionsField:format(
 				target and target.name or "default",
 				lobbyData.companionTemplate or "private-chat",
+				logChannel and logChannel.name or locale.none,
 				lobbyData.greeting or locale.none
 			),
 			inline = true

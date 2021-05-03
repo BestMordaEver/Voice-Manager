@@ -11,7 +11,8 @@ CREATE TABLE lobbies(
 	permissions INTEGER NOT NULL,	/* mutable, default 0 */
 	capacity INTEGER,	/* mutable, default NULL */
 	bitrate INTEGER,	/* mutable, default NULL */
-	greeting VARCHAR	/* mutable, default NULL */
+	greeting VARCHAR,	/* mutable, default NULL */
+	companionLog VARCHAR	/* mutable, default NULL */
 )]]
 
 local lobbiesData = require "sqlite3".open("lobbiesData.db")
@@ -31,7 +32,7 @@ local discordia = require "discordia"
 local emitter = discordia.Emitter()
 
 local storageStatements = {
-	add = {"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL)", "ADD LOBBY %s"},
+	add = {"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL)", "ADD LOBBY %s"},
 	
 	remove = {"DELETE FROM lobbies WHERE id = ?", "DELETE LOBBY %s"},
 	
@@ -53,7 +54,9 @@ local storageStatements = {
 	
 	setCompanionTarget = {"UPDATE lobbies SET companionTarget = ? WHERE id = ?","SET COMPANION TARGET %s => LOBBY %s"},
 	
-	setGreeting = {"UPDATE lobbies SET greeting = ? WHERE id = ?","SET GREETING %s => LOBBY %s"}
+	setGreeting = {"UPDATE lobbies SET greeting = ? WHERE id = ?","SET GREETING %s => LOBBY %s"},
+	
+	setCompanionLog = {"UPDATE lobbies SET companionLog = ? WHERE id = ?","SET COMPANION LOG %s => LOBBY %s"},
 }
 
 for name, statement in pairs(storageStatements) do
@@ -134,6 +137,12 @@ local lobbyMethods = {
 		emitter:emit("setGreeting", greeting, self.id)
 	end,
 	
+	setCompanionLog = function (self, companionLogChannel)
+		self.companionLogChannel = companionLogChannel
+		logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLogChannel)
+		emitter:emit("setCompanionLog", companionLogChannel, self.id)
+	end,
+	
 	-- returns filled position
 	attachChild = function (self, channelID, position)
 		return self.children:fill(channelID, position)
@@ -191,7 +200,9 @@ local lobbiesIndex = {
 					isMatchmaking = lobbyIDs.isMatchmaking[i] == 1, role = lobbyIDs.role[i], permissions = botPermissions(tonumber(lobbyIDs.permissions[i]) or 0),
 					template = lobbyIDs.template[i], capacity = tonumber(lobbyIDs.capacity[i]), bitrate = tonumber(lobbyIDs.bitrate[i]), target = lobbyIDs.target[i],
 					companionTemplate = lobbyIDs.companionTemplate[i],
-						companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i], greeting = lobbyIDs.greeting[i]})
+						companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i],
+						greeting = lobbyIDs.greeting[i],
+						companionLog = lobbyIDs.companionLog[i]})
 
 				local lobby = client:getChannel(lobbyID)
 				if lobby then

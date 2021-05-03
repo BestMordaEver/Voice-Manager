@@ -114,7 +114,7 @@ local function lobbyJoin (member, lobby)
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 			end
 			
-			if lobbyData.greeting then companion:send(embeds("greeting", newChannel)) end
+			if lobbyData.greeting or lobbyData.companionLog then companion:send(embeds("greeting", newChannel)) end
 		end
 		
 		processing[newChannel.id]:unlock()

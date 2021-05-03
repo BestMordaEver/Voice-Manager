@@ -59,7 +59,8 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"vm!companions",
 			"vm!companions category <category ID or name>",
 			"vm!companions name <new companion name>",
-			"vm!companions greeting <greeting text>"
+			"vm!companions greeting <greeting text>",
+			"vm!companions log <log channel>",
 		},
 		{
 			"vm!room",
@@ -153,7 +154,7 @@ You can put different `%combos%` in the name to customize it
 `last` - selects the last available channel]],
 		},
 		{
-			"Show all lobies that have companion enabled",
+			"Show all lobies that have companion chats enabled",
 			"Select a category in which chats will be created",
 			[[Configure what name a chat will have when it's created. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
@@ -164,7 +165,8 @@ You can put different `%combos%` in the name to customize it
 `%commands%` - formatted list of `vm!room` and `vm!chat` commands
 `%roomcommands%` - raw list of `vm!room` commands
 `%chatcommands%` - raw list of `vm!chat` commands
-`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `vm!lobbies name`]]
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `vm!lobbies name`]],
+			"Enable chat logging. Logs will be sent to a channel of your choosing. **Logs will expire in 1 month!**"
 		},
 		{
 			"Show room info and available commands",
@@ -300,6 +302,7 @@ You can create a matchmaking lobby with `match`]],
 You can enable companion channels with `companion`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
+**Logging:** %s
 **Greeting:**
 %s]],
 	
@@ -307,6 +310,11 @@ You can enable companion channels with `companion`]],
 	greetingReset = "Disabled the greeting",
 	roomCommands = "Available `vm!room` commands: ",
 	chatCommands = "Available `vm!chat` commands: ",
+	logConfirm = "Chat logs will be sent to %s",
+	logReset = "Disabled the chatlogs",
+	loggerLink = "`%s` room of `%s` lobby\n%s",
+	loggerWarning = "*This text chat is recorded and will be visible to mods after it's deleted*\n",
+	pastebinError = "`%s` room of `%s` lobby\nThere was an issue with pastebin, notify devs if this persists",
 	
 	-- room
 	roomInfoTitle = "Room info | %s",
@@ -379,6 +387,7 @@ You can enable companion channels with `companion`]],
 	amountNotANumber = "Channels amount must be a number between 1 and 50",
 	amountOOB = "There can be only 50 channels per category",
 	emptyName = "Given input will result in an empty name",
+	noParent = "unknown lobby",
 	
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
