@@ -313,7 +313,7 @@ You can enable companion channels with `companion`]],
 	logConfirm = "Chat logs will be sent to %s",
 	logReset = "Disabled the chatlogs",
 	loggerLink = "`%s` room of `%s` lobby\n%s",
-	loggerWarning = "*This text chat will be logged*\n",
+	loggerWarning = "\n*This text chat will be logged*",
 	pastebinError = "`%s` room of `%s` lobby\nThere was an issue with pastebin, notify devs if this persists",
 	
 	-- room
