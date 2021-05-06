@@ -35,6 +35,6 @@ embeds:new("greeting", function (room)
 	return {
 		title = companion.name,
 		color = 6561661,
-		description = (channelData.parent.companionLog and locale.loggerWarning or "") .. (channelData.parent.greeting or ""):gsub("%%(.-)%%", rt)
+		description = (channelData.parent.greeting or ""):gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
 	}
 end)
