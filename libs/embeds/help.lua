@@ -3,6 +3,7 @@ local config = require "config"
 local locale = require "locale"
 local embeds = require "embeds/embeds"
 local reactions = embeds.reactions
+local colors = embeds.colors
 
 local helpEmbed = {}
 
@@ -13,7 +14,7 @@ end
 function helpEmbed:setContent(page)
 	self.embed = {
 		title = locale.helpTitle[page],
-		color = 6561661,
+		color = colors.blurple,
 		description = locale.helpDescription[page]
 	}
 	self.embed.fields = {}

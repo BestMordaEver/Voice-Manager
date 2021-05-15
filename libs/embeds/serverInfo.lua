@@ -5,6 +5,7 @@ local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
 local channels = require "storage/channels"
 local bitfield = require "utils/bitfield"
+local colors = embeds.colors
 
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("serverInfo", function (guild)
@@ -13,7 +14,7 @@ embeds:new("serverInfo", function (guild)
 	
 	return {
 		title = locale.serverInfoTitle:format(guild.name),
-		color = 6561661,
+		color = colors.blurple,
 		description = locale.serverInfo:format(
 			guildData.prefix,
 			guildData.permissions,

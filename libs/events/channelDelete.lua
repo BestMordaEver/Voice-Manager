@@ -19,14 +19,16 @@ return function (channel) -- and make sure there are no traces!
 		if companion then
 			if channelData.parent and channelData.parent.companionLog then
 				local logChannel = client:getChannel(channelData.parent.companionLog)
-				logWriter.start(companion)
-				local isOk, link = logWriter.finish(companion)
-				if isOk then
-					logChannel:sendf(locale.loggerLink,
-						channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent, link)
-				else
-					logChannel:sendf(locale.pastebinError, channel.name, channel.parent and client:getChannel(channel.parent.id).name or locale.noParent)
-					logger:log(2, "Couldn't post to pastebin.com, see following error\n%s", link)
+				if logChannel then
+					logWriter.start(companion)
+					local isOk, link = logWriter.finish(companion)
+					if isOk then
+						logChannel:sendf(locale.loggerLink,
+							channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent, link)
+					else
+						logChannel:sendf(locale.pastebinError, channel.name, channel.parent and client:getChannel(channel.parent.id).name or locale.noParent)
+						logger:log(2, "Couldn't post to pastebin.com, see following error\n%s", link)
+					end
 				end
 			end
 			

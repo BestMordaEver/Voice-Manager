@@ -5,6 +5,7 @@ local channels = require "storage/channels"
 local availableCommands = require "funcs/availableCommands"
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
+local colors = embeds.colors
 
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("roomInfo", function (room)
@@ -30,7 +31,7 @@ embeds:new("roomInfo", function (room)
 	
 	return {
 		title = locale.roomInfoTitle:format(room.name),
-		color = 6561661,
+		color = colors.blurple,
 		description = locale.roomInfo:format(reservations, blocklist, muted, commands)
 	}
 end)

@@ -6,6 +6,7 @@ local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
+local colors = embeds.colors
 
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("companionsInfo", function (guild)
@@ -13,7 +14,7 @@ embeds:new("companionsInfo", function (guild)
 	
 	local embed = {
 		title = locale.companionsInfoTitle:format(guild.name),
-		color = 6561661,
+		color = colors.blurple,
 		description = #guildData.lobbies == 0 and locale.companionsNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}

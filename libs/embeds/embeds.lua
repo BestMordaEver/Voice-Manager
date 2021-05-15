@@ -16,6 +16,16 @@ return setmetatable({}, {
 			["⬅"] = "left", ["➡"] = "right", ["📄"] = "page", ["*️⃣"] = "all", ["❌"] = "stop"
 		},
 		
+		colors = {
+			blurple = 0x5865F2,
+			green = 0x57F287,
+			red = 0xed4245,
+			yellow = 0xfee75c,
+			white = 0xffffff,
+			fuchsia = 0xeb459e,
+			black = 0x23272a
+		},
+		
 		-- it dies if not noticed for long enough
 		tick = function (self)
 			for message, embedData in pairs(self) do

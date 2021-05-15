@@ -7,6 +7,7 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
 local channelType = require "discordia".enums.channelType
+local colors = embeds.colors
 
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("matchmakingInfo", function (guild)
@@ -14,7 +15,7 @@ embeds:new("matchmakingInfo", function (guild)
 	
 	local embed = {
 		title = locale.matchmakingInfoTitle:format(guild.name),
-		color = 6561661,
+		color = colors.blurple,
 		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or locale.matchmakingInfo,
 		fields = {}
 	}
