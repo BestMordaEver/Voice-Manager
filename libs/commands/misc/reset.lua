@@ -26,7 +26,8 @@ local commands = {
 	companions = {
 		category = require "commands/companions/category",
 		greeting = require "commands/companions/greeting",
-		name = require "commands/companions/name"
+		name = require "commands/companions/name",
+		log = require "commands/companions/log"
 	},
 	
 	server = {
