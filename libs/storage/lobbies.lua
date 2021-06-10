@@ -137,10 +137,10 @@ local lobbyMethods = {
 		emitter:emit("setGreeting", greeting, self.id)
 	end,
 	
-	setCompanionLog = function (self, companionLogChannel)
-		self.companionLogChannel = companionLogChannel
-		logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLogChannel)
-		emitter:emit("setCompanionLog", companionLogChannel, self.id)
+	setCompanionLog = function (self, companionLog)
+		self.companionLog = companionLog
+		logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLog)
+		emitter:emit("setCompanionLog", companionLog, self.id)
 	end,
 	
 	-- returns filled position
