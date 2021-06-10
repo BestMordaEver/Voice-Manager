@@ -11,6 +11,9 @@ return function (message, input)
 	for _,channel in pairs(message.guild.voiceChannels) do
 		if channel.name:lower() == input then return channel end
 	end
+	for _,channel in pairs(message.guild.textChannels) do
+		if channel.name:lower() == input then return channel end
+	end
 	for _, channel in pairs(message.guild.categories) do
 		if channel.name:lower() == input then return channel end
 	end
