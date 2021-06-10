@@ -19,7 +19,7 @@ return function (message)
 		dialogue(message.author.id, channel.id)
 		if channel.type == channelType.voice then
 			if lobbies[channel.id] then
-				return "Selected lobby"..channel.id, "ok", locale.selectVoice:format(channel.name)
+				return "Selected lobby "..channel.id, "ok", locale.selectVoice:format(channel.name)
 			end
 		else
 			return "Selected category "..channel.id, "ok", locale.selectCategory:format(channel.name)
