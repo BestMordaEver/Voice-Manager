@@ -42,6 +42,7 @@ local channelMT = {
 		-- no granular control, if it goes away, it does so everywhere
 		delete = function (self)
 			if channels[self.id] then
+				if type(self.parent) == "table" then self.parent:detachChild(self.position) end
 				channels[self.id] = nil
 				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end

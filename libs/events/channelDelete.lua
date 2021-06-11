@@ -34,7 +34,6 @@ return function (channel) -- and make sure there are no traces!
 			
 			companion:delete()
 		end
-		if type(channelData.parent) == "table" then channelData.parent:detachChild(channelData.position) end
 		channelData:delete()
 	end
 	for lobbyData,_ in pairs(guildData.lobbies) do
