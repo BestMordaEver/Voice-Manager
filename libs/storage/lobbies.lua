@@ -2,7 +2,7 @@
 --[[
 CREATE TABLE lobbies(
 	id VARCHAR PRIMARY KEY,
-	isMatchmaking BOOL	/* mutable, default FALSE */
+	isMatchmaking BOOL NOT NULL,	/* mutable, default FALSE */
 	template VARCHAR,	/* mutable, default NULL */
 	companionTemplate VARCHAR,	/* mutable, default NULL */
 	target VARCHAR,	/* mutable, default NULL */
