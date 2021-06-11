@@ -27,7 +27,7 @@ return function (channel) -- and make sure there are no traces!
 							channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent, link)
 					else
 						logger:log(2, "Couldn't post to pastebin.com, see following error\n%s", link)
-						logChannel:sendf(locale.pastebinError, channel.name, channel.parent and client:getChannel(channel.parent.id).name or locale.noParent)
+						logChannel:sendf(locale.pastebinError, channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent)
 					end
 				end
 			end
