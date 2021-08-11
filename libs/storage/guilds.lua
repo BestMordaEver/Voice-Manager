@@ -124,7 +124,7 @@ local guildsIndex = {
 	
 	cleanup = function (self)
 		for guildID, _ in pairs(self) do
-			if not client:getChannel(guildID) then
+			if not client:getGuild(guildID) then
 				emitter:emit("remove", guildID)
 			end
 		end

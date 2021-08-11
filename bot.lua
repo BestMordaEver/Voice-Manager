@@ -25,6 +25,7 @@ local events = require "events/init"
 
 -- Other events are registered in "ready"
 client:once(events("init"))
+client:once(events("ready"))
 
 -- initializing all embed types
 -- really gotta think about a more elegant solution
