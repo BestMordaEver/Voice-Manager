@@ -312,7 +312,7 @@ You can enable companion channels with `companion`]],
 	chatCommands = "Available `vm!chat` commands: ",
 	logConfirm = "Chat logs will be sent to %s",
 	logReset = "Disabled the chatlogs",
-	loggerLink = "`%s` room of `%s` lobby\n%s",
+	logName = "`%s` room of `%s` lobby\n",
 	loggerWarning = "\n\n*This text chat will be logged*",
 	pastebinError = "`%s` room of `%s` lobby\nThere was an issue with pastebin, notify devs if this persists",
 	

@@ -13,6 +13,7 @@ local Date = discordia.Date
 local insert, concat = table.insert, table.concat
 local f, byte = string.format, string.byte
 
+--[[ -- ratelimits foiled me
 local function tohex (char)
 	return f('%%%02X', byte(char))
 end
@@ -26,18 +27,11 @@ local function send (name, text)
 		return res.code == 200, body
 	end
 end
---[=[
-emitter:on("hehe", send)
-emitter:emit("hehe", "huehueh hehe", [[text
-and text
-and text
 ]]
-..json.encode({[1]=1})
-)]=]
 
 local function logEmbed (embed)
 	embed.type = nil
-	return "[[ Embed\r\n{\"embed\":"..json.encode(embed).."}\r\n"
+	return "[[ Embed\n{\"embed\":"..json.encode(embed).."}\n"
 end
 
 local function logAttachments(attachments)
@@ -46,7 +40,7 @@ local function logAttachments(attachments)
 		insert(lines, attachment.url)
 	end
 	insert(lines, "")
-	return concat(lines, "\r\n")
+	return concat(lines, "\n")
 end
 
 local logWriter = {}
@@ -140,21 +134,21 @@ emitter:on(safeEvent("resume", logWriter))
 function logWriter.start(channel)
 	if not logs[channel.id] then
 		logs[channel.id] = {
-			f("Chat log of channel \"%s\" in server \"%s\"\r\nTimestamps use UTC time\r\nEmbeds can be viewed as seen in app here - https://leovoel.github.io/embed-visualizer/\r\n\r\n",
+			f("Chat log of channel \"%s\" in server \"%s\"\nTimestamps use UTC time\nEmbeds can be viewed as seen in app here - https://leovoel.github.io/embed-visualizer/\n\n",
 				channel.name, channel.guild.name)
 		}
 		
 		local log = logs[channel.id]
 		local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
 		if message then
-			insert(log, f("[%s] <%s> %s\r\n%s%s",
+			insert(log, f("[%s] <%s> %s\n%s%s",
 				Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
 				(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
 				
 			repeat
 				local messages = channel:getMessagesAfter(message, 100):toArray("createdAt")
 				for _, message in ipairs(messages) do
-					insert(log, f("[%s] <%s> %s\r\n%s%s",
+					insert(log, f("[%s] <%s> %s\n%s%s",
 						Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
 						(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
 				end
@@ -164,11 +158,10 @@ function logWriter.start(channel)
 	end
 end
 
--- this will make sense later
 function logWriter.finish(channel)
 	local log = logs[channel.id]
 	logs[channel.id] = nil
-	return send(f("Channel \"%s\" in server \"%s\"", channel.id, channel.guild.id), concat(log))
+	return concat(log)
 end
 
 return logWriter
