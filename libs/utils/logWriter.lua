@@ -140,20 +140,25 @@ function logWriter.start(channel)
 		
 		local log = logs[channel.id]
 		local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
+		
 		if message then
 			insert(log, f("[%s] <%s> %s\n%s%s",
 				Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
 				(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
-				
-			repeat
-				local messages = channel:getMessagesAfter(message, 100):toArray("createdAt")
-				for _, message in ipairs(messages) do
-					insert(log, f("[%s] <%s> %s\n%s%s",
-						Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
-						(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
+			
+			while message ~= lastMessage do
+				if channel:getMessagesAfter(message, 1) then
+					local messages = channel:getMessagesAfter(message, 100):toArray("createdAt")
+					for _, message in ipairs(messages) do
+						insert(log, f("[%s] <%s> %s\n%s%s",
+							Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
+							(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
+					end
+					message = messages[#messages]
+				else
+					break
 				end
-				message = messages[#messages]
-			until message == lastMessage
+			end
 		end
 	end
 end
