@@ -13,8 +13,11 @@ return function (member, channel) -- now remove the unwanted corpses!
 		if #channel.connectedMembers == 0 then
 			if channels[channel.id].isPersistent then
 				channels[channel.id]:delete()
-				for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
-					if permissionOverwrite.type == "member" then permissionOverwrite:delete() end
+				local perms = guilds[channel.guild.id].permissions:toDiscordia()
+				if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+					for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
+						if permissionOverwrite.type == "member" then permissionOverwrite:delete() end
+					end
 				end
 				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)
 			else
