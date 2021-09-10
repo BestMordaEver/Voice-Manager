@@ -4,7 +4,7 @@ local locale = require "locale"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
-local logWriter = require "utils/logWriter"
+local Overseer = require "utils/logWriter"
 
 return function (channel) -- and make sure there are no traces!
 	local lobbyData, channelData = lobbies[channel.id], channels[channel.id]
@@ -20,8 +20,7 @@ return function (channel) -- and make sure there are no traces!
 			if channelData.parent and channelData.parent.companionLog then
 				local logChannel = client:getChannel(channelData.parent.companionLog)
 				if logChannel then
-					logWriter.start(companion)
-					local log = logWriter.finish(companion)
+					local log = Overseer:stop(companion)
 					logChannel:send{
 						content = locale.logName:format(channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent),
 						file = {string.format("%s.txt", companion.id), log}

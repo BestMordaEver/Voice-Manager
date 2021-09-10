@@ -6,6 +6,7 @@ local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local embeds = require "embeds/embeds"
 local matchmakers = require "utils/matchmakers"
+local Overseer = require "utils/logWriter"
 local templateInterpreter = require "funcs/templateInterpreter"
 local enforceReservations = require "funcs/enforceReservations"
 
@@ -114,6 +115,7 @@ local function lobbyJoin (member, lobby)
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 			end
 			
+			if lobbyData.companionLog then Overseer:track(companion) end
 			if lobbyData.greeting or lobbyData.companionLog then companion:send(embeds("greeting", newChannel)) end
 		end
 		

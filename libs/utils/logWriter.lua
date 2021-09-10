@@ -13,22 +13,6 @@ local Date = discordia.Date
 local insert, concat = table.insert, table.concat
 local f, byte = string.format, string.byte
 
---[[ -- ratelimits foiled me
-local function tohex (char)
-	return f('%%%02X', byte(char))
-end
-
-local function send (name, text)	
-	if token.pastebin then
-		local res, body = https.request("POST","https://pastebin.com/api/api_post.php",{{'Content-Type','application/x-www-form-urlencoded'}},
-			f("api_dev_key=%s&api_paste_name=%s&api_paste_code=%s&api_option=paste&api_paste_private=1&api_paste_expire_date=1M",
-				token.pastebin, name:gsub("%W", tohex), text:gsub("%W", tohex)))
-
-		return res.code == 200, body
-	end
-end
-]]
-
 local function logEmbed (embed)
 	embed.type = nil
 	return "[[ Embed\n{\"embed\":"..json.encode(embed).."}\n"
@@ -43,116 +27,112 @@ local function logAttachments(attachments)
 	return concat(lines, "\n")
 end
 
-local logWriter = {}
-local logs = {}
---[[local actions = {
-	mesageCreate = function (message)
-		local log = logs[message.channel.id]
-		if log then
-			insert(log, f("[%s] <%s sends %s> %s\r\n%s",
-				Date.fromSnowflake(message.id):toString(), message.author.id, message.id, message.content, 
-				(message.embed and logEmbed(message.embed) or "") .. (message.attachments and logAttachments(message.attachments) or "")))
-		end
-	end,
-	
-	messageUpdate = function (message)
-		local file = files[message.channel.id]
-		if file then
-			file:write(f("[%s] <%s updates %s> %s\r\n%s",
-				Date.fromTable(os.date()):toString(), message.author.id, message.id, message.content, 
-				(message.embed and logEmbed(message.embed) or "") .. (message.attachments and logAttachments(message.attachments) or "")))
-		end
-	end,
-	
-	messageUpdateUncached = function (channel, messageID)
-		local file, message = files[channel.id], channel:getMessage(messageID)
-		if file and message then
-			file:write(f("[%s] <%s updates %s> %s\r\n%s",
-				Date.fromTable(os.date()):toString(), message.author.id, message.id, message.content, 
-				(message.embed and logEmbed(message.embed) or "") .. (message.attachments and logAttachments(message.attachments) or "")))
-		end
-	end,
-	
-	messageDelete = function (message)
-		local file = files[message.channel.id]
-		if file then
-			file:write(f("[%s] <%s deletes %s> %s\r\n%s",
-				Date.fromTable(os.date()):toString(), message.author.id, message.id, message.content, 
-				(message.embed and logEmbed(message.embed) or "") .. (message.attachments and logAttachments(message.attachments) or "")))
-		end
-	end,
-	
-	messageDeleteUncached = function (channel, messageID)
-		local file, message = files[channel.id], channel:getMessage(messageID)
-		if file and message then
-			file:write(f("[%s] <%s deletes %s> %s\r\n%s",
-				Date.fromTable(os.date()):toString(), message.author.id, message.id, message.content, 
-				(message.embed and logEmbed(message.embed) or "") .. (message.attachments and logAttachments(message.attachments) or "")))
-		end
-	end,
-	
-	reactionAdd = function (reaction, userID)
-		local file = files[reaction.message.channel.id]
-		if file and message then
-			file:write(f("[%s] <%s reacts to %s> %s",
-				Date.fromTable(os.date()):toString(), userID, message.id, reaction.emojiHash))
-		end
-	end,
-	
-	reactionAddUncached = function (channel, messageID, hash, userID)
-		local file = files[channel.id]
-		if file then
-			file:write(f("[%s] <%s reacts to %s> %s",
-				Date.fromTable(os.date()):toString(), userID, messageID, hash))
-		end
-	end,
-	
-	reactionRemove = function (reaction, userID)
-		local file = files[reaction.message.channel.id]
-		if file and message then
-			file:write(f("[%s] <%s removes reaction to %s> %s",
-				Date.fromTable(os.date()):toString(), userID, message.id, reaction.emojiHash))
-		end
-	end,
-	
-	reactionRemoveUncached = function (channel, messageID, hash, userID)
-		local file = files[channel.id]
-		if file then
-			file:write(f("[%s] <%s removes reaction to %s> %s",
-				Date.fromTable(os.date()):toString(), userID, messageID, hash))
+local function logReactions(reactions)
+	local lines = {"[[Reactions"}
+	for _, reaction in pairs(reactions) do
+		insert(lines, f("\n:%s: - ", reaction.emojiHash))
+		if reaction.count > 25 then
+			insert(lines, f("%d users", reaction.count))
+		else
+			for _, user in pairs(reaction:getUsers()) do
+				insert(lines, f("%s, ", user.name))
+			end
+			lines[#lines] = lines[#lines]:sub(1,-3)
 		end
 	end
+end
+
+local writerMeta = {
+	__index = {
+		messageCreate = function (self, message)
+			insert(self, f("[%s] <%s sends %s> %s\r\n%s",
+				message:getDate():toString("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content,
+				(#message.reactions > 0 and logReactions(message.reactions) or "")
+					..
+				(message.embed and logEmbed(message.embed) or "")
+					..
+				(message.attachments and logAttachments(message.attachments) or ""))
+			)
+		end,
+		
+		messageUpdate = function (self, message)
+			insert(self, f("[%s] <%s edits %s> %s\r\n%s",
+				os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
+				(#message.reactions > 0 and logReactions(message.reactions) or "")
+					..
+				(message.embed and logEmbed(message.embed) or "")
+					..
+				(message.attachments and logAttachments(message.attachments) or ""))
+			)
+		end,
+		
+		messageUpdateUncached = function (self, channel, messageID)
+			local message = channel:getMessage(messageID)
+			if message then
+				insert(self, f("[%s] <%s edits %s> %s\r\n%s",
+					os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
+					(#message.reactions > 0 and logReactions(message.reactions) or "")
+						..
+					(message.embed and logEmbed(message.embed) or "")
+						..
+					(message.attachments and logAttachments(message.attachments) or ""))
+				)
+			else
+				insert(self, f("[%s] <%s is edited>", os.date("!%Y-%m-%d %H:%M:%S"), messageID))
+			end
+		end,
+		
+		messageDelete = function (self, message)
+			insert(self, f("[%s] <%s is deleted>", os.date("!%Y-%m-%d %H:%M:%S"), message.id))
+		end,
+		
+		messageDeleteUncached = function (self, channel, messageID)
+			insert(self, f("[%s] <%s is deleted>", os.date("!%Y-%m-%d %H:%M:%S"), messageID))
+		end,
+		
+		reactionAdd = function (self, reaction, userID)
+			print(client:getUser(userID), reaction, userID)
+			insert(self, f("[%s] <%s reacts to %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, reaction.message.id, reaction.emojiHash))
+		end,
+		
+		reactionAddUncached = function (self, channel, messageID, hash, userID)
+			insert(self, f("[%s] <%s reacts to %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, messageID, hash))
+		end,
+		
+		reactionRemove = function (self, reaction, userID)
+			insert(self, f("[%s] <%s removes reaction from %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, reaction.message.id, reaction.emojiHash))
+		end,
+		
+		reactionRemoveUncached = function (self, channel, messageID, hash, userID)
+			insert(self, f("[%s] <%s removes reaction from %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, messageID, hash))
+		end
+	}
 }
 
-for name, event in ipairs(actions) do
-	client:on(name, function(...) emitter:emit(name, ...) end)
-	emitter:onSync(safeEvent(name, event))
-end
-emitter:on(safeEvent("resume", logWriter))
-]]
-
-function logWriter.start(channel)
-	if not logs[channel.id] then
-		logs[channel.id] = {
+local writers = {}
+local Overseer = {
+	track = function (self, channel)
+		if not writers[channel.id] then
+			writers[channel.id] = setmetatable({
 			f("Chat log of channel \"%s\" in server \"%s\"\nTimestamps use UTC time\nEmbeds can be viewed as seen in app here - https://leovoel.github.io/embed-visualizer/\n\n",
-				channel.name, channel.guild.name)
-		}
+				channel.name, channel.guild.name)},writerMeta)
+		end
+		return writers[channel.id]
+	end,
+	
+	resume = function (self, channel)
+		local writer = self:track(channel)
 		
-		local log = logs[channel.id]
 		local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
 		
 		if message then
-			insert(log, f("[%s] <%s> %s\n%s%s",
-				Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
-				(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
+			writer:messageCreate(message)
 			
 			while message ~= lastMessage do
 				if channel:getMessagesAfter(message, 1) then
 					local messages = channel:getMessagesAfter(message, 100):toArray("createdAt")
 					for _, message in ipairs(messages) do
-						insert(log, f("[%s] <%s> %s\n%s%s",
-							Date(message.createdAt):toString("!%Y-%m-%d %X"), message.author.name, message.content, 
-							(message.embed and logEmbed(message.embed) or ""), (message.attachments and logAttachments(message.attachments) or "")))
+						writer:messageCreate(message)
 					end
 					message = messages[#messages]
 				else
@@ -160,13 +140,74 @@ function logWriter.start(channel)
 				end
 			end
 		end
-	end
+	end,
+	
+	stop = function (self, channel)
+		local writer = writers[channel.id]
+		writers[channel.id] = nil
+		return concat(writer)
+	end,
+	
+	events = {
+		messageCreate = function (message)
+			if writers[message.channel.id] then
+				writers[message.channel.id]:messageCreate(message)
+			end
+		end,
+		
+		messageUpdate = function (message)
+			if writers[message.channel.id] then
+				writers[message.channel.id]:messageUpdate(message)
+			end
+		end,
+		
+		messageUpdateUncached = function (channel, messageID)
+			if writers[channel.id] then
+				writers[channel.id]:messageUpdateUncached(channel, messageID)
+			end
+		end,
+		
+		messageDelete = function (message)
+			if writers[message.channel.id] then
+				writers[message.channel.id]:messageDelete(message)
+			end
+		end,
+		
+		messageDeleteUncached = function (channel, messageID)
+			if writers[channel.id] then
+				writers[channel.id]:messageDeleteUncached(channel, messageID)
+			end
+		end,
+		
+		reactionAdd = function (reaction, userID)
+			if writers[reaction.message.channel.id] then
+				writers[reaction.message.channel.id]:reactionAdd(reaction, userID)
+			end
+		end,
+		
+		reactionAddUncached = function (channel, messageID, hash, userID)
+			if writers[channel.id] then
+				writers[channel.id]:reactionAddUncached(channel, messageID, hash, userID)
+			end
+		end,
+		
+		reactionRemove = function (reaction, userID)
+			if writers[reaction.message.channel.id] then
+				writers[reaction.message.channel.id]:reactionRemove(reaction, userID)
+			end
+		end,
+		
+		reactionRemoveUncached = function (channel, messageID, hash, userID)
+			if writers[channel.id] then
+				writers[channel.id]:reactionRemoveUncached(channel, messageID, hash, userID)
+			end
+		end
+	}
+}
+
+for name, event in pairs(Overseer.events) do
+	client:on(name, function (...) emitter:emit(name, ...) end)
+	emitter:onSync(safeEvent(name, event))
 end
 
-function logWriter.finish(channel)
-	local log = logs[channel.id]
-	logs[channel.id] = nil
-	return concat(log)
-end
-
-return logWriter
+return Overseer

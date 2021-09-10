@@ -18,6 +18,7 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 
 local set = require "utils/set"
+local Overseer = require "utils/logWriter"
 local storageInteraction = require "funcs/storageInteraction"
 
 -- used to start storageInteractionEvent as async process
@@ -95,11 +96,17 @@ local channelsIndex = {
 				local channel = client:getChannel(channelID)
 				if channel then
 					if #channel.connectedMembers > 0 then
+						local parent = lobbies[channelIDs.parent[i]] -- can be nil!
+						
 						self:loadAdd(channelID, 
-							channelIDs.isPersistent[i] == 1, channelIDs.host[i], lobbies[channelIDs.parent[i]],
+							channelIDs.isPersistent[i] == 1, channelIDs.host[i], parent,
 							tonumber(channelIDs.position[i]), channelIDs.companion[i])
-						if lobbies[channelIDs.parent[i]] then
-							self[channelID].parent:attachChild(self[channelID], tonumber(self[channelID].position))
+						
+						if parent then
+							parent:attachChild(self[channelID], tonumber(self[channelID].position))
+							if channelIDs.companion[i] and parent.companionLog and client:getChannel(channelIDs.companion[i]) then
+								Overseer:resume(client:getChannel(channelIDs.companion[i]))
+							end
 						end
 					else
 						if channelIDs.isPersistent[i] == 1 then
