@@ -129,8 +129,9 @@ local Overseer = {
 			writer:messageCreate(message)
 			
 			while message ~= lastMessage do
-				if channel:getMessagesAfter(message, 1) then
-					local messages = channel:getMessagesAfter(message, 100):toArray("createdAt")
+				local messages = channel:getMessagesAfter(message, 100)
+				if messages then
+					messages = messages:toArray("createdAt")
 					for _, message in ipairs(messages) do
 						writer:messageCreate(message)
 					end
