@@ -43,7 +43,7 @@ return function (member)
 	end
 	
 	local channelData = channels[member.voiceChannel.id]
-	if not channelData.parent.template:match("%%game%(?.-%)?%%") then
+	if not (channelData.parent and channelData.parent.template:match("%%game%(?.-%)?%%")) then
 		return		-- nothing to check? gtfo
 	end
 	
