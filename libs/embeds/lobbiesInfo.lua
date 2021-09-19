@@ -12,7 +12,7 @@ local insert = table.insert
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("lobbiesInfo", function (guild)
 	local guildData = guilds[guild.id]
-	local prefix = guilds[(self.guild or self.message.guild).id].prefix
+	local prefix = guilds[guild.id].prefix
 	if prefix:match("%w$") then prefix = prefix .. " " end
 	
 	local embed = {
