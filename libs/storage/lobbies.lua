@@ -156,11 +156,10 @@ local lobbyMethods = {
 local nonSetters = {delete = true, attachChild = true, detachChild = true}
 local lobbyMT = {
 	__index = function (self, index)
-		if nonSetters[index] or (client:getChannel(self.id) and lobbies[self.id]) then
-			return lobbyMethods[index]
-		else
+		if not (nonSetters[index] or (client:getChannel(self.id) and lobbies[self.id])) then
 			self:delete()
 		end
+		return lobbyMethods[index]
 	end,
 	__tostring = function (self) return string.format("LobbyData: %s", self.id) end
 }
