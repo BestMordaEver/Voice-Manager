@@ -27,7 +27,7 @@ return {
 	matchmaking = require "commands/matchmaking/matchmaking",
 	room = require "commands/room/room",
 	chat = require "commands/chat/chat",
-	create = require "commands/misc/create",
+	--create = require "commands/misc/create",
 	shutdown = require "commands/misc/shutdown",
 	support = invite,
 	invite = invite,
