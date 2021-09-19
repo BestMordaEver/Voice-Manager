@@ -13,6 +13,8 @@ embeds:new("greeting", function (room)
 	local companion = client:getChannel(channelData.companion)
 	if not companion then return end
 	
+	local prefix = guilds[(self.guild or self.message.guild).id].prefix
+	if prefix:match("%w$") then prefix = prefix .. " " end
 	local roomC, chatC = availableCommands(room)
 	
 	local member = room.guild:getMember(channelData.host)
@@ -27,7 +29,7 @@ embeds:new("greeting", function (room)
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = string.format("%s%s\n%s%s", locale.roomCommands, roomC, locale.chatCommands, chatC),
+		commands = locale.roomCommands:gsub("%%prefix%%", prefix) .. roomC .."\n" .. locale.chatCommands:gsub("%%prefix%%", prefix) .. chatC),
 		roomcommands = roomC,
 		chatcommands = chatC
 	}

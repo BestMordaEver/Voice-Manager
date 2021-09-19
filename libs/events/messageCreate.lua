@@ -47,13 +47,13 @@ return function (message)
 	end
 	
 	-- call the command, log it, and all in protected call
-	local res, logMsg, msgType, msg  = xpcall(commands[command], debug.traceback, message)
+	local res, logMsg, embedType, data = xpcall(commands[command], debug.traceback, message)
 	
 	-- notify user if failed
 	if res then
 		logger:log(4, "GUILD %s USER %s: %s", message.guild.id, message.author.id, logMsg)
-		local embed = embeds(msgType, msg)
-		client:emit("embedSent", msgType, message, message:reply(embed), embed)
+		local embed = embeds(embedType, data, message)
+		client:emit("embedSent", embedType, message, message:reply(embed), embed)
 	else
 		message:reply(embeds("error"))
 		error(logMsg)

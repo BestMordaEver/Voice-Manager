@@ -16,12 +16,12 @@ return {
 	
 	helpDescription = {
 		[0] = "",[[Enter a lobby to create a room. Room is deleted once it's empty
-Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
+Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]],
 		[[Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool
-Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
+Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]],
 		[[Companion chats are created and deleted along rooms. Chat is visible only to inhabitants of the room
-Companion chats are enabled with `vm!lobbies companion`
-Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
+Companion chats are enabled with `%prefix%lobbies companion`
+Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]],
 		"Most room commands are used by a room host - user who created the room. Those commands can be enabled by admins",
 		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins","",""
 	},
@@ -37,79 +37,79 @@ Select a lobby with `vm!select <lobby ID or name>` to change it's settings]],
 			"Other commands - 7️⃣",
 		},
 		{
-			"vm!lobbies",
-			"vm!lobbies add <channel ID or name>",
-			"vm!lobbies remove <lobby ID or name>",
-			"vm!lobbies category <category ID or name>",
-			"vm!lobbies name <new room name>",
-			"vm!lobbies capacity <0-99>",
-			"vm!lobbies bitrate <8-96>",
-			"vm!lobbies companion enable/disable",
-			"vm!lobbies permissions <permission> [permission] allow/deny",
-			"vm!lobbies role <role mention>"
+			"%prefix%lobbies",
+			"%prefix%lobbies add <channel ID or name>",
+			"%prefix%lobbies remove <lobby ID or name>",
+			"%prefix%lobbies category <category ID or name>",
+			"%prefix%lobbies name <new room name>",
+			"%prefix%lobbies capacity <0-99>",
+			"%prefix%lobbies bitrate <8-96>",
+			"%prefix%lobbies companion enable/disable",
+			"%prefix%lobbies permissions <permission> [permission] allow/deny",
+			"%prefix%lobbies role <role mention>"
 		},
 		{
-			"vm!matchmaking",
-			"vm!matchmaking add <channel ID or name>",
-			"vm!matchmaking remove <lobby ID or name>",
-			"vm!matchmaking target <lobby or category ID or name>",
-			"vm!matchmaking mode <mode>"
+			"%prefix%matchmaking",
+			"%prefix%matchmaking add <channel ID or name>",
+			"%prefix%matchmaking remove <lobby ID or name>",
+			"%prefix%matchmaking target <lobby or category ID or name>",
+			"%prefix%matchmaking mode <mode>"
 		},
 		{
-			"vm!companions",
-			"vm!companions category <category ID or name>",
-			"vm!companions name <new companion name>",
-			"vm!companions greeting <greeting text>",
-			"vm!companions log <log channel>",
+			"%prefix%companions",
+			"%prefix%companions category <category ID or name>",
+			"%prefix%companions name <new companion name>",
+			"%prefix%companions greeting <greeting text>",
+			"%prefix%companions log <log channel>",
 		},
 		{
-			"vm!room",
-			"vm!room rename <new name>",
-			"vm!room resize <0-99>",
-			"vm!room bitrate <8-96>",
-			"vm!room mute/unmute <user mention>",
-			"vm!room kick <user mention>",
-			"vm!room blocklist add/remove <user mention>",
-			"vm!room reservations add/remove <user mention>",
-			"vm!room reservations lock",
-			"vm!room blocklist/reservations clear",
-			"vm!room promote <user mention>",
-			"vm!room host",
-			"vm!room invite [user mention]"
+			"%prefix%room",
+			"%prefix%room rename <new name>",
+			"%prefix%room resize <0-99>",
+			"%prefix%room bitrate <8-96>",
+			"%prefix%room mute/unmute <user mention>",
+			"%prefix%room kick <user mention>",
+			"%prefix%room blocklist add/remove <user mention>",
+			"%prefix%room reservations add/remove <user mention>",
+			"%prefix%room reservations lock",
+			"%prefix%room blocklist/reservations clear",
+			"%prefix%room promote <user mention>",
+			"%prefix%room host",
+			"%prefix%room invite [user mention]"
 		},
 		{
-			"vm!chat",
-			"vm!chat rename <new name>",
-			"vm!chat mute/unmute <user mention>",
-			"vm!chat hide/show <user mention>",
-			"vm!chat clear [amount]"
+			"%prefix%chat",
+			"%prefix%chat rename <new name>",
+			"%prefix%chat mute/unmute <user mention>",
+			"%prefix%chat hide/show <user mention>",
+			"%prefix%chat clear [amount]"
 		},
 		{
-			"vm!server",
-			"vm!server role <role mention>",
-			"vm!server limit <0-500>",
-			"vm!server permissions <permission> [permission] allow/deny",
-			"vm!server prefix <new prefix>"
+			"%prefix%server",
+			"%prefix%server role <role mention>",
+			"%prefix%server limit <0-500>",
+			"%prefix%server permissions <permission> [permission] allow/deny",
+			"%prefix%server prefix <new prefix>"
 		},
 		{
-			"vm!help [lobbies/matchmaking/companions/room/chat/server/other]",
-			"vm!invite or vm!support",
-			"vm!select <lobby or category ID or name>",
-			"vm!reset <command> <subcommand>",
-			"vm!create voice/text <1-50> <name>",
-			"vm!create voice/text <start index> <end index> <name>",
-			"vm!delete voice/text top/bottom <1-50> [force]"
+			"%prefix%help [lobbies/matchmaking/companions/room/chat/server/other]",
+			"%prefix%invite or %prefix%support",
+			"%prefix%select <lobby or category ID or name>",
+			"%prefix%reset <command> <subcommand>",
+			"%prefix%create voice/text <1-50> <name>",
+			"%prefix%create voice/text <start index> <end index> <name>",
+			"%prefix%delete voice/text top/bottom <1-50> [force]"
 		}
 	},
 	
 	helpFieldValues = {
 		[0] = {
-			"Setup and configure lobbies - `vm!lobbies`",
-			"Setup and configure matchmaking in lobbies or normal channels - `vm!matchmaking`",
-			"Configure companion chats (see `Lobby commands` first) - `vm!companions`",
-			"Allow users to moderate and configure their rooms - `vm!room`",
-			"Allow users to moderate and configure their private chats - `vm!chat`",
-			"Additional settings like prefix - `vm!server`",
+			"Setup and configure lobbies - `%prefix%lobbies`",
+			"Setup and configure matchmaking in lobbies or normal channels - `%prefix%matchmaking`",
+			"Configure companion chats (see `Lobby commands` first) - `%prefix%companions`",
+			"Allow users to moderate and configure their rooms - `%prefix%room`",
+			"Allow users to moderate and configure their private chats - `%prefix%chat`",
+			"Additional settings like prefix - `%prefix%server`",
 			"Different helpful commands for users and administrators"
 		},
 		{
@@ -126,17 +126,17 @@ You can put different `%combos%` in the name to customize it
 `%tag%` - user's tag (for example **Riddles#2773**)
 `%game%` - user's currently played or streamed game (**no game** if user's not playing anything)
 `%counter%` - room position. Keeps rooms ordered
-`%rename%` - blank when room is created. When host uses `vm!room rename`, gets replaced by host's input]],
+`%rename%` - blank when room is created. When host uses `%prefix%room rename`, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
 			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby",
 			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
 			[[Give rooms' hosts access to different commands
-`rename` - allows use of `vm!room rename` and `vm!chat rename`
-`resize` - allows use of `vm!room resize`
-`bitrate` - allows use of `vm!room bitrate`
+`rename` - allows use of `%prefix%room rename` and `%prefix%chat rename`
+`resize` - allows use of `%prefix%room resize`
+`bitrate` - allows use of `%prefix%room bitrate`
 `manage` - all of the above, plus gives host **Manage Channels** permission in their room
-`mute` - allows use of `vm!room mute/unmute` and `vm!chat mute/unmute`
-`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `vm!room kick`, `vm!room block/reserve` and `vm!chat hide/show`]],
+`mute` - allows use of `%prefix%room mute/unmute` and `%prefix%chat mute/unmute`
+`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `%prefix%room kick`, `%prefix%room block/reserve` and `%prefix%chat hide/show`]],
 			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 		},
 		{
@@ -162,10 +162,10 @@ Text chat names have default formatting enforced by Discord, name template will 
 You can put different `%combos%` in the name to customize it
 `%roomname%` - name of the room chat belongs to
 `%chatname%` - name of the chat
-`%commands%` - formatted list of `vm!room` and `vm!chat` commands
-`%roomcommands%` - raw list of `vm!room` commands
-`%chatcommands%` - raw list of `vm!chat` commands
-`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `vm!lobbies name`]],
+`%commands%` - formatted list of `%prefix%room` and `%prefix%chat` commands
+`%roomcommands%` - raw list of `%prefix%room` commands
+`%chatcommands%` - raw list of `%prefix%chat` commands
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `%prefix%lobbies name`]],
 			"Enable chat logging. Logs will be sent to a channel of your choosing. **Logs will expire in 1 month!**"
 		},
 		{
@@ -211,7 +211,7 @@ You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
 			"Select a lobby or a category to change their settings",
 			[[Reset any setting to its default value
-Example: `vm!reset companions greeting`]],
+Example: `%prefix%reset companions greeting`]],
 			[[🛠 Command is temporarily disabled 🛠
 Create a certain amount of channels in selected category
 Use `%counter%` to include channel number in the name]],
@@ -253,7 +253,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
-You can add a lobby with `vm!lobbies add`]],
+You can add a lobby with `%prefix%lobbies add`]],
 	lobbiesInfo = "Select lobbies to change their settings",
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
@@ -308,8 +308,8 @@ You can enable companion channels with `companion`]],
 	
 	greetingConfirm = "Set new greeting!",
 	greetingReset = "Disabled the greeting",
-	roomCommands = "Available `vm!room` commands: ",
-	chatCommands = "Available `vm!chat` commands: ",
+	roomCommands = "Available `%prefix%room` commands: ",
+	chatCommands = "Available `%prefix%chat` commands: ",
 	logConfirm = "Chat logs will be sent to %s",
 	logReset = "Disabled the chatlogs",
 	logName = "`%s` room of `%s` lobby\n",
