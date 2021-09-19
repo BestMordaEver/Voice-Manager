@@ -37,6 +37,8 @@ events = {
 	
 	channelDelete = require "events/channelDelete",
 	
+	presenceUpdate = require "events/presenceUpdate",
+	
 	init = function ()
 		guilds:load()
 		lobbies:load()
@@ -57,6 +59,7 @@ events = {
 		client:on(events("voiceChannelLeave"))
 		client:on(events("channelUpdate"))
 		client:on(events("channelDelete"))
+		client:on(events("presenceUpdate"))
 		clock:on(events("min"))
 		clock:on(events("day"))
 		

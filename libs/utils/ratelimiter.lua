@@ -1,13 +1,16 @@
 local timer = require "timer"
 
 local Time = require "discordia".Time
+local Emitter = require "discordia".Emitter
 local logger = require "logger"
 local safeEvent = require "funcs/safeEvent"
 
 local ratelimiter = {}
+local emitter = Emitter()
 
 local function reset (name, point)
 	ratelimiter[name][point] = nil
+	emitter:emit("reset", name, point)
 end
 
 return setmetatable(ratelimiter,{
@@ -32,6 +35,10 @@ return setmetatable(ratelimiter,{
 			end
 			
 			return limitPoint.remaining, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString()
+		end,
+		
+		on = function (self, f)
+			return emitter:on("reset", f)
 		end
 	},
 	
