@@ -43,16 +43,15 @@ return function (member)
 	end
 	
 	local channelData = channels[member.voiceChannel.id]
-	if not (channelData.parent and channelData.parent.template:match("%%game%(?.-%)?%%")) then
+	if not (channelData.parent and channelData.parent.template and channelData.parent.template:match("%%game%(?.-%)?%%")) then
 		return		-- nothing to check? gtfo
 	end
-	
-	local name = nameGenerator(member.voiceChannel)
 	
 	if not member.voiceChannel.name:match(channelData.parent.template:gsub("%%.-%%", ".-")) then
 		return		-- edited beyond recognition by user? gtfo
 	end
 	
+	local name = nameGenerator(member.voiceChannel)
 	if member.voiceChannel.name == name then
 		return		-- no need to waste ratelimits
 	end
