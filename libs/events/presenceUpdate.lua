@@ -56,7 +56,7 @@ return function (member)
 	if member.voiceChannel.name == name then
 		return		-- no need to waste ratelimits
 	end
-	.
+	
 	local limit, retryIn = ratelimiter:limit("channelName", member.voiceChannel.id)
 	if limit == -1 then
 		awaiting[channelData.id] = true
