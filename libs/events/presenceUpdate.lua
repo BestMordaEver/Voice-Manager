@@ -52,7 +52,7 @@ return function (member)
 	end
 	
 	local name = nameGenerator(member.voiceChannel)
-	if member.voiceChannel.name == name then
+	if not member.voiceChannel or member.voiceChannel.name == name then
 		return		-- no need to waste ratelimits
 	end
 	
