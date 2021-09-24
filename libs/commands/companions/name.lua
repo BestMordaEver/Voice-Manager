@@ -3,8 +3,7 @@ local lobbies = require "storage/lobbies"
 
 return function (message, channel, name)
 	if name then
-		name = name:lower()
-		name = name:gsub("%s+", "%-")
+		name = name:lower():gsub("%s+", "%-")
 	else
 		name = "private-chat"
 	end
