@@ -156,7 +156,7 @@ You can put different `%combos%` in the name to customize it
 		{
 			"Show all lobies that have companion chats enabled",
 			"Select a category in which chats will be created",
-			[[Configure what name a chat will have when it's created. Default is `private-chat`
+			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `%prefix%lobbies name`. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
 			[[Configure a message that will be automatically sent to chat when it's created
 You can put different `%combos%` in the name to customize it
@@ -166,7 +166,7 @@ You can put different `%combos%` in the name to customize it
 `%roomcommands%` - raw list of `%prefix%room` commands
 `%chatcommands%` - raw list of `%prefix%chat` commands
 `%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `%prefix%lobbies name`]],
-			"Enable chat logging. Logs will be sent to a channel of your choosing. **Logs will expire in 1 month!**"
+			"Enable chat logging. Logs will be sent as files to a channel of your choosing"
 		},
 		{
 			"Show room info and available commands",
