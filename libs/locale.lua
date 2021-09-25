@@ -124,11 +124,12 @@ You can put different `%combos%` in the name to customize it
 `%nickname%` - user's nickname (name is used if nickname is not set)
 `%name's%`, `%nickname's%` - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
 `%tag%` - user's tag (for example **Riddles#2773**)
-`%game%` - user's currently played or streamed game (**no game** if user's not playing anything)
+`%game%` - user's currently played game (**no game** if user's not playing anything)
+`%game(text)%` - same as %game%, but shows **text** instead of **no game**
 `%counter%` - room position. Keeps rooms ordered
 `%rename%` - blank when room is created. When host uses `%prefix%room rename`, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
-			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby",
+			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respect server boost status, so you may want to try bigger numbers",
 			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
 			[[Give rooms' hosts access to different commands
 `rename` - allows use of `%prefix%room rename` and `%prefix%chat rename`
@@ -173,7 +174,7 @@ You can put different `%combos%` in the name to customize it
 			[[Change room name
 ❗Changes to channel names are ratelimited to 2 per 10 minutes❗]],
 			"Change room capacity",
-			"Change room bitrate",
+			"Change room bitrate. This command respects server boost status, check if you can use higher bitrates",
 			"Mute/unmute mentioned users",
 			"Kick mentioned users from the room",
 			"Add mentioned users to room's blocklist",
