@@ -51,7 +51,7 @@ return function (member)
 	local companion = client:getChannel(channelData.companion)
 	
 	if parentData then
-		if parent.template and parentData.template:match("%%game%(?.-%)?%%") then
+		if parentData.template and parentData.template:match("%%game%(?.-%)?%%") then
 			local name = templateInterpreter(parentData.template, member, channelData.position)
 			
 			if channel.name ~= name then	-- no need to waste ratelimits
