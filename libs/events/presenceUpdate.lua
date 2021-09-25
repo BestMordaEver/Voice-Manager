@@ -47,39 +47,35 @@ return function (member)
 		return		-- not host? gtfo
 	end
 	
-	local channelData, parent = channels[channel.id], channels[channel.id].parent
+	local channelData, parentData = channels[channel.id], channels[channel.id].parent
 	local companion = client:getChannel(channelData.companion)
 	
-	if not (parent and (
-		(parent.template and parent.template:match("%%game%(?.-%)?%%"))
-			or
-		(parent.companionTemplate and parent.companionTemplate:match("%%game%(?.-%)?%%"))
-		)) then
-		return		-- nothing to check? gtfo
-	end
-	
-	local name = templateInterpreter(parent.template, member, channelData.position)
-		
-	if channel.name ~= name then	-- no need to waste ratelimits
-		local limit, retryIn = ratelimiter:limit("channelName", channel.id)
-		if limit == -1 then
-			awaiting[channelData.id] = true
-		else
-			channel:setName(name)
-			awaiting[channel.id] = nil
-		end
-	end
-	
-	if companion then
-		name = templateInterpreter(parent.companionTemplate, member, channelData.position):discordify()
+	if parentData then
+		if parent.template and parentData.template:match("%%game%(?.-%)?%%") then
+			local name = templateInterpreter(parentData.template, member, channelData.position)
 			
-		if companion.name ~= name then
-			limit, retryIn = ratelimiter:limit("companionName", companion.id, channel.id)
-			if limit == -1 then
-				awaiting[companion.id] = true
-			else
-				companion:setName(name)
-				awaiting[companion.id] = nil
+			if channel.name ~= name then	-- no need to waste ratelimits
+				local limit, retryIn = ratelimiter:limit("channelName", channel.id)
+				if limit == -1 then
+					awaiting[channelData.id] = true
+				else
+					channel:setName(name)
+					awaiting[channel.id] = nil
+				end
+			end
+		end
+		
+		if companion and parentData.companionTemplate and parentData.companionTemplate:match("%%game%(?.-%)?%%") then
+			local name = templateInterpreter(parentData.companionTemplate, member, channelData.position):discordify()
+				
+			if companion.name ~= name then
+				limit, retryIn = ratelimiter:limit("companionName", companion.id, channel.id)
+				if limit == -1 then
+					awaiting[companion.id] = true
+				else
+					companion:setName(name)
+					awaiting[companion.id] = nil
+				end
 			end
 		end
 	end
