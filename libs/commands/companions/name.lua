@@ -3,7 +3,7 @@ local lobbies = require "storage/lobbies"
 
 return function (message, channel, name)
 	if name then
-		name = name:lower():gsub("%s+", "%-")
+		name = name:discordify()
 	else
 		name = "private-chat"
 	end

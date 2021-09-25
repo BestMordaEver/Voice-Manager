@@ -9,6 +9,15 @@ require "D:\\lua\\deps\\discordia\\init.lua"	table: 0x025638037e88 absolute path
 ]]
 local discordia = require "discordia"
 discordia.extensions.table()
+string.demagic = function (s)
+	return s:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]","%%%1"), nil
+end
+
+string.discordify = function (s)
+	return s:gsub("[%s%-~]+","-"):gsub("^%-+",""):gsub("[\\%!\"#%$&%*%+,%./:;<=>%?@%[%]%^`{|}]",""):gsub("%-+","-"):lower()
+	--return s:gsub("[%s%-~]+","-"):gsub("^%-+",""):gsub("[\\\'%%%(%)%!\"#%$&%*%+,%./:;<=>%?@%[%]%^`{|}]",""):gsub("%-+","-"):lower()
+	-- \'%%%(%) is omitted to allow name templates to work properly
+end
 
 local client = discordia.Client()
 

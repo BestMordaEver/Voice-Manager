@@ -7,6 +7,8 @@ local hostPermissionCheck = require "funcs/hostPermissionCheck"
 local templateInterpreter = require "funcs/templateInterpreter"
 local ratelimiter = require "utils/ratelimiter"
 
+ratelimiter("companionName", 2, 60*10)
+
 return function (message, chat, name)
 	local channel = hostCheck(message)
 	if not channel then
@@ -18,7 +20,7 @@ return function (message, chat, name)
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
 	
-	local limit, retryIn = ratelimiter:limit("channelName", chat.id)
+	local limit, retryIn = ratelimiter:limit("companionName", chat.id)
 	local success, err
 	
 	if limit == -1 then
@@ -26,11 +28,11 @@ return function (message, chat, name)
 	else
 		local channelData, guildData = channels[channel.id], guilds[channel.guild.id]
 		if channelData.parent and channelData.parent.companionTemplate and channelData.parent.companionTemplate:match("%%rename%%") then
-			success, err = chat:setName(templateInterpreter(channelData.parent.companionTemplate, message.member, channelData.position, name))
+			success, err = chat:setName(templateInterpreter(channelData.parent.companionTemplate, message.member, channelData.position, name):discordify())
 		elseif guildData.companionTemplate and guildData.companionTemplate:match("%%rename%%") then
-			success, err = chat:setName(templateInterpreter(guildData.companionTemplate, message.member, channelData.position, name))
+			success, err = chat:setName(templateInterpreter(guildData.companionTemplate, message.member, channelData.position, name):discordify())
 		else
-			success, err = chat:setName(name)
+			success, err = chat:setName(name:discordify())
 		end
 	end
 	

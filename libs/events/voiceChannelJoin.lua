@@ -84,7 +84,7 @@ local function lobbyJoin (member, lobby)
 		
 			if companionTarget then
 				if name:match("%%.-%%") then
-					name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
+					name = templateInterpreter(name, member, position):discordify()
 					if name == "" then name = "private-chat" end
 				end
 			
