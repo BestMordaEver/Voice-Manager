@@ -122,6 +122,7 @@ local function lobbyJoin (member, lobby)
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
 	else
+		lobbyData:detachChild(position)
 		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room", lobby.guild.id, lobby.id, member.user.id)
 	end
 end
