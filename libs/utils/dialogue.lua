@@ -1,18 +1,20 @@
 local timer = require "timer"
 local timers = {}
 
-local function clear (self, userID)
-	self[userID] = nil
-	timers[userID] = nil
+local function clear (self, selected)
+	self[selected] = nil
+	timers[selected] = nil
 end
 
 return setmetatable({},{
 	__call = function (self, userID, selected)
 		-- new dialogues with the user nullify previous ones
-		self[userID] = selected
-		if timers[userID] then
-			timer.clearTimeout(timers[userID])
+		self[selected] = userID
+		if timers[selected] then
+			timer.clearTimeout(timers[selected])
 		end
-		timers[userID] = timer.setTimeout(3000000, clear, self, userID)
-	end
+		timers[selected] = timer.setTimeout(3000000, clear, self, selected)
+	end,
+	
+	__index = {clear = clear}
 })
