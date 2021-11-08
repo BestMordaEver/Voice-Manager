@@ -284,8 +284,8 @@ You can add a lobby with `%prefix%lobbies add`]],
 	
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
-	matchmakingNoInfo = [[There are not registered matchmaking lobbies
-You can create a matchmaking lobby with `match`]],
+	matchmakingNoInfo = [[There are no registered matchmaking lobbies
+You can create a matchmaking lobby with `%prefix%matchmaking add`]],
 	matchmakingField = [[**Target:** %s
 **Mode:** %s
 **Matchmaking pool:** %d channels]],
@@ -300,7 +300,7 @@ You can create a matchmaking lobby with `match`]],
 	-- companion
 	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
-You can enable companion channels with `companion`]],
+You can enable companion channels with `%prefix%lobbies companion enable`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
 **Logging:** %s
