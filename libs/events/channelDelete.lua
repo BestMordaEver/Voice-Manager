@@ -8,8 +8,6 @@ local Overseer = require "utils/logWriter"
 local dialogue = require "utils/dialogue"
 
 return function (channel) -- and make sure there are no traces!
-	if dialogue[channel.id] then dialogue:clear(channel.id) end
-	
 	local lobbyData, channelData = lobbies[channel.id], channels[channel.id]
 	local guildData = guilds[channel.guild.id]
 	

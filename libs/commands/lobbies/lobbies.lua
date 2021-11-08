@@ -1,5 +1,6 @@
 local client = require "client"
 local locale = require "locale"
+local lobbies = require "storage/lobbies"
 local dialogue = require "utils/dialogue"
 local permissionCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
@@ -35,10 +36,10 @@ return function (message)
 			return "Couldn't find channel to add", "warning", locale.badChannel
 		end
 		
-		dialogue(message.author.id, lobby.id)
+		if subcommand == "add" then dialogue(message.author.id, lobby.id) end
 	else
 		lobby = client:getChannel(dialogue[message.author.id])
-		if not lobby or lobby.type ~= channelType.voice then
+		if not (lobby and lobbies[lobby.id] and lobby.type == channelType.voice) then
 			return "No lobby selected", "warning", locale.noLobbySelected
 		end
 	end
