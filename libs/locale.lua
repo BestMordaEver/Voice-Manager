@@ -116,7 +116,7 @@ Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]
 			"Show current lobbies",
 			"Add a new lobby",
 			"Remove an existing lobby",
-			"Select a category, in which users' rooms will be created. By default, rooms are created in the same category as the lobby",
+			"Select a category in which rooms will be created. By default, rooms are created in the same category as the lobby",
 			[[Configure what name a room will have when it's created
 Default name is `%nickname's% room`
 You can put different `%combos%` in the name to customize it
@@ -131,7 +131,7 @@ You can put different `%combos%` in the name to customize it
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
 			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respect server boost status, so you may want to try bigger numbers",
 			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
-			[[Give rooms' hosts access to different commands
+			[[Give room hosts' access to different commands
 `rename` - allows use of `%prefix%room rename` and `%prefix%chat rename`
 `resize` - allows use of `%prefix%room resize`
 `bitrate` - allows use of `%prefix%room bitrate`
