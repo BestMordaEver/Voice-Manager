@@ -11,56 +11,72 @@ local templateInterpreter = require "funcs/templateInterpreter"
 
 local awaiting = {}
 
-local function nameGenerator(channel)
-	local channelData = channels[channel.id]
-	local template = channelData.parent.template
-	return templateInterpreter(template, channel.guild:getMember(channelData.host), channelData.position,
-		template:match("rename") and channel.name:match(template:gsub("%%rename%%", "(.-)"):gsub("%%.-%%",".-"), 1) or "")
-end
-
-ratelimiter:on(function (name, point)
-	if name ~= "channelName" then
-		return
-	end
-	
-	local channel = client:getChannel(point)
-	if not (channel and channel.name:match(channels[point].parent.template:gsub("%%.-%%", ".-"))) then
-		return		-- edited beyond recognition by user? gtfo
-	end
-	
-	if awaiting[point] then
-		local name = nameGenerator(channel)
-		if channel.name ~= name then
-			channel:setName()
+ratelimiter:on("channelName", function (channelID)
+	if awaiting[channelID] then
+		local channel = client:getChannel(channelID)
+		if channel then
+			local name = templateInterpreter(channels[channelID].parent.template, channel.guild:getMember(channels[channelID].host), channels[channelID].position)
+			
+			if channel.name ~= name then
+				channel:setName(name)
+			end
 		end
-		awaiting[point] = nil
+		awaiting[channelID] = nil
+	end
+end)
+
+ratelimiter:on("companionName", function (companionID, channelID)
+	if awaiting[companionID] then
+		local channel, companion = client:getChannel(channelID), client:getChannel(companionID)
+		
+		if channel and companion then
+			local name = templateInterpreter(channels[channelID].parent.companionTemplate, 
+				companion.guild:getMember(channels[channelID].host), channels[channelID].position):discordify()
+			
+			if companion.name ~= name then
+				companion:setName(name)
+			end
+		end
+		awaiting[companionID] = nil
 	end
 end)
 
 return function (member)
-	if not (member.voiceChannel and channels[member.voiceChannel.id] and channels[member.voiceChannel.id].host == member.user.id) then
+	local channel = member.voiceChannel
+	if not (channel and channels[channel.id] and channels[channel.id].host == member.user.id) then
 		return		-- not host? gtfo
 	end
 	
-	local channelData = channels[member.voiceChannel.id]
-	if not (channelData.parent and channelData.parent.template and channelData.parent.template:match("%%game%(?.-%)?%%")) then
-		return		-- nothing to check? gtfo
-	end
+	local channelData, parentData = channels[channel.id], channels[channel.id].parent
+	local companion = client:getChannel(channelData.companion)
 	
-	if not member.voiceChannel.name:match(channelData.parent.template:gsub("%%.-%%", ".-")) then
-		return		-- edited beyond recognition by user? gtfo
-	end
-	
-	local name = nameGenerator(member.voiceChannel)
-	if not member.voiceChannel or member.voiceChannel.name == name then
-		return		-- no need to waste ratelimits
-	end
-	
-	local limit, retryIn = ratelimiter:limit("channelName", member.voiceChannel.id)
-	if limit == -1 then
-		awaiting[channelData.id] = true
-	else
-		member.voiceChannel:setName(name)
-		awaiting[channelData.id] = nil
+	if parentData then
+		if parentData.template and parentData.template:match("%%game%(?.-%)?%%") then
+			local name = templateInterpreter(parentData.template, member, channelData.position)
+			
+			if channel.name ~= name then	-- no need to waste ratelimits
+				local limit, retryIn = ratelimiter:limit("channelName", channel.id)
+				if limit == -1 then
+					awaiting[channelData.id] = true
+				else
+					channel:setName(name)
+					awaiting[channel.id] = nil
+				end
+			end
+		end
+		
+		if companion and parentData.companionTemplate and parentData.companionTemplate:match("%%game%(?.-%)?%%") then
+			local name = templateInterpreter(parentData.companionTemplate, member, channelData.position):discordify()
+				
+			if companion.name ~= name then
+				limit, retryIn = ratelimiter:limit("companionName", companion.id, channel.id)
+				if limit == -1 then
+					awaiting[companion.id] = true
+				else
+					companion:setName(name)
+					awaiting[companion.id] = nil
+				end
+			end
+		end
 	end
 end

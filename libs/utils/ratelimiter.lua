@@ -8,15 +8,15 @@ local safeEvent = require "funcs/safeEvent"
 local ratelimiter = {}
 local emitter = Emitter()
 
-local function reset (name, point)
+local function reset (name, point, ...)
 	ratelimiter[name][point] = nil
-	emitter:emit("reset", name, point)
+	emitter:emit(name, point, ...)
 end
 
 return setmetatable(ratelimiter,{
 	__index = {
 		-- returns remeaining attempts and tostring of how much time left until ratelimit is reset
-		limit = function (self, name, point)
+		limit = function (self, name, point, ...)
 			if not self[name] then error ("No ratelimits on event "..tostring(name)) end
 			
 			local limitPoint = self[name][point]
@@ -24,7 +24,7 @@ return setmetatable(ratelimiter,{
 			if not limitPoint then
 				self[name][point] = {remaining = self[name].limit - 1, resetAfter = os.time() + self[name].timer}
 				limitPoint = self[name][point]
-				timer.setTimeout(self[name].timer * 1000, reset, name, point)
+				timer.setTimeout(self[name].timer * 1000, reset, name, point, ...)
 				logger:log(4, "EVENT %s ENDPOINT %s: ratelimiting for %s, %s tries left", name, point, Time.fromSeconds(self[name].timer):toString(), limitPoint.remaining)
 			elseif limitPoint.remaining > 0 then
 				limitPoint.remaining = limitPoint.remaining - 1
@@ -37,8 +37,8 @@ return setmetatable(ratelimiter,{
 			return limitPoint.remaining, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString()
 		end,
 		
-		on = function (self, f)
-			return emitter:on("reset", f)
+		on = function (self, name, f)
+			return emitter:on(name, f)
 		end
 	},
 	

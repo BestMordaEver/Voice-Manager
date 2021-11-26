@@ -5,6 +5,7 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local Overseer = require "utils/logWriter"
+local dialogue = require "utils/dialogue"
 
 return function (channel) -- and make sure there are no traces!
 	local lobbyData, channelData = lobbies[channel.id], channels[channel.id]

@@ -14,5 +14,7 @@ return setmetatable({},{
 			timer.clearTimeout(timers[userID])
 		end
 		timers[userID] = timer.setTimeout(3000000, clear, self, userID)
-	end
+	end,
+	
+	__index = {clear = clear}
 })

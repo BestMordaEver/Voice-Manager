@@ -116,7 +116,7 @@ Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]
 			"Show current lobbies",
 			"Add a new lobby",
 			"Remove an existing lobby",
-			"Select a category, in which users' rooms will be created. By default, rooms are created in the same category as the lobby",
+			"Select a category in which rooms will be created. By default, rooms are created in the same category as the lobby",
 			[[Configure what name a room will have when it's created
 Default name is `%nickname's% room`
 You can put different `%combos%` in the name to customize it
@@ -124,13 +124,14 @@ You can put different `%combos%` in the name to customize it
 `%nickname%` - user's nickname (name is used if nickname is not set)
 `%name's%`, `%nickname's%` - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
 `%tag%` - user's tag (for example **Riddles#2773**)
-`%game%` - user's currently played or streamed game (**no game** if user's not playing anything)
+`%game%` - user's currently played game (**no game** if user's not playing anything)
+`%game(text)%` - same as %game%, but shows **text** instead of **no game**
 `%counter%` - room position. Keeps rooms ordered
 `%rename%` - blank when room is created. When host uses `%prefix%room rename`, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
-			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby",
+			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respect server boost status, so you may want to try bigger numbers",
 			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
-			[[Give rooms' hosts access to different commands
+			[[Give room hosts' access to different commands
 `rename` - allows use of `%prefix%room rename` and `%prefix%chat rename`
 `resize` - allows use of `%prefix%room resize`
 `bitrate` - allows use of `%prefix%room bitrate`
@@ -156,7 +157,7 @@ You can put different `%combos%` in the name to customize it
 		{
 			"Show all lobies that have companion chats enabled",
 			"Select a category in which chats will be created",
-			[[Configure what name a chat will have when it's created. Default is `private-chat`
+			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `%prefix%lobbies name`. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
 			[[Configure a message that will be automatically sent to chat when it's created
 You can put different `%combos%` in the name to customize it
@@ -166,14 +167,14 @@ You can put different `%combos%` in the name to customize it
 `%roomcommands%` - raw list of `%prefix%room` commands
 `%chatcommands%` - raw list of `%prefix%chat` commands
 `%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `%prefix%lobbies name`]],
-			"Enable chat logging. Logs will be sent to a channel of your choosing. **Logs will expire in 1 month!**"
+			"Enable chat logging. Logs will be sent as files to a channel of your choosing"
 		},
 		{
 			"Show room info and available commands",
 			[[Change room name
 ❗Changes to channel names are ratelimited to 2 per 10 minutes❗]],
 			"Change room capacity",
-			"Change room bitrate",
+			"Change room bitrate. This command respects server boost status, check if you can use higher bitrates",
 			"Mute/unmute mentioned users",
 			"Kick mentioned users from the room",
 			"Add mentioned users to room's blocklist",
@@ -283,8 +284,8 @@ You can add a lobby with `%prefix%lobbies add`]],
 	
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
-	matchmakingNoInfo = [[There are not registered matchmaking lobbies
-You can create a matchmaking lobby with `match`]],
+	matchmakingNoInfo = [[There are no registered matchmaking lobbies
+You can create a matchmaking lobby with `%prefix%matchmaking add`]],
 	matchmakingField = [[**Target:** %s
 **Mode:** %s
 **Matchmaking pool:** %d channels]],
@@ -299,7 +300,7 @@ You can create a matchmaking lobby with `match`]],
 	-- companion
 	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
-You can enable companion channels with `companion`]],
+You can enable companion channels with `%prefix%lobbies companion enable`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
 **Logging:** %s
