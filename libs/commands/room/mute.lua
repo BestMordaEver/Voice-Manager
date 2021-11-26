@@ -34,7 +34,7 @@ return function (message, mentionString)
 		channel:getPermissionOverwriteFor(member):denyPermissions(permission.speak)
 		if member.voiceChannel == channel then
 			member:setVoiceChannel(silentRoom)
-			if silentRoom then member:setVoiceChannel(silentRoom) end
+			if silentRoom then member:setVoiceChannel(channel) end
 		end
 	end
 	
