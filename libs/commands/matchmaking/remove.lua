@@ -7,6 +7,6 @@ return function (message, channel)
 	if lobbies[channel.id] then
 		lobbies[channel.id]:delete()
 	end
-	
+
 	return "Matchmaking lobby removed", "ok", locale.matchmakingRemoveConfirm:format(channel.name)
 end

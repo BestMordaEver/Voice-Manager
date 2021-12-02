@@ -1,12 +1,11 @@
 local client = require "client"
-local guilds = require "storage/guilds"
 
 return function (message, input)
 	local channel = client:getChannel(input)
 	if channel and channel.guild == message.guild then
 		return channel
 	end
-	
+
 	input = input:lower()
 	for _,channel in pairs(message.guild.voiceChannels) do
 		if channel.name:lower() == input then return channel end

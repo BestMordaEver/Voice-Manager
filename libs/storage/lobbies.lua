@@ -33,29 +33,29 @@ local emitter = discordia.Emitter()
 
 local storageStatements = {
 	add = {"INSERT INTO lobbies VALUES(?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL)", "ADD LOBBY %s"},
-	
+
 	remove = {"DELETE FROM lobbies WHERE id = ?", "DELETE LOBBY %s"},
-	
+
 	setMatchmaking = {"UPDATE lobbies SET isMatchmaking = ? WHERE id = ?","SET MATCHMAKING %s => LOBBY %s"},
-	
+
 	setRole = {"UPDATE lobbies SET role = ? WHERE id = ?","SET ROLE %s => LOBBY %s"},
-	
+
 	setPermissions = {"UPDATE lobbies SET permissions = ? WHERE id = ?","SET PERMISSIONS %s => LOBBY %s"},
-	
+
 	setTemplate = {"UPDATE lobbies SET template = ? WHERE id = ?","SET TEMPLATE %s => LOBBY %s"},
-	
+
 	setTarget = {"UPDATE lobbies SET target = ? WHERE id = ?","SET TARGET %s => LOBBY %s"},
-	
+
 	setCapacity = {"UPDATE lobbies SET capacity = ? WHERE id = ?","SET CAPACITY %s => LOBBY %s"},
-	
+
 	setBitrate = {"UPDATE lobbies SET bitrate = ? WHERE id = ?","SET BITRATE %s => LOBBY %s"},
-	
+
 	setCompanionTemplate = {"UPDATE lobbies SET companionTemplate = ? WHERE id = ?","SET COMPANION TEMPLATE %s => LOBBY %s"},
-	
+
 	setCompanionTarget = {"UPDATE lobbies SET companionTarget = ? WHERE id = ?","SET COMPANION TARGET %s => LOBBY %s"},
-	
+
 	setGreeting = {"UPDATE lobbies SET greeting = ? WHERE id = ?","SET GREETING %s => LOBBY %s"},
-	
+
 	setCompanionLog = {"UPDATE lobbies SET companionLog = ? WHERE id = ?","SET COMPANION LOG %s => LOBBY %s"},
 }
 
@@ -76,43 +76,43 @@ local lobbyMethods = {
 		end
 		emitter:emit("remove", self.id)
 	end,
-	
+
 	setMatchmaking = function (self, isMatchmaking)
 		self.isMatchmaking = isMatchmaking
 		logger:log(6, "GUILD %s LOBBY %s: updated matchmaking status to %s", self.guildID, self.id, isMatchmaking)
 		emitter:emit("setMatchmaking", isMatchmaking and 1 or 0, self.id)
 	end,
-	
+
 	setRole = function (self, role)
 		self.role = role
 		logger:log(6, "GUILD %s LOBBY %s: updated managed role to %s", self.guildID, self.id, role)
 		emitter:emit("setRole", role, self.id)
 	end,
-	
+
 	setPermissions = function (self, permissions)
 		self.permissions = permissions
 		logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guildID, self.id, permissions)
 		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 	end,
-	
+
 	setTemplate = function (self, template)
 		self.template = template
 		logger:log(6, "GUILD %s LOBBY %s: updated template to %s", self.guildID, self.id, template)
 		emitter:emit("setTemplate", template, self.id)
 	end,
-	
+
 	setTarget = function (self, target)
 		self.target = target
 		logger:log(6, "GUILD %s LOBBY %s: updated target to %s", self.guildID, self.id, target)
 		emitter:emit("setTarget", target, self.id)
 	end,
-	
+
 	setCapacity = function (self, capacity)
 		self.capacity = capacity
 		logger:log(6, "GUILD %s LOBBY %s: updated capacity to %s", self.guildID, self.id, capacity)
 		emitter:emit("setCapacity", capacity, self.id)
 	end,
-	
+
 	setBitrate = function (self, bitrate)
 		self.bitrate = bitrate
 		logger:log(6, "GUILD %s LOBBY %s: updated bitrate to %s", self.guildID, self.id, bitrate)
@@ -124,30 +124,30 @@ local lobbyMethods = {
 		logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guildID, self.id, companionTarget)
 		emitter:emit("setCompanionTarget", tostring(companionTarget), self.id)
 	end,
-	
+
 	setCompanionTemplate = function (self, companionTemplate)
 		self.companionTemplate = companionTemplate
 		logger:log(6, "GUILD %s LOBBY %s: updated companion template to %s", self.guildID, self.id, companionTemplate)
 		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
 	end,
-	
+
 	setGreeting = function (self, greeting)
 		self.greeting = greeting
 		logger:log(6, "GUILD %s LOBBY %s: updated greeting to %s", self.guildID, self.id, greeting)
 		emitter:emit("setGreeting", greeting, self.id)
 	end,
-	
+
 	setCompanionLog = function (self, companionLog)
 		self.companionLog = companionLog
 		logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLog)
 		emitter:emit("setCompanionLog", companionLog, self.id)
 	end,
-	
+
 	-- returns filled position
 	attachChild = function (self, channelID, position)
 		return self.children:fill(channelID, position)
 	end,
-	
+
 	detachChild = function (self, position)
 		self.children:drain(position)
 	end
@@ -180,7 +180,7 @@ local lobbiesIndex = {
 			end
 		end
 	end,
-	
+
 	-- loadAdd and start interaction with db
 	add = function (self, lobbyID)
 		self:loadAdd({id = lobbyID, isMatchmaking = false, permissions = botPermissions(0)})
@@ -189,7 +189,7 @@ local lobbiesIndex = {
 			return self[lobbyID]
 		end
 	end,
-	
+
 	load = function (self)
 		logger:log(4, "STARTUP: Loading lobbies")
 		local lobbyIDs = lobbiesData:exec("SELECT * FROM lobbies")
@@ -209,10 +209,10 @@ local lobbiesIndex = {
 				end
 			end
 		end
-		
+
 		logger:log(4, "STARTUP: Loaded!")
 	end,
-	
+
 	cleanup = function (self)
 		for lobbyID, lobbyData in pairs(self) do
 			local lobby = client:getChannel(lobbyID)

@@ -11,9 +11,9 @@ local colors = embeds.colors
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("chatInfo", function (room)
 	local hidden, shown, muted = "","",""
-	
+
 	local companion = client:getChannel(channels[room.id].companion)
-	
+
 	for _,overwrite in pairs(companion.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
 		if Permissions(overwrite.allowedPermissions):has(permission.readMessages) then
 			hidden = hidden..overwrite:getObject().user.mentionString.." "
@@ -25,13 +25,13 @@ embeds:new("chatInfo", function (room)
 			muted = muted..overwrite:getObject().user.mentionString.." "
 		end
 	end
-	
+
 	local _, commands = availableCommands(room)
-	
+
 	if hidden == "" then hidden = locale.none end
 	if shown == "" then shown = locale.none end
 	if muted == "" then muted = locale.none end
-	
+
 	return {
 		title = locale.chatInfoTitle:format(companion.name),
 		color = colors.blurple,

@@ -7,10 +7,10 @@ local channelType = require "discordia".enums.channelType
 return function (message, channel, input)
 	if input then
 		local category = lookForChannel(message, input)	-- could be lobby!
-		if not category or not (category.type == channelType.category or (category.type == channelType.voice and lobbies[category.id])) then 
+		if not category or not (category.type == channelType.category or (category.type == channelType.voice and lobbies[category.id])) then
 			return "Couldn't find target", "warning", locale.badChannel
 		end
-		
+
 		local isPermitted, logMsg, msg = permissionCheck(message, category)
 		if isPermitted then
 			lobbies[channel.id]:setTarget(category.id)

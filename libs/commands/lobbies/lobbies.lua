@@ -19,11 +19,11 @@ local subcommands = {
 
 return function (message)
 	local subcommand, argument = message.content:match("lobbies%s*(%a*)%s*(.-)$")
-	
+
 	if subcommand == "" or argument == "" then
 		return "Sent lobbies info", "lobbiesInfo", message.guild
 	end
-	
+
 	local lobby
 	if subcommand == "add" or subcommand == "remove" then
 		lobby = client:getChannel(argument)
@@ -31,11 +31,11 @@ return function (message)
 			argument = argument:lower()
 			lobby = message.guild.voiceChannels:find(function(voiceChannel) return voiceChannel.name:lower() == argument end)
 		end
-		
+
 		if not lobby then
 			return "Couldn't find channel to add", "warning", locale.badChannel
 		end
-		
+
 		if subcommand == "add" then dialogue(message.author.id, lobby.id) end
 	else
 		lobby = client:getChannel(dialogue[message.author.id])
@@ -43,12 +43,12 @@ return function (message)
 			return "No lobby selected", "warning", locale.noLobbySelected
 		end
 	end
-	
+
 	local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
 	if not isPermitted then
 		return logMsg, "warning", userMsg
 	end
-	
+
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, lobby, argument)
 	else

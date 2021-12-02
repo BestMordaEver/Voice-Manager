@@ -10,12 +10,12 @@ return function (message, mentionString)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local isPermitted = hostPermissionCheck(message.member, channel, "mute")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
-	
+
 	local silentRoom
 	if channel.guild.afkChannel then
 		silentRoom = channel.guild.afkChannel
@@ -26,7 +26,7 @@ return function (message, mentionString)
 		end
 		if not silentRoom then silentRoom = nil end
 	end
-	
+
 	mentionString = ""
 	for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 		mentionString = mentionString .. user.mentionString .. " "
@@ -37,8 +37,8 @@ return function (message, mentionString)
 			if silentRoom then member:setVoiceChannel(channel) end
 		end
 	end
-	
+
 	if silentRoom then silentRoom:delete() end
-	
+
 	return "Muted mentioned members", "ok", locale.muteConfirm:format(mentionString)
 end

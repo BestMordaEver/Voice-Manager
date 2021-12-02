@@ -10,7 +10,7 @@ return function (message, channel, input)
 		if not category or category.type ~= channelType.category then
 			return "Couldn't find target category", "warning", locale.badCategory
 		end
-		
+
 		local isPermitted, logMsg, msg = permissionCheck(message, category)
 		if isPermitted then
 			lobbies[channel.id]:setTarget(category.id)

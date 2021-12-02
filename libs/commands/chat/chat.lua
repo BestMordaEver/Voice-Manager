@@ -14,20 +14,20 @@ local subcommands = {
 
 return function (message)
 	local subcommand, argument = message.content:match("chat%s*(%a*)%s*(.-)$")
-	
+
 	if not (message.member.voiceChannel and channels[message.member.voiceChannel.id]) then
 		return "User not in room", "warning", locale.notInRoom
 	end
-	
+
 	local chat = client:getChannel(channels[message.member.voiceChannel.id].companion)
 	if not chat then
 		return "Room doesn't have a chat", "warning", locale.noCompanion
 	end
-	
+
 	if subcommand == "" then
 		return "Sent chat info", "chatInfo", message.member.voiceChannel
 	end
-	
+
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, chat, argument)
 	else

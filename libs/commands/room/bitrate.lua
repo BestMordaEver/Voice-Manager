@@ -11,22 +11,22 @@ return function (message, bitrate)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local isPermitted = hostPermissionCheck(message.member, channel, "bitrate")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
-	
+
 	bitrate = tonumber(bitrate)
 	local tier = message.guild.premiumTier
 	for _,feature in ipairs(message.guild.features) do
 		if feature == "VIP_REGIONS" then tier = 3 end
 	end
-	
+
 	if not bitrate or bitrate < 8 or bitrate > tierRate[tier] then
-		return "Bitrate OOB", "warning", locale.bitrateOOB
+		return "Bitrate OOB", "warning", locale[tierLocale[tier]]
 	end
-	
+
 	local success, err = channel:setBitrate(bitrate * 1000)
 	if success then
 		return "Successfully changed room bitrate", "ok", locale.bitrateConfirm:format(bitrate)

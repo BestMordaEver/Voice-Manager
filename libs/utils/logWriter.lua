@@ -1,17 +1,14 @@
 local discordia = require "discordia"
-local token = require "token"
 local client = require "client"
 
 local safeEvent = require "funcs/safeEvent"
 
-local https = require "coro-http"
 local json = require "json"
 
 local emitter = discordia.Emitter()
-local Date = discordia.Date
 
 local insert, concat = table.insert, table.concat
-local f, byte = string.format, string.byte
+local f = string.format
 
 local function logEmbed (embed)
 	embed.type = nil
@@ -54,7 +51,7 @@ local writerMeta = {
 				(message.attachments and logAttachments(message.attachments) or ""))
 			)
 		end,
-		
+
 		messageUpdate = function (self, message)
 			insert(self, f("[%s] <%s edits %s> %s\r\n%s",
 				os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
@@ -65,7 +62,7 @@ local writerMeta = {
 				(message.attachments and logAttachments(message.attachments) or ""))
 			)
 		end,
-		
+
 		messageUpdateUncached = function (self, channel, messageID)
 			local message = channel:getMessage(messageID)
 			if message then
@@ -81,28 +78,28 @@ local writerMeta = {
 				insert(self, f("[%s] <%s is edited>", os.date("!%Y-%m-%d %H:%M:%S"), messageID))
 			end
 		end,
-		
+
 		messageDelete = function (self, message)
 			insert(self, f("[%s] <%s is deleted>", os.date("!%Y-%m-%d %H:%M:%S"), message.id))
 		end,
-		
+
 		messageDeleteUncached = function (self, channel, messageID)
 			insert(self, f("[%s] <%s is deleted>", os.date("!%Y-%m-%d %H:%M:%S"), messageID))
 		end,
-		
+
 		reactionAdd = function (self, reaction, userID)
 			print(client:getUser(userID), reaction, userID)
 			insert(self, f("[%s] <%s reacts to %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, reaction.message.id, reaction.emojiHash))
 		end,
-		
+
 		reactionAddUncached = function (self, channel, messageID, hash, userID)
 			insert(self, f("[%s] <%s reacts to %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, messageID, hash))
 		end,
-		
+
 		reactionRemove = function (self, reaction, userID)
 			insert(self, f("[%s] <%s removes reaction from %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, reaction.message.id, reaction.emojiHash))
 		end,
-		
+
 		reactionRemoveUncached = function (self, channel, messageID, hash, userID)
 			insert(self, f("[%s] <%s removes reaction from %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, messageID, hash))
 		end
@@ -119,15 +116,15 @@ local Overseer = {
 		end
 		return writers[channel.id]
 	end,
-	
+
 	resume = function (self, channel)
 		local writer = self:track(channel)
-		
+
 		local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
-		
+
 		if message then
 			writer:messageCreate(message)
-			
+
 			while message ~= lastMessage do
 				local messages = channel:getMessagesAfter(message, 100)
 				if messages then
@@ -142,62 +139,62 @@ local Overseer = {
 			end
 		end
 	end,
-	
+
 	stop = function (self, channel)
 		local writer = writers[channel.id]
 		writers[channel.id] = nil
 		return concat(writer)
 	end,
-	
+
 	events = {
 		messageCreate = function (message)
 			if writers[message.channel.id] then
 				writers[message.channel.id]:messageCreate(message)
 			end
 		end,
-		
+
 		messageUpdate = function (message)
 			if writers[message.channel.id] then
 				writers[message.channel.id]:messageUpdate(message)
 			end
 		end,
-		
+
 		messageUpdateUncached = function (channel, messageID)
 			if writers[channel.id] then
 				writers[channel.id]:messageUpdateUncached(channel, messageID)
 			end
 		end,
-		
+
 		messageDelete = function (message)
 			if writers[message.channel.id] then
 				writers[message.channel.id]:messageDelete(message)
 			end
 		end,
-		
+
 		messageDeleteUncached = function (channel, messageID)
 			if writers[channel.id] then
 				writers[channel.id]:messageDeleteUncached(channel, messageID)
 			end
 		end,
-		
+
 		reactionAdd = function (reaction, userID)
 			if writers[reaction.message.channel.id] then
 				writers[reaction.message.channel.id]:reactionAdd(reaction, userID)
 			end
 		end,
-		
+
 		reactionAddUncached = function (channel, messageID, hash, userID)
 			if writers[channel.id] then
 				writers[channel.id]:reactionAddUncached(channel, messageID, hash, userID)
 			end
 		end,
-		
+
 		reactionRemove = function (reaction, userID)
 			if writers[reaction.message.channel.id] then
 				writers[reaction.message.channel.id]:reactionRemove(reaction, userID)
 			end
 		end,
-		
+
 		reactionRemoveUncached = function (channel, messageID, hash, userID)
 			if writers[channel.id] then
 				writers[channel.id]:reactionRemoveUncached(channel, messageID, hash, userID)

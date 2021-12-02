@@ -7,15 +7,15 @@ local channelType = require "discordia".enums.channelType
 
 return function (message)
 	local argument = message.content:match("select%s*(.-)$")
-	
+
 	local channel = lookForChannel(message, argument)
-	
+
 	if channel then
 		local isPermitted, logMsg, msg = permissionCheck(message, channel)
 		if not isPermitted then
 			return logMsg, "warning", msg
 		end
-		
+
 		dialogue(message.author.id, channel.id)
 		if channel.type == channelType.voice then
 			if lobbies[channel.id] then

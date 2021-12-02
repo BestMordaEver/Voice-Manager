@@ -17,15 +17,15 @@ local subcommands = {
 
 return function (message)
 	local subcommand, argument = message.content:match("room%s*(%a*)%s*(.-)$")
-	
+
 	if not (message.member.voiceChannel and channels[message.member.voiceChannel.id]) then
 		return "User not in room", "warning", locale.notInRoom
 	end
-	
+
 	if subcommand == "" then
 		return "Sent room info", "roomInfo", message.member.voiceChannel
 	end
-	
+
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, argument)
 	else

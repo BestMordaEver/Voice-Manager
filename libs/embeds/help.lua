@@ -1,5 +1,4 @@
 local client = require "client"
-local config = require "config"
 local locale = require "locale"
 local embeds = require "embeds/embeds"
 local guilds = require "storage/guilds"
@@ -17,21 +16,21 @@ end
 function helpEmbed:setContent(page)
 	local prefix = guilds[(self.guild or self.message.guild).id].prefix
 	if prefix:match("%w$") then prefix = prefix .. " " end
-	
+
 	self.embed = {
 		title = locale.helpTitle[page],
 		color = colors.blurple,
 		description = gs(locale.helpDescription[page], "%%prefix%%", prefix)
 	}
 	self.embed.fields = {}
-	
+
 	for i, name in ipairs(locale.helpFieldNames[page]) do
 		insert(self.embed.fields, {
 			name = gs(name, "%%prefix%%", prefix),
 			value = gs(locale.helpFieldValues[page][i], "%%prefix%%", prefix)
 		})
 	end
-	
+
 	insert(self.embed.fields, {name = locale.helpLinksTitle, value = locale.helpLinks})
 end
 
@@ -67,10 +66,10 @@ local metaHelp = {
 client:on("embedSent", function (type, message, newMessage, embed)
 	if type ~= "help" or not newMessage then return end
 	local embedData = setmetatable({command = "help", killIn = 10, author = message.author, embed = embed, guild = message.guild}, metaHelp)
-	
+
 	embeds[newMessage] = embedData
 	embedData.id = newMessage.id
-	
+
 	newMessage:addReaction(reactions.page)
 	for i=1,7 do
 		newMessage:addReaction(reactions[i])

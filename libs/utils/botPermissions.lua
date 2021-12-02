@@ -14,7 +14,7 @@ local botPermissionsMT = {
 			resize = 0x20,
 			bitrate = 0x40
 		},
-		
+
 		perms = {
 			--[0x01] = "deafen",
 			[0x02] = "mute",
@@ -24,28 +24,28 @@ local botPermissionsMT = {
 			[0x20] = "resize",
 			[0x40] = "bitrate"
 		},
-		
+
 		toDiscordia = function (self)
 			local perms = {}
 			if self.bitfield:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
 			if self.bitfield:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
-			
+
 			return perms
 		end,
-		
+
 		has = function (self, permission)
 			return self.bitfield:has(self.bits[permission] or permission)
 		end
 	},
-	
+
 	__add = function (left, right)
 		return botPermissions((left.bitfield + right.bitfield).value)
 	end,
-	
+
 	__sub = function (left, right)
 		return botPermissions((left.bitfield - right.bitfield).value)
 	end,
-	
+
 	__tostring = function (self)
 		local str = ""
 		for bit, name in pairs(self.perms) do

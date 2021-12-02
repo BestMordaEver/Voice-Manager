@@ -2,7 +2,7 @@ return {
 	random = function (channels)
 		return channels[math.random(#channels)]
 	end,
-	
+
 	max = function (channels)
 		local max = channels[1]
 		for i, channel in pairs(channels) do
@@ -12,7 +12,7 @@ return {
 		end
 		return max
 	end,
-	
+
 	min = function (channels)
 		local min = channels[1]
 		for i, channel in pairs(channels) do
@@ -22,11 +22,11 @@ return {
 		end
 		return min
 	end,
-	
+
 	first = function (channels)
 		return channels[1]
 	end,
-	
+
 	last = function (channels)
 		return channels[#channels]
 	end

@@ -9,13 +9,13 @@ local client = require "client"
 local logger = require "logger"
 local emitter = require "discordia".Emitter()
 
-local function send (name, server)	
+local function send (name, server)
 	if token.tokens[name] then
 		local res, body = https.request("POST",server.endpoint,
 			{{"Authorization", token.tokens[name]},{"Content-Type", "application/json"},{"Accept", "application/json"}},
 			json.encode({[server.body] = #client.guilds}))
-		
-		if res.code ~= 204 and res.code ~= 200 then 
+
+		if res.code ~= 204 and res.code ~= 200 then
 			logger:log(2, "Couldn't send stats to %s - %s", name, body)
 		end
 	end
@@ -36,27 +36,27 @@ local statservers = {
 		endpoint = "https://discordbotlist.com/api/bots/"..client.user.id.."/stats",
 		body = "guilds"
 	},
-	
+
 	["top.gg"] = {
 		endpoint = "https://top.gg/api/bots/"..client.user.id.."/stats",
 		body = "server_count"
 	},
-	
+
 	["botsfordiscord.com"] = {
 		endpoint = "https://botsfordiscord.com/api/bot/"..client.user.id,
 		body = "server_count"
 	},
-	
+
 	["discord.boats"] = {
 		endpoint = "https://discord.boats/api/bot/"..client.user.id,
 		body = "server_count"
 	},
-	
+
 	["bots.ondiscord.xyz"] = {
 		endpoint = "https://bots.ondiscord.xyz/bot-api/bots/"..client.user.id.."/guilds",
 		body = "guildCount"
 	},
-	
+
 	["discord.bots.gg"] = {
 		endpoint = "https://discord.bots.gg/api/v1/bots/"..client.user.id.."/stats",
 		body = "guildCount"

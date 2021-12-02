@@ -8,15 +8,15 @@ return function (message, chat, amount)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local isPermitted = hostPermissionCheck(message.member, channel, "manage")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
-	
+
 	amount = tonumber(amount)
 	local trueAmount = 0
-	
+
 	if not amount then
 		local first = chat:getFirstMessage()
 		repeat
@@ -38,6 +38,6 @@ return function (message, chat, amount)
 			amount = amount > 100 and amount - 100 or 0
 		until amount == 0
 	end
-	
+
 	return "Successfully cleared "..trueAmount.." messages", "ok", locale.clearConfirm:format(trueAmount)
 end

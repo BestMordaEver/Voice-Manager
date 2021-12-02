@@ -6,7 +6,7 @@ return function (message, lobby, role)
 	if not role then
 		return "Invalid role provided", "warning", locale.roleBadInput
 	end
-	
+
 	lobbies[lobby.id]:setRole(role.id)
 	return "Lobby managed role set", "ok", locale.roleConfirm
 end

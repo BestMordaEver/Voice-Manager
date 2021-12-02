@@ -8,10 +8,10 @@ return function (message, newHost)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local users = message.mentionedUsers:toArray(function (user) return user ~= client.user end)
 	newHost = users[1] or client:getUser(newHost:match("%d+"))
-	
+
 	if newHost then
 		if message.guild:getMember(newHost).voiceChannel == channel then
 			channels[channel.id]:setHost(newHost.id)

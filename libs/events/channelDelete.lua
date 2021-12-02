@@ -1,16 +1,14 @@
 local client = require "client"
-local logger = require "logger"
 local locale = require "locale"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 local Overseer = require "utils/logWriter"
-local dialogue = require "utils/dialogue"
 
 return function (channel) -- and make sure there are no traces!
 	local lobbyData, channelData = lobbies[channel.id], channels[channel.id]
 	local guildData = guilds[channel.guild.id]
-	
+
 	if lobbyData then
 		guildData.lobbies:remove(channel.id)
 		lobbyData:delete()
@@ -28,7 +26,7 @@ return function (channel) -- and make sure there are no traces!
 					}
 				end
 			end
-			
+
 			companion:delete()
 		end
 		channelData:delete()

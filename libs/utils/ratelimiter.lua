@@ -3,7 +3,6 @@ local timer = require "timer"
 local Time = require "discordia".Time
 local Emitter = require "discordia".Emitter
 local logger = require "logger"
-local safeEvent = require "funcs/safeEvent"
 
 local ratelimiter = {}
 local emitter = Emitter()
@@ -18,9 +17,9 @@ return setmetatable(ratelimiter,{
 		-- returns remeaining attempts and tostring of how much time left until ratelimit is reset
 		limit = function (self, name, point, ...)
 			if not self[name] then error ("No ratelimits on event "..tostring(name)) end
-			
+
 			local limitPoint = self[name][point]
-			
+
 			if not limitPoint then
 				self[name][point] = {remaining = self[name].limit - 1, resetAfter = os.time() + self[name].timer}
 				limitPoint = self[name][point]
@@ -33,15 +32,15 @@ return setmetatable(ratelimiter,{
 				logger:log(4, "EVENT %s ENDPOINT %s: ratelimit hit for %s", name, point, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString())
 				return -1, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString()
 			end
-			
+
 			return limitPoint.remaining, Time.fromSeconds(limitPoint.resetAfter - os.time()):toString()
 		end,
-		
+
 		on = function (self, name, f)
 			return emitter:on(name, f)
 		end
 	},
-	
+
 	__call = function (self, name, limit, timer)
 		self[name] = setmetatable({},{__index = {limit = limit, timer = timer}})
 	end

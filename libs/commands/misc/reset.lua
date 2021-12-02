@@ -1,8 +1,6 @@
 local locale = require "locale"
 local client = require "client"
 local dialogue = require "utils/dialogue"
-local lobbies = require "storage/lobbies"
-local guilds = require "storage/guilds"
 
 local permissionCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
@@ -17,19 +15,19 @@ local commands = {
 		permissions = require "commands/lobbies/permissions",
 		role = require "commands/lobbies/role"
 	},
-	
+
 	matchmaking = {
 		mode = require "commands/matchmaking/mode",
 		target = require "commands/matchmaking/target"
 	},
-	
+
 	companions = {
 		category = require "commands/companions/category",
 		greeting = require "commands/companions/greeting",
 		name = require "commands/companions/name",
 		log = require "commands/companions/log"
 	},
-	
+
 	server = {
 		limit = require "commands/server/limit",
 		permissions = require "commands/server/permissions",
@@ -43,9 +41,7 @@ return function (message)
 	if not commands[command] or not commands[command][subcommand] then
 		return "Bad subcommand", "warning", locale.badSubcommand
 	end
-	
-	local lobbyData, guildData = lobbies[dialogue[message.author.id]], guilds[message.guild.id]
-	
+
 	if command == "server" then
 		if not message.member:hasPermission("manageChannels") then
 			return "Bad user permissions", "warning", locale.badUserPermissions
@@ -56,12 +52,12 @@ return function (message)
 		if not lobby or lobby.type ~= channelType.voice then
 			return "No lobby selected", "warning", locale.noLobbySelected
 		end
-		
+
 		local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
 		if not isPermitted then
 			return logMsg, "warning", userMsg
 		end
-		
+
 		return commands[command][subcommand](message, lobby)
 	end
 end

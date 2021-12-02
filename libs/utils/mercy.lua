@@ -14,11 +14,11 @@ return {
 	reset = function ()
 		aliveTracker = 5
 	end,
-	
+
 	tick = function ()
 		aliveTracker = aliveTracker - 1
 		return aliveTracker < 0
 	end,
-	
+
 	kill = shutdown
 }

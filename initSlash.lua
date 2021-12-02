@@ -39,11 +39,11 @@ local function request (method, url, payload, retries)
 		{{"Authorization", token},{"Content-Type", "application/json"},{"Accept", "application/json"}}, payload and json.encode(payload))
 	local delay, maxRetries = 300, 5
 	retries = retries or 0
-	
+
 	if not success then
 		return nil, res
 	end
-	
+
 	for i, v in ipairs(res) do
 		res[v[1]:lower()] = v[2]
 		res[i] = nil
@@ -53,14 +53,14 @@ local function request (method, url, payload, retries)
 		delay = math.max(1000 * res['x-ratelimit-reset-after'], delay)
 	end
 
-	local data = json.decode(msg, 1, null)
+	local data = json.decode(msg, 1, json.null)
 
 	if res.code < 300 then
 		printf('SUCCESS : %i - %s : %s %s', res.code, res.reason, method, url)
 		return data or true, nil
 	else
 		if type(data) == 'table' then
-		
+
 			local retry
 			if res.code == 429 then -- TODO: global ratelimiting
 				delay = data.retry_after*1000
@@ -84,7 +84,7 @@ local function request (method, url, payload, retries)
 			if data.errors then
 				msg = parseErrors({msg}, data.errors)
 			end
-			
+
 			printf('ERROR : %i - %s : %s %s', res.code, res.reason, method, url)
 			return nil, msg, delay
 		end

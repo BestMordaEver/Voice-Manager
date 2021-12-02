@@ -10,15 +10,15 @@ return function (message, argument)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local isPermitted = hostPermissionCheck(message.member, channel, "moderate")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
-	
+
 	local subcommand = argument:match("%a+")
 	local mentionString = ""
-	
+
 	if subcommand == "add" then
 		for _,user in ipairs(message.mentionedUsers:toArray(function (user) return user ~= client.user end)) do
 			mentionString = mentionString .. user.mentionString .. " "

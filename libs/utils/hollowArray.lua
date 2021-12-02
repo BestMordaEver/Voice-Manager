@@ -16,7 +16,7 @@ local hollowMT = {
 
 		drain = function (self, pos)
 			if self[pos] == nil then return end
-			
+
 			self.mutex:lock()
 			local ret = self[pos]
 			self[pos] = nil
@@ -32,7 +32,7 @@ local hollowMT = {
 		return function (t, index)
 			if not index then index = 0 end
 			index = index + 1
-			
+
 			repeat 
 				if t[index] then
 					return index, t[index]
@@ -40,7 +40,7 @@ local hollowMT = {
 					index = index + 1
 				end
 			until index > t.max
-			
+
 			return nil
 		end, self
 	end

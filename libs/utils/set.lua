@@ -3,14 +3,14 @@ local setMT = {
 	__index = {
 		add = function (self, o)
 			if self[o] then return end
-			
+
 			self[o] = true
 			self.n = self.n + 1
 		end,
-		
+
 		remove = function (self, o)
 			if not self[o] then return end
-			
+
 			self[o] = nil
 			self.n = self.n - 1
 		end

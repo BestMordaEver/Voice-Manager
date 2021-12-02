@@ -1,5 +1,3 @@
-local embeds = require "embeds/embeds"
-
 local articles = {
 	help = 0,
 	lobbies = 1,
@@ -16,6 +14,6 @@ return function (message)
 	if not articles[command] then
 		command = "help"
 	end
-	
+
 	return command.." help message", "help", articles[command]
 end

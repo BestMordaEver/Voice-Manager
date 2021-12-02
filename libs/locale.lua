@@ -13,7 +13,7 @@ return {
 		"Help | Server commmands",
 		"Help | Other commands"
 	},
-	
+
 	helpDescription = {
 		[0] = "",[[Enter a lobby to create a room. Room is deleted once it's empty
 Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]],
@@ -25,7 +25,7 @@ Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]
 		"Most room commands are used by a room host - user who created the room. Those commands can be enabled by admins",
 		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins","",""
 	},
-	
+
 	helpFieldNames = {
 		[0] = {
 			"Lobby commands - 1️⃣",
@@ -101,7 +101,7 @@ Select a lobby with `%prefix%select <lobby ID or name>` to change it's settings]
 			"%prefix%delete voice/text top/bottom <1-50> [force]"
 		}
 	},
-	
+
 	helpFieldValues = {
 		[0] = {
 			"Setup and configure lobbies - `%prefix%lobbies`",
@@ -224,14 +224,14 @@ Delete a certain amount of empty channels in selected category starting from the
 If `force` is added in the end, non-empty channels are also deleted]]
 		}
 	},
-	
+
 	helpLinksTitle = "Links",
 	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
 [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
 [How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID)
 [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
 [Support Server](https://discord.gg/tqj6jvT)]],
-	
+
 	-- server
 	serverInfoTitle = "Server info | %s",
 	serverInfo = [[**Prefix:** %s
@@ -241,7 +241,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 **Active users:** %d
 **Channels:** %d
 **Limit:** %d]],
-	
+
 	limitBadInput = "Limit must be a number between 0 and 500",
 	limitConfirm = "New limit set!",
 	limitReset = "Limit is reset to 500",
@@ -250,7 +250,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	roleReset = "Managed role is reset to @everyone",
 	prefixConfirm = "New prefix set: %s",
 	prefixReset = "Prefix is reset to `vm!`",
-	
+
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
@@ -263,7 +263,7 @@ You can add a lobby with `%prefix%lobbies add`]],
 **Capacity:** %s
 **Companion:** %s
 **Channels:** %d]],
-	
+
 	addConfirm = "Added new lobby %s",
 	removeConfirm = "Removed lobby %s",
 	capacityOOB = "Capacity must be a number between 0 and 99",
@@ -281,7 +281,7 @@ You can add a lobby with `%prefix%lobbies add`]],
 	permissionsBadInput = "Unknown permission: %s",
 	permissionsConfirm = "New permissions set!",
 	permissionsReset = "All permissions were disabled!",
-	
+
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
 	matchmakingNoInfo = [[There are no registered matchmaking lobbies
@@ -289,14 +289,14 @@ You can create a matchmaking lobby with `%prefix%matchmaking add`]],
 	matchmakingField = [[**Target:** %s
 **Mode:** %s
 **Matchmaking pool:** %d channels]],
-	
+
 	matchmakingAddConfirm = "Added new matchmaking lobby %s",
 	matchmakingRemoveConfirm = "Removed matchmaking lobby %s",
 	targetConfirm = "Changed matchmaking target to %s",
 	targetReset = "Matchmaking target is reset, lobby will matchmake for its current category",
 	modeBadInput = "Unknown matchmaking mode: %s",
 	modeConfirm = "Changed matchmaking mode to %s",
-	
+
 	-- companion
 	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
@@ -306,7 +306,7 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 **Logging:** %s
 **Greeting:**
 %s]],
-	
+
 	greetingConfirm = "Set new greeting!",
 	greetingReset = "Disabled the greeting",
 	roomCommands = "Available `%prefix%room` commands: ",
@@ -316,7 +316,7 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 	logName = "`%s` room of `%s` lobby\n",
 	loggerWarning = "\n\n*This text chat will be logged*",
 	pastebinError = "`%s` room of `%s` lobby\nThere was an issue with pastebin, notify devs if this persists",
-	
+
 	-- room
 	roomInfoTitle = "Room info | %s",
 	roomInfo = [[**Reserved:** %s
@@ -338,7 +338,7 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 	badNewHost = "Can't promote users outside of the room",
 	hostIdentify = "%s is a room host",
 	badHost = "Can't identify the host",
-	
+
 	-- chat
 	chatInfoTitle = "Room info | %s",
 	chatInfo = [[**Visible to:** %s
@@ -350,16 +350,16 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 	hideConfirm = "Chat is now hidden from %s",
 	showConfirm = "Chat is now visible to %s",
 	clearConfirm = "Deleted %d messages",
-	
+
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",
 	hostError = "Bot wasn't able to perform this action. Contact your administrators if issue persists",
-	
+
 	-- select
 	selectFailed = "Couldn't find a lobby or category",
 	selectVoice = "Selected lobby %s",
 	selectCategory = "Selected category %s",
-	
+
 	-- utility
 	embedPages = "Page %d of %d",
 	embedDelete = "❌ - delete this message",
@@ -370,10 +370,10 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
 	unfinishedCommand = "🛠 Command is temporarily disabled 🛠",
-	
+
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
-	
+
 	-- errors
 	lobbyDupe = "This channel is already registered as a lobby",
 	channelDupe = "Can't register a room as a lobby",
@@ -389,7 +389,7 @@ You can enable companion channels with `%prefix%lobbies companion enable`]],
 	amountOOB = "There can be only 50 channels per category",
 	emptyName = "Given input will result in an empty name",
 	noParent = "unknown lobby",
-	
+
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
 		"I'm sowwy",

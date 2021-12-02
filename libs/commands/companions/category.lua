@@ -9,12 +9,12 @@ return function (message, channel, input)
 		lobbies[channel.id]:setCompanionTarget()
 		return "Companion target category reset", "ok", locale.categoryReset
 	end
-	
+
 	local category = lookForChannel(message, input)
 	if not category or category.type ~= channelType.category then
 		return "Couldn't find target category", "warning", locale.badCategory
 	end
-	
+
 	local isPermitted, logMsg, msg = permissionCheck(message, category)
 	if isPermitted then
 		lobbies[channel.id]:setCompanionTarget(category.id)

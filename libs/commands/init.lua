@@ -1,4 +1,3 @@
-local embeds = require "embeds/embeds"
 local config = require "config"
 
 local function invite (message)
@@ -33,13 +32,13 @@ return {
 	invite = invite,
 	exec = function (message)
 		if not config.owners[message.author.id] then return "Not owner", "warning", "You're not my father" end
-		
+
 		local fn, syntaxError = load(message.content:match("exec%s*(.-)$"), "Bot", "t", sandbox)
 		if not fn then return "Syntax error", "warning", code(syntaxError) end
 
 		local success, runtimeError = pcall(fn)
 		if not success then return "Runtime error", "warning", code(runtimeError) end
-		
+
 		return "Code executed", "ok", "Code executed"
 	end
 }

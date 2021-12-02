@@ -8,7 +8,7 @@ return function (message)
 		if not config.owners[message.author.id] then return "Not owner", "warning", "You're not my father" end
 		message:reply("Shutting down gracefully")
 	end
-	
+
 	local status, msg = xpcall(function()
 		client:setGame({name = "the maintenance", type = 3})
 		clock:stop()

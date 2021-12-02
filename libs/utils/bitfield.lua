@@ -8,11 +8,11 @@ local bitfieldMT = {
 	__add = function (left, right)
 		return bitfield(bit.bor(left.value, tonumber(right) and right or right.value))
 	end,
-	
+
 	__sub = function (left, right)
 		return bitfield(bit.band(left.value, bit.bnot(tonumber(right) and right or right.value)))
 	end,
-	
+
 	__index = function (self, key)
 		if tonumber(key) then
 			if key > 64 or key < 1 then

@@ -14,15 +14,15 @@ return function (message, name)
 	if not channel then
 		return "Not a host", "warning", locale.notHost
 	end
-	
+
 	local isPermitted = hostPermissionCheck(message.member, channel, "rename")
 	if not isPermitted then
 		return "Insufficient permissions", "warning", locale.badHostPermission
 	end
-	
+
 	local limit, retryIn = ratelimiter:limit("channelName", channel.id)
 	local success, err
-	
+
 	if limit == -1 then
 		return "Ratelimit reached", "warning", locale.ratelimitReached:format(retryIn)
 	else
@@ -35,7 +35,7 @@ return function (message, name)
 			success, err = channel:setName(name)
 		end
 	end
-	
+
 	if success then
 		return "Successfully changed room name", "ok", locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn)
 	else

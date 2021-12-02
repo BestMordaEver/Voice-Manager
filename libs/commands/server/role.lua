@@ -6,7 +6,7 @@ return function (message, role)
 	if not role then
 		return "Invalid role provided", "warning", locale.roleBadInput
 	end
-	
+
 	guilds[message.guild.id]:setRole(role.id)
 	return "Server managed role set", "ok", locale.roleConfirm
 end

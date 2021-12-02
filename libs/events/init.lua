@@ -1,8 +1,6 @@
 -- all event preprocessing happens here
 local client = require "client"
-local logger = require "logger"
 local clock = require "clock"
-local timer = require "timer"
 
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
@@ -18,38 +16,38 @@ full list and arguments - https://github.com/SinisterRectus/Discordia/wiki/Event
 local events
 events = {
 	messageCreate = require "events/messageCreate",
-	
+
 	messageUpdate = require "events/messageUpdate",
-	
+
 	messageDelete = require "events/messageDelete",
-	
+
 	reactionAdd = require "events/reactionAdd",
-	
+
 	guildCreate = require "events/guildCreate",
-	
+
 	guildDelete = require "events/guildDelete",
-	
+
 	voiceChannelJoin = require "events/voiceChannelJoin",
-	
+
 	voiceChannelLeave = require "events/voiceChannelLeave",
-	
+
 	channelUpdate = require "events/channelUpdate",
-	
+
 	channelDelete = require "events/channelDelete",
-	
+
 	presenceUpdate = require "events/presenceUpdate",
-	
+
 	init = function ()
 		guilds:load()
 		lobbies:load()
 		channels:load()
 		clock:start()
-		
+
 		client:setGame(status())
 		if config.wakeUpFeed then
 			client:getChannel(config.wakeUpFeed):send("I'm listening")
 		end
-		
+
 		client:on(events("messageCreate"))
 		client:on(events("messageUpdate"))
 		client:on(events("reactionAdd"))
@@ -62,10 +60,10 @@ events = {
 		client:on(events("presenceUpdate"))
 		clock:on(events("min"))
 		clock:on(events("day"))
-		
+
 		if config.sendStats then clock:on(events("hour", require "events/stats")) end
 	end,
-	
+
 	ready = function ()
 		client:emit("init")
 		guilds:cleanup()
@@ -74,7 +72,7 @@ events = {
 	end,
 
 	min = require "events/min",
-	
+
 	day = require "events/day",
 }
 

@@ -4,7 +4,7 @@ local channels = require "storage/channels"
 
 return function (message)
 	local host = client:getUser(channels[message.member.voiceChannel.id].host)
-	
+
 	if host then
 		return "Pinged the host", "ok", locale.hostIdentify:format(host.mentionString)
 	else

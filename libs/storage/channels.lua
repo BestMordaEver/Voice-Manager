@@ -14,10 +14,8 @@ local channelsData = require "sqlite3".open("channelsData.db")
 local client = require "client"
 local logger = require "logger"
 
-local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 
-local set = require "utils/set"
 local Overseer = require "utils/logWriter"
 local storageInteraction = require "funcs/storageInteraction"
 
@@ -27,9 +25,9 @@ local emitter = require "discordia".Emitter()
 
 local storageStatements = {
 	add = {"INSERT INTO channels VALUES(?,?,?,?,?,?)", "ADD CHANNEL %s"},
-	
+
 	remove = {"DELETE FROM channels WHERE id = ?", "DELETE CHANNEL %s"},
-	
+
 	setHost = {"UPDATE channels SET host = ? WHERE id = ?", "SET HOST %s => CHANNEL %s"}
 }
 
@@ -49,7 +47,7 @@ local channelMT = {
 			end
 			emitter:emit("remove", self.id)
 		end,
-		
+
 		setHost = function (self, hostID)
 			local channel = client:getChannel(self.id)
 			if channel and channels[self.id] then
@@ -77,7 +75,7 @@ local channelsIndex = {
 			end
 		end
 	end,
-	
+
 	-- loadAdd and start interaction with db
 	add = function (self, channelID, isPersistent, host, parentID, position, companion)
 		self:loadAdd(channelID, isPersistent, host, lobbies[parentID], position, companion)
@@ -86,22 +84,22 @@ local channelsIndex = {
 			return self[channelID]
 		end
 	end,
-	
+
 	load = function (self)
 		logger:log(4, "STARTUP: Loading rooms")
 		local channelIDs = channelsData:exec("SELECT * FROM channels")
-		
+
 		if channelIDs then
 			for i, channelID in ipairs(channelIDs[1]) do
 				local channel = client:getChannel(channelID)
 				if channel then
 					if #channel.connectedMembers > 0 then
 						local parent = lobbies[channelIDs.parent[i]] -- can be nil!
-						
+
 						self:loadAdd(channelID, 
 							channelIDs.isPersistent[i] == 1, channelIDs.host[i], parent,
 							tonumber(channelIDs.position[i]), channelIDs.companion[i])
-						
+
 						if parent then
 							parent:attachChild(self[channelID], tonumber(self[channelID].position))
 							if channelIDs.companion[i] and parent.companionLog and client:getChannel(channelIDs.companion[i]) then
@@ -124,10 +122,10 @@ local channelsIndex = {
 				end
 			end
 		end
-		
+
 		logger:log(4, "STARTUP: Loaded!")
 	end,
-	
+
 	-- are there empty channels? kill!
 	cleanup = function (self)
 		for channelID, channelData in pairs(self) do
@@ -147,7 +145,7 @@ local channelsIndex = {
 			end
 		end
 	end,
-	
+
 	-- how many are there?
 	people = function (self, guildID)
 		local p = 0
@@ -159,7 +157,7 @@ local channelsIndex = {
 		end
 		return p
 	end,
-	
+
 	inGuild = function (self, guildID)
 		local count = 0
 		for _,channelData in pairs(self) do if channelData.guildID == guildID then count = count + 1 end end

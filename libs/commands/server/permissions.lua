@@ -14,13 +14,13 @@ return function (message, permissions)
 				return "Unknown permission provided", "warning", locale.permissionsBadInput:format(permission)
 			end
 		end
-		
+
 		if message.content:match("allow") then
 			permissionBits = guildData.permissions + permissionBits
 		elseif message.content:match("deny") then
 			permissionBits = guildData.permissions - permissionBits
 		end
-		
+
 		guildData:setPermissions(permissionBits)
 		return "Server permissions set", "ok", locale.permissionsConfirm
 	else

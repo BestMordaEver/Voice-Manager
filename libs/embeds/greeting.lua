@@ -9,18 +9,18 @@ local availableCommands = require "funcs/availableCommands"
 embeds:new("greeting", function (room)
 	local channelData = channels[room.id]
 	if not channelData then return end
-	
+
 	local companion = client:getChannel(channelData.companion)
 	if not companion then return end
-	
+
 	local prefix = guilds[room.guild.id].prefix
 	if prefix:match("%w$") then prefix = prefix .. " " end
 	local roomC, chatC = availableCommands(room)
-	
+
 	local member = room.guild:getMember(channelData.host)
 	local uname = member.user.name
 	local nickname = member.nickname or uname
-	
+
 	local rt = {
 		roomname = room.name,
 		chatname = companion and companion.name or nil,
@@ -33,7 +33,7 @@ embeds:new("greeting", function (room)
 		roomcommands = roomC,
 		chatcommands = chatC
 	}
-	
+
 	return {
 		title = companion.name,
 		color = 6561661,

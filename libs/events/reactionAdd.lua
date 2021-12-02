@@ -9,14 +9,14 @@ return function (reaction, userID) -- embeds processing
 	if not reaction.me or client:getUser(userID).bot or not embeds[reaction.message] or embeds[reaction.message].author.id ~= userID then
 		return
 	end
-	
+
 	local embedData = embeds[reaction.message]
-	
+
 	logger:log(4, "GUILD %s USER %s EMBED %s => added %s", reaction.message.guild.id, userID, reaction.message.id, reactions[reaction.emojiHash])
-	
+
 	reaction:delete(userID)
 	embedData(reaction)
 	embedData.killIn = 10
-	
+
 	logger:log(4, "GUILD %s USER %s EMBED %s: processed", reaction.message.guild.id, userID, reaction.message.id)
 end

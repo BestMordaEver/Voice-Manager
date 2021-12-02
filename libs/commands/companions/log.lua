@@ -10,7 +10,7 @@ return function (message, channel, input)
 		if not logChannel or logChannel.type ~= channelType.text then
 			return "Couldn't find the channel", "warning", locale.badChannel
 		end
-		
+
 		local isPermitted, logMsg, msg = permissionCheck(message, logChannel)
 		if isPermitted then
 			lobbies[channel.id]:setCompanionLog(logChannel.id)

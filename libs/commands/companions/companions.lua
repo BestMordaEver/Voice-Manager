@@ -14,7 +14,7 @@ local subcommands = {
 
 return function (message)
 	local subcommand, argument = message.content:match("companions%s*(%a*)%s*(.-)$")
-	
+
 	if subcommand == "" or argument == "" then
 		return "Sent companions info", "companionsInfo", message.guild
 	end
@@ -23,12 +23,12 @@ return function (message)
 	if not (lobby and lobbies[lobby.id] and lobby.type == channelType.voice) then
 		return "No lobby selected", "warning", locale.noLobbySelected
 	end
-	
+
 	local isPermitted, logMsg, userMsg = permissionCheck(message, lobby)
 	if not isPermitted then
 		return logMsg, "warning", userMsg
 	end
-	
+
 	if subcommands[subcommand] then
 		return subcommands[subcommand](message, lobby, argument)
 	else

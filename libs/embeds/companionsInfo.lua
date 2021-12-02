@@ -1,4 +1,3 @@
-local config = require "config"
 local locale = require "locale"
 local client = require "client"
 
@@ -11,21 +10,21 @@ local colors = embeds.colors
 -- no embed data is saved, since this is non-interactive embed
 embeds:new("companionsInfo", function (guild)
 	local guildData = guilds[guild.id]
-	
+
 	local embed = {
 		title = locale.companionsInfoTitle:format(guild.name),
 		color = colors.blurple,
 		description = #guildData.lobbies == 0 and locale.companionsNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
-	
+
 	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
 		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget
 	end), tps)
-	
+
 	local sortedLobbyData = {}
 	for i, lobby in ipairs(sortedLobbies) do table.insert(sortedLobbyData, lobbies[lobby.id]) end
-	
+
 	for _, lobbyData in pairs(sortedLobbyData) do
 		local target = client:getChannel(lobbyData.companionTarget)
 		local logChannel = client:getChannel(lobbyData.companionLog)
@@ -40,6 +39,6 @@ embeds:new("companionsInfo", function (guild)
 			inline = true
 		})
 	end
-	
+
 	return embed
 end)

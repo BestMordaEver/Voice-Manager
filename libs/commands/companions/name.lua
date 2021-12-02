@@ -7,7 +7,7 @@ return function (message, channel, name)
 	else
 		name = "private-chat"
 	end
-	
+
 	lobbies[channel.id]:setCompanionTemplate(name)
 	return "Companion name template set", "ok", locale.nameConfirm:format(name)
 end

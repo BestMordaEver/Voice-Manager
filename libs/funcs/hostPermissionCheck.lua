@@ -14,9 +14,9 @@ local perms = {
 
 return function (member, channel, permissionName)
 	if config.owners[member.user.id] then return true end
-	
+
 	local permissions = channels[channel.id].parent and channels[channel.id].parent.permissions or guilds[channel.guild.id].permissions
-	
+
 	return member:hasPermission(channel, permission.administrator) or (
 		channels[channel.id].host == member.user.id and (
 			permissions:has(permissionName) or permissions:has(perms[permissionName])))

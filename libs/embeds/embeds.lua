@@ -15,7 +15,7 @@ return setmetatable({}, {
 			left = "⬅", right = "➡", page = "📄", all = "*️⃣", stop = "❌",
 			["⬅"] = "left", ["➡"] = "right", ["📄"] = "page", ["*️⃣"] = "all", ["❌"] = "stop"
 		},
-		
+
 		colors = {
 			blurple = 0x5865F2,
 			green = 0x57F287,
@@ -25,7 +25,7 @@ return setmetatable({}, {
 			fuchsia = 0xeb459e,
 			black = 0x23272a
 		},
-		
+
 		-- it dies if not noticed for long enough
 		tick = function (self)
 			for message, embedData in pairs(self) do
@@ -39,7 +39,7 @@ return setmetatable({}, {
 				end
 			end
 		end,
-		
+
 		new = function (self, name, embedFactory)
 			if self.types[name] then
 				error("Embed type "..name.." already exists")
@@ -48,7 +48,7 @@ return setmetatable({}, {
 			end
 		end
 	},
-	
+
 	__call = function (self, type, ...)
 		if self.types[type] then
 			return {embed = self.types[type](...)}
