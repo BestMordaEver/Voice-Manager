@@ -288,8 +288,7 @@ local commandsStructure = {
 					{
 						name = "name",
 						description = "Name a room will have when it's created",
-						type = commandOptionType.string,
-						autocomplete = true
+						type = commandOptionType.string
 					}
 				}
 			},
@@ -553,8 +552,7 @@ local commandsStructure = {
 					{
 						name = "name",
 						description = "Name a chat will have when it's created",
-						type = commandOptionType.string,
-						autocomplete = true
+						type = commandOptionType.string
 					}
 				}
 			},
@@ -566,8 +564,7 @@ local commandsStructure = {
 					{
 						name = "greeting",
 						description = "A message that will be automatically sent to chat when it's created",
-						type = commandOptionType.string,
-						autocomplete = true
+						type = commandOptionType.string
 					}
 				}
 			},
