@@ -217,7 +217,7 @@ return function (member, channel)
 			end
 		elseif channels[channel.id] then
 			if channels[channel.id].host ~= member.user.id then roomJoin(member, channel) end
-		else
+		elseif guilds[channel.guild.id].permissions.bitfield.value ~= 0 then
 			channelJoin(member, channel)
 		end
 
