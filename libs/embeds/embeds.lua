@@ -51,7 +51,7 @@ return setmetatable({}, {
 
 	__call = function (self, type, ...)
 		if self.types[type] then
-			return {embed = self.types[type](...)}
+			return {embeds = {self.types[type](...)}}
 		else
 			error("Invalid embed type: "..tostring(type))
 		end
