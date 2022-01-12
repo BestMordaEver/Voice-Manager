@@ -1,4 +1,4 @@
-Voice Manager Terms and Conditions of Use
+Voice Manager Terms and Conditions of Use  
 Last updated and effective: January 12, 2022
 
 Terms  
