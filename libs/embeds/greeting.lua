@@ -1,12 +1,12 @@
 local locale = require "locale"
 local client = require "client"
-local embeds = require "embeds/embeds"
+local embeds = require "embeds"
 local channels = require "storage/channels"
 local guilds = require "storage/guilds"
 local availableCommands = require "funcs/availableCommands"
+local fuchsia = embeds.colors.fuchsia
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("greeting", function (room)
+return embeds("greeting", function (room)
 	local channelData = channels[room.id]
 	if not channelData then return end
 
@@ -29,14 +29,14 @@ embeds:new("greeting", function (room)
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = locale.roomCommands:gsub("%%prefix%%", prefix) .. roomC .."\n" .. locale.chatCommands:gsub("%%prefix%%", prefix) .. chatC,
+		commands = locale.roomCommands .. roomC .."\n" .. locale.chatCommands .. chatC,
 		roomcommands = roomC,
 		chatcommands = chatC
 	}
 
-	return {
+	return {embeds = {{
 		title = companion.name,
-		color = 6561661,
+		color = fuchsia,
 		description = (channelData.parent.greeting or ""):gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
-	}
+	}}}
 end)

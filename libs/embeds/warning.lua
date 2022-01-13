@@ -1,12 +1,11 @@
 local locale = require "locale"
-local embeds = require "embeds/embeds"
-local colors = embeds.colors
+local embeds = require "embeds"
+local yellow = embeds.colors.yellow
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("warning", function (msg)
-	return {
+return embeds("warning", function (msg)
+	return {embeds = {{
 		title = locale.embedWarning,
-		color = colors.yellow,
+		color = yellow,
 		description = msg
-	}
+	}}}
 end)

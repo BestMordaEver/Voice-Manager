@@ -26,7 +26,7 @@ package.loaded.client = client
 package.loaded.clock = discordia.Clock()
 package.loaded.logger = discordia.Logger(6, '%F %T')
 
---[[ 
+--[[
 holds all the event methods and logic
 notice that metametod call of the table produces two values
 ]]
@@ -35,10 +35,6 @@ local events = require "events/init"
 -- Other events are registered in "ready"
 client:once(events("init"))
 client:once(events("ready"))
-
--- initializing all embed types
--- really gotta think about a more elegant solution
-require "embeds/init"
 
 -- yep, it's permanent now
 local timer = require "timer"

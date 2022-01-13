@@ -1,19 +1,17 @@
+local helpEmbed = require "embeds/help"
+
 local articles = {
 	help = 0,
-	lobbies = 1,
+	lobby = 1,
 	matchmaking = 2,
-	companions = 3,
+	companion = 3,
 	room = 4,
 	chat = 5,
 	server = 6,
 	other = 7
 }
 
-return function (message)
-	local command = (message.content:match("help%s*(.-)$") or "help"):lower()
-	if not articles[command] then
-		command = "help"
-	end
-
-	return command.." help message", "help", articles[command]
+return function (interaction)
+	local command = interaction.option and interaction.option.value or "help"
+	return command.." help message", helpEmbed(articles[command])
 end

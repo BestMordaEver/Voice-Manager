@@ -1,12 +1,11 @@
 local locale = require "locale"
-local dialogue = require "utils/dialogue"
 local lobbies = require "storage/lobbies"
+local okEmbed = require "embeds/ok"
 
-return function (message, channel)
-	dialogue[message.author.id] = nil
+return function (interaction, channel)
 	if lobbies[channel.id] then
 		lobbies[channel.id]:delete()
 	end
 
-	return "Lobby removed", "ok", locale.removeConfirm:format(channel.name)
+	return "Lobby removed", okEmbed(locale.removeConfirm:format(channel.name))
 end

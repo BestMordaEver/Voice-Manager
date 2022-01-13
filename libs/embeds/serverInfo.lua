@@ -1,18 +1,17 @@
 local locale = require "locale"
 
-local embeds = require "embeds/embeds"
+local embeds = require "embeds"
 local guilds = require "storage/guilds"
 local channels = require "storage/channels"
-local colors = embeds.colors
+local blurple = embeds.colors.blurple
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("serverInfo", function (guild)
+return embeds("serverInfo", function (guild)
 	local guildData = guilds[guild.id]
 	if not guild:getRole(guildData.role) then guildData:setRole(guild.defaultRole.id) end
 
-	return {
+	return {embeds = {{
 		title = locale.serverInfoTitle:format(guild.name),
-		color = colors.blurple,
+		color = blurple,
 		description = locale.serverInfo:format(
 			guildData.prefix,
 			guildData.permissions,
@@ -22,5 +21,5 @@ embeds:new("serverInfo", function (guild)
 			channels:inGuild(guild.id),
 			guildData.limit
 		)
-	}
+	}}}
 end)

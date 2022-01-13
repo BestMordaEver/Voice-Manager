@@ -1,13 +1,11 @@
 local client = require "client"
 local channels = require "storage/channels"
-local embeds = require "embeds/embeds"
 local mercy = require "utils/mercy"
 local status = require "funcs/status"
 local config = require "config"
 
 return function (date)
 	channels:cleanup()
-	embeds:tick()
 	client:setGame(status())
 
 	if config.heartbeat then

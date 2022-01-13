@@ -1,17 +1,14 @@
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
+local okEmbed = require "embeds/ok"
 
-return function (message, channel, capacity)
-	if capacity then
-		capacity = tonumber(capacity)
-		if not capacity or capacity < 0 or capacity > 99 then
-			return "Capacity OOB", "warning", locale.capacityOOB
-		else
-			lobbies[channel.id]:setCapacity(capacity)
-			return "Lobby capacity set", "ok", locale.capacityConfirm:format(capacity)
-		end
-	else
+return function (interaction, channel, reset)
+	if reset then
 		lobbies[channel.id]:setCapacity()
-		return "Lobby capacity reset", "ok", locale.capacityReset
+		return "Lobby capacity reset", okEmbed(locale.capacityReset)
+	else
+		local capacity = interaction.option.options.capacity.value
+		lobbies[channel.id]:setCapacity(capacity)
+		return "Lobby capacity set", okEmbed(locale.capacityConfirm:format(capacity))
 	end
 end

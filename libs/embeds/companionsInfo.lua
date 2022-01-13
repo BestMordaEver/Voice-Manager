@@ -1,34 +1,35 @@
 local locale = require "locale"
 local client = require "client"
 
-local embeds = require "embeds/embeds"
+local embeds = require "embeds"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
-local colors = embeds.colors
+local blurple = embeds.colors.blurple
+local insert = table.insert
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("companionsInfo", function (guild)
+return embeds("companionsInfo", function (guild)
 	local guildData = guilds[guild.id]
 
 	local embed = {
 		title = locale.companionsInfoTitle:format(guild.name),
-		color = colors.blurple,
+		color = blurple,
 		description = #guildData.lobbies == 0 and locale.companionsNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
 
+---@diagnostic disable-next-line: undefined-field
 	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
 		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget
 	end), tps)
 
 	local sortedLobbyData = {}
-	for i, lobby in ipairs(sortedLobbies) do table.insert(sortedLobbyData, lobbies[lobby.id]) end
+	for i, lobby in ipairs(sortedLobbies) do insert(sortedLobbyData, lobbies[lobby.id]) end
 
 	for _, lobbyData in pairs(sortedLobbyData) do
 		local target = client:getChannel(lobbyData.companionTarget)
 		local logChannel = client:getChannel(lobbyData.companionLog)
-		table.insert(embed.fields, {
+		insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
 			value = locale.companionsField:format(
 				target and target.name or "default",
@@ -40,5 +41,5 @@ embeds:new("companionsInfo", function (guild)
 		})
 	end
 
-	return embed
+	return {embeds = {embed}}
 end)

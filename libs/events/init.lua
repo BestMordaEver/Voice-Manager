@@ -15,13 +15,11 @@ full list and arguments - https://github.com/SinisterRectus/Discordia/wiki/Event
 ]]
 local events
 events = {
-	messageCreate = require "events/messageCreate",
+	commandInteraction = require "events/commandInteraction",
+
+	componentInteraction = require "events/componentInteraction",
 
 	messageUpdate = require "events/messageUpdate",
-
-	messageDelete = require "events/messageDelete",
-
-	reactionAdd = require "events/reactionAdd",
 
 	guildCreate = require "events/guildCreate",
 
@@ -48,9 +46,9 @@ events = {
 			client:getChannel(config.wakeUpFeed):send("I'm listening")
 		end
 
-		client:on(events("messageCreate"))
+		client:on(events("commandInteraction"))
+		client:on(events("componentInteraction"))
 		client:on(events("messageUpdate"))
-		client:on(events("reactionAdd"))
 		client:on(events("guildCreate"))
 		client:on(events("guildDelete"))
 		client:on(events("voiceChannelJoin"))

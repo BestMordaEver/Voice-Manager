@@ -16,17 +16,17 @@ local sandbox = setmetatable({
 },{ __index = _G})
 
 -- all possible bot commands are processed in corresponding files, should return message for logger
-return {
+return setmetatable({
 	help = require "commands/misc/help",
-	select = require "commands/misc/select",
 	reset = require "commands/misc/reset",
 	server = require "commands/server/server",
-	lobbies = require "commands/lobbies/lobbies",
-	companions = require "commands/companions/companions",
+	lobby = require "commands/lobbies/lobbies",
+	companion = require "commands/companions/companions",
 	matchmaking = require "commands/matchmaking/matchmaking",
 	room = require "commands/room/room",
 	chat = require "commands/chat/chat",
-	--create = require "commands/misc/create",
+	create = require "commands/misc/create",
+	delete = require "commands/misc/delete",
 	shutdown = require "commands/misc/shutdown",
 	support = invite,
 	invite = invite,
@@ -41,4 +41,4 @@ return {
 
 		return "Code executed", "ok", "Code executed"
 	end
-}
+},{__call = function (self, interaction) return self[interaction.commandName](interaction) end})

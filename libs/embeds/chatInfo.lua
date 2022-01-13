@@ -1,15 +1,14 @@
 local locale = require "locale"
 local client = require "client"
 
-local embeds = require "embeds/embeds"
+local embeds = require "embeds"
 local channels = require "storage/channels"
 local availableCommands = require "funcs/availableCommands"
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
-local colors = embeds.colors
+local blurple = embeds.colors.blurple
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("chatInfo", function (room)
+return embeds("chatInfo", function (room)
 	local hidden, shown, muted = "","",""
 
 	local companion = client:getChannel(channels[room.id].companion)
@@ -32,9 +31,9 @@ embeds:new("chatInfo", function (room)
 	if shown == "" then shown = locale.none end
 	if muted == "" then muted = locale.none end
 
-	return {
+	return {embeds = {{
 		title = locale.chatInfoTitle:format(companion.name),
-		color = colors.blurple,
+		color = blurple,
 		description = locale.chatInfo:format(hidden, shown, muted, commands)
-	}
+	}}}
 end)

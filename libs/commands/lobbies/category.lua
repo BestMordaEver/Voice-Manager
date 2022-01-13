@@ -1,25 +1,26 @@
 local locale = require "locale"
 local lobbies = require "storage/lobbies"
-local lookForChannel = require "funcs/lookForChannel"
 local permissionCheck = require "funcs/permissionCheck"
 local channelType = require "discordia".enums.channelType
+local warningEmbed = require "embeds/warning"
+local okEmbed = require "embeds/ok"
 
-return function (message, channel, input)
-	if input then
-		local category = lookForChannel(message, input)
+return function (interaction, channel, reset)
+	if reset then
+		lobbies[channel.id]:setTarget()
+		return "Lobby target category reset", okEmbed(locale.categoryReset)
+	else
+		local category = interaction.option.options.category.value
 		if not category or category.type ~= channelType.category then
-			return "Couldn't find target category", "warning", locale.badCategory
+			return "Couldn't find target category", warningEmbed(locale.badCategory)
 		end
 
-		local isPermitted, logMsg, msg = permissionCheck(message, category)
+		local isPermitted, logMsg, msg = permissionCheck(interaction, category)
 		if isPermitted then
 			lobbies[channel.id]:setTarget(category.id)
-			return "Lobby target category set", "ok", locale.categoryConfirm:format(category.name)
+			return "Lobby target category set", okEmbed(locale.categoryConfirm:format(category.name))
 		else
-			return logMsg, "warning", msg
+			return logMsg, warningEmbed(msg)
 		end
-	else
-		lobbies[channel.id]:setTarget()
-		return "Lobby target category reset", "ok", locale.categoryReset
 	end
 end

@@ -4,7 +4,7 @@ local logger = require "logger"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
-local embeds = require "embeds/embeds"
+local greetingEmbed = require "embeds/greeting"
 local matchmakers = require "utils/matchmakers"
 local Overseer = require "utils/logWriter"
 local templateInterpreter = require "funcs/templateInterpreter"
@@ -113,7 +113,7 @@ local function lobbyJoin (member, lobby)
 			end
 
 			if lobbyData.companionLog then Overseer:track(companion) end
-			if lobbyData.greeting or lobbyData.companionLog then companion:send(embeds("greeting", newChannel)) end
+			if lobbyData.greeting or lobbyData.companionLog then companion:send(greetingEmbed(newChannel)) end
 		end
 
 		processing[newChannel.id]:unlock()

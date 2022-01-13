@@ -10,7 +10,6 @@ local commands = {
 		bitrate = require "commands/lobbies/bitrate",
 		capacity = require "commands/lobbies/capacity",
 		category = require "commands/lobbies/category",
-		companion = require "commands/lobbies/companion",
 		name = require "commands/lobbies/name",
 		permissions = require "commands/lobbies/permissions",
 		role = require "commands/lobbies/role"

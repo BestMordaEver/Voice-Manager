@@ -92,86 +92,67 @@ local function request (method, url, payload, retries)
 end
 
 local CommandManager = {
-	commandType = {
-		"chatInput","user","message",
-		chatInput = 1,
-		user = 2,
-		message = 3
-	},
-	commandOptionType = {
-		"subcommand","subcommandGroup","string","integer","boolean","user","channel","role","mentionable","number",
-		subcommand = 1,
-		subcommandGroup = 2,
-		string = 3,
-		integer = 4,
-		boolean = 5,
-		user = 6,
-		channel = 7,
-		role = 8,
-		mentionable = 9,
-		number = 10
-	}
+	getGlobalCommands = function ()
+		return request("GET", GLOBAL_COMMANDS)
+	end,
+
+	getGlobalCommand = function (id)
+		return request("GET", GLOBAL_COMMAND:format(id))
+	end,
+
+	createGlobalCommand = function (payload)
+		return request("POST", GLOBAL_COMMANDS, payload)
+	end,
+
+	editGlobalCommand = function (id, payload)
+		return request("PATCH", GLOBAL_COMMAND:format(id), payload)
+	end,
+
+	editGlobalCommands = function (payload)
+		return request("PATCH", GLOBAL_COMMANDS, payload)
+	end,
+
+	deleteGlobalCommand = function (id)
+		return request("DELETE", GLOBAL_COMMAND:format(id))
+	end,
+
+	overwriteGlobalCommands = function(payload)
+		return request("PUT", GLOBAL_COMMANDS, payload)
+	end,
+
+	getGuildCommands = function (guild)
+		return request("GET", GUILD_COMMANDS:format(guild))
+	end,
+
+	getGuildCommand = function (guild, id)
+		return request("GET", GUILD_COMMAND:format(guild, id))
+	end,
+
+	createGuildCommand = function (guild, payload)
+		return request("POST", GUILD_COMMANDS:format(guild), payload)
+	end,
+
+	editGuildCommand = function (guild, id, payload)
+		return request("PATCH", GUILD_COMMAND:format(guild, id), payload)
+	end,
+
+	editGuildCommands = function (guild, payload)
+		return request("PATCH", GUILD_COMMANDS:format(guild), payload)
+	end,
+
+	deleteGuildCommand = function (guild, id)
+		return request("DELETE", GUILD_COMMAND:format(guild, id))
+	end,
+
+	overwriteGuildCommands = function(guild, payload)
+		return request("PUT", GUILD_COMMANDS:format(guild), payload)
+	end
 }
 
-function CommandManager.getGlobalCommands ()
-	return request("GET", GLOBAL_COMMANDS)
-end
-
-function CommandManager.getGlobalCommand (id)
-	return request("GET", GLOBAL_COMMAND:format(id))
-end
-
-function CommandManager.createGlobalCommand (payload)
-	return request("POST", GLOBAL_COMMANDS, payload)
-end
-
-function CommandManager.editGlobalCommand (id, payload)
-	return request("PATCH", GLOBAL_COMMAND:format(id), payload)
-end
-
-function CommandManager.editGlobalCommands (payload)
-	return request("PATCH", GLOBAL_COMMANDS, payload)
-end
-
-function CommandManager.deleteGlobalCommand (id)
-	return request("DELETE", GLOBAL_COMMAND:format(id))
-end
-
-function CommandManager.overwriteGlobalCommands(payload)
-	return request("PUT", GLOBAL_COMMANDS)
-end
-
-function CommandManager.getGuildCommands (guild)
-	return request("GET", GUILD_COMMANDS:format(guild))
-end
-
-function CommandManager.getGuildCommand (guild, id)
-	return request("GET", GUILD_COMMAND:format(guild, id))
-end
-
-function CommandManager.createGuildCommand (guild, payload)
-	return request("POST", GUILD_COMMANDS:format(guild), payload)
-end
-
-function CommandManager.editGuildCommand (guild, id, payload)
-	return request("PATCH", GUILD_COMMAND:format(guild, id), payload)
-end
-
-function CommandManager.editGuildCommands (guild, payload)
-	return request("PATCH", GUILD_COMMANDS:format(guild), payload)
-end
-
-function CommandManager.deleteGuildCommand (guild, id)
-	return request("DELETE", GUILD_COMMAND:format(guild, id))
-end
-
-function CommandManager.overwriteGuildCommands(guild, payload)
-	return request("PUT", GUILD_COMMANDS)
-end
-
-local channelType = require "discordia".enums.channelType
-local commandType = CommandManager.commandType
-local commandOptionType = CommandManager.commandOptionType
+local enums = require "discordia".enums
+local channelType = enums.channelType
+local commandType = enums.applicationCommandType
+local commandOptionType = enums.applicationCommandOptionType
 
 local commandsStructure = {
 	{
@@ -211,20 +192,6 @@ local commandsStructure = {
 						name = "misc",
 						value = "misc"
 					}
-				}
-			}
-		}
-	},
-	{
-		name = "view",
-		description = "Show registered lobbies",
-		options = {
-			{
-				name = "lobby",
-				description = "A lobby to be viewed",
-				type = commandOptionType.channel,
-				channel_types = {
-					channelType.voice
 				}
 			}
 		}
@@ -286,9 +253,20 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "name",
 						description = "Name a room will have when it's created",
-						type = commandOptionType.string
+						type = commandOptionType.string,
+						required = true,
+						autocomplete = true
 					}
 				}
 			},
@@ -298,9 +276,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "category",
 						description = "Category in which rooms will be created",
 						type = commandOptionType.channel,
+						required = true,
 						channel_types = {
 							channelType.category
 						}
@@ -313,9 +301,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "bitrate",
 						description = "New rooms' bitrate",
 						type = commandOptionType.integer,
+						required = true,
 						min_value = 8,
 						max_value = 384
 					}
@@ -327,9 +325,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "capacity",
 						description = "New rooms' capacity",
 						type = commandOptionType.integer,
+						required = true,
 						min_value = 0,
 						max_value = 99
 					}
@@ -340,6 +348,15 @@ local commandsStructure = {
 				description = "Give room hosts' access to different commands",
 				type = commandOptionType.subcommand,
 				options = {
+					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
 					{
 						name = "moderate",
 						description = "Permission to use moderation commands",
@@ -378,9 +395,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "role",
 						description = "The default role bot uses to manage user permissions",
-						type = commandOptionType.role
+						type = commandOptionType.role,
+						required = true
 					}
 				}
 			}
@@ -443,9 +470,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "target",
 						description = "A target for matchmaking pool",
 						type = commandOptionType.channel,
+						required = true,
 						channel_types = {
 							channelType.voice, channelType.category
 						}
@@ -458,9 +495,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "mode",
 						description = "A matchmaking mode",
 						type = commandOptionType.string,
+						required = true,
 						choices = {
 							{
 								name = "random",
@@ -535,9 +582,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "category",
 						description = "A category in which a companion chat will be created",
 						type = commandOptionType.channel,
+						required = true,
 						channel_types = {
 							channelType.category
 						}
@@ -550,9 +607,20 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "name",
 						description = "Name a chat will have when it's created",
-						type = commandOptionType.string
+						type = commandOptionType.string,
+						required = true,
+						autocomplete = true
 					}
 				}
 			},
@@ -562,9 +630,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "greeting",
 						description = "A message that will be automatically sent to chat when it's created",
-						type = commandOptionType.string
+						type = commandOptionType.string,
+						required = true
 					}
 				}
 			},
@@ -574,9 +652,19 @@ local commandsStructure = {
 				type = commandOptionType.subcommand,
 				options = {
 					{
+						name = "lobby",
+						description = "A lobby to be configured",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
 						name = "channel",
 						description = "A channel where logs will be sent",
 						type = commandOptionType.channel,
+						required = true,
 						channel_types = {
 							channelType.text
 						}
@@ -603,8 +691,9 @@ local commandsStructure = {
 						name = "limit",
 						description = "Maximum amount of channels the bot will create",
 						type = commandOptionType.integer,
-							min_value = 0,
-							max_value = 500
+						required = true,
+						min_value = 0,
+						max_value = 500
 					}
 				}
 			},
@@ -653,7 +742,8 @@ local commandsStructure = {
 					{
 						name = "role",
 						description = "The default role bot uses to manage user permissions",
-						type = commandOptionType.role
+						type = commandOptionType.role,
+						required = true
 					}
 				}
 			}
@@ -849,7 +939,7 @@ local commandsStructure = {
 								name = "user",
 								description = "User that you want to remove from reservations",
 								type = commandOptionType.user,
-								required = true 
+								required = true
 							}
 						}
 					},

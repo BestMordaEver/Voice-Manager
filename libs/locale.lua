@@ -226,10 +226,8 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	},
 
 	helpLinksTitle = "Links",
-	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide)
-[User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide)
-[How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID)
-[Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide) | [How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID) | [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+[Privacy](https://github.com/BestMordaEver/Voice-Manager/blob/dev/privacy.md) | [ToS](https://github.com/BestMordaEver/Voice-Manager/blob/dev/tos.md)
 [Support Server](https://discord.gg/tqj6jvT)]],
 
 	-- server
@@ -255,6 +253,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
 You can add a lobby with `/lobbies add`]],
+	lobbyInfo = "Lobby selected! You now can change lobby settings",
 	lobbiesInfo = "Select lobbies to change their settings",
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
@@ -355,8 +354,8 @@ You can enable companion channels with `/lobbies companion enable`]],
 	badHostPermission = "You're not permitted to perform this command",
 	hostError = "Bot wasn't able to perform this action. Contact your administrators if issue persists",
 
-	-- select
-	selectFailed = "Couldn't find a lobby or category",
+	-- view
+	selectFailed = "Selected channel is not a lobby",
 	selectVoice = "Selected lobby %s",
 	selectCategory = "Selected category %s",
 

@@ -1,12 +1,11 @@
 local locale = require "locale"
-local embeds = require "embeds/embeds"
-local colors = embeds.colors
+local embeds = require "embeds"
+local red = embeds.colors.red
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("error", function ()
-	return {
+return embeds("error", function ()
+	return {embeds = {{
 		title = locale.embedError,
-		color = colors.red,
+		color = red,
 		description = locale.error:format(locale.errorReaction[math.random(1, #locale.errorReaction)])
-	}
+	}}}
 end)

@@ -1,34 +1,37 @@
 local locale = require "locale"
 local client = require "client"
 
-local embeds = require "embeds/embeds"
+local embeds = require "embeds"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local tps = require "funcs/truePositionSorting"
-local colors = embeds.colors
+local blurple = embeds.colors.blurple
 local insert = table.insert
 
--- no embed data is saved, since this is non-interactive embed
-embeds:new("lobbiesInfo", function (guild)
+return embeds("lobbiesInfo", function (guild, channel)
 	local guildData = guilds[guild.id]
-	local prefix = guilds[guild.id].prefix
-	if prefix:match("%w$") then prefix = prefix .. " " end
 
 	local embed = {
 		title = locale.lobbiesInfoTitle:format(guild.name),
-		color = colors.blurple,
-		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo:gsub("%%prefix%%", prefix) or locale.lobbiesInfo,
+		color = blurple,
+		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or locale.lobbiesInfo,
 		fields = {}
 	}
 
-	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
-		return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
-	end), tps)
+	local sortedLobbies
+	if channel then
+		sortedLobbies = {lobbies[channel.id]}
+	else
+		---@diagnostic disable-next-line: undefined-field
+		sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
+			return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
+		end), tps)
+		for i,lobby in ipairs(sortedLobbies) do
+			sortedLobbies[i] = lobbies[lobby.id]
+		end
+	end
 
-	local sortedLobbyData = {}
-	for i, lobby in ipairs(sortedLobbies) do insert(sortedLobbyData, lobbies[lobby.id]) end
-
-	for _, lobbyData in pairs(sortedLobbyData) do
+	for _, lobbyData in pairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.target)
 		if not guild:getRole(lobbyData.role) then lobbyData:setRole(guild.defaultRole.id) end
 
@@ -47,5 +50,5 @@ embeds:new("lobbiesInfo", function (guild)
 		})
 	end
 
-	return embed
+	return {embeds = {embed}}
 end)
