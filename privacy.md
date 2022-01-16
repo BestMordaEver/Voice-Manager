@@ -1,5 +1,5 @@
 Voice Manager Privacy Policy  
-Last updated and effective: January 12, 2022
+Last updated and effective: January 16, 2022
 
 Thanks for using our bot!  
 The Voice Manager team provides utilities and services on Discord social platform, mainly by servicing and maintaining the Voice Manager bot. As part of those services, some user information is collected and this Privacy Policy sets forth our policy with respect to this information.
