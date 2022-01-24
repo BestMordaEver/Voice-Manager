@@ -1057,32 +1057,98 @@ local commandsStructure = {
 					{
 						name = "name",
 						description = "Set new room name to default \"%nickname's room\"",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "category",
 						description = "Set new room category to lobby's category",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "bitrate",
 						description = "Set new room bitrate to 64",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "capacity",
 						description = "Set new room capacity to copy from lobby",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "permissions",
 						description = "Disable all room permissions",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "role",
 						description = "Reset default managed role to @everyone",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					}
 				}
 			},
@@ -1094,12 +1160,34 @@ local commandsStructure = {
 					{
 						name = "target",
 						description = "Reset matchmaking target to current category",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "mode",
 						description = "Reset matchmaking mode to random",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					}
 				}
 			},
@@ -1111,22 +1199,66 @@ local commandsStructure = {
 					{
 						name = "category",
 						description = "Reset companion category to use lobby settings",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "name",
 						description = "Reset companion name to \"private-chat\"",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "greeting",
 						description = "Disable companion greeting",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					},
 					{
 						name = "log",
 						description = "Disable companion logging",
-						type = commandOptionType.subcommand
+						type = commandOptionType.subcommand,
+						options = {
+							{
+								name = "lobby",
+								description = "A lobby to be configured",
+								type = commandOptionType.channel,
+								required = true,
+								channel_types = {
+									channelType.voice
+								}
+							}
+						}
 					}
 				}
 			},
@@ -1155,13 +1287,37 @@ local commandsStructure = {
 		}
 	},
 	{
+		name = "support",
+		description = "Send invite to the support server",
+	},
+	{
 		name = "Invite",
 		type = commandType.user
 	}
 }
 
+local debugCommands = {
+	{
+		name = "exec",
+		description = "This is gonna be our little secret",
+		options = {
+			{
+				name = "code",
+				description = "What do you want me to do?",
+				type = commandOptionType.string,
+				required = true
+			}
+		}
+	},
+	{
+		name = "shutdown",
+		description = "Guess I'll die",
+	}
+}
+
 coroutine.wrap(function ()
 	CommandManager.overwriteGuildCommands(guild,commandsStructure)
+	for _,command in ipairs(debugCommands) do CommandManager.createGuildCommand(guild, command) end
 end)()
 
 return CommandManager
