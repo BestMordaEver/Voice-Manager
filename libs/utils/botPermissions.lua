@@ -35,6 +35,10 @@ local botPermissionsMT = {
 
 		has = function (self, permission)
 			return self.bitfield:has(self.bits[permission] or permission)
+		end,
+
+		value = function (self)
+			return self.bitfield.value
 		end
 	},
 
@@ -58,7 +62,7 @@ local botPermissionsMT = {
 	end
 }
 
-botPermissions = function (perms) 
+botPermissions = function (perms)
 	return setmetatable({bitfield = bitfield(perms)},botPermissionsMT)
 end
 
