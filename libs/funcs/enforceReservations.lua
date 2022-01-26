@@ -1,5 +1,7 @@
 local logger = require "logger"
+
 local guilds = require "storage/guilds"
+
 local permission = require "discordia".enums.permission
 
 return function (channel)

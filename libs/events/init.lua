@@ -1,13 +1,14 @@
 -- all event preprocessing happens here
 local client = require "client"
+local config = require "config"
 local clock = require "clock"
 
-local channels = require "storage/channels"
-local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
+
 local status = require "funcs/status"
 local safeEvent = require "funcs/safeEvent"
-local config = require "config"
 
 --[[
 events are listed by name here, discordia events may differ from OG discord events for sake of convenience

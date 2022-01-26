@@ -1,7 +1,8 @@
 local locale = require "locale"
-
 local embeds = require "embeds"
+
 local availableCommands = require "funcs/availableCommands"
+
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
 local blurple = embeds.colors.blurple

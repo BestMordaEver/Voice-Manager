@@ -1,4 +1,5 @@
 local logger = require "logger"
+
 local helpEmbed = require "embeds/help"
 
 return function (interaction)

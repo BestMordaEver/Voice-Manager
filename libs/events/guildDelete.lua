@@ -1,9 +1,9 @@
 local client = require "client"
-
-local channels = require "storage/channels"
-local lobbies = require "storage/lobbies"
-local guilds = require "storage/guilds"
 local config = require "config"
+
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 
 return function (guild) -- same but opposite
 	if guilds[guild.id] then guilds[guild.id]:delete() end

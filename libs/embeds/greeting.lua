@@ -1,9 +1,12 @@
 local locale = require "locale"
 local client = require "client"
 local embeds = require "embeds"
-local channels = require "storage/channels"
+
 local guilds = require "storage/guilds"
+local channels = require "storage/channels"
+
 local availableCommands = require "funcs/availableCommands"
+
 local fuchsia = embeds.colors.fuchsia
 
 return embeds("greeting", function (room)

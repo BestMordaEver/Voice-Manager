@@ -1,12 +1,15 @@
 local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
+
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+
 local greetingEmbed = require "embeds/greeting"
-local matchmakers = require "utils/matchmakers"
+
 local Overseer = require "utils/logWriter"
+local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
 local enforceReservations = require "funcs/enforceReservations"
 

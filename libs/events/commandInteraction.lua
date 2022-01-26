@@ -1,6 +1,8 @@
 local logger = require "logger"
-local errorEmbed = require "embeds/error"
+
 local commands = require "commands/init"
+
+local errorEmbed = require "embeds/error"
 
 return function (interaction)
     if not interaction.guild then return end

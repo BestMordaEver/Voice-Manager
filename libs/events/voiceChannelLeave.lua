@@ -1,8 +1,10 @@
 local client = require "client"
 local logger = require "logger"
+
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
+
 local enforceReservations = require "funcs/enforceReservations"
 
 local permission = require "discordia".enums.permission

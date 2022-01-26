@@ -1,8 +1,9 @@
 local locale = require "locale"
 local embeds = require "embeds"
-local enums = require "discordia".enums
-local componentType, buttonStyle = enums.componentType, enums.buttonStyle
 
+local enums = require "discordia".enums
+
+local componentType, buttonStyle = enums.componentType, enums.buttonStyle
 local blurple = embeds.colors.blurple
 local insert = table.insert
 

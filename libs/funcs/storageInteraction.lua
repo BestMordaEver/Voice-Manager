@@ -2,8 +2,10 @@
 -- it ensures that no statement is used by two threads at the same time
 local config = require "config"
 local client = require "client"
-local Mutex = require "discordia".Mutex
 local logger = require "logger"
+
+local Mutex = require "discordia".Mutex
+
 local mutexes = {}
 
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end

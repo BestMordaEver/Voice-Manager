@@ -1,12 +1,15 @@
 local locale = require "locale"
 local config = require "config"
+
 local guilds = require "storage/guilds"
-local permission = require "discordia".enums.permission
+
+local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
-local botPermissions = require "utils/botPermissions"
-local okEmbed = require "embeds/ok"
 
+local botPermissions = require "utils/botPermissions"
+
+local permission = require "discordia".enums.permission
 
 local subcommands = {
 	role = function (interaction, role)

@@ -1,6 +1,7 @@
 local config = require "config"
-local warningEmbed = require "embeds/warning"
+
 local okEmbed = require "embeds/ok"
+local warningEmbed = require "embeds/warning"
 
 local function code (s)
 	return string.format("```\n%s```", s)

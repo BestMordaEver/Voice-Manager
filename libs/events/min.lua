@@ -1,8 +1,10 @@
 local client = require "client"
+local config = require "config"
+
 local channels = require "storage/channels"
+
 local mercy = require "utils/mercy"
 local status = require "funcs/status"
-local config = require "config"
 
 return function (date)
 	channels:cleanup()

@@ -1,8 +1,9 @@
 local locale = require "locale"
-
 local embeds = require "embeds"
+
 local guilds = require "storage/guilds"
 local channels = require "storage/channels"
+
 local blurple = embeds.colors.blurple
 
 return embeds("serverInfo", function (guild)

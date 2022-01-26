@@ -1,9 +1,11 @@
 local locale = require "locale"
 local client = require "client"
-
 local embeds = require "embeds"
+
 local channels = require "storage/channels"
+
 local availableCommands = require "funcs/availableCommands"
+
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
 local blurple = embeds.colors.blurple

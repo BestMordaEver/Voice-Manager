@@ -1,6 +1,7 @@
+local client = require "client"
+
 local channels = require "storage/channels"
 local lobbies = require "storage/lobbies"
-local client = require "client"
 
 --[[
 status generating function

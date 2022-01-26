@@ -1,5 +1,6 @@
 local locale = require "locale"
 local embeds = require "embeds"
+
 local red = embeds.colors.red
 
 return embeds("error", function ()

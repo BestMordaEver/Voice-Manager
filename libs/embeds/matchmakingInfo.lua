@@ -1,10 +1,12 @@
 local locale = require "locale"
 local client = require "client"
-
 local embeds = require "embeds"
+
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
+
 local tps = require "funcs/truePositionSorting"
+
 local channelType = require "discordia".enums.channelType
 local blurple = embeds.colors.blurple
 local insert = table.insert

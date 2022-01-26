@@ -1,6 +1,8 @@
 local locale = require "locale"
 local config = require "config"
+
 local lobbies = require "storage/lobbies"
+
 local warningEmbed = require "embeds/warning"
 
 local permissionCheck = require "funcs/permissionCheck"

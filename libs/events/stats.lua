@@ -1,7 +1,7 @@
 -- stats to different bot boards are sent from here
 
 local https = require "coro-http"
-local json = require "json"
+local encode = require "json".encode
 
 local token = require "token"
 local config = require "config"
@@ -13,7 +13,7 @@ local function send (name, server)
 	if token.tokens[name] then
 		local res, body = https.request("POST",server.endpoint,
 			{{"Authorization", token.tokens[name]},{"Content-Type", "application/json"},{"Accept", "application/json"}},
-			json.encode({[server.body] = #client.guilds}))
+			encode({[server.body] = #client.guilds}))
 
 		if res.code ~= 204 and res.code ~= 200 then
 			logger:log(2, "Couldn't send stats to %s - %s", name, body)

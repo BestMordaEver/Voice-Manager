@@ -1,5 +1,6 @@
 local locale = require "locale"
 local config = require "config"
+
 local permission = require "discordia".enums.permission
 
 return function (interaction, channel)
