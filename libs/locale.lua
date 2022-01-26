@@ -352,12 +352,10 @@ You can enable companion channels with `/lobbies companion enable`]],
 
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",
-	hostError = "Bot wasn't able to perform this action. Contact your administrators if issue persists",
-
-	-- view
-	selectFailed = "Selected channel is not a lobby",
-	selectVoice = "Selected lobby %s",
-	selectCategory = "Selected category %s",
+	renameError = "Bot wasn't able to change channel name. Contact your administrators if issue persists",
+	resizeError = "Bot wasn't able to change channel capacity. Contact your administrators if issue persists",
+	bitrateError = "Bot wasn't able to change channel bitrate. Contact your administrators if issue persists",
+	inviteError = "Bot wasn't able to create invite. Contact your administrators if issue persists",
 
 	-- utility
 	embedPages = "Page %d of %d",
@@ -374,6 +372,7 @@ You can enable companion channels with `/lobbies companion enable`]],
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 
 	-- errors
+	notLobby = "Selected channel is not a lobby",
 	lobbyDupe = "This channel is already registered as a lobby",
 	channelDupe = "Can't register a room as a lobby",
 	badBotPermissions = "Bot doesn't have sufficient permissions",
@@ -388,6 +387,7 @@ You can enable companion channels with `/lobbies companion enable`]],
 	amountOOB = "There can be only 50 channels per category",
 	emptyName = "Given input will result in an empty name",
 	noParent = "unknown lobby",
+	noDMs = "Can't send invite to user. Invite link - %s",
 
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
@@ -396,7 +396,7 @@ You can enable companion channels with `/lobbies companion enable`]],
 		"Sure did see this one coming",
 		"Kinda saw this one coming",
 		"Never saw this one coming",
-		"Sirens blaring in distance",
+		"sirens blaring in distance",
 		"Is everyone alive?",
 		"I sure hope nobody got killed",
 		"Ow, my leg",
@@ -405,6 +405,13 @@ You can enable companion channels with `/lobbies companion enable`]],
 		"bonk",
 		"This is so sad",
 		"insert random pop culture reference here",
-		"Now you're just doing this on purpose, don't you?"
-	},
+		"Now you're just doing this on purpose, aren't you?",
+		"Tastes like cookies",
+		"Valhalla, take me!",
+		"Pretty sure this isn't supposed to happen",
+		"Yeah, just let me grab my comically large wrench",
+		"smacks computer with comically large wrench",
+		"Local bot repeatedly embarasses his owner",
+		"Add this one to the list"
+	}
 }

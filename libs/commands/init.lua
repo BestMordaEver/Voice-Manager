@@ -1,44 +1,29 @@
-local config = require "config"
-
-local function invite (message)
-	return "Sent support invite", "asIs", "https://discord.gg/tqj6jvT"
+local function invite ()
+	return "Sent support invite", "https://discord.gg/tqj6jvT"
 end
-
-local function code (s)
-	return string.format("```\n%s```", s)
-end
-
-local sandbox = setmetatable({
-	client = require "client",
-	guilds = require "storage/guilds",
-	lobbies = require "storage/lobbies",
-	channels = require "storage/channels"
-},{ __index = _G})
 
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return setmetatable({
-	help = require "commands/misc/help",
-	reset = require "commands/misc/reset",
-	server = require "commands/server/server",
-	lobby = require "commands/lobbies/lobbies",
-	companion = require "commands/companions/companions",
-	matchmaking = require "commands/matchmaking/matchmaking",
-	room = require "commands/room/room",
-	chat = require "commands/chat/chat",
-	create = require "commands/misc/create",
-	delete = require "commands/misc/delete",
-	shutdown = require "commands/misc/shutdown",
+	help = require "commands/help",
+	reset = require "commands/reset",
+	server = require "commands/server",
+	lobby = require "commands/lobbies",
+	companion = require "commands/companions",
+	matchmaking = require "commands/matchmaking",
+	room = require "commands/room",
+	chat = require "commands/chat",
+	create = require "commands/create",
+	delete = require "commands/delete",
+	shutdown = require "commands/shutdown",
 	support = invite,
 	invite = invite,
-	exec = function (message)
-		if not config.owners[message.author.id] then return "Not owner", "warning", "You're not my father" end
-
-		local fn, syntaxError = load(message.content:match("exec%s*(.-)$"), "Bot", "t", sandbox)
-		if not fn then return "Syntax error", "warning", code(syntaxError) end
-
-		local success, runtimeError = pcall(fn)
-		if not success then return "Runtime error", "warning", code(runtimeError) end
-
-		return "Code executed", "ok", "Code executed"
+	exec = require "commands/exec"
+},{__call = function (self, interaction)
+	local command, subcommand, argument = interaction.commandName, interaction.option and interaction.option.name
+	if interaction.option and interaction.option.options then
+		for optionName, option in pairs(interaction.option.options) do
+			if optionName ~= "lobby" then argument = option end
+		end
 	end
-},{__call = function (self, interaction) return self[interaction.commandName](interaction) end})
+	return self[command](interaction, subcommand, argument and (argument.value or argument))
+end})
