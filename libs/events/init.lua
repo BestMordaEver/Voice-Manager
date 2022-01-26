@@ -16,26 +16,6 @@ full list and arguments - https://github.com/SinisterRectus/Discordia/wiki/Event
 ]]
 local events
 events = {
-	commandInteraction = require "events/commandInteraction",
-
-	componentInteraction = require "events/componentInteraction",
-
-	messageUpdate = require "events/messageUpdate",
-
-	guildCreate = require "events/guildCreate",
-
-	guildDelete = require "events/guildDelete",
-
-	voiceChannelJoin = require "events/voiceChannelJoin",
-
-	voiceChannelLeave = require "events/voiceChannelLeave",
-
-	channelUpdate = require "events/channelUpdate",
-
-	channelDelete = require "events/channelDelete",
-
-	presenceUpdate = require "events/presenceUpdate",
-
 	init = function ()
 		guilds:load()
 		lobbies:load()
@@ -47,20 +27,20 @@ events = {
 			client:getChannel(config.wakeUpFeed):send("I'm listening")
 		end
 
-		client:on(events("commandInteraction"))
-		client:on(events("componentInteraction"))
-		client:on(events("messageUpdate"))
-		client:on(events("guildCreate"))
-		client:on(events("guildDelete"))
-		client:on(events("voiceChannelJoin"))
-		client:on(events("voiceChannelLeave"))
-		client:on(events("channelUpdate"))
-		client:on(events("channelDelete"))
-		client:on(events("presenceUpdate"))
-		clock:on(events("min"))
-		clock:on(events("day"))
+		client:on(safeEvent("commandInteraction", require "events/commandInteraction"))
+		client:on(safeEvent("componentInteraction", require "events/componentInteraction"))
+		client:on(safeEvent("messageUpdate", require "events/messageUpdate"))
+		client:on(safeEvent("guildCreate", require "events/guildCreate"))
+		client:on(safeEvent("guildDelete", require "events/guildDelete"))
+		client:on(safeEvent("voiceChannelJoin", require "events/voiceChannelJoin"))
+		client:on(safeEvent("voiceChannelLeave", require "events/voiceChannelLeave"))
+		client:on(safeEvent("channelUpdate", require "events/channelUpdate"))
+		client:on(safeEvent("channelDelete", require "events/channelDelete"))
+		client:on(safeEvent("presenceUpdate", require "events/presenceUpdate"))
+		clock:on(safeEvent("min", require "events/min"))
+		clock:on(safeEvent("day", require "events/day"))
 
-		if config.sendStats then clock:on(events("hour", require "events/stats")) end
+		if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
 	end,
 
 	ready = function ()
@@ -68,11 +48,7 @@ events = {
 		guilds:cleanup()
 		lobbies:cleanup()
 		channels:cleanup()
-	end,
-
-	min = require "events/min",
-
-	day = require "events/day",
+	end
 }
 
 return setmetatable(events, {__call = function (self, name, fn)
