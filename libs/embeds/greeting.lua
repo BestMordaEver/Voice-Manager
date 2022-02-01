@@ -5,7 +5,7 @@ local embeds = require "embeds"
 local guilds = require "storage/guilds"
 local channels = require "storage/channels"
 
-local availableCommands = require "funcs/availableCommands"
+local availableCommands = require "embeds/availableCommands"
 
 local fuchsia = embeds.colors.fuchsia
 

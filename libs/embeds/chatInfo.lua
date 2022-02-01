@@ -4,7 +4,7 @@ local embeds = require "embeds"
 
 local channels = require "storage/channels"
 
-local availableCommands = require "funcs/availableCommands"
+local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions

@@ -1,7 +1,7 @@
 local locale = require "locale"
 local embeds = require "embeds"
 
-local availableCommands = require "funcs/availableCommands"
+local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
