@@ -947,13 +947,13 @@ local commandsStructure = {
 						name = "clear",
 						description = "Clear the reservations",
 						type = commandOptionType.subcommand
-					},
-					{
-						name = "lock",
-						description = "Add all users that are currently in the room to room's reservations",
-						type = commandOptionType.subcommand
 					}
 				}
+			},
+			{
+				name = "lock",
+				description = "Set room to invite only mode",
+				type = commandOptionType.subcommand
 			}
 		}
 	},

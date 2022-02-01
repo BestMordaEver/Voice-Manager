@@ -2,6 +2,7 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
+local guilds = require "storage/guilds"
 local channels = require "storage/channels"
 
 local okEmbed = require "embeds/ok"
@@ -81,7 +82,7 @@ local subcommands = {
 
 		elseif subcommand == "remove" then
 			overwrite:clearPermissions(permission.connect)
-			return "Unlocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
+			return "Unblocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
 			local mentionString = ""
@@ -118,16 +119,18 @@ local subcommands = {
 			end
 			enforceReservations(voiceChannel)
 			return "Cleared reservations", okEmbed(locale.unreserveConfirm:format(mentionString))
-
-		elseif subcommand == "lock" then
-			local mentionString = ""
-			for _, member in pairs(voiceChannel.connectedMembers) do
-				mentionString = mentionString .. member.user.mentionString .. " "
-				voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
-			end
-			enforceReservations(voiceChannel)
-			return "Locked the room", okEmbed(locale.reserveConfirm:format(mentionString))
 		end
+	end,
+
+	lock = function (interaction, voiceChannel)
+		local mentionString = ""
+		for _, member in pairs(voiceChannel.connectedMembers) do
+			voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
+		end
+
+		local guild = voiceChannel.guild
+		voiceChannel:getPermissionOverwriteFor(guild:getRole(guilds[guild.id].role) or guild.defaultRole):denyPermissions(permission.connect)
+		return "Locked the room", okEmbed(locale.lockConfirm:format(mentionString))
 	end,
 
 	kick = function (interaction, voiceChannel, user)
