@@ -229,7 +229,7 @@ return function (interaction, subcommand, argument)
 
 	if noAdmin[subcommand] or interaction.member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, voiceChannel, argument)
-	elseif channels[voiceChannel.id].host == interaction.author.id then
+	elseif channels[voiceChannel.id].host == interaction.user.id then
 		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end

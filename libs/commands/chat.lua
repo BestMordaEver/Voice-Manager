@@ -111,7 +111,7 @@ return function (interaction, subcommand, argument)
 
 	if interaction.member:hasPermission(chat, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, chat, argument)
-	elseif channels[voiceChannel.id].host == interaction.author.id then
+	elseif channels[voiceChannel.id].host == interaction.user.id then
 		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, chat, argument)
 		end
