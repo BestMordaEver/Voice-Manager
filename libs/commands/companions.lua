@@ -7,17 +7,22 @@ local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
 local permissionCheck = require "funcs/permissionCheck"
-local lobbyPreProcess = require "funcs/lobbyPreProcess"
+local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local subcommands = {
-	enable = function (interaction, channel, enable)
-		lobbies[channel.id]:setCompanionTarget(enable or nil)
-		return enable and "Lobby companion enable" or "Lobby companion disabled", "ok", locale.companionToggle:format(enable and "enable" or "disable")
+	enable = function (interaction, channel)
+		lobbies[channel.id]:setCompanionTarget(true)
+		return "Lobby companion enabled", okEmbed(locale.companionEnable)
+	end,
+
+	disable = function (interaction, channel)
+		lobbies[channel.id]:setCompanionTarget(nil)
+		return "Lobby companion disabled", okEmbed(locale.companionDisable)
 	end,
 
 	category = function (interaction, channel, category)
 		if not category then
-			lobbies[channel.id]:setCompanionTarget()
+			lobbies[channel.id]:setCompanionTarget(true)
 			return "Companion target category reset", okEmbed(locale.categoryReset)
 		end
 
@@ -34,7 +39,7 @@ local subcommands = {
 		if not name then name = "private-chat" end
 
 		lobbies[channel.id]:setCompanionTemplate(name)
-		return "Companion name template set", "ok", locale.nameConfirm:format(name)
+		return "Companion name template set", okEmbed(locale.nameConfirm:format(name))
 	end,
 
 	greeting = function (interaction, channel, greeting)
@@ -63,8 +68,8 @@ local subcommands = {
 	end
 }
 
-return function (interaction)
-	local command, channel = lobbyPreProcess(interaction, companionsInfoEmbed)
-	if subcommands[command] then return subcommands[command](interaction, channel) end
-	return command, channel
+return function (interaction, subcommand, argument)
+	local channel, embed = lobbyPreProcess(interaction, companionsInfoEmbed)
+	if embed then return channel, embed end
+	return subcommands[subcommand](interaction, channel, argument)
 end

@@ -103,7 +103,7 @@ local channelsIndex = {
 						if parent then
 							parent:attachChild(self[channelID], tonumber(self[channelID].position))
 							if channelIDs.companion[i] and parent.companionLog and client:getChannel(channelIDs.companion[i]) then
-								Overseer:resume(client:getChannel(channelIDs.companion[i]))
+								Overseer.resume(client:getChannel(channelIDs.companion[i]))
 							end
 						end
 					else

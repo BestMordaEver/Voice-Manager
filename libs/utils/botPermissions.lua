@@ -34,7 +34,7 @@ local botPermissionsMT = {
 		end,
 
 		has = function (self, permission)
-			return self.bitfield:has(self.bits[permission] or permission)
+			return (self.bits[permission] or tonumber(permission)) and self.bitfield:has(self.bits[permission] or permission) or false
 		end,
 
 		value = function (self)

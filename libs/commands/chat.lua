@@ -15,6 +15,8 @@ local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
 
+ratelimiter("companionName", 2, 600)
+
 local subcommands = {
 	rename = function (interaction, chat, name)
 		local limit, retryIn = ratelimiter:limit("companionName", chat.id)
@@ -63,9 +65,10 @@ local subcommands = {
 	clear = function (interaction, chat, amount)
 		local trueAmount = 0
 
-		if amount then
+		if amount and amount > 0 then
 			repeat
 				local bulk = chat:getMessages(amount > 100 and 100 or amount)
+				if #bulk == 0 then break end
 				trueAmount = trueAmount + #bulk
 				chat:bulkDelete(bulk)
 				amount = amount > 100 and amount - 100 or 0
@@ -96,17 +99,17 @@ local subcommands = {
 return function (interaction, subcommand, argument)
 	local voiceChannel = interaction.member.voiceChannel
 
-	if not channels[voiceChannel.id] then
+	if not (voiceChannel and channels[voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
-	end
-
-	if subcommand == "view" then
-		return "Sent room info", chatInfoEmbed(voiceChannel)
 	end
 
 	local chat = client:getChannel(channels[voiceChannel.id].companion)
 	if not chat then
 		return "Room doesn't have a chat", warningEmbed(locale.noCompanion)
+	end
+
+	if subcommand == "view" then
+		return "Sent chat info", chatInfoEmbed(voiceChannel)
 	end
 
 	if interaction.member:hasPermission(chat, permission.administrator) or config.owners[interaction.user.id] then
@@ -115,7 +118,7 @@ return function (interaction, subcommand, argument)
 		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, chat, argument)
 		end
-		return "Not a host", warningEmbed(locale.notHost)
+		return "Insufficient permissions", warningEmbed(locale.badHostPermission)
 	end
-	return "Insufficient permissions", warningEmbed(locale.badHostPermission)
+	return "Not a host", warningEmbed(locale.notHost)
 end

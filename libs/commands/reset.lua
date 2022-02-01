@@ -8,9 +8,9 @@ local warningEmbed = require "embeds/warning"
 local permissionCheck = require "funcs/permissionCheck"
 
 local commands = {
-	lobbies = require "commands/lobbies",
+	lobby = require "commands/lobbies",
 	matchmaking = require "commands/matchmaking",
-	companions = require "commands/companions",
+	companion = require "commands/companions",
 	server = require "commands/server",
 }
 

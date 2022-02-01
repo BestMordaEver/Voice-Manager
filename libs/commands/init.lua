@@ -21,7 +21,7 @@ return setmetatable({
 	invite = invite,
 	exec = require "commands/exec"
 },{__call = function (self, interaction)
-	if interaction.type == commandType.chatInput then
+	if interaction.commandType == commandType.chatInput then
 		local command, subcommand, argument = interaction.commandName, interaction.option and interaction.option.name
 		if interaction.option and interaction.option.options then
 			for optionName, option in pairs(interaction.option.options) do

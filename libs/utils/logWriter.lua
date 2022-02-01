@@ -107,101 +107,101 @@ local writerMeta = {
 }
 
 local writers = {}
-local Overseer = {
-	track = function (self, channel)
-		if not writers[channel.id] then
-			writers[channel.id] = setmetatable({
-			f("Chat log of channel \"%s\" in server \"%s\"\nTimestamps use UTC time\nEmbeds can be viewed as seen in app here - https://leovoel.github.io/embed-visualizer/\n\n",
-				channel.name, channel.guild.name)},writerMeta)
-		end
-		return writers[channel.id]
-	end,
+local Overseer = {}
+Overseer.track = function (channel)
+	if not writers[channel.id] then
+		writers[channel.id] = setmetatable({
+		f("Chat log of channel \"%s\" in server \"%s\"\nTimestamps use UTC time\nEmbeds can be viewed as seen in app here - https://leovoel.github.io/embed-visualizer/\n\n",
+			channel.name, channel.guild.name)},writerMeta)
+	end
+	return writers[channel.id]
+end
 
-	resume = function (self, channel)
-		local writer = self:track(channel)
+Overseer.resume = function (channel)
+	local writer = Overseer.track(channel)
 
-		local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
+	local message, lastMessage = channel:getFirstMessage(), channel:getLastMessage()
 
-		if message then
-			writer:messageCreate(message)
+	if message then
+		writer:messageCreate(message)
 
-			while message ~= lastMessage do
-				local messages = channel:getMessagesAfter(message, 100)
-				if messages then
-					messages = messages:toArray("createdAt")
-					for _, message in ipairs(messages) do
-						writer:messageCreate(message)
-					end
-					message = messages[#messages]
-				else
-					break
+		while message ~= lastMessage do
+			local messages = channel:getMessagesAfter(message, 100)
+			if messages then
+				messages = messages:toArray("createdAt")
+				for _, message in ipairs(messages) do
+					writer:messageCreate(message)
 				end
+				message = messages[#messages]
+			else
+				break
 			end
+		end
+	end
+end
+
+Overseer.stop = function (self, channel)
+	local writer = writers[channel.id]
+	writers[channel.id] = nil
+	return concat(writer)
+end
+
+Overseer.events = {
+	messageCreate = function (message)
+		if writers[message.channel.id] then
+			writers[message.channel.id]:messageCreate(message)
 		end
 	end,
 
-	stop = function (self, channel)
-		local writer = writers[channel.id]
-		writers[channel.id] = nil
-		return concat(writer)
+	messageUpdate = function (message)
+		if writers[message.channel.id] then
+			writers[message.channel.id]:messageUpdate(message)
+		end
 	end,
 
-	events = {
-		messageCreate = function (message)
-			if writers[message.channel.id] then
-				writers[message.channel.id]:messageCreate(message)
-			end
-		end,
-
-		messageUpdate = function (message)
-			if writers[message.channel.id] then
-				writers[message.channel.id]:messageUpdate(message)
-			end
-		end,
-
-		messageUpdateUncached = function (channel, messageID)
-			if writers[channel.id] then
-				writers[channel.id]:messageUpdateUncached(channel, messageID)
-			end
-		end,
-
-		messageDelete = function (message)
-			if writers[message.channel.id] then
-				writers[message.channel.id]:messageDelete(message)
-			end
-		end,
-
-		messageDeleteUncached = function (channel, messageID)
-			if writers[channel.id] then
-				writers[channel.id]:messageDeleteUncached(channel, messageID)
-			end
-		end,
-
-		reactionAdd = function (reaction, userID)
-			if writers[reaction.message.channel.id] then
-				writers[reaction.message.channel.id]:reactionAdd(reaction, userID)
-			end
-		end,
-
-		reactionAddUncached = function (channel, messageID, hash, userID)
-			if writers[channel.id] then
-				writers[channel.id]:reactionAddUncached(channel, messageID, hash, userID)
-			end
-		end,
-
-		reactionRemove = function (reaction, userID)
-			if writers[reaction.message.channel.id] then
-				writers[reaction.message.channel.id]:reactionRemove(reaction, userID)
-			end
-		end,
-
-		reactionRemoveUncached = function (channel, messageID, hash, userID)
-			if writers[channel.id] then
-				writers[channel.id]:reactionRemoveUncached(channel, messageID, hash, userID)
-			end
+	messageUpdateUncached = function (channel, messageID)
+		if writers[channel.id] then
+			writers[channel.id]:messageUpdateUncached(channel, messageID)
 		end
-	}
+	end,
+
+	messageDelete = function (message)
+		if writers[message.channel.id] then
+			writers[message.channel.id]:messageDelete(message)
+		end
+	end,
+
+	messageDeleteUncached = function (channel, messageID)
+		if writers[channel.id] then
+			writers[channel.id]:messageDeleteUncached(channel, messageID)
+		end
+	end,
+
+	reactionAdd = function (reaction, userID)
+		if writers[reaction.message.channel.id] then
+			writers[reaction.message.channel.id]:reactionAdd(reaction, userID)
+		end
+	end,
+
+	reactionAddUncached = function (channel, messageID, hash, userID)
+		if writers[channel.id] then
+			writers[channel.id]:reactionAddUncached(channel, messageID, hash, userID)
+		end
+	end,
+
+	reactionRemove = function (reaction, userID)
+		if writers[reaction.message.channel.id] then
+			writers[reaction.message.channel.id]:reactionRemove(reaction, userID)
+		end
+	end,
+
+	reactionRemoveUncached = function (channel, messageID, hash, userID)
+		if writers[channel.id] then
+			writers[channel.id]:reactionRemoveUncached(channel, messageID, hash, userID)
+		end
+	end
 }
+
 
 for name, event in pairs(Overseer.events) do
 	client:on(name, function (...) emitter:emit(name, ...) end)

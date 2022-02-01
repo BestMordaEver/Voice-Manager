@@ -71,8 +71,8 @@ local subcommands = {
 		end
 	end,
 
-	blocklist = function (interaction, voiceChannel, subcommand)
-		local user = interaction.option.option.option
+	blocklist = function (interaction, voiceChannel)
+		local user, subcommand = interaction.option.option.option, interaction.option.option.name
 		user = user and user.value
 		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
 
@@ -85,17 +85,15 @@ local subcommands = {
 			return "Unblocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
-			local mentionString = ""
 			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite) return permissionOverwrite.type == "member" end)) do
-				mentionString = mentionString .. permissionOverwrite:getObject().user.mentionString .. " "
 				permissionOverwrite:clearPermissions(permission.connect)
 			end
-			return "Cleared blocklist", okEmbed(locale.unblockConfirm:format(mentionString))
+			return "Cleared blocklist", okEmbed(locale.blocklistClear:format())
 		end
 	end,
 
-	reservations = function (interaction, voiceChannel, subcommand)
-		local user = interaction.option.option.option
+	reservations = function (interaction, voiceChannel)
+		local user, subcommand = interaction.option.option.option, interaction.option.option.name
 		user = user and user.value
 		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
 
@@ -110,15 +108,13 @@ local subcommands = {
 			return "Unreserved mentioned members", okEmbed(locale.unreserveConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
-			local mentionString = ""
 			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite)
 				return permissionOverwrite.type == "member" and permissionOverwrite:getObject() ~= permissionOverwrite.guild.me
 			end)) do
-				mentionString = mentionString .. permissionOverwrite:getObject().user.mentionString .. " "
 				permissionOverwrite:clearPermissions(permission.connect, permission.readMessages)
 			end
 			enforceReservations(voiceChannel)
-			return "Cleared reservations", okEmbed(locale.unreserveConfirm:format(mentionString))
+			return "Cleared reservations", okEmbed(locale.reservationsClear:format())
 		end
 	end,
 
@@ -222,7 +218,7 @@ local noAdmin = {host = true, invite = true}
 return function (interaction, subcommand, argument)
 	local voiceChannel = interaction.member.voiceChannel
 
-	if not channels[voiceChannel.id] then
+	if not (voiceChannel and channels[voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
 	end
 
@@ -236,7 +232,7 @@ return function (interaction, subcommand, argument)
 		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end
-		return "Not a host", warningEmbed(locale.notHost)
+		return "Insufficient permissions", warningEmbed(locale.badHostPermission)
 	end
-	return "Insufficient permissions", warningEmbed(locale.badHostPermission)
+	return "Not a host", warningEmbed(locale.notHost)
 end

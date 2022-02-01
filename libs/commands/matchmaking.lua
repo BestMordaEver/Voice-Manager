@@ -8,7 +8,7 @@ local warningEmbed = require "embeds/warning"
 local matchmakingInfoEmbed = require "embeds/matchmakingInfo"
 
 local permissionCheck = require "funcs/permissionCheck"
-local lobbyPreProcess = require "funcs/lobbyPreProcess"
+local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType
 
@@ -61,6 +61,6 @@ local subcommands = {
 
 return function (interaction, subcommand, argument)
 	local channel, embed = lobbyPreProcess(interaction, matchmakingInfoEmbed)
-	if subcommands[subcommand] then return subcommands[subcommand](interaction, channel, argument) end
-	return channel, embed
+	if embed then return channel, embed end
+	return subcommands[subcommand](interaction, channel, argument)
 end

@@ -567,12 +567,22 @@ local commandsStructure = {
 						channel_types = {
 							channelType.voice
 						}
-					},
+					}
+				}
+			},
+			{
+				name = "disable",
+				description = "Disable companion chats for selected lobby",
+				type = commandOptionType.subcommand,
+				options = {
 					{
-						name = "enabled",
-						description = "Enable or disable",
-						type = commandOptionType.boolean,
-						required = true
+						name = "lobby",
+						description = "Selected lobby",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
 					}
 				}
 			},
@@ -668,82 +678,6 @@ local commandsStructure = {
 						channel_types = {
 							channelType.text
 						}
-					}
-				}
-			}
-		}
-	},
-	{
-		name = "server",
-		description = "Configure server settings",
-		options = {
-			{
-				name = "view",
-				description = "Show server settings",
-				type = commandOptionType.subcommand
-			},
-			{
-				name = "limit",
-				description = "Configure the global limit of channels created by the bot",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "limit",
-						description = "Maximum amount of channels the bot will create",
-						type = commandOptionType.integer,
-						required = true,
-						min_value = 0,
-						max_value = 500
-					}
-				}
-			},
-			{
-				name = "permissions",
-				description = "Give people in voice channels access to different commands",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "moderate",
-						description = "Permission to use moderation commands",
-						type = commandOptionType.boolean
-					},
-					{
-						name = "manage",
-						description = "Permission to manage room properties",
-						type = commandOptionType.boolean
-					},
-					{
-						name = "rename",
-						description = "Permission to rename their room",
-						type = commandOptionType.boolean
-					},
-					{
-						name = "resize",
-						description = "Permission to change room capacity",
-						type = commandOptionType.boolean
-					},
-					{
-						name = "bitrate",
-						description = "Permission to change room bitrate",
-						type = commandOptionType.boolean
-					},
-					{
-						name = "mute",
-						description = "Permission to mute users in their room",
-						type = commandOptionType.boolean
-					}
-				}
-			},
-			{
-				name = "role",
-				description = "Change the default role bot uses to manage user permissions",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "role",
-						description = "The default role bot uses to manage user permissions",
-						type = commandOptionType.role,
-						required = true
 					}
 				}
 			}
@@ -870,11 +804,6 @@ local commandsStructure = {
 				type = commandOptionType.subcommandGroup,
 				options = {
 					{
-						name = "view",
-						description = "Display your current blocklist",
-						type = commandOptionType.subcommand
-					},
-					{
 						name = "add",
 						description = "Add users to the blocklist",
 						type = commandOptionType.subcommand,
@@ -912,11 +841,6 @@ local commandsStructure = {
 				description = "Manage the reservations in your room",
 				type = commandOptionType.subcommandGroup,
 				options = {
-					{
-						name = "view",
-						description = "Display your current reservations",
-						type = commandOptionType.subcommand
-					},
 					{
 						name = "add",
 						description = "Reserve a place for a user",
@@ -1039,7 +963,8 @@ local commandsStructure = {
 					{
 						name = "amount",
 						description = "How many messages to delete",
-						type = commandOptionType.integer
+						type = commandOptionType.integer,
+						min_value = 0
 					}
 				}
 			}
@@ -1259,28 +1184,6 @@ local commandsStructure = {
 								}
 							}
 						}
-					}
-				}
-			},
-			{
-				name = "server",
-				description = "Server settings",
-				type = commandOptionType.subcommandGroup,
-				options = {
-					{
-						name = "limit",
-						description = "Reset channel creation limit to 500 (server max)",
-						type = commandOptionType.subcommand
-					},
-					{
-						name = "permissions",
-						description = "Disable all global bot permissions",
-						type = commandOptionType.subcommand
-					},
-					{
-						name = "role",
-						description = "Reset default global managed role to @everyone",
-						type = commandOptionType.subcommand
 					}
 				}
 			}

@@ -9,7 +9,7 @@ local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
 
 local botPermissions = require "utils/botPermissions"
 local permissionCheck = require "funcs/permissionCheck"
-local lobbyPreProcess = require "funcs/lobbyPreProcess"
+local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
