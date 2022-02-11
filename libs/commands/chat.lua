@@ -63,23 +63,25 @@ local subcommands = {
 	end,
 
 	clear = function (interaction, chat, amount)
-		local trueAmount = 0
+		local trueAmount, first = 0, chat:getFirstMessage()
 
 		if amount and amount > 0 then
 			repeat
 				local bulk = chat:getMessages(amount > 100 and 100 or amount)
+				if bulk:get(first) then bulk = chat:getMessagesAfter(first, 100) end
 				if #bulk == 0 then break end
 				trueAmount = trueAmount + #bulk
 				chat:bulkDelete(bulk)
-				amount = amount > 100 and amount - 100 or 0
-			until amount == 0
+				amount = amount - 100
+			until amount <= 0
 		else
-			local first = chat:getFirstMessage()
 			repeat
 				local bulk = chat:getMessagesAfter(first, 100)
 				if #bulk == 0 then
-					chat:bulkDelete({first})
-					trueAmount = trueAmount + 1
+					if first.author ~= client.user then
+						chat:bulkDelete({first})
+						trueAmount = trueAmount + 1
+					end
 					break
 				else
 					chat:bulkDelete(bulk)
