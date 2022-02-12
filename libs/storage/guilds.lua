@@ -40,48 +40,41 @@ for name, statement in pairs(storageStatements) do
 end
 
 local guilds = {}
-local guildMethods = {
-	delete = function (self)
-		if guilds[self.id] then
-			guilds[self.id] = nil
-			logger:log(4, "GUILD %s: deleted", self.id)
-		end
-		emitter:emit("remove", self.id)
-	end,
-
-	setRole = function (self, role)
-		self.role = role
-		logger:log(4, "GUILD %s: updated managed role to %d", self.id, role)
-		emitter:emit("setRole", role, self.id)
-	end,
-
-	setLimit = function (self, limit)
-		self.limit = limit
-		logger:log(4, "GUILD %s: updated limit to %d", self.id, limit)
-		emitter:emit("setLimit", limit, self.id)
-	end,
-
-	setPermissions = function (self, permissions)
-		self.permissions = permissions
-		logger:log(4, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
-		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
-	end,
-
-	setPrefix = function (self, prefix)
-		self.prefix = prefix
-		logger:log(4, "GUILD %s: updated prefix to %s", self.id, prefix)
-		emitter:emit("setPrefix", prefix, self.id)
-	end
-}
 
 local guildMT = {
-	__index = function (self, index)
-		if index == "delete" or (client:getGuild(self.id) and guilds[self.id]) then
-			return guildMethods[index]
-		else
-			self:delete()
+	__index = {
+		delete = function (self)
+			if guilds[self.id] then
+				guilds[self.id] = nil
+				logger:log(4, "GUILD %s: deleted", self.id)
+			end
+			emitter:emit("remove", self.id)
+		end,
+
+		setRole = function (self, role)
+			self.role = role
+			logger:log(4, "GUILD %s: updated managed role to %d", self.id, role)
+			emitter:emit("setRole", role, self.id)
+		end,
+
+		setLimit = function (self, limit)
+			self.limit = limit
+			logger:log(4, "GUILD %s: updated limit to %d", self.id, limit)
+			emitter:emit("setLimit", limit, self.id)
+		end,
+
+		setPermissions = function (self, permissions)
+			self.permissions = permissions
+			logger:log(4, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
+			emitter:emit("setPermissions", permissions.bitfield.value, self.id)
+		end,
+
+		setPrefix = function (self, prefix)
+			self.prefix = prefix
+			logger:log(4, "GUILD %s: updated prefix to %s", self.id, prefix)
+			emitter:emit("setPrefix", prefix, self.id)
 		end
-	end,
+	},
 	__tostring = function (self) return string.format("GuildData: %s", self.id) end
 }
 

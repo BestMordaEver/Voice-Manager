@@ -64,103 +64,96 @@ for name, statement in pairs(storageStatements) do
 end
 
 local lobbies = {}
-local lobbyMethods = {
-	delete = function (self)
-		if lobbies[self.id] then
-			lobbies[self.id] = nil
-			local lobby = client:getChannel(self.id)
-			if lobby and guilds[self.guildID] then
-				guilds[self.guildID].lobbies:remove(self)
-				logger:log(6, "GUILD %s LOBBY %s: deleted", self.guildID, self.id)
-			end
-		end
-		emitter:emit("remove", self.id)
-	end,
 
-	setMatchmaking = function (self, isMatchmaking)
-		self.isMatchmaking = isMatchmaking
-		logger:log(6, "GUILD %s LOBBY %s: updated matchmaking status to %s", self.guildID, self.id, isMatchmaking)
-		emitter:emit("setMatchmaking", isMatchmaking and 1 or 0, self.id)
-	end,
-
-	setRole = function (self, role)
-		self.role = role
-		logger:log(6, "GUILD %s LOBBY %s: updated managed role to %s", self.guildID, self.id, role)
-		emitter:emit("setRole", role, self.id)
-	end,
-
-	setPermissions = function (self, permissions)
-		self.permissions = permissions
-		logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guildID, self.id, permissions)
-		emitter:emit("setPermissions", permissions.bitfield.value, self.id)
-	end,
-
-	setTemplate = function (self, template)
-		self.template = template
-		logger:log(6, "GUILD %s LOBBY %s: updated template to %s", self.guildID, self.id, template)
-		emitter:emit("setTemplate", template, self.id)
-	end,
-
-	setTarget = function (self, target)
-		self.target = target
-		logger:log(6, "GUILD %s LOBBY %s: updated target to %s", self.guildID, self.id, target)
-		emitter:emit("setTarget", target, self.id)
-	end,
-
-	setCapacity = function (self, capacity)
-		self.capacity = capacity
-		logger:log(6, "GUILD %s LOBBY %s: updated capacity to %s", self.guildID, self.id, capacity)
-		emitter:emit("setCapacity", capacity, self.id)
-	end,
-
-	setBitrate = function (self, bitrate)
-		self.bitrate = bitrate
-		logger:log(6, "GUILD %s LOBBY %s: updated bitrate to %s", self.guildID, self.id, bitrate)
-		emitter:emit("setBitrate", bitrate, self.id)
-	end,
-
-	setCompanionTarget = function (self, companionTarget)
-		self.companionTarget = companionTarget
-		logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guildID, self.id, companionTarget)
-		emitter:emit("setCompanionTarget", tostring(companionTarget), self.id)
-	end,
-
-	setCompanionTemplate = function (self, companionTemplate)
-		self.companionTemplate = companionTemplate
-		logger:log(6, "GUILD %s LOBBY %s: updated companion template to %s", self.guildID, self.id, companionTemplate)
-		emitter:emit("setCompanionTemplate", companionTemplate, self.id)
-	end,
-
-	setGreeting = function (self, greeting)
-		self.greeting = greeting
-		logger:log(6, "GUILD %s LOBBY %s: updated greeting to %s", self.guildID, self.id, greeting)
-		emitter:emit("setGreeting", greeting, self.id)
-	end,
-
-	setCompanionLog = function (self, companionLog)
-		self.companionLog = companionLog
-		logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLog)
-		emitter:emit("setCompanionLog", companionLog, self.id)
-	end,
-
-	-- returns filled position
-	attachChild = function (self, channelID, position)
-		return self.children:fill(channelID, position)
-	end,
-
-	detachChild = function (self, position)
-		self.children:drain(position)
-	end
-}
-
-local nonSetters = {delete = true, attachChild = true, detachChild = true}
 local lobbyMT = {
-	__index = function (self, index)
-		if not (nonSetters[index] or (client:getChannel(self.id) and lobbies[self.id])) then
-			self:delete()
+	__index = {
+		delete = function (self)
+			if lobbies[self.id] then
+				lobbies[self.id] = nil
+				local lobby = client:getChannel(self.id)
+				if lobby and guilds[self.guildID] then
+					guilds[self.guildID].lobbies:remove(self)
+					logger:log(6, "GUILD %s LOBBY %s: deleted", self.guildID, self.id)
+				end
+			end
+			emitter:emit("remove", self.id)
+		end,
+
+		setMatchmaking = function (self, isMatchmaking)
+			self.isMatchmaking = isMatchmaking
+			logger:log(6, "GUILD %s LOBBY %s: updated matchmaking status to %s", self.guildID, self.id, isMatchmaking)
+			emitter:emit("setMatchmaking", isMatchmaking and 1 or 0, self.id)
+		end,
+
+		setRole = function (self, role)
+			self.role = role
+			logger:log(6, "GUILD %s LOBBY %s: updated managed role to %s", self.guildID, self.id, role)
+			emitter:emit("setRole", role, self.id)
+		end,
+
+		setPermissions = function (self, permissions)
+			self.permissions = permissions
+			logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guildID, self.id, permissions)
+			emitter:emit("setPermissions", permissions.bitfield.value, self.id)
+		end,
+
+		setTemplate = function (self, template)
+			self.template = template
+			logger:log(6, "GUILD %s LOBBY %s: updated template to %s", self.guildID, self.id, template)
+			emitter:emit("setTemplate", template, self.id)
+		end,
+
+		setTarget = function (self, target)
+			self.target = target
+			logger:log(6, "GUILD %s LOBBY %s: updated target to %s", self.guildID, self.id, target)
+			emitter:emit("setTarget", target, self.id)
+		end,
+
+		setCapacity = function (self, capacity)
+			self.capacity = capacity
+			logger:log(6, "GUILD %s LOBBY %s: updated capacity to %s", self.guildID, self.id, capacity)
+			emitter:emit("setCapacity", capacity, self.id)
+		end,
+
+		setBitrate = function (self, bitrate)
+			self.bitrate = bitrate
+			logger:log(6, "GUILD %s LOBBY %s: updated bitrate to %s", self.guildID, self.id, bitrate)
+			emitter:emit("setBitrate", bitrate, self.id)
+		end,
+
+		setCompanionTarget = function (self, companionTarget)
+			self.companionTarget = companionTarget
+			logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guildID, self.id, companionTarget)
+			emitter:emit("setCompanionTarget", tostring(companionTarget), self.id)
+		end,
+
+		setCompanionTemplate = function (self, companionTemplate)
+			self.companionTemplate = companionTemplate
+			logger:log(6, "GUILD %s LOBBY %s: updated companion template to %s", self.guildID, self.id, companionTemplate)
+			emitter:emit("setCompanionTemplate", companionTemplate, self.id)
+		end,
+
+		setGreeting = function (self, greeting)
+			self.greeting = greeting
+			logger:log(6, "GUILD %s LOBBY %s: updated greeting to %s", self.guildID, self.id, greeting)
+			emitter:emit("setGreeting", greeting, self.id)
+		end,
+
+		setCompanionLog = function (self, companionLog)
+			self.companionLog = companionLog
+			logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guildID, self.id, companionLog)
+			emitter:emit("setCompanionLog", companionLog, self.id)
+		end,
+
+		-- returns filled position
+		attachChild = function (self, channelID, position)
+			return self.children:fill(channelID, position)
+		end,
+
+		detachChild = function (self, position)
+			self.children:drain(position)
 		end
-		return lobbyMethods[index]
-	end,
+	},
 	__tostring = function (self) return string.format("LobbyData: %s", self.id) end
 }
 
