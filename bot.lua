@@ -19,7 +19,19 @@ string.discordify = function (s)
 	-- \'%%%(%) is omitted to allow name templates to work properly
 end
 
-local client = discordia.Client()
+local intents = discordia.enums.gatewayIntent
+-- [[
+local client = discordia.Client{
+	intents =
+		intents.guilds +
+		intents.guildMembers +
+		intents.guildVoiceStates +
+		intents.guildPresences +
+		intents.guildMessages +
+		intents.guildMessageReactions
+}
+-- ]]
+--local client = discordia.Client()
 
 -- creating stubs for require to easily access all relevant bits without making them global
 package.loaded.client = client
