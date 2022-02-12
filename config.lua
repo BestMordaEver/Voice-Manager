@@ -5,7 +5,7 @@ return {
 	},
 	guildFeed = nil,							-- channel that will list all guilds, that invite the bot; can be nil
 	wakeUpFeed = "676432067566895111",			-- channel that will receive a message every time the bot starts up
-	statsFeed = "676432067566895111",			-- channel that will receive stats every hour (guild count, active users, channels and lobbies)
+	statsFeed = "676432067566895111",			-- channel that will receive stats every day (guild count, active users, channels and lobbies)
 	stderr = "686261668522491980",				-- channel than will post error messages; can be nil
 	heartbeat = true,							-- perform heartbeat check?
 	heartbeatChannel = "676791988518912020",	-- channel that contains heartbeat message
