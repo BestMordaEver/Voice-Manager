@@ -135,7 +135,7 @@ local subcommands = {
 	end,
 
 	invite = function (interaction, voiceChannel, user)
-		local tryReservation = channels[voiceChannel.id].host == interaction.author.id and hostPermissionCheck(interaction.member, voiceChannel, "moderate")
+		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and hostPermissionCheck(interaction.member, voiceChannel, "moderate")
 		local invite = voiceChannel:createInvite()
 
 		if invite then
@@ -165,7 +165,7 @@ local subcommands = {
 		if guild.afkChannel then
 			silentRoom = guild.afkChannel
 		else
-			silentRoom = interaction.category:createVoiceChannel("Silent room")
+			silentRoom = interaction.channel.category:createVoiceChannel("Silent room")
 			if not silentRoom then
 				silentRoom = guild:createVoiceChannel("Silent room")
 			end
