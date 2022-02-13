@@ -5,7 +5,8 @@ local timer = require "timer"
 
 --local id = "601347755046076427" -- vm
 local id = "676787135650463764" -- rat
-local guild = "669676999211483144"
+--local guild = "669676999211483144" -- playground
+local guild = "741645965869711410" -- test
 
 local domain = "https://discord.com/api/v8"
 local GLOBAL_COMMANDS = string.format("%s/applications/%s/commands", domain, id)
@@ -265,8 +266,7 @@ local commandsStructure = {
 						name = "name",
 						description = "Name a room will have when it's created",
 						type = commandOptionType.string,
-						required = true,
-						autocomplete = true
+						required = true
 					}
 				}
 			},
@@ -629,8 +629,7 @@ local commandsStructure = {
 						name = "name",
 						description = "Name a chat will have when it's created",
 						type = commandOptionType.string,
-						required = true,
-						autocomplete = true
+						required = true
 					}
 				}
 			},
