@@ -86,7 +86,7 @@ local channelsIndex = {
 	end,
 
 	load = function (self)
-		logger:log(4, "STARTUP: Loading rooms")
+		logger:log(6, "STARTUP: Loading rooms")
 		local channelIDs = channelsData:exec("SELECT * FROM channels")
 
 		if channelIDs then
@@ -123,7 +123,7 @@ local channelsIndex = {
 			end
 		end
 
-		logger:log(4, "STARTUP: Loaded!")
+		logger:log(6, "STARTUP: Loaded!")
 	end,
 
 	-- are there empty channels? kill!

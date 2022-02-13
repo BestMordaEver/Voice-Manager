@@ -46,32 +46,32 @@ local guildMT = {
 		delete = function (self)
 			if guilds[self.id] then
 				guilds[self.id] = nil
-				logger:log(4, "GUILD %s: deleted", self.id)
+				logger:log(6, "GUILD %s: deleted", self.id)
 			end
 			emitter:emit("remove", self.id)
 		end,
 
 		setRole = function (self, role)
 			self.role = role
-			logger:log(4, "GUILD %s: updated managed role to %d", self.id, role)
+			logger:log(6, "GUILD %s: updated managed role to %d", self.id, role)
 			emitter:emit("setRole", role, self.id)
 		end,
 
 		setLimit = function (self, limit)
 			self.limit = limit
-			logger:log(4, "GUILD %s: updated limit to %d", self.id, limit)
+			logger:log(6, "GUILD %s: updated limit to %d", self.id, limit)
 			emitter:emit("setLimit", limit, self.id)
 		end,
 
 		setPermissions = function (self, permissions)
 			self.permissions = permissions
-			logger:log(4, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
+			logger:log(6, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
 			emitter:emit("setPermissions", permissions.bitfield.value, self.id)
 		end,
 
 		setPrefix = function (self, prefix)
 			self.prefix = prefix
-			logger:log(4, "GUILD %s: updated prefix to %s", self.id, prefix)
+			logger:log(6, "GUILD %s: updated prefix to %s", self.id, prefix)
 			emitter:emit("setPrefix", prefix, self.id)
 		end
 	},
@@ -88,7 +88,7 @@ local guildsIndex = {
 			permissions = botPermissions(permissions or 0),
 			prefix = prefix or "vm!",
 			lobbies = set()}, guildMT)
-		logger:log(4, "GUILD %s: added", guildID)
+		logger:log(6, "GUILD %s: added", guildID)
 	end,
 
 	-- loadAdd and start interaction with db
@@ -99,7 +99,7 @@ local guildsIndex = {
 	end,
 
 	load = function (self)
-		logger:log(4, "STARTUP: Loading guilds from save")
+		logger:log(6, "STARTUP: Loading guilds from save")
 		local guildIDs = guildsData:exec("SELECT * FROM guilds")
 		if guildIDs then
 			for i, guildID in ipairs(guildIDs.id) do
@@ -107,12 +107,12 @@ local guildsIndex = {
 			end
 		end
 
-		logger:log(4, "STARTUP: Loading guilds from client")
+		logger:log(6, "STARTUP: Loading guilds from client")
 		for _, guild in pairs(client.guilds) do
 			if not self[guild.id] then self:add(guild.id) end
 		end
 
-		logger:log(4, "STARTUP: Loaded!")
+		logger:log(6, "STARTUP: Loaded!")
 	end,
 
 	cleanup = function (self)

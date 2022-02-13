@@ -170,40 +170,40 @@ local lobbiesIndex = {
 				data.mutex = discordia.Mutex()
 				guilds[lobby.guild.id].lobbies:add(self[data.id])
 				logger:log(6, "GUILD %s LOBBY %s: added", lobby.guild.id, data.id)
+				return self[data.id]
 			end
 		end
 	end,
 
 	-- loadAdd and start interaction with db
 	add = function (self, lobbyID)
-		self:loadAdd({id = lobbyID, isMatchmaking = false, permissions = botPermissions(0)})
-		if self[lobbyID] then
+		if self:loadAdd({id = lobbyID, isMatchmaking = false, permissions = botPermissions(0)}) then
 			emitter:emit("add", lobbyID)
 			return self[lobbyID]
 		end
 	end,
 
 	load = function (self)
-		logger:log(4, "STARTUP: Loading lobbies")
+		logger:log(6, "STARTUP: Loading lobbies")
 		local lobbyIDs = lobbiesData:exec("SELECT * FROM lobbies")
 		if lobbyIDs then
 			for i, lobbyID in ipairs(lobbyIDs.id) do
-				self:loadAdd({id = lobbyID,
-					isMatchmaking = lobbyIDs.isMatchmaking[i] == 1, role = lobbyIDs.role[i], permissions = botPermissions(tonumber(lobbyIDs.permissions[i]) or 0),
-					template = lobbyIDs.template[i], capacity = tonumber(lobbyIDs.capacity[i]), bitrate = tonumber(lobbyIDs.bitrate[i]), target = lobbyIDs.target[i],
-					companionTemplate = lobbyIDs.companionTemplate[i],
-						companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i],
-						greeting = lobbyIDs.greeting[i],
-						companionLog = lobbyIDs.companionLog[i]})
-
 				local lobby = client:getChannel(lobbyID)
 				if lobby then
-					guilds[lobby.guild.id].lobbies:add(self[lobbyID])
+					guilds[lobby.guild.id].lobbies:add(self:loadAdd({id = lobbyID,
+						isMatchmaking = lobbyIDs.isMatchmaking[i] == 1, role = lobbyIDs.role[i], permissions = botPermissions(tonumber(lobbyIDs.permissions[i]) or 0),
+						template = lobbyIDs.template[i], capacity = tonumber(lobbyIDs.capacity[i]), bitrate = tonumber(lobbyIDs.bitrate[i]), target = lobbyIDs.target[i],
+						companionTemplate = lobbyIDs.companionTemplate[i],
+							companionTarget = lobbyIDs.companionTarget[i] == "true" and true or lobbyIDs.companionTarget[i],
+							greeting = lobbyIDs.greeting[i],
+							companionLog = lobbyIDs.companionLog[i]}))
+				else
+					emitter:emit("remove", lobbyID)
 				end
 			end
 		end
 
-		logger:log(4, "STARTUP: Loaded!")
+		logger:log(6, "STARTUP: Loaded!")
 	end,
 
 	cleanup = function (self)
@@ -222,7 +222,7 @@ return setmetatable(lobbies, {
 	__index = lobbiesIndex,
 	__len = function (self)
 		local count = 0
-		for v,_ in pairs(self) do count = count + 1 end
+		for _,_ in pairs(self) do count = count + 1 end
 		return count
 	end,
 	__call = lobbiesIndex.add
