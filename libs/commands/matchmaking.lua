@@ -33,7 +33,7 @@ local subcommands = {
 	end,
 
 	target = function (interaction, channel, target)
-		if target then
+		if target and target ~= channel then
 			if target.type == channelType.voice and not lobbies[target.id] then
 				return "Selected target is not lobby or category", warningEmbed(locale.notLobby)
 			end
