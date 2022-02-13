@@ -54,12 +54,12 @@ local subcommands = {
 
 	mute = function (interaction, chat, user)
 		chat:getPermissionOverwriteFor(chat.guild:getMember(user)):denyPermissions(permission.sendMessages)
-		return "Muted mentioned members", okEmbed(locale.hideConfirm:format(user.mentionString))
+		return "Muted mentioned members", okEmbed(locale.muteConfirm:format(user.mentionString))
 	end,
 
 	unmute = function (interaction, chat, user)
 		chat:getPermissionOverwriteFor(chat.guild:getMember(user)):clearPermissions(permission.sendMessages)
-		return "Unmuted mentioned members", okEmbed(locale.showConfirm:format(user.mentionString))
+		return "Unmuted mentioned members", okEmbed(locale.unmuteConfirm:format(user.mentionString))
 	end,
 
 	clear = function (interaction, chat, amount)
@@ -68,7 +68,7 @@ local subcommands = {
 		if amount and amount > 0 then
 			repeat
 				local bulk = chat:getMessages(amount > 100 and 100 or amount)
-				if bulk:get(first) then bulk = chat:getMessagesAfter(first, 100) end
+				if bulk:get(first.id) then bulk = chat:getMessagesAfter(first, 100) end
 				if #bulk == 0 then break end
 				trueAmount = trueAmount + #bulk
 				chat:bulkDelete(bulk)
