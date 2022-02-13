@@ -74,6 +74,10 @@ local subcommands = {
 	blocklist = function (interaction, voiceChannel)
 		local user, subcommand = interaction.option.option.option, interaction.option.option.name
 		user = user and user.value
+		if user == client.user then
+			return "Attempt to block the bot", warningEmbed(locale.shame)
+		end
+
 		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
 
 		if subcommand == "add" then

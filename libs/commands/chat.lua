@@ -43,6 +43,9 @@ local subcommands = {
 	end,
 
 	hide = function (interaction, chat, user)
+		if user == client.user then
+			return "Attempt to block the bot", warningEmbed(locale.shame)
+		end
 		chat:getPermissionOverwriteFor(chat.guild:getMember(user)):denyPermissions(permission.readMessages)
 		return "Hidden the chat from user", okEmbed(locale.hideConfirm:format(user.mentionString))
 	end,
