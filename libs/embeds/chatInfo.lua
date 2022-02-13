@@ -1,5 +1,5 @@
-local locale = require "locale"
 local client = require "client"
+local locale = require "locale"
 local embeds = require "embeds"
 
 local channels = require "storage/channels"
@@ -32,10 +32,11 @@ return embeds("chatInfo", function (room)
 	if hidden == "" then hidden = locale.none end
 	if shown == "" then shown = locale.none end
 	if muted == "" then muted = locale.none end
+	local user = client:getUser(channels[room.id].host)
 
 	return {embeds = {{
 		title = locale.chatInfoTitle:format(companion.name),
 		color = blurple,
-		description = locale.chatInfo:format(hidden, shown, muted, commands)
+		description = locale.chatInfo:format(user.mentionString, hidden, shown, muted, commands)
 	}}}
 end)

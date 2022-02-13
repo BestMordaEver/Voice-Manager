@@ -318,7 +318,8 @@ You can enable companion channels with `/lobbies companion enable`]],
 
 	-- room
 	roomInfoTitle = "Room info | %s",
-	roomInfo = [[**Reserved:** %s
+	roomInfo = [[**Host:** %s
+**Reserved:** %s
 **Blocked:** %s
 **Muted:** %s
 
@@ -343,7 +344,8 @@ You can enable companion channels with `/lobbies companion enable`]],
 
 	-- chat
 	chatInfoTitle = "Room info | %s",
-	chatInfo = [[**Visible to:** %s
+	chatInfo = [[**Host:** %s
+**Visible to:** %s
 **Hidden from:** %s
 **Muted:** %s
 
