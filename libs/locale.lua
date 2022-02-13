@@ -10,20 +10,15 @@ return {
 		"Help | Companion commands",
 		"Help | Room commands",
 		"Help | Chat commands",
-		"Help | Server commmands",
 		"Help | Other commands"
 	},
 
 	helpDescription = {
-		[0] = "",[[Enter a lobby to create a room. Room is deleted once it's empty
-Select a lobby with `/select <lobby ID or name>` to change it's settings]],
-		[[Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool
-Select a lobby with `/select <lobby ID or name>` to change it's settings]],
-		[[Companion chats are created and deleted along rooms. Chat is visible only to inhabitants of the room
-Companion chats are enabled with `/lobbies companion`
-Select a lobby with `/select <lobby ID or name>` to change it's settings]],
+		[0] = "","Enter a lobby to create a room. Room is deleted once it's empty",
+		"Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool",
+		"Companion chats are created and deleted along rooms. Chat is visible only to inhabitants of the room",
 		"Most room commands are used by a room host - user who created the room. Those commands can be enabled by admins",
-		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins","",""
+		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins",""
 	},
 
 	helpFieldNames = {
@@ -33,72 +28,60 @@ Select a lobby with `/select <lobby ID or name>` to change it's settings]],
 			"Companion commands",
 			"Room commands",
 			"Chat commands",
-			"Server commands",
 			"Other commands",
 		},
 		{
-			"/lobbies",
-			"/lobbies add <channel ID or name>",
-			"/lobbies remove <lobby ID or name>",
-			"/lobbies category <category ID or name>",
-			"/lobbies name <new room name>",
-			"/lobbies capacity <0-99>",
-			"/lobbies bitrate <8-96>",
-			"/lobbies companion enable/disable",
-			"/lobbies permissions <permission> [permission] allow/deny",
-			"/lobbies role <role mention>"
+			"/lobbies view",
+			"/lobbies add",
+			"/lobbies remove",
+			"/lobbies category",
+			"/lobbies name",
+			"/lobbies capacity",
+			"/lobbies bitrate",
+			"/lobbies permissions",
+			"/lobbies role"
 		},
 		{
-			"/matchmaking",
-			"/matchmaking add <channel ID or name>",
-			"/matchmaking remove <lobby ID or name>",
-			"/matchmaking target <lobby or category ID or name>",
-			"/matchmaking mode <mode>"
+			"/matchmaking view",
+			"/matchmaking add",
+			"/matchmaking remove",
+			"/matchmaking target",
+			"/matchmaking mode"
 		},
 		{
-			"/companions",
-			"/companions category <category ID or name>",
-			"/companions name <new companion name>",
-			"/companions greeting <greeting text>",
-			"/companions log <log channel>",
+			"/companions view",
+			"/companions category",
+			"/companions name",
+			"/companions greeting",
+			"/companions log",
 		},
 		{
-			"/room",
-			"/room rename <new name>",
-			"/room resize <0-99>",
-			"/room bitrate <8-96>",
-			"/room mute/unmute <user mention>",
-			"/room kick <user mention>",
-			"/room blocklist add/remove <user mention>",
-			"/room reservations add/remove <user mention>",
+			"/room view",
+			"/room rename",
+			"/room resize",
+			"/room bitrate",
+			"/room mute|unmute",
+			"/room kick",
+			"/room blocklist add|remove|clear",
+			"/room reservations add|remove|clear",
 			"/room reservations lock",
-			"/room blocklist/reservations clear",
-			"/room promote <user mention>",
 			"/room host",
-			"/room invite [user mention]"
+			"/room invite"
 		},
 		{
-			"/chat",
-			"/chat rename <new name>",
-			"/chat mute/unmute <user mention>",
-			"/chat hide/show <user mention>",
-			"/chat clear [amount]"
+			"/chat view",
+			"/chat rename",
+			"/chat mute|unmute",
+			"/chat hide|show",
+			"/chat clear"
 		},
 		{
-			"/server",
-			"/server role <role mention>",
-			"/server limit <0-500>",
-			"/server permissions <permission> [permission] allow/deny",
-			"/server prefix <new prefix>"
-		},
-		{
-			"/help [lobbies/matchmaking/companions/room/chat/server/other]",
-			"/invite or /support",
-			"/select <lobby or category ID or name>",
+			"/help [lobbies|matchmaking|companions|room|chat|other]",
+			"/support",
 			"/reset <command> <subcommand>",
-			"/create voice/text <1-50> <name>",
-			"/create voice/text <start index> <end index> <name>",
-			"/delete voice/text top/bottom <1-50> [force]"
+			"/create voice|text <1-50> <name>",
+			"/create voice|text <start index> <end index> <name>",
+			"/delete voice|text top|bottom <1-50> [force]"
 		}
 	},
 
@@ -109,7 +92,6 @@ Select a lobby with `/select <lobby ID or name>` to change it's settings]],
 			"Configure companion chats (see `Lobby commands` first) - `/companions`",
 			"Allow users to moderate and configure their rooms - `/room`",
 			"Allow users to moderate and configure their private chats - `/chat`",
-			"Advanced server setting - `/server`",
 			"Different helpful commands for users and administrators"
 		},
 		{
@@ -130,14 +112,13 @@ You can put different `%combos%` in the name to customize it
 `%rename%` - blank when room is created. When host uses `/room rename`, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
 			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respect server boost status, so you may want to try bigger numbers",
-			"Create text chats along the new rooms, that are visible only for room's inhabitants. Chat will be deleted along the room",
 			[[Give room hosts' access to different commands
 `rename` - allows use of `/room rename` and `/chat rename`
 `resize` - allows use of `/room resize`
 `bitrate` - allows use of `/room bitrate`
 `manage` - all of the above, plus gives host **Manage Channels** permission in their room
-`mute` - allows use of `/room mute/unmute` and `/chat mute/unmute`
-`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `/room kick`, `/room block/reserve` and `/chat hide/show`]],
+`mute` - allows use of `/room mute|unmute` and `/chat mute|unmute`
+`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `/room kick`, `/room block|reserve` and `/chat hide|show`]],
 			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 		},
 		{
@@ -160,7 +141,7 @@ You can put different `%combos%` in the name to customize it
 			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `/lobbies name`. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
 			[[Configure a message that will be automatically sent to chat when it's created
-You can put different `%combos%` in the name to customize it
+You can put different `%combos%` in the greeting to customize it
 `%roomname%` - name of the room chat belongs to
 `%chatname%` - name of the chat
 `%commands%` - formatted list of `/room` and `/chat` commands
@@ -175,15 +156,13 @@ You can put different `%combos%` in the name to customize it
 ❗Changes to channel names are ratelimited to 2 per 10 minutes❗]],
 			"Change room capacity",
 			"Change room bitrate. This command respects server boost status, check if you can use higher bitrates",
-			"Mute/unmute mentioned users",
+			"Mute|unmute mentioned users",
 			"Kick mentioned users from the room",
-			"Add mentioned users to room's blocklist",
-			[[Add mentioned users to room's reservations
+			"Manage room's blocklist",
+			[[Manage room's reservations
 Room won't let any more people in to ensure reservations]],
-			"Add all users that are currently in the room to room's reservations",
-			"Clear blocklist/reservations",
-			"Transfer host privileges to the mentioned users",
-			"Ping current room host",
+			"Locks entry to the room, no new people will be able to join",
+			"Ping current room host or transfer host privileges to the mentioned user",
 			[[Send invite to immediately connect to the room
 If specific user is mentioned - sends them a DM
 If sent by a room host, adds mentioned users to reservations]]
@@ -192,25 +171,16 @@ If sent by a room host, adds mentioned users to reservations]]
 			"Show chat info and available commands",
 			[[Change chat room name
 Default Discord formatting rules will be applied automatically]],
-			"Restrict/allow mentioned users to write in chat",
-			[[Hide/show the chat to mentioned users
+			"Restrict|allow mentioned users to write in chat",
+			[[Hide|show the chat to mentioned users
 You can show chat to people that are not in the room]],
 			[[Delete messages in the chat
 By default, deletes all messages]]
 		},
 		{
-			"Show server info",
-			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
-			[[Set the global limit of channels created by the bot
-Discord limits you to 50 channels per category and 500 channels per server]],
-			"Acts similarly to lobby permissions and allows use of room commands in *any* voice channel",
-			"Change bot's prefix"
-		},
-		{
 			[[Show table of contents for help
 You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
-			"Select a lobby or a category to change their settings",
 			[[Reset any setting to its default value
 Example: `/reset companions greeting`]],
 			[[🛠 Command is temporarily disabled 🛠

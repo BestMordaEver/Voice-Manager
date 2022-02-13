@@ -7,8 +7,7 @@ local articles = {
 	companion = 3,
 	room = 4,
 	chat = 5,
-	server = 6,
-	other = 7
+	other = 6
 }
 
 return function (interaction)

@@ -63,13 +63,8 @@ return embeds("help", function (page)
 						style = buttonStyle.primary
 					},{
 						type = componentType.button,
-						label = "Server",
-						custom_id = "help_6",
-						style = buttonStyle.primary
-					},{
-						type = componentType.button,
 						label = "Other",
-						custom_id = "help_7",
+						custom_id = "help_6",
 						style = buttonStyle.primary
 					}
 				}
