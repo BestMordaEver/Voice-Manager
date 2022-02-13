@@ -64,7 +64,7 @@ return {
 			"/room kick",
 			"/room blocklist add|remove|clear",
 			"/room reservations add|remove|clear",
-			"/room reservations lock",
+			"/room lock",
 			"/room host",
 			"/room invite"
 		},
