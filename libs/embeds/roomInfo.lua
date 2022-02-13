@@ -14,7 +14,7 @@ return embeds("roomInfo", function (room)
 	local blocklist, reservations, muted = "","",""
 
 	for _,overwrite in pairs(room.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
-		if Permissions(overwrite.allowedPermissions):has(permission.connect) then
+		if overwrite:getObject().user ~= client.user and Permissions(overwrite.allowedPermissions):has(permission.connect) then
 			reservations = reservations..overwrite:getObject().user.mentionString.." "
 		end
 		if Permissions(overwrite.deniedPermissions):has(permission.connect) then

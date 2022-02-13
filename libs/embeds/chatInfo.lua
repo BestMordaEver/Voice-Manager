@@ -16,7 +16,7 @@ return embeds("chatInfo", function (room)
 	local companion = client:getChannel(channels[room.id].companion)
 
 	for _,overwrite in pairs(companion.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
-		if Permissions(overwrite.allowedPermissions):has(permission.readMessages) then
+		if overwrite:getObject().user ~= client.user and Permissions(overwrite.allowedPermissions):has(permission.readMessages) then
 			hidden = hidden..overwrite:getObject().user.mentionString.." "
 		end
 		if Permissions(overwrite.deniedPermissions):has(permission.readMessages) then
