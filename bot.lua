@@ -46,7 +46,7 @@ local channels = require "storage/channels"
 local status = require "funcs/status"
 local safeEvent = require "funcs/safeEvent"
 
-client:onceSync(safeEvent("init", function ()
+client:once(safeEvent("init", function ()
 	guilds:load()
 	lobbies:load()
 	channels:load()
@@ -67,13 +67,14 @@ client:onceSync(safeEvent("init", function ()
 	client:on(safeEvent("channelUpdate", require "events/channelUpdate"))
 	client:on(safeEvent("channelDelete", require "events/channelDelete"))
 	client:on(safeEvent("presenceUpdate", require "events/presenceUpdate"))
+	client:on(safeEvent("heartbeat", require "events/heartbeat"))
 	clock:on(safeEvent("min", require "events/min"))
 	clock:on(safeEvent("day", require "events/day"))
 
 	if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
 end))
 
-client:onceSync(safeEvent("ready", function ()
+client:once(safeEvent("ready", function ()
 	client:emit("init")
 	guilds:cleanup()
 	lobbies:cleanup()
