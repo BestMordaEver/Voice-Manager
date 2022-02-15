@@ -71,7 +71,7 @@ client:once(safeEvent("init", function ()
 	client:on(safeEvent("channelUpdate", require "events/channelUpdate"))
 	client:on(safeEvent("channelDelete", require "events/channelDelete"))
 	client:on(safeEvent("presenceUpdate", require "events/presenceUpdate"))
-	client:on(safeEvent("heartbeat", require "events/heartbeat"))
+	client:on(safeEvent("sendHeartbeat", require "events/heartbeat"))
 	clock:on(safeEvent("min", require "events/min"))
 	clock:on(safeEvent("day", require "events/day"))
 
