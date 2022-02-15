@@ -50,6 +50,10 @@ client:once(safeEvent("init", function ()
 	guilds:load()
 	lobbies:load()
 	channels:load()
+
+	client:emit("loaded")
+	client:on(safeEvent("init", function() client:emit("loaded") end))
+
 	clock:start()
 
 	client:setGame(status())
@@ -76,6 +80,8 @@ end))
 
 client:once(safeEvent("ready", function ()
 	client:emit("init")
+	client:waitFor("loaded")
+
 	guilds:cleanup()
 	lobbies:cleanup()
 	channels:cleanup()
