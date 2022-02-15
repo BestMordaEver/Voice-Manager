@@ -31,15 +31,15 @@ return {
 			"Other commands",
 		},
 		{
-			"/lobbies view",
-			"/lobbies add",
-			"/lobbies remove",
-			"/lobbies category",
-			"/lobbies name",
-			"/lobbies capacity",
-			"/lobbies bitrate",
-			"/lobbies permissions",
-			"/lobbies role"
+			"/lobby view",
+			"/lobby add",
+			"/lobby remove",
+			"/lobby category",
+			"/lobby name",
+			"/lobby capacity",
+			"/lobby bitrate",
+			"/lobby permissions",
+			"/lobby role"
 		},
 		{
 			"/matchmaking view",
@@ -49,11 +49,11 @@ return {
 			"/matchmaking mode"
 		},
 		{
-			"/companions view",
-			"/companions category",
-			"/companions name",
-			"/companions greeting",
-			"/companions log",
+			"/companion view",
+			"/companion category",
+			"/companion name",
+			"/companion greeting",
+			"/companion log",
 		},
 		{
 			"/room view",
@@ -87,9 +87,9 @@ return {
 
 	helpFieldValues = {
 		[0] = {
-			"Setup and configure lobbies - `/lobbies`",
+			"Setup and configure lobbies - `/lobby`",
 			"Setup and configure matchmaking in lobbies or normal channels - `/matchmaking`",
-			"Configure companion chats (see `Lobby commands` first) - `/companions`",
+			"Configure companion chats (see `Lobby commands` first) - `/companion`",
 			"Allow users to moderate and configure their rooms - `/room`",
 			"Allow users to moderate and configure their private chats - `/chat`",
 			"Different helpful commands for users and administrators"
@@ -138,7 +138,7 @@ You can put different `%combos%` in the name to customize it
 		{
 			"Show all lobies that have companion chats enabled",
 			"Select a category in which chats will be created",
-			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `/lobbies name`. Default is `private-chat`
+			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `/lobby name`. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
 			[[Configure a message that will be automatically sent to chat when it's created
 You can put different `%combos%` in the greeting to customize it
@@ -147,7 +147,7 @@ You can put different `%combos%` in the greeting to customize it
 `%commands%` - formatted list of `/room` and `/chat` commands
 `%roomcommands%` - raw list of `/room` commands
 `%chatcommands%` - raw list of `/chat` commands
-`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobbies name`]],
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobby name`]],
 			"Enable chat logging. Logs will be sent as files to a channel of your choosing"
 		},
 		{
@@ -222,7 +222,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
-You can add a lobby with `/lobbies add`]],
+You can add a lobby with `/lobby add`]],
 	lobbyInfo = "Lobby selected! You now can change lobby settings",
 	lobbiesInfo = "Select lobbies to change their settings",
 	lobbiesField = [[**Target category:** %s
@@ -270,7 +270,7 @@ You can create a matchmaking lobby with `/matchmaking add`]],
 	-- companion
 	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
-You can enable companion channels with `/lobbies companion enable`]],
+You can enable companion channels with `/lobby companion enable`]],
 	companionsField = [[**Category:** %s
 **Name:** %s
 **Logging:** %s
