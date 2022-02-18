@@ -12,11 +12,11 @@ local f = string.format
 
 local function logEmbed (embed)
 	embed.type = nil
-	return "[[ Embed\n{\"embed\":"..json.encode(embed).."}\n"
+	return "\n[[ Embed\n{\"embed\":"..json.encode(embed).."}\n"
 end
 
 local function logAttachments(attachments)
-	local lines = {"[[ Attachment"}
+	local lines = {"\n[[ Attachment"}
 	for i, attachment in ipairs(attachments) do
 		insert(lines, attachment.url)
 	end
@@ -25,7 +25,7 @@ local function logAttachments(attachments)
 end
 
 local function logReactions(reactions)
-	local lines = {"[[Reactions"}
+	local lines = {"\n[[Reactions"}
 	for _, reaction in pairs(reactions) do
 		insert(lines, f("\n:%s: - ", reaction.emojiHash))
 		if reaction.count > 25 then
@@ -42,7 +42,7 @@ end
 local writerMeta = {
 	__index = {
 		messageCreate = function (self, message)
-			insert(self, f("[%s] <%s sends %s> %s\r\n%s",
+			insert(self, f("[%s] <%s sends %s> %s%s",
 				message:getDate():toString("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content,
 				(#message.reactions > 0 and logReactions(message.reactions) or "")
 					..
@@ -53,7 +53,7 @@ local writerMeta = {
 		end,
 
 		messageUpdate = function (self, message)
-			insert(self, f("[%s] <%s edits %s> %s\r\n%s",
+			insert(self, f("[%s] <%s edits %s> %s%s",
 				os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
 				(#message.reactions > 0 and logReactions(message.reactions) or "")
 					..
@@ -66,7 +66,7 @@ local writerMeta = {
 		messageUpdateUncached = function (self, channel, messageID)
 			local message = channel:getMessage(messageID)
 			if message then
-				insert(self, f("[%s] <%s edits %s> %s\r\n%s",
+				insert(self, f("[%s] <%s edits %s> %s%s",
 					os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
 					(#message.reactions > 0 and logReactions(message.reactions) or "")
 						..
@@ -142,7 +142,7 @@ end
 Overseer.stop = function (channelID)
 	local writer = writers[channelID]
 	writers[channelID] = nil
-	return concat(writer)
+	return concat(writer, "\n")
 end
 
 Overseer.events = {
