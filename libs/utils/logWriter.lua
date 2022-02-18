@@ -88,7 +88,6 @@ local writerMeta = {
 		end,
 
 		reactionAdd = function (self, reaction, userID)
-			print(client:getUser(userID), reaction, userID)
 			insert(self, f("[%s] <%s reacts to %s> %s", os.date("!%Y-%m-%d %H:%M:%S"), client:getUser(userID).tag, reaction.message.id, reaction.emojiHash))
 		end,
 
