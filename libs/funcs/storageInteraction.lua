@@ -10,20 +10,17 @@ local mutexes = {}
 
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end
 
-local storageInteractionEvent = function (statement, ...)
+return function (statement, logMsg)
+	local success, failure = logMsg..": completed", logMsg..": failed"
 	if not mutexes[statement] then
 		mutexes[statement] = Mutex()
 	end
-	mutexes[statement]:lock()
-	local ok, msg = xpcall(pcallFunc, debug.traceback, statement, ...)
-	mutexes[statement]:unlock()
-	if not ok then error(msg) end
-end
 
-return function (statement, logMsg)
-	local success, failure = logMsg..": completed", logMsg..": failed"
 	return function (...)
-		local ok, msg = xpcall(storageInteractionEvent, debug.traceback, statement, ...)
+		mutexes[statement]:lock()
+		local ok, msg = xpcall(pcallFunc, debug.traceback, statement, ...)
+		mutexes[statement]:unlock()
+
 		if ok then
 			logger:log(5, success, ...)
 		else
