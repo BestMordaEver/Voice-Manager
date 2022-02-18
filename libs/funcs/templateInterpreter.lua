@@ -1,8 +1,11 @@
 return function (template, member, position, replacement)
 	local uname = member.user.name
 	local nickname = member.nickname or uname
-	local game = (member.activity and (member.activity.type == 0 or member.activity.type == 1)) and member.activity.name or 
-		(template:match("%%game%((.-)%)%%") or "no game")
+	local game =
+		member.playing and member.playing.name or
+		(member.streaming and member.streaming.name) or
+		(member.competing and member.competing.name) or
+		template:match("%%game%((.-)%)%%") or "no game"
 
 	template = template:gsub("%%game%(.-%)%%", "%%game%%")
 

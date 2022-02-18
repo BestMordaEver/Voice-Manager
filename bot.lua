@@ -23,11 +23,11 @@ local intents = discordia.enums.gatewayIntent
 local client = discordia.Client{
 	intents =
 		intents.guilds +
-		intents.guildMembers +
 		intents.guildVoiceStates +
 		intents.guildPresences +
 		intents.guildMessages +
-		intents.guildMessageReactions
+		intents.guildMessageReactions +
+		intents.messageContent
 }
 
 local clock = discordia.Clock()
