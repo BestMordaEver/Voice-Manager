@@ -134,7 +134,10 @@ local subcommands = {
 	end,
 
 	kick = function (interaction, voiceChannel, user)
-		interaction.guild:getMember(user):setVoiceChannel()
+		local member = interaction.guild:getMember(user)
+		if member.voiceChannel == voiceChannel then
+			member:setVoiceChannel()
+		end
 		return "Kicked member", okEmbed(locale.kickConfirm:format(user.mentionString))
 	end,
 
