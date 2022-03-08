@@ -39,21 +39,16 @@ package.loaded.logger = discordia.Logger(6, '%F %T')
 
 local config = require "config"
 
-local guilds = require "storage/guilds"
-local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
+local storage = require "storage"
 
 local status = require "funcs/status"
 local safeEvent = require "funcs/safeEvent"
 
-client:once(safeEvent("init", function ()
-	guilds:load()
-	lobbies:load()
-	channels:load()
+client:on(safeEvent("guildAvailable", function (guild)
+	storage.loadGuild(guild)
+end))
 
-	client:emit("loaded")
-	client:on(safeEvent("init", function() client:emit("loaded") end))
-
+client:once(safeEvent("ready", function ()
 	clock:start()
 
 	client:setGame(status())
@@ -76,19 +71,10 @@ client:once(safeEvent("init", function ()
 	clock:on(safeEvent("day", require "events/day"))
 
 	if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
+	storage.guilds:cleanup()
+	storage.lobbies:cleanup()
+	storage.channels:cleanup()
 end))
-
-client:once(safeEvent("ready", function ()
-	client:emit("init")
-	client:waitFor("loaded")
-
-	guilds:cleanup()
-	lobbies:cleanup()
-	channels:cleanup()
-end))
-
-local timer = require "timer"
-timer.setTimeout(180000, client.emit, client, "init")
 
 -- bot starts working here
 client:run('Bot '..require "token".token)

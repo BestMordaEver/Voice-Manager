@@ -1,7 +1,7 @@
 local locale = require "locale"
 
-local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
+local lobbies = require "storage".lobbies
+local channels = require "storage".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
@@ -23,7 +23,7 @@ local subcommands = {
 			return "Rooms can't be lobbies", warningEmbed(locale.channelDupe)
 		end
 
-		lobbies(channel.id)
+		lobbies:store(channel)
 		return "New lobby added", okEmbed(locale.addConfirm:format(channel.name))
 	end,
 

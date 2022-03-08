@@ -2,7 +2,7 @@ local client = require "client"
 local locale = require "locale"
 local embeds = require "embeds"
 
-local channels = require "storage/channels"
+local channels = require "storage".channels
 
 local availableCommands = require "embeds/availableCommands"
 

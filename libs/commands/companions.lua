@@ -1,6 +1,6 @@
 local locale = require "locale"
 
-local lobbies = require "storage/lobbies"
+local lobbies = require "storage".lobbies
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"

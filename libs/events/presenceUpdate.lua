@@ -1,6 +1,6 @@
 local client = require "client"
 
-local channels = require "storage/channels"
+local channels = require "storage".channels
 
 local ratelimiter = require "utils/ratelimiter"
 local templateInterpreter = require "funcs/templateInterpreter"

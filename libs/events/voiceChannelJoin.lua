@@ -2,9 +2,9 @@ local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
 
-local guilds = require "storage/guilds"
-local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
+local guilds = require "storage".guilds
+local lobbies = require "storage".lobbies
+local channels = require "storage".channels
 
 local greetingEmbed = require "embeds/greeting"
 
@@ -13,18 +13,20 @@ local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
 local enforceReservations = require "funcs/enforceReservations"
 
+local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
 
 local processing = {}
 
+-- user joined a lobby
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
 	-- parent to which a new channel will be attached
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
 
-	-- target is voice channel? nothing to do here!
+	-- target is voice channel? user error, nothing to do here!
 	if target.type == channelType.voice then
 		member:setVoiceChannel()
 	end
@@ -46,6 +48,7 @@ local function lobbyJoin (member, lobby)
 		if name == "" then name = templateInterpreter("%nickname's% room", member) end
 	end
 
+	-- determine channel position if %counter% is detected
 	local distance = 0
 	if needsMove then
 		local children = lobbyData.children
@@ -61,7 +64,8 @@ local function lobbyJoin (member, lobby)
 		end
 	end
 
-	local newChannel = lobby.guild:createChannel({
+	-- TODO: create channel with initialized permissions
+	local newChannel, err = lobby.guild:createChannel({
 		name = name,
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate,
@@ -72,13 +76,14 @@ local function lobbyJoin (member, lobby)
 
 	-- did we fail? statistics say "probably yes!"
 	if newChannel then
-		processing[newChannel.id] = discordia.Mutex()
+		processing[newChannel.id] = Mutex()
 		processing[newChannel.id]:lock()
 
 		member:setVoiceChannel(newChannel.id)
 
 		local companion
 		if lobbyData.companionTarget then
+			-- this might look familiar
 			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or newChannel.guild) or client:getChannel(lobbyData.companionTarget)
 			local name = lobbyData.companionTemplate or "private-chat"
 
@@ -96,17 +101,21 @@ local function lobbyJoin (member, lobby)
 			end
 		end
 
-		channels:add(newChannel.id, false, member.user.id, lobby.id, position, companion and companion.id or nil)
+		-- save channel data, attach to parent
+		channels:store(newChannel.id, 0, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(channels[newChannel.id], position)
 
+		-- yes, sometimes required
 		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect)
 
+		-- provide host permissions if any
 		local perms = lobbyData.permissions:toDiscordia()
 		if #perms ~= 0 and lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 		end
 
 		if companion then
+			-- companions are private by default
 			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
@@ -122,11 +131,13 @@ local function lobbyJoin (member, lobby)
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
 	else
+		-- something went wrong, most likely user error
 		lobbyData:detachChild(position)
 		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room", lobby.guild.id, lobby.id, member.user.id)
 	end
 end
 
+-- user joined matchmaking lobby
 local function matchmakingJoin (member, lobby)
 	logger:log(4, "GUILD %s mLOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
@@ -134,7 +145,8 @@ local function matchmakingJoin (member, lobby)
 	if target then
 		local children
 
-		if target.type == channelType.voice then
+		if lobbies[target.id] then
+			-- if target is another lobby - matchmake among its children
 			children = lobby.guild.voiceChannels:toArray("position", function (channel)
 				if channels[channel.id] then
 					local parent = client:getChannel(channels[channel.id].parent.id)
@@ -142,6 +154,7 @@ local function matchmakingJoin (member, lobby)
 				end
 			end)
 		else
+			-- otherwise matchmake in the available channels of category
 			children = target.voiceChannels:toArray("position", function (channel)
 				return (channel ~= lobby) and (channel.userLimit == 0 or #channel.connectedMembers < channel.userLimit) and member:hasPermission(channel, permission.connect)
 			end)
@@ -151,12 +164,10 @@ local function matchmakingJoin (member, lobby)
 			if member:setVoiceChannel(children[1]) then
 				logger:log(4, "GUILD %s mLOBBY %s USER %s: matchmade", lobby.guild.id, lobby.id, target.id)
 			end
-			return
 		elseif #children > 1 then
 			if member:setVoiceChannel((matchmakers[lobbies[lobby.id].template] or matchmakers.random)(children)) then
 				logger:log(4, "GUILD %s mLOBBY %s USER %s: matchmade", lobby.guild.id, lobby.id, target.id)
 			end
-			return
 		else	-- if no available channels - create new or kick
 			if target.type == channelType.voice then
 				logger:log(4, "GUILD %s mLOBBY %s: no available room, delegating to LOBBY %s", lobby.guild.id, lobby.id, target.id)
@@ -165,11 +176,11 @@ local function matchmakingJoin (member, lobby)
 				logger:log(4, "GUILD %s mLOBBY %s: no available room, gtfo", lobby.guild.id, lobby.id)
 				member:setVoiceChannel()
 			end
-			return
 		end
 	end
 end
 
+-- user joined a room
 local function roomJoin (member, channel)
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 
@@ -181,6 +192,7 @@ local function roomJoin (member, channel)
 	end
 end
 
+-- user joined an empty channel that allows execution of commands
 local function channelJoin (member, channel)
 	logger:log(4, "GUILD %s CHANNEL %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 
@@ -193,7 +205,7 @@ local function channelJoin (member, channel)
 		channel.guild.voiceChannels:toArray("position", function (vchannel) return not vchannel.category and vchannel.position <= channel.position end))
 	]]
 
-	channels:add(channel.id, true, member.user.id, channel.guild.id, 0, nil)
+	channels:store(channel.id, 1, member.user.id, channel.guild.id, 0, nil)
 
 	local perms = guilds[channel.guild.id].permissions:toDiscordia()
 	if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
@@ -216,7 +228,7 @@ return function (member, channel)
 				lobbyData.mutex:lock()
 				local ok, err = xpcall(lobbyJoin, debug.traceback, member, channel)
 				lobbyData.mutex:unlock()
-				if not ok then error(err) end	-- no ignoring!
+				if not ok then error(err) end
 			end
 		elseif channels[channel.id] then
 			if channels[channel.id].host ~= member.user.id then roomJoin(member, channel) end

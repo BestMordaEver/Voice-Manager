@@ -9,9 +9,9 @@ end
 
 local sandbox = setmetatable({
 	client = require "client",
-	guilds = require "storage/guilds",
-	lobbies = require "storage/lobbies",
-	channels = require "storage/channels"
+	guilds = require "storage".guilds,
+	lobbies = require "storage".lobbies,
+	channels = require "storage".channels
 },{ __index = _G})
 
 return function (interaction)

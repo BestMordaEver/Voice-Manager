@@ -1,5 +1,5 @@
-local guilds = require "storage/guilds"
-local channels = require "storage/channels"
+local guilds = require "storage".guilds
+local channels = require "storage".channels
 
 local requiredPerms = {
 	bitrate = "manage",
@@ -14,7 +14,7 @@ local requiredPerms = {
 }
 
 return function (member, channel, permissionName)
-	local permissions = channels[channel.id].parent and channels[channel.id].parent.permissions or guilds[channel.guild.id].permissions
+	local permissions = channels[channel.id].parent.permissions
 
 	return channels[channel.id].host == member.user.id and (permissions:has(permissionName) or permissions:has(requiredPerms[permissionName]))
 end

@@ -1,7 +1,7 @@
 local locale = require "locale"
 local config = require "config"
 
-local guilds = require "storage/guilds"
+local guilds = require "storage".guilds
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
@@ -49,8 +49,6 @@ local subcommands = {
 
 return function (interaction, subcommand, argument)
 
-	return "No", warningEmbed("no")
-	--[[
 	if not (interaction.member:hasPermission(permission.manageChannels) or config.owners[interaction.user.id]) then
 		return "Bad user permissions", warningEmbed(locale.badUserPermissions)
 	end
@@ -59,5 +57,5 @@ return function (interaction, subcommand, argument)
 		return "Sent server info", serverInfoEmbed(interaction.guild)
 	end
 
-	return subcommands[subcommand](interaction, argument)]]
+	return subcommands[subcommand](interaction, argument)
 end

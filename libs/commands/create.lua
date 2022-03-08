@@ -2,7 +2,6 @@ local client = require "client"
 local locale = require "locale"
 
 local warningEmbed = require "embeds/warning"
-local dialogue = require "utils/dialogue"
 local templateInterpreter = require "funcs/templateInterpreter"
 
 local channelType = require "discordia".enums.channelType

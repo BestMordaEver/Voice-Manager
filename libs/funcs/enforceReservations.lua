@@ -1,6 +1,6 @@
 local logger = require "logger"
 
-local guilds = require "storage/guilds"
+local channels = require "storage".channels
 
 local permission = require "discordia".enums.permission
 
@@ -15,7 +15,7 @@ return function (channel)
 	end)
 	if reservations == 0 then return end
 
-	local roleOverwrite = channel:getPermissionOverwriteFor(channel.guild:getRole(guilds[channel.guild.id].role) or channel.guild.defaultRole)
+	local roleOverwrite = channel:getPermissionOverwriteFor(channel.guild:getRole(channels[channel.id].parent.role) or channel.guild.defaultRole)
 
 	if reservations >= channel.userLimit - #channel.connectedMembers then
 		if not roleOverwrite:getDeniedPermissions():has(permission.connect) then

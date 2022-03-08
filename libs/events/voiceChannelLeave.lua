@@ -1,9 +1,9 @@
 local client = require "client"
 local logger = require "logger"
 
-local guilds = require "storage/guilds"
-local lobbies = require "storage/lobbies"
-local channels = require "storage/channels"
+local guilds = require "storage".guilds
+local lobbies = require "storage".lobbies
+local channels = require "storage".channels
 
 local enforceReservations = require "funcs/enforceReservations"
 
@@ -12,7 +12,7 @@ local permission = require "discordia".enums.permission
 return function (member, channel) -- now remove the unwanted corpses!
 	if channel and channels[channel.id] then
 		if #channel.connectedMembers == 0 then
-			if channels[channel.id].isPersistent then
+			if channels[channel.id].parentType ~= 0 then
 				channels[channel.id]:delete()
 				local perms = guilds[channel.guild.id].permissions:toDiscordia()
 				if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
@@ -23,7 +23,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)
 			else
 				local parent = channels[channel.id].parent
-				if parent then
+				if parent.mutex then
 					parent.mutex:lock()
 					channel:delete()
 					logger:log(4, "GUILD %s ROOM %s: deleted", channel.guild.id, channel.id)

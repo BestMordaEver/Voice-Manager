@@ -1,4 +1,4 @@
-local channels = require "storage/channels"
+local channels = require "storage".channels
 
 local enforceReservations = require "funcs/enforceReservations"
 

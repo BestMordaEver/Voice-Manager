@@ -2,8 +2,8 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
-local guilds = require "storage/guilds"
-local channels = require "storage/channels"
+local guilds = require "storage".guilds
+local channels = require "storage".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
