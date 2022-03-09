@@ -16,14 +16,14 @@ local subcommands = {
 		if not role then role = interaction.guild.defaultRole end
 
 		guilds[interaction.guild.id]:setRole(role.id)
-		return "Server managed role set", okEmbed(locale.roleConfirm)
+		return "Server managed role set", okEmbed(locale.roleConfirm:format(role.mentionString))
 	end,
 
 	limit = function (interaction, limit)
 		if not limit then limit = 500 end
 
 		guilds[interaction.guild.id]:setLimit(limit)
-		return "Server limit set", okEmbed(locale.limitConfirm)
+		return "Server limit set", okEmbed(locale.limitConfirm:format(limit))
 	end,
 
 	permissions = function (interaction, perm)
@@ -43,18 +43,17 @@ local subcommands = {
 		end
 
 		guildData:setPermissions(botPermissions())
-		return "Server permissions reset", "ok", locale.permissionsReset
+		return "Server permissions reset", okEmbed(locale.permissionsReset)
 	end
 }
 
 return function (interaction, subcommand, argument)
+	if subcommand == "view" then
+		return "Sent server info", serverInfoEmbed(interaction.guild)
+	end
 
 	if not (interaction.member:hasPermission(permission.manageChannels) or config.owners[interaction.user.id]) then
 		return "Bad user permissions", warningEmbed(locale.badUserPermissions)
-	end
-
-	if subcommand == "view" then
-		return "Sent server info", serverInfoEmbed(interaction.guild)
 	end
 
 	return subcommands[subcommand](interaction, argument)

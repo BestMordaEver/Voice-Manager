@@ -202,22 +202,15 @@ If `force` is added in the end, non-empty channels are also deleted]]
 
 	-- server
 	serverInfoTitle = "Server info | %s",
-	serverInfo = [[**Prefix:** %s
-**Permissions:** %s
+	serverInfo = [[**Permissions:** %s
 **Managed role:** %s
 **Lobbies:** %d
 **Active users:** %d
 **Channels:** %d
-**Limit:** %d]],
+**Room limit:** %d]],
 
-	limitBadInput = "Limit must be a number between 0 and 500",
-	limitConfirm = "New limit set!",
-	limitReset = "Limit is reset to 500",
-	roleBadInput = "Couldn't find the specified role",
-	roleConfirm = "New managed role set!",
-	roleReset = "Managed role is reset to @everyone",
-	prefixConfirm = "New prefix set: %s",
-	prefixReset = "Prefix is reset to `vm!`",
+	limitConfirm = "Limit is set to %d!",
+	roleConfirm = "New managed role set to %s!",
 
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",

@@ -391,7 +391,7 @@ local commandsStructure = {
 			},
 			{
 				name = "role",
-				description = "Change the default role bot uses to manage user permissions",
+				description = "Change the default role bot uses to enforce user commands",
 				type = commandOptionType.subcommand,
 				options = {
 					{
@@ -405,7 +405,7 @@ local commandsStructure = {
 					},
 					{
 						name = "role",
-						description = "The default role bot uses to manage user permissions",
+						description = "The default role bot uses to enforce user commands",
 						type = commandOptionType.role,
 						required = true
 					}
@@ -970,6 +970,82 @@ local commandsStructure = {
 		}
 	},
 	{
+		name = "server",
+		description = "Configure global server settings",
+		options = {
+			{
+				name = "view",
+				description = "Show server settings",
+				type = commandOptionType.subcommand
+			},
+			{
+				name = "limit",
+				description = "Limit the amount of rooms bot is permitted to create",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "limit",
+						description = "The amount of rooms bot will be able to create",
+						type = commandOptionType.integer,
+						required = true,
+						min_value = 0,
+						max_value = 500
+					}
+				}
+			},
+			{
+				name = "permissions",
+				description = "Give users ability to access room commands in normal channels",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "moderate",
+						description = "Permission to use moderation commands",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "manage",
+						description = "Permission to manage room properties",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "rename",
+						description = "Permission to rename room",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "resize",
+						description = "Permission to change room capacity",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "bitrate",
+						description = "Permission to change room bitrate",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "mute",
+						description = "Permission to mute users in room",
+						type = commandOptionType.boolean
+					}
+				}
+			},
+			{
+				name = "role",
+				description = "Change the default role bot uses to enforce user commands",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "role",
+						description = "The default role bot uses to enforce user commands",
+						type = commandOptionType.role,
+						required = true
+					}
+				}
+			}
+		}
+	},
+	{
 		name = "reset",
 		description = "Reset bot settings",
 		options = {
@@ -1183,6 +1259,28 @@ local commandsStructure = {
 								}
 							}
 						}
+					}
+				}
+			},
+			{
+				name = "server",
+				description = "Server settings",
+				type = commandOptionType.subcommandGroup,
+				options = {
+					{
+						name = "limit",
+						description = "Reset limit to 500",
+						type = commandOptionType.subcommand
+					},
+					{
+						name = "permissions",
+						description = "Disable all permissions",
+						type = commandOptionType.subcommand
+					},
+					{
+						name = "role",
+						description = "Reset default managed role to @everyone",
+						type = commandOptionType.subcommand
 					}
 				}
 			}

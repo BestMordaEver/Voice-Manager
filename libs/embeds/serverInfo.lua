@@ -14,7 +14,6 @@ return embeds("serverInfo", function (guild)
 		title = locale.serverInfoTitle:format(guild.name),
 		color = blurple,
 		description = locale.serverInfo:format(
-			guildData.prefix,
 			guildData.permissions,
 			guild:getRole(guildData.role).mentionString,
 			#guildData.lobbies,
