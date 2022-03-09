@@ -20,7 +20,7 @@ local subcommands = {
 			return "Rooms can't be lobbies", warningEmbed(locale.channelDupe)
 		end
 
-		lobbies(channel.id):setMatchmaking(true)
+		lobbies:store(channel.id):setMatchmaking(true)
 		return "New matchmaking lobby added", okEmbed(locale.matchmakingAddConfirm:format(channel.name))
 	end,
 
