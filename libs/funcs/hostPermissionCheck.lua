@@ -10,7 +10,8 @@ local requiredPerms = {
 	reservations = "moderate",
 	resize = "manage",
 	unmute = "moderate",
-	clear = "manage"
+	clear = "manage",
+	lock = "moderate"
 }
 
 return function (member, channel, permissionName)
