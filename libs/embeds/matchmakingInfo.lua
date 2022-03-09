@@ -17,7 +17,7 @@ return embeds("matchmakingInfo", function (guild)
 	local embed = {
 		title = locale.matchmakingInfoTitle:format(guild.name),
 		color = blurple,
-		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or locale.lobbiesInfo,
+		description = #guildData.lobbies == 0 and locale.matchmakingNoInfo or nil,
 		fields = {}
 	}
 

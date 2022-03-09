@@ -15,7 +15,7 @@ return embeds("companionsInfo", function (guild)
 	local embed = {
 		title = locale.companionsInfoTitle:format(guild.name),
 		color = blurple,
-		description = #guildData.lobbies == 0 and locale.companionsNoInfo or locale.lobbiesInfo,
+		description = #guildData.lobbies == 0 and locale.companionsNoInfo or nil,
 		fields = {}
 	}
 

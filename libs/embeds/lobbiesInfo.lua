@@ -16,7 +16,7 @@ return embeds("lobbiesInfo", function (guild, channel)
 	local embed = {
 		title = locale.lobbiesInfoTitle:format(guild.name),
 		color = blurple,
-		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or locale.lobbiesInfo,
+		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or nil,
 		fields = {}
 	}
 
