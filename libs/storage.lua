@@ -148,7 +148,7 @@ local channelMeta = {
 	__index = {
 		delete = function (self)
 			if channels[self.id] then
-				if type(self.parent) == "table" then self.parent:detachChild(self.position) end
+				if self.parent.detachChild then self.parent:detachChild(self.position) end
 				channels[self.id] = nil
 				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end
