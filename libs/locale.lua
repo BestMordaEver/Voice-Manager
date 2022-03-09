@@ -209,14 +209,13 @@ If `force` is added in the end, non-empty channels are also deleted]]
 **Channels:** %d
 **Room limit:** %d]],
 
-	limitConfirm = "Limit is set to %d!",
-	roleConfirm = "New managed role set to %s!",
+	limitConfirm = "Limit is set to %d",
+	roleConfirm = "New managed role set to %s",
 
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
 You can add a lobby with `/lobby add`]],
-	lobbyInfo = "Lobby selected! You now can change lobby settings",
 	lobbiesInfo = "Select lobbies to change their settings",
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
@@ -240,8 +239,8 @@ You can add a lobby with `/lobby add`]],
 	companionEnable = "Companion chats are now enabled for this lobby",
 	companionDisable = "Companion chats are now disabled for this lobby",
 	nameConfirm = "Changed name to %s",
-	permissionsConfirm = "New permissions set!",
-	permissionsReset = "All permissions were disabled!",
+	permissionsConfirm = "New permissions set",
+	permissionsReset = "All permissions were disabled",
 
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
@@ -267,7 +266,7 @@ You can enable companion channels with `/lobby companion enable`]],
 **Greeting:**
 %s]],
 
-	greetingConfirm = "Set new greeting!",
+	greetingConfirm = "Set new greeting",
 	greetingReset = "Disabled the greeting",
 	roomCommands = "Available `/room` commands: ",
 	chatCommands = "Available `/chat` commands: ",
