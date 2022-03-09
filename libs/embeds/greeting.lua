@@ -16,8 +16,6 @@ return embeds("greeting", function (room)
 	local companion = client:getChannel(channelData.companion)
 	if not companion then return end
 
-	local prefix = guilds[room.guild.id].prefix
-	if prefix:match("%w$") then prefix = prefix .. " " end
 	local roomC, chatC = availableCommands(room)
 
 	local member = room.guild:getMember(channelData.host)
