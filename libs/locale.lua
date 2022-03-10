@@ -196,7 +196,7 @@ If `force` is added in the end, non-empty channels are also deleted]]
 	},
 
 	helpLinksTitle = "Links",
-	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide) | [How to find IDs](https://github.com/BestMordaEver/Voice-Manager/wiki/How-to-find-channel-ID) | [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
+	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide) | [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
 [Privacy](https://github.com/BestMordaEver/Voice-Manager/blob/dev/privacy.md) | [ToS](https://github.com/BestMordaEver/Voice-Manager/blob/dev/tos.md)
 [Support Server](https://discord.gg/tqj6jvT)]],
 
