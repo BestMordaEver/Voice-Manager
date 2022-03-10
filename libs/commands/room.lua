@@ -203,7 +203,27 @@ local subcommands = {
 			if interaction.user == host then
 				if interaction.guild:getMember(user).voiceChannel == voiceChannel then
 					channelData:setHost(user.id)
+
+					local perms = channelData.parent.permissions:toDiscordia()
+					if #perms ~= 0 then
+						local member, oldMember = interaction.guild:getMember(user.id), interaction.guild:getMember(host.id)
+
+						if interaction.guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
+							voiceChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+							voiceChannel:getPermissionOverwriteFor(oldMember):clearPermissions(table.unpack(perms))
+						end
+
+						local companion = client:getChannel(channelData.companion)
+						if companion then
+							if #perms ~= 0 and interaction.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+								companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+								companion:getPermissionOverwriteFor(oldMember):allowPermissions(table.unpack(perms))
+							end
+						end
+					end
+
 					return "Promoted a new host", okEmbed(locale.hostConfirm:format(user.mentionString))
+
 				else
 					return "Can't promote person not in a room", warningEmbed(locale.badNewHost)
 				end
