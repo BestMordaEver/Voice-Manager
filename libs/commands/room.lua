@@ -129,7 +129,7 @@ local subcommands = {
 		end
 
 		local guild = voiceChannel.guild
-		voiceChannel:getPermissionOverwriteFor(guild:getRole(guilds[guild.id].role) or guild.defaultRole):denyPermissions(permission.connect)
+		voiceChannel:getPermissionOverwriteFor(guild:getRole(channels[voiceChannel].parent.role) or guild.defaultRole):denyPermissions(permission.connect)
 		return "Locked the room", okEmbed(locale.lockConfirm:format(mentionString))
 	end,
 
