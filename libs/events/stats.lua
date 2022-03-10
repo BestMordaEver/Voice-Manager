@@ -33,7 +33,7 @@ end)
 
 local statservers = {
 	["discordbotlist.com"] = {
-		endpoint = "https://discordbotlist.com/api/bots/"..client.user.id.."/stats",
+		endpoint = "https://discordbotlist.com/api/v1/bots/"..client.user.id.."/stats",
 		body = "guilds"
 	},
 
@@ -42,13 +42,8 @@ local statservers = {
 		body = "server_count"
 	},
 
-	["botsfordiscord.com"] = {
-		endpoint = "https://botsfordiscord.com/api/bot/"..client.user.id,
-		body = "server_count"
-	},
-
-	["discord.boats"] = {
-		endpoint = "https://discord.boats/api/bot/"..client.user.id,
+	["discords.com"] = {
+		endpoint = "https://discords.com/bots/api/bot/"..client.user.id,
 		body = "server_count"
 	},
 
@@ -60,6 +55,11 @@ local statservers = {
 	["discord.bots.gg"] = {
 		endpoint = "https://discord.bots.gg/api/v1/bots/"..client.user.id.."/stats",
 		body = "guildCount"
+	},
+
+	["botdesignerlist.com"] = {
+		endpoint = "https://botdesignerlist.com/api/exposed/bot/update",
+		body = "servers"
 	}
 }
 
