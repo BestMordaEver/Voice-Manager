@@ -20,6 +20,8 @@ local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
 
 ratelimiter("channelName", 2, 600)
+local inviteText = [[%s invited you to join %s!
+https://discord.gg/%s]]
 
 local subcommands = {
 	rename = function (interaction, voiceChannel, name)
@@ -146,10 +148,9 @@ local subcommands = {
 		local invite = voiceChannel:createInvite()
 
 		if invite then
-			invite = "https://discord.gg/"..invite.code
 			if user then
 				if user:getPrivateChannel() then
-					user:getPrivateChannel():send(invite)
+					user:getPrivateChannel():sendf(inviteText, interaction.user.tag, voiceChannel.name, invite.code)
 					if tryReservation then
 						voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.connect, permission.speak)
 					end
