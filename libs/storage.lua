@@ -176,7 +176,7 @@ guilds = setmetatable({}, {
 			self[guildID] = setmetatable({
 				id = guildID,
 				role = role,
-				limit = limit or 500,
+				limit = tonumber(limit) or 500,
 				permissions = botPermissions(tonumber(permissions) or 0),
 				lobbies = set()}, guildMeta)
 			logger:log(6, "GUILD %s: added", guildID)
