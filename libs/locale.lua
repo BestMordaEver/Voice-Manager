@@ -10,6 +10,7 @@ return {
 		"Help | Companion commands",
 		"Help | Room commands",
 		"Help | Chat commands",
+		"Help | Server commands",
 		"Help | Other commands"
 	},
 
@@ -18,7 +19,8 @@ return {
 		"Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool",
 		"Companion chats are created and deleted along rooms. Chat is visible only to inhabitants of the room",
 		"Most room commands are used by a room host - user who created the room. Those commands can be enabled by admins",
-		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins",""
+		"Most chat commands are used by a room host - user who created the room and its chat. Those commands can be enabled by admins",
+		"Global server settings. Room commands in normal channels can be enabled using these commands",""
 	},
 
 	helpFieldNames = {
@@ -74,6 +76,12 @@ return {
 			"/chat mute|unmute",
 			"/chat hide|show",
 			"/chat clear"
+		},
+		{
+			"/server view",
+			"/server limit",
+			"/server permissions",
+			"/server role"
 		},
 		{
 			"/help [lobbies|matchmaking|companions|room|chat|other]",
@@ -176,6 +184,13 @@ Default Discord formatting rules will be applied automatically]],
 You can show chat to people that are not in the room]],
 			[[Delete messages in the chat
 By default, deletes all messages]]
+		},
+		{
+			"Show server settings",
+			"Set the maximum amount of channels bot will create on the server",
+			[[Enable room commands in normal voice channels, similar to `/lobby permissions`
+Bot will start deleting user permission overwrites in all channels once this is enabled, use at your own risk!]],
+			"Change the default role that's used to inflict restrictions in channels"
 		},
 		{
 			[[Show table of contents for help
