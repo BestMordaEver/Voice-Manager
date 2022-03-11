@@ -21,7 +21,7 @@ return function (interaction)
 		if not (interaction.member:hasPermission("manageChannels") or config.owners[interaction.user.id]) then
 			return "Bad user permissions", warningEmbed(locale.badUserPermissions)
 		end
-		return commands.server(interaction)
+		return commands.server(interaction, subcommand)
 	else
 		local lobby = interaction.option.option.option.value
 		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(locale.notLobby) end
