@@ -1,5 +1,4 @@
 local locale = require "locale"
-local config = require "config"
 
 local guilds = require "storage".guilds
 
@@ -8,8 +7,7 @@ local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
-
-local permission = require "discordia".enums.permission
+local permissionCheck = require "funcs/permissionCheck"
 
 local subcommands = {
 	role = function (interaction, role)
@@ -52,8 +50,9 @@ return function (interaction, subcommand, argument)
 		return "Sent server info", serverInfoEmbed(interaction.guild)
 	end
 
-	if not (interaction.member:hasPermission(permission.manageChannels) or config.owners[interaction.user.id]) then
-		return "Bad user permissions", warningEmbed(locale.badUserPermissions)
+	local isPermitted, logMsg, userMsg = permissionCheck(interaction)
+	if not isPermitted then
+		return logMsg, warningEmbed(userMsg)
 	end
 
 	return subcommands[subcommand](interaction, argument)
