@@ -1291,6 +1291,49 @@ local commandsStructure = {
 		description = "Send invite to the support server",
 	},
 	{
+		name = "create",
+		description = "Create several channels",
+		options = {
+			{
+				name = "type",
+				description = "Channel type",
+				type = commandOptionType.string,
+				required = true,
+				choices = {
+					{
+						name = "text",
+						value = "text"
+					},
+					{
+						name = "voice",
+						value = "voice"
+					}
+				}
+			},
+			{
+				name = "amount",
+				description = "How many channels to create",
+				type = commandOptionType.integer,
+				required = true,
+				min_value = 1,
+				max_value = 50
+			},
+			{
+				name = "name",
+				description = "Channel names, can accept %counter% combo",
+				type = commandOptionType.string,
+				required = true
+			},
+			{
+				name = "category",
+				description = "Category where channels will be created",
+				type = commandOptionType.channel,
+				channel_types = {
+					channelType.category
+				}
+			}
+		}
+	},
 		name = "Invite",
 		type = commandType.user
 	}

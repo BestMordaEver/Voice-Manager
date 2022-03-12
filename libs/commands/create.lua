@@ -1,36 +1,33 @@
-local client = require "client"
 local locale = require "locale"
 
+local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
-local templateInterpreter = require "funcs/templateInterpreter"
 
-local channelType = require "discordia".enums.channelType
+local enums = require "discordia".enums
+local channelType, permission = enums.channelType, enums.permission
 
-return function (message, argument)
-	return "unfinished", warningEmbed(locale.unfinishedCommand)
-	--[[local category = client:getChannel(dialogue[message.author.id])
-	if not category or category.type ~= channelType.category then
-		return "No category selected", "warning", locale.noCategorySelected
+return function (interaction)
+	local type, amount, name = interaction.options.type.value, interaction.options.amount.value, interaction.options.name.value
+	local category = interaction.options.category and interaction.options.category.value
+
+	if not interaction.guild.me:hasPermission(category, permission.manageChannels) then
+		return "Bad bot permissions", warningEmbed(locale.badBotPermissions)
 	end
 
-	local type, startI, endI, name = argument:match("(%a+)%s*(%d+)%s*(%d*)%s*(.-)$")
-
-	if type ~= "voice" and type ~= "text" then
-		return "Unknown type", "warning", locale.badType:format(type)
+	if category and #category.textChannels + #category.voiceChannels + amount > 50 then
+		return "Create aborted, category overflow", warningEmbed(locale.createCategoryOverflow)
 	end
 
-	startI, endI = tonumber(startI), tonumber(endI)
-	local amount = endI and math.abs(startI-endI) or startI
-
-	if not startI or startI < 1 or startI > 50 then
-		return "Start index is not a number", "warning", locale.amountNotANumber
-	elseif endI and (endI < 1 or endI > 50) then
-		return "End index is OOB", "warning", locale.amountNotANumber
-	elseif #category.voiceChannels + #category.textChannels + amount > 50 then
-		return "Channel amount OOB", "warning", locale.amountOOB
+	local success = 0
+	for i=1,amount do
+		if interaction.guild:createChannel({
+			name = name:gsub("%%counter%%", tostring(i)),
+			type = channelType[type],
+			parent_id = category and category.id
+		}) then
+			success = success + 1
+		end
 	end
 
-	if templateInterpreter(name, message.member, 1) == "" then
-		return "Empty name", "warning", locale.emptyName
-	end]]
+	return "Created channels", okEmbed(locale.createConfirm:format(success))
 end

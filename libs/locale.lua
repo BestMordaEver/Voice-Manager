@@ -336,6 +336,10 @@ You can enable companion channels with `/lobby companion enable`]],
 	bitrateError = "Bot wasn't able to change channel bitrate. Contact your administrators if issue persists",
 	inviteError = "Bot wasn't able to create invite. Contact your administrators if issue persists",
 
+	--create
+	createCategoryOverflow = "There can be a maximum of 50 channels per category",
+	createConfirm = "Created %d channels",
+
 	-- utility
 	embedOK = "✅ OK",
 	embedWarning = "⚠ Warning",
