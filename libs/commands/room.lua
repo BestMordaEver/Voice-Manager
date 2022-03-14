@@ -2,7 +2,6 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
-local guilds = require "storage".guilds
 local channels = require "storage".channels
 
 local okEmbed = require "embeds/ok"
@@ -131,7 +130,7 @@ local subcommands = {
 		end
 
 		local guild = voiceChannel.guild
-		voiceChannel:getPermissionOverwriteFor(guild:getRole(channels[voiceChannel].parent.role) or guild.defaultRole):denyPermissions(permission.connect)
+		voiceChannel:getPermissionOverwriteFor(guild:getRole(channels[voiceChannel.id].parent.role) or guild.defaultRole):denyPermissions(permission.connect)
 		return "Locked the room", okEmbed(locale.lockConfirm:format(mentionString))
 	end,
 
