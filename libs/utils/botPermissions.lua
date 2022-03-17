@@ -27,7 +27,10 @@ local botPermissionsMT = {
 
 		toDiscordia = function (self)
 			local perms = {}
-			if self.bitfield:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
+			if self.bitfield:has(self.bits.moderate) then
+				table.insert(perms, permission.moveMembers)
+				table.insert(perms, permission.managePermissions)
+			end
 			if self.bitfield:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 
 			return perms
