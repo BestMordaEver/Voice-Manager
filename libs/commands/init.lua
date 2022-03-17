@@ -14,7 +14,7 @@ return setmetatable({
 	matchmaking = require "commands/matchmaking",
 	room = require "commands/room",
 	chat = require "commands/chat",
-	create = require "commands/create",
+	clone = require "commands/clone",
 	delete = require "commands/delete",
 	shutdown = require "commands/shutdown",
 	support = invite,

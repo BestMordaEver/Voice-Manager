@@ -1291,23 +1291,17 @@ local commandsStructure = {
 		description = "Send invite to the support server",
 	},
 	{
-		name = "create",
-		description = "Create several channels",
+		name = "clone",
+		description = "Spawn multiple clones of a channel",
 		options = {
 			{
-				name = "type",
-				description = "Channel type",
-				type = commandOptionType.string,
+				name = "source",
+				description = "Which channel to copy",
+				type = commandOptionType.channel,
 				required = true,
-				choices = {
-					{
-						name = "text",
-						value = "text"
-					},
-					{
-						name = "voice",
-						value = "voice"
-					}
+				channel_types = {
+					channelType.text,
+					channelType.voice
 				}
 			},
 			{
@@ -1320,23 +1314,123 @@ local commandsStructure = {
 			},
 			{
 				name = "name",
-				description = "Channel names, can accept %counter% combo",
+				description = "Channel names",
+				type = commandOptionType.string
+			}
+		}
+	},
+	{
+		name = "delete",
+		description = "Quickly delete several channels",
+		options = {
+			{
+				name = "type",
+				description = "Channel type",
 				type = commandOptionType.string,
-				required = true
+				choices = {
+					{
+						name = "text",
+						value = "text"
+					},
+					{
+						name = "voice",
+						value = "voice"
+					}
+				}
 			},
 			{
 				name = "category",
-				description = "Category where channels will be created",
+				description = "Category where channels will be deleted",
 				type = commandOptionType.channel,
 				channel_types = {
 					channelType.category
 				}
+			},
+			{
+				name = "amount",
+				description = "How many channels to delete",
+				type = commandOptionType.integer,
+				min_value = 1,
+				max_value = 50
+			},
+			{
+				name = "name",
+				description = "Delete all the channels that match the name",
+				type = commandOptionType.string
+			},
+			{
+				name = "only_empty",
+				description = "Whether to delete voice channels with connected users. Defaults to false",
+				type = commandOptionType.boolean
 			}
 		}
 	},
+	--[[{
+		name = "users",
+		description = "Miscellaneous moderation and helper commands",
+		options = {
+			{
+				name = "print",
+				description = "Create a list of users that are in the channel",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "channel",
+						description = "Channel or lobby to be queried",
+						type = commandOptionType.channel,
+						channel_types = {
+							channelType.voice
+						}
+					}
+				}
+			},
+			{
+				name = "give",
+				description = "Give users in a channel or lobby rooms a role",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "channel",
+						description = "Channel or lobby to be queried",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					},
+					{
+						name = "role",
+						description = "Role to be given out",
+						type = commandOptionType.role,
+						required = true
+					}
+				}
+			}
+		}
+	},
+	{
+		name = "stats",
+		description = "Check up on bot's status!",
+		options = {
+			{
+				name = "local",
+				description = "Whether to see global or local stats",
+				type = commandOptionType.boolean
+			}
+		}
+	},]]
+	{
 		name = "Invite",
 		type = commandType.user
-	}
+	},
+	--[[{
+		name = "Clear messages above",
+		type = commandType.message
+	},
+	{
+		name = "Clear messages below",
+		type = commandType.message
+	}]]
 }
 
 local debugCommands = {

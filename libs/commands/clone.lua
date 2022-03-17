@@ -5,11 +5,10 @@ local warningEmbed = require "embeds/warning"
 
 local permissionCheck = require "funcs/permissionCheck"
 
-local channelType = require "discordia".enums.channelType
-
 return function (interaction)
-	local type, amount, name = interaction.options.type.value, interaction.options.amount.value, interaction.options.name.value
-	local category = interaction.options.category and interaction.options.category.value
+	local options = interaction.options
+	local source, amount = options.source.value, options.amount.value
+	local category, name = source.category, options.name and options.name.value or source.name
 
 	local isPermitted, logMsg, userMsg = permissionCheck(interaction, category)
 	if not isPermitted then
@@ -20,11 +19,11 @@ return function (interaction)
 		return "Create aborted, category overflow", warningEmbed(locale.createCategoryOverflow)
 	end
 
-	local success = 0
-	for i=1,amount do
+	local success, start = 0, tonumber(name:match("%%counter%((%d+)%)%%")) or 0
+	for i=1, amount do
 		if interaction.guild:createChannel({
-			name = name:gsub("%%counter%%", tostring(i)),
-			type = channelType[type],
+			name = name and name:gsub("%%counter.-%%", tostring(i + start - 1)) or source.name,
+			type = source.type,
 			parent_id = category and category.id
 		}) then
 			success = success + 1
