@@ -24,7 +24,7 @@ return function (interaction)
 
     interaction:deferReply(true)
 
-	local commandString = concat(stringer({interaction.commandName}, interaction.options), " ")
+	local commandString = interaction.options and concat(stringer({interaction.commandName}, interaction.options), " ") or interaction.commandName
 	logger:log(4, "GUILD %s USER %s invoked a command: %s", interaction.guild.id, interaction.user.id, commandString)
 
 	-- call the command, log it, and all in protected call
