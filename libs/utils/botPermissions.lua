@@ -29,7 +29,7 @@ local botPermissionsMT = {
 			local perms = {}
 			if self.bitfield:has(self.bits.moderate) then
 				table.insert(perms, permission.moveMembers)
-				table.insert(perms, permission.managePermissions)
+				table.insert(perms, permission.manageRoles)
 			end
 			if self.bitfield:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 
