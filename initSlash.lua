@@ -156,7 +156,7 @@ local commandType = enums.applicationCommandType
 local commandOptionType = enums.applicationCommandOptionType
 
 local commandsStructure = {
-	[0] = {
+	{ -- 0
 		name = "help",
 		description = "A help command!",
 		options = {
@@ -197,7 +197,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[1] = {
+	{ -- 1
 		name = "lobby",
 		description = "Configure lobby settings",
 		options = {
@@ -413,7 +413,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[2] = {
+	{ -- 2
 		name = "matchmaking",
 		description = "Configure matchmaking lobby settings",
 		options = {
@@ -535,7 +535,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[3] = {
+	{ -- 3
 		name = "companion",
 		description = "Configure lobby companion settings",
 		options = {
@@ -682,7 +682,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[4] = {
+	{ -- 4
 		name = "room",
 		description = "Configure room settings",
 		options = {
@@ -880,7 +880,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[5] = {
+	{ -- 5
 		name = "chat",
 		description = "Configure chat settings",
 		options = {
@@ -969,7 +969,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[6] = {
+	{ -- 6
 		name = "server",
 		description = "Configure global server settings",
 		options = {
@@ -1045,7 +1045,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[7] = {
+	{ -- 7
 		name = "reset",
 		description = "Reset bot settings",
 		options = {
@@ -1286,11 +1286,11 @@ local commandsStructure = {
 			}
 		}
 	},
-	[8] = {
+	{ -- 8
 		name = "support",
 		description = "Send invite to the support server",
 	},
-	[9] = {
+	{ -- 9
 		name = "clone",
 		description = "Spawn multiple clones of a channel",
 		options = {
@@ -1319,7 +1319,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[10] = {
+	{ -- 10
 		name = "delete",
 		description = "Quickly delete several channels",
 		options = {
@@ -1366,7 +1366,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	--[[[11] = {
+	--[[{ -- 11
 		name = "users",
 		description = "Miscellaneous moderation and helper commands",
 		options = {
@@ -1409,7 +1409,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	[12] = {
+	{ -- 12
 		name = "stats",
 		description = "Check up on bot's status!",
 		options = {
@@ -1420,15 +1420,15 @@ local commandsStructure = {
 			}
 		}
 	},]]
-	[13] = {
+	{ -- 13
 		name = "Invite",
 		type = commandType.user
 	},
-	--[[[14] = {
+	--[[{ -- 14
 		name = "Clear messages above",
 		type = commandType.message
 	},
-	[15] = {
+	{ -- 15
 		name = "Clear messages below",
 		type = commandType.message
 	}]]
