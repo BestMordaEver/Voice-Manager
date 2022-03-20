@@ -22,7 +22,7 @@ return setmetatable({
 	exec = require "commands/exec"
 },{__call = function (self, interaction)
 	if interaction.commandType == commandType.chatInput then
-		local command, subcommand, argument = interaction.commandName, interaction.option and interaction.option.name
+		local command, subcommand, argument = interaction.commandName, interaction.option and not interaction.option.value and interaction.option.name
 		if interaction.option and interaction.option.options then
 			for optionName, option in pairs(interaction.option.options) do
 				if optionName ~= "lobby" then argument = option end

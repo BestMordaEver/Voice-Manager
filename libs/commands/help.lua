@@ -11,7 +11,11 @@ local articles = {
 	misc = 7
 }
 
-return function (interaction)
-	local command = interaction.option and interaction.option.value or "help"
-	return command.." help message", helpEmbed(articles[command])
+return function (interaction, page)
+	if page then
+		return interaction:update(helpEmbed(page))
+	else
+		local command = interaction.option and interaction.option.value or "help"
+		return command.." help message", helpEmbed(articles[command])
+	end
 end
