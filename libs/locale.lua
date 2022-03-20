@@ -336,15 +336,24 @@ You can enable companion channels with `/lobby companion enable`]],
 	bitrateError = "Bot wasn't able to change channel bitrate. Contact your administrators if issue persists",
 	inviteError = "Bot wasn't able to create invite. Contact your administrators if issue persists",
 
-	--create
+	-- create
 	createCategoryOverflow = "There can be a maximum of 50 channels per category",
 	createConfirm = "Created %d channels",
+
+	-- delete
+	deleteForm = "You're about to delete %d channels! This action is irreversible, so please review your selection and press all the keys before nuking the channels",
+	deleteNotArmed = "Press all the keys first!",
+	deleteNone = "No channels matched your selection parameters",
+	deleteProcessing = "Processing...",
+	deleteConfirm = "Deleted %d channels",
 
 	-- utility
 	embedOK = "✅ OK",
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
 	unfinishedCommand = "🛠 Command is temporarily disabled 🛠",
+
+	inCategory = "in %s category",
 
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
@@ -358,6 +367,7 @@ You can enable companion channels with `/lobby companion enable`]],
 	noParent = "unknown lobby",
 	noDMs = "Can't send invite to user. Invite link - %s",
 	shame = "Why would you need to do this?",
+	interactionTimeout = "Interaction time out!",
 
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {

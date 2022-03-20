@@ -1327,6 +1327,7 @@ local commandsStructure = {
 				name = "type",
 				description = "Channel type",
 				type = commandOptionType.string,
+				required = true,
 				choices = {
 					{
 						name = "text",
@@ -1351,7 +1352,7 @@ local commandsStructure = {
 				description = "How many channels to delete",
 				type = commandOptionType.integer,
 				min_value = 1,
-				max_value = 50
+				max_value = 100
 			},
 			{
 				name = "name",
