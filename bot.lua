@@ -75,6 +75,10 @@ client:once(safeEvent("ready", function ()
 	storage.guilds:cleanup()
 	storage.lobbies:cleanup()
 	storage.channels:cleanup()
+
+	storage.stats.lobbies = #storage.lobbies
+	storage.stats.channels = #storage.channels
+	storage.stats.users = storage.channels:users()
 end))
 
 -- bot starts working here

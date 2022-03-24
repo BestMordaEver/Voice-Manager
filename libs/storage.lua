@@ -47,6 +47,27 @@ local guildMeta = {
 			self.permissions = permissions
 			logger:log(6, "GUILD %s: updated permissions to %d", self.id, permissions.bitfield.value)
 			emitter:emit("setGuildPermissions", permissions.bitfield.value, self.id)
+		end,
+
+		channels = function (self)
+			local count = 0
+			for lobbyData, _ in pairs(self.lobbies) do
+				count = count + #lobbyData.children
+			end
+			return count
+		end,
+
+		users = function (self)
+			local count = 0
+			for lobbyData, _ in pairs(self.lobbies) do
+				for _, channelData in pairs(lobbyData.children) do
+					local channel = client:getChannel(channelData.id)
+					if channel then
+						count = count + #channel.connectedMembers
+					end
+				end
+			end
+			return count
 		end
 	},
 	__tostring = function (self) return string.format("GuildData: %s", self.id) end
@@ -270,21 +291,15 @@ channels = setmetatable({}, {
 			end
 		end,
 
-		people = function (self, guildID)
+		users = function (self)
 			local p = 0
 			for channelID, _ in pairs(self) do
 				local channel = client:getChannel(channelID)
 				if channel then
-					if guildID and channel.guild.id == guildID or not guildID then p = p + #channel.connectedMembers end
+					p = p + #channel.connectedMembers
 				end
 			end
 			return p
-		end,
-
-		inGuild = function (self, guildID)
-			local count = 0
-			for _,channelData in pairs(self) do if channelData.guildID == guildID then count = count + 1 end end
-			return count
 		end
 	},
 	__len = function (self)
@@ -461,5 +476,10 @@ return {
 	guilds = guilds,
 	lobbies = lobbies,
 	channels = channels,
-	loadGuild = loadGuild
+	loadGuild = loadGuild,
+	stats = {
+		lobbies = 0,
+		channels = 0,
+		users = 0
+	}
 }

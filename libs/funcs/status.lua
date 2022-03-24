@@ -1,7 +1,6 @@
 local client = require "client"
 
-local lobbies = require "storage".lobbies
-local channels = require "storage".channels
+local stats = require "storage".stats
 
 --[[
 status generating function
@@ -18,18 +17,18 @@ return function ()
 	local step = math.fmod(os.date("*t").min, 4)
 
 	if step == 0 then -- people
-		local people = channels:people()
+		local users = stats.users
 
 		self.name =
-			people == 0 and "the sound of silence" or (
-			people .. (
-				people == 1 and " person" or " people") .. (
-				tostring(people):match("69") and " (nice!)" or ""))
+			users == 0 and "the sound of silence" or (
+			users .. (
+				users == 1 and " person" or " people") .. (
+				tostring(users):match("69") and " (nice!)" or ""))
 
 		self.type = 2
 
 	elseif step == 1 then -- channels
-		local channels = #channels
+		local channels = stats.channels
 
 		self.name =
 			channels == 0 and "the world go by" or (
@@ -40,7 +39,7 @@ return function ()
 		self.type = 3
 
 	elseif step == 2 then -- lobbies
-		local lobbies = #lobbies
+		local lobbies = stats.lobbies
 
 		self.name =
 			lobbies == 0 and "the world go by" or (

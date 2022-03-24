@@ -1470,17 +1470,10 @@ local commandsStructure = {
 			}
 		}
 	},
-	--[[{ -- 12
-		name = "stats",
-		description = "Check up on bot's status!",
-		options = {
-			{
-				name = "local",
-				description = "Whether to see global or local stats",
-				type = commandOptionType.boolean
-			}
-		}
-	},]]
+	{ -- 12
+		name = "ping",
+		description = "Check up on bot's status!"
+	},
 	{ -- 13
 		name = "Invite",
 		type = commandType.user

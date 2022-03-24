@@ -33,7 +33,7 @@ local function lobbyJoin (member, lobby)
 
 	local guildData = guilds[lobby.guild.id]
 
-	if guildData.limit <= channels:inGuild(guildData.id) then return end
+	if guildData.limit <= guildData:channels() then return end
 
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]

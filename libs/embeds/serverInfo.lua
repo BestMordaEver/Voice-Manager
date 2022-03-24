@@ -17,8 +17,8 @@ return embeds("serverInfo", function (guild)
 			guildData.permissions,
 			guild:getRole(guildData.role).mentionString,
 			#guildData.lobbies,
-			channels:people(guild.id),
-			channels:inGuild(guild.id),
+			guildData:users(),
+			guildData:channels(),
 			guildData.limit
 		)
 	}}}

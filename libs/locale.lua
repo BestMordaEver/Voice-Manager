@@ -364,6 +364,12 @@ You can enable companion channels with `/lobby companion enable`]],
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 
+	ping = [[:green_circle: `%dms`
+`%d` servers 
+`%d | %d` lobbies
+`%d | %d` channels
+`%d | %d` users]],
+
 	-- errors
 	notLobby = "Selected channel is not a lobby",
 	lobbyDupe = "This channel is already registered as a lobby",

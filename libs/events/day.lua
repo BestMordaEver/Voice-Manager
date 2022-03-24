@@ -1,22 +1,14 @@
 local client = require "client"
 local config = require "config"
 
-local lobbies = require "storage".lobbies
-local channels = require "storage".channels
-
-local s, l, c, p
+local stats = require "storage".stats
 
 return function ()
-	if not s then
-		s, l, c, p = #client.guilds, #lobbies, #channels, channels:people()
-	end
 
 	if config.statsFeed then
-		client:getChannel(config.statsFeed):send(string.format([[Servers: %d (%+d)
-Lobbies: %d (%+d)
-Channels: %d (%+d)
-Users: %d (%+d)]], #client.guilds, #client.guilds - s, #lobbies, #lobbies - l, #channels, #channels - c, channels:people(), channels:people() - p))
+		client:getChannel(config.statsFeed):send(string.format([[servers - %d
+lobbies - %d
+channels - %d
+users - %d]], #client.guilds, stats.lobbies, stats.channels, stats.users))
 	end
-
-	s, l, c, p = #client.guilds, #lobbies, #channels, channels:people()
 end
