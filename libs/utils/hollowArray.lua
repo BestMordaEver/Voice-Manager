@@ -33,7 +33,7 @@ local hollowMT = {
 			if not index then index = 0 end
 			index = index + 1
 
-			repeat 
+			repeat
 				if t[index] then
 					return index, t[index]
 				else
