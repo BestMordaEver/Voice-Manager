@@ -16,6 +16,7 @@ return setmetatable({
 	chat = require "commands/chat",
 	clone = require "commands/clone",
 	delete = require "commands/delete",
+	users = require "commands/users",
 	shutdown = require "commands/shutdown",
 	support = invite,
 	invite = invite,

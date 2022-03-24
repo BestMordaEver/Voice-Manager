@@ -1366,7 +1366,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	--[[{ -- 11
+	{ -- 11
 		name = "users",
 		description = "Miscellaneous moderation and helper commands",
 		options = {
@@ -1377,11 +1377,46 @@ local commandsStructure = {
 				options = {
 					{
 						name = "channel",
-						description = "Channel or lobby to be queried",
+						description = "Channels to be queried",
 						type = commandOptionType.channel,
+						required = true,
 						channel_types = {
-							channelType.voice
+							channelType.voice,
+							channelType.stage,
+							channelType.category
 						}
+					},
+					{
+						name = "print_as",
+						description = "Output mode, default is mention (will never ping)",
+						type = commandOptionType.string,
+						choices = {
+							{
+								name = "username",
+								value = "username"
+							},
+							{
+								name = "tag",
+								value = "tag"
+							},
+							{
+								name = "nickname",
+								value = "nickname"
+							},
+							{
+								name = "mention",
+								value = "mention"
+							},
+							{
+								name = "id",
+								value = "id"
+							}
+						}
+					},
+					{
+						name = "separator",
+						description = "Separator string that will be put between entries of a list, default is space",
+						type = commandOptionType.string
 					}
 				}
 			},
@@ -1396,7 +1431,33 @@ local commandsStructure = {
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
-							channelType.voice
+							channelType.voice,
+							channelType.stage,
+							channelType.category
+						}
+					},
+					{
+						name = "role",
+						description = "Role to be given out",
+						type = commandOptionType.role,
+						required = true
+					}
+				}
+			},
+			{
+				name = "remove",
+				description = "Give users in a channel or lobby rooms a role",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "channel",
+						description = "Channel or lobby to be queried",
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice,
+							channelType.stage,
+							channelType.category
 						}
 					},
 					{
@@ -1409,7 +1470,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 12
+	--[[{ -- 12
 		name = "stats",
 		description = "Check up on bot's status!",
 		options = {

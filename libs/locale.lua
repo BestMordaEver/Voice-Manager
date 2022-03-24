@@ -87,9 +87,10 @@ return {
 			"/help [lobbies|matchmaking|companions|room|chat|other]",
 			"/support",
 			"/reset <command> <subcommand>",
-			"/create voice|text <1-50> <name>",
-			"/create voice|text <start index> <end index> <name>",
-			"/delete voice|text top|bottom <1-50> [force]"
+			"/clone <channel> <amount> [name]",
+			"/delete <channel_type> [category] [amount] [name] [only_empty]",
+			"/users print <channel|lobby|category> [mode] [separator]",
+			"/users give|remove <channel|lobby|category> <role>"
 		}
 	},
 
@@ -198,15 +199,14 @@ You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
 			[[Reset any setting to its default value
 Example: `/reset companions greeting`]],
-			[[🛠 Command is temporarily disabled 🛠
-Create a certain amount of channels in selected category
-Use `%counter%` to include channel number in the name]],
-			[[🛠 Command is temporarily disabled 🛠
-Create a certain amount of channels in selected category
-`%counter%` will be sequentially replaced with numbers between start and end index]],
-			[[🛠 Command is temporarily disabled 🛠
-Delete a certain amount of empty channels in selected category starting from the top/bottom
-If `force` is added in the end, non-empty channels are also deleted]]
+			[[Clone a channel. You can add `%counter%` to channel name to make the cloned channels numbered, and `%counter(number)%` to start counting from a specific number
+This command will not carry over any permission overrides from the cloned channel - all clones will spawn synced with the parent category]],
+			[[Delete several channels. Optionally select several filters - category, name, whether to consider channels with messages (for test) or connected members (for voice).
+This command will not immediately delete the selected channels, instead helper tool will appear. Handle with care, since channels are deleted irreversibly!]],
+			[[Create a handy list of users in a selected channel.
+If selected channel is a lobby, prints users in lobby's rooms or matchmaking pool channels
+If category is selected, all it's channels are used]],
+			"Give or remove a role to/from users in a selected channel. Selection rules are similar to `/users print`"
 		}
 	},
 
@@ -346,6 +346,12 @@ You can enable companion channels with `/lobby companion enable`]],
 	deleteNone = "No channels matched your selection parameters",
 	deleteProcessing = "Processing...",
 	deleteConfirm = "Deleted %d channels",
+
+	-- users
+	noChildChannels = "This lobby doesn't have children channels",
+	usersSent = "Sent users list",
+	usersRolesAdded = "Given the role to %d users",
+	usersRolesRemoved = "Removed the role from %d users",
 
 	-- utility
 	embedOK = "✅ OK",
