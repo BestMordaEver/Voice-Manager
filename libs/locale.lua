@@ -357,7 +357,6 @@ You can enable companion channels with `/lobby companion enable`]],
 	embedOK = "✅ OK",
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
-	unfinishedCommand = "🛠 Command is temporarily disabled 🛠",
 
 	inCategory = "in %s category",
 
