@@ -10,9 +10,8 @@ local emitter = discordia.Emitter()
 local insert, concat = table.insert, table.concat
 local f = string.format
 
-local function logEmbed (embed)
-	embed.type = nil
-	return "\n[[ Embed\n{\"embed\":"..json.encode(embed).."}\n"
+local function logEmbed (embeds)
+	return "\n[[ Embed\n{\"embed\":"..json.encode(embeds).."}\n"
 end
 
 local function logAttachments(attachments)
@@ -46,7 +45,7 @@ local writerMeta = {
 				message:getDate():toString("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content,
 				(#message.reactions > 0 and logReactions(message.reactions) or "")
 					..
-				(message.embed and logEmbed(message.embed) or "")
+				(message.embeds and logEmbed(message.embeds) or "")
 					..
 				(message.attachments and logAttachments(message.attachments) or ""))
 			)
@@ -57,7 +56,7 @@ local writerMeta = {
 				os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
 				(#message.reactions > 0 and logReactions(message.reactions) or "")
 					..
-				(message.embed and logEmbed(message.embed) or "")
+				(message.embeds and logEmbed(message.embeds) or "")
 					..
 				(message.attachments and logAttachments(message.attachments) or ""))
 			)
@@ -70,7 +69,7 @@ local writerMeta = {
 					os.date("!%Y-%m-%d %H:%M:%S"), message.author.tag, message.id, message.content, 
 					(#message.reactions > 0 and logReactions(message.reactions) or "")
 						..
-					(message.embed and logEmbed(message.embed) or "")
+					(message.embeds and logEmbed(message.embeds) or "")
 						..
 					(message.attachments and logAttachments(message.attachments) or ""))
 				)
