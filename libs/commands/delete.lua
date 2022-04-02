@@ -63,6 +63,10 @@ return function (interaction, action, argument)
 			return logMsg, warningEmbed(userMsg)
 		end
 
+		if not (category or interaction.guild) then
+			return "Command must be issued in guild", locale.notInGuild
+		end
+
 		---@diagnostic disable-next-line: undefined-field
 		local channels = table.sorted((category or interaction.guild)[type == "text" and "textChannels" or "voiceChannels"]:toArray(function(channel)
 			if name and not channel.name:match(name:demagic()) then

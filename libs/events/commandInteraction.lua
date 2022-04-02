@@ -20,19 +20,26 @@ local function stringer (strings, options)
 end
 
 return function (interaction)
-    if not interaction.guild then return end
-
     interaction:deferReply(true)
 
 	local commandString = interaction.options and concat(stringer({interaction.commandName}, interaction.options), " ") or interaction.commandName
-	logger:log(4, "GUILD %s USER %s invoked a command: %s", interaction.guild.id, interaction.user.id, commandString)
+
+	if interaction.guild then
+		logger:log(4, "GUILD %s USER %s invoked a command: %s", interaction.guild.id, interaction.user.id, commandString)
+	else
+		logger:log(4, "USER %s invoked a commandin DMs: %s", interaction.user.id, commandString)
+	end
 
 	-- call the command, log it, and all in protected call
 	local res, logMsg, reply = xpcall(commands, debug.traceback, interaction)
 
 	-- notify user if failed
 	if res then
-		logger:log(4, "GUILD %s USER %s: %s", interaction.guild.id, interaction.user.id, logMsg)
+		if interaction.guild then
+			logger:log(4, "GUILD %s USER %s: %s", interaction.guild.id, interaction.user.id, logMsg)
+		else
+			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
+		end
         interaction:updateReply(reply or errorEmbed())	-- reply mustn't be empty
 	else
 		interaction:updateReply(errorEmbed())

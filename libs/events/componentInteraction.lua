@@ -3,9 +3,12 @@ local logger = require "logger"
 local commands = require "commands/init"
 
 return function (interaction)
-	if not interaction.guild then return end
 
-	logger:log(4, "GUILD %s USER %s: %s button pressed", interaction.guild.id, interaction.user.id, interaction.customId)
+	if interaction.guild then
+		logger:log(4, "GUILD %s USER %s: %s component triggered", interaction.guild.id, interaction.user.id, interaction.customId)
+	else
+		logger:log(4, "USER %s in DMs: %s component triggered", interaction.user.id, interaction.customId)
+	end
 
 	local command, primary, secondary = interaction.customId:match("^(.-)_(.-)_(.-)$")
 	if secondary then

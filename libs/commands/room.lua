@@ -30,9 +30,10 @@ local subcommands = {
 		end
 
 		local channelData, success, err = channels[voiceChannel.id]
+		local parent = channelData.parent
 
-		if channelData.parent and channelData.parent.template and channelData.parent.template:match("%%rename%%") then
-			success, err = voiceChannel:setName(templateInterpreter(channelData.parent.template, interaction.member, channelData.position, name))
+		if parent and parent.template and parent.template:match("%%rename%%") then
+			success, err = voiceChannel:setName(templateInterpreter(parent.template, interaction.member or voiceChannel.guild:getMember(interaction.user), channelData.position, name))
 		else
 			success, err = voiceChannel:setName(name)
 		end
@@ -54,9 +55,9 @@ local subcommands = {
 	end,
 
 	bitrate = function (interaction, voiceChannel, bitrate)
-		local tier = interaction.guild.premiumTier
+		local tier = voiceChannel.guild.premiumTier
 
-		for _,feature in ipairs(interaction.guild.features) do
+		for _,feature in ipairs(voiceChannel.guild.features) do
 			if feature == "VIP_REGIONS" then tier = 3 end
 		end
 
@@ -135,7 +136,7 @@ local subcommands = {
 	end,
 
 	kick = function (interaction, voiceChannel, user)
-		local member = interaction.guild:getMember(user)
+		local member = voiceChannel.guild:getMember(user)
 		if member.voiceChannel == voiceChannel then
 			member:setVoiceChannel()
 		end
@@ -143,7 +144,8 @@ local subcommands = {
 	end,
 
 	invite = function (interaction, voiceChannel, user)
-		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and hostPermissionCheck(interaction.member, voiceChannel, "moderate")
+		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and
+			hostPermissionCheck(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
 		local invite = voiceChannel:createInvite()
 
 		if invite then
@@ -166,13 +168,13 @@ local subcommands = {
 	end,
 
 	mute = function (interaction, voiceChannel, user)
-		local guild, silentRoom = interaction.guild
+		local guild, silentRoom = voiceChannel.guild
 		local member = guild:getMember(user)
 
 		if guild.afkChannel then
 			silentRoom = guild.afkChannel
 		else
-			silentRoom = interaction.channel.category:createVoiceChannel("Silent room")
+			silentRoom = voiceChannel.category:createVoiceChannel("Silent room")
 			if not silentRoom then
 				silentRoom = guild:createVoiceChannel("Silent room")
 			end
@@ -191,7 +193,7 @@ local subcommands = {
 	end,
 
 	unmute = function (interaction, voiceChannel, user)
-		voiceChannel:getPermissionOverwriteFor(interaction.guild:getMember(user)):clearPermissions(permission.speak)
+		voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):clearPermissions(permission.speak)
 		return "Unmuted mentioned members", okEmbed(locale.unmuteConfirm:format(user.mentionString))
 	end,
 
@@ -201,21 +203,22 @@ local subcommands = {
 
 		if user then
 			if interaction.user == host then
-				if interaction.guild:getMember(user).voiceChannel == voiceChannel then
+				local guild = voiceChannel.guild
+				if guild:getMember(user).voiceChannel == voiceChannel then
 					channelData:setHost(user.id)
 
 					local perms = channelData.parent.permissions:toDiscordia()
 					if #perms ~= 0 then
-						local member, oldMember = interaction.guild:getMember(user.id), interaction.guild:getMember(host.id)
+						local member, oldMember = guild:getMember(user.id), guild:getMember(host.id)
 
-						if interaction.guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
+						if guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
 							voiceChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 							voiceChannel:getPermissionOverwriteFor(oldMember):clearPermissions(table.unpack(perms))
 						end
 
 						local companion = client:getChannel(channelData.companion)
 						if companion then
-							if #perms ~= 0 and interaction.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+							if #perms ~= 0 and guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
 								companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
 								companion:getPermissionOverwriteFor(oldMember):allowPermissions(table.unpack(perms))
 							end
@@ -240,10 +243,11 @@ local subcommands = {
 	end
 }
 
-local noAdmin = {host = true, invite = true}
+local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}
 
 return function (interaction, subcommand, argument)
-	local voiceChannel = interaction.member.voiceChannel
+	local member = interaction.member or interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end):getMember(interaction.user)
+	local voiceChannel = member.voiceChannel
 
 	if not (voiceChannel and channels[voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
@@ -253,10 +257,10 @@ return function (interaction, subcommand, argument)
 		return "Sent room info", roomInfoEmbed(voiceChannel)
 	end
 
-	if noAdmin[subcommand] or interaction.member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
+	if noAdmin[subcommand] or member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, voiceChannel, argument)
 	elseif channels[voiceChannel.id].host == interaction.user.id then
-		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
+		if hostPermissionCheck(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end
 		return "Insufficient permissions", warningEmbed(locale.badHostPermission)

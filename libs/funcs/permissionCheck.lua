@@ -10,7 +10,11 @@ return function (interaction, channel)
 
 	if config.owners[interaction.user.id] then return true end
 
-	if not (channel and channel.permissions and channel.permissions:has(permission.manageChannels) or interaction.member:hasPermission(channel, permission.manageChannels))then
+	if not (
+		channel and
+		channel.permissions and
+		channel.permissions:has(permission.manageChannels) or
+			(interaction.member or channel.guild:getMember(interaction.user)):hasPermission(channel, permission.manageChannels))then
 		return false, "Bad user permissions", locale.badUserPermissions
 	end
 

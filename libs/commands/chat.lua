@@ -25,11 +25,12 @@ local subcommands = {
 		if limit == -1 then
 			return "Ratelimit reached", warningEmbed(locale.ratelimitReached:format(retryIn))
 		else
-			local channelData, guildData = channels[interaction.member.voiceChannel.id], guilds[interaction.guild.id]
-			if channelData.parent and channelData.parent.companionTemplate and channelData.parent.companionTemplate:match("%%rename%%") then
-				success, err = chat:setName(templateInterpreter(channelData.parent.companionTemplate, interaction.member, channelData.position, name):discordify())
-			elseif guildData.companionTemplate and guildData.companionTemplate:match("%%rename%%") then
-				success, err = chat:setName(templateInterpreter(guildData.companionTemplate, interaction.member, channelData.position, name):discordify())
+			local member = interaction.member or chat.guild:getMember(interaction.user)
+			local channelData = channels[member.voiceChannel.id]
+			local parent = channelData.parent
+
+			if parent and parent.companionTemplate and parent.companionTemplate:match("%%rename%%") then
+				success, err = chat:setName(templateInterpreter(parent.companionTemplate, member, channelData.position, name):discordify())
 			else
 				success, err = chat:setName(name:discordify())
 			end
@@ -102,7 +103,8 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	local voiceChannel = interaction.member.voiceChannel
+	local member = interaction.member or interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end):getMember(interaction.user)
+	local voiceChannel = member.voiceChannel
 
 	if not (voiceChannel and channels[voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
@@ -117,10 +119,10 @@ return function (interaction, subcommand, argument)
 		return "Sent chat info", chatInfoEmbed(voiceChannel)
 	end
 
-	if interaction.member:hasPermission(chat, permission.administrator) or config.owners[interaction.user.id] then
+	if member:hasPermission(chat, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, chat, argument)
 	elseif channels[voiceChannel.id].host == interaction.user.id then
-		if hostPermissionCheck(interaction.member, voiceChannel, subcommand) then
+		if hostPermissionCheck(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, chat, argument)
 		end
 		return "Insufficient permissions", warningEmbed(locale.badHostPermission)

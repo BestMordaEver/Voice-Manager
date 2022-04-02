@@ -17,41 +17,8 @@ local modes = {
     id = function (member) return member.user.id end
 }
 
-return function (interaction, subcommand)
-    local channels, options = {}, interaction.option.options
-    do
-        local channel = options.channel.value
-        local lobbyData = lobbies[channel.id]
-
-        if lobbyData then
-            local target = client:getChannel(lobbyData.target)
-            if lobbyData.isMatchmaking and (not target or target.type == channelType.category) then
-                for _, channel in pairs((target or channel.category or channel.guild).voiceChannels) do
-                    insert(channels, channel)
-                end
-            else
-                while lobbyData.isMatchmaking do
-                    lobbyData = lobbies[lobbyData.target]
-                end
-
-                for _,channelData in pairs(lobbyData.children) do
-                    insert(channels, client:getChannel(channelData.id))
-                end
-            end
-        elseif channel.type == channelType.category then
-            for _, channel in pairs(channel.voiceChannels) do
-                insert(channels, channel)
-            end
-        else
-            channels = {channel}
-        end
-
-        if #channels == 0 then
-            return "No channels to query", warningEmbed(locale.noChildChannels)
-        end
-    end
-
-    if subcommand == "print" then
+local commands = {
+    print = function (interaction, channels, options)
         local names = {}
         do
             local separator, extractor = options.separator and options.separator.value or " ", modes[options.print_as and options.print_as.value or "mention"]
@@ -71,7 +38,7 @@ return function (interaction, subcommand)
                 insert(embeds, {description = names:sub(index, index + 4095)})
                 index = index + 4096
                 if #embeds == 10 then
-                    interaction:followup {embeds = embeds}
+                    interaction:followup {ephemeral = true, embeds = embeds}
                     embeds = {}
                 end
             until index >= len
@@ -84,7 +51,9 @@ return function (interaction, subcommand)
         until index >= len
         return "Sent names list", {embeds = embeds}
 
-    elseif subcommand == "give" then
+    end,
+
+    give = function (interaction, channels, options)
         local role, count = options.role.value, 0
         for _, channel in ipairs(channels) do
             for _, member in pairs(channel.connectedMembers) do
@@ -95,7 +64,9 @@ return function (interaction, subcommand)
         end
         return "Added roles to users", okEmbed(locale.usersRolesAdded:format(count))
 
-    elseif subcommand == "remove" then
+    end,
+
+    remove = function (interaction, channels, options)
         local role, count = options.role.value, 0
         for _, channel in ipairs(channels) do
             for _, member in pairs(channel.connectedMembers) do
@@ -106,4 +77,40 @@ return function (interaction, subcommand)
         end
         return "Added roles to users", okEmbed(locale.usersRolesRemoved:format(count))
     end
+}
+
+return function (interaction, subcommand)
+    local channels, options = {}, interaction.option.options
+
+    local channel = options.channel.value
+    local lobbyData = lobbies[channel.id]
+
+    if lobbyData then
+        local target = client:getChannel(lobbyData.target)
+        if lobbyData.isMatchmaking and (not target or target.type == channelType.category) then
+            for _, channel in pairs((target or channel.category or channel.guild).voiceChannels) do
+                insert(channels, channel)
+            end
+        else
+            while lobbyData.isMatchmaking do
+                lobbyData = lobbies[lobbyData.target]
+            end
+
+            for _,channelData in pairs(lobbyData.children) do
+                insert(channels, client:getChannel(channelData.id))
+            end
+        end
+    elseif channel.type == channelType.category then
+        for _, channel in pairs(channel.voiceChannels) do
+            insert(channels, channel)
+        end
+    else
+        channels = {channel}
+    end
+
+    if #channels == 0 then
+        return "No channels to query", warningEmbed(locale.noChildChannels)
+    end
+
+    return commands[subcommand](interaction, channels, options)
 end

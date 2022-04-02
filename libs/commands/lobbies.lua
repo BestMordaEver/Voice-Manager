@@ -68,7 +68,7 @@ local subcommands = {
 
 	bitrate = function (interaction, channel, bitrate)
 		if not bitrate then bitrate = 64 end
-		local tier = interaction.guild.premiumTier
+		local tier = channel.guild.premiumTier
 
 		for _,feature in ipairs(interaction.guild.features) do
 			if feature == "VIP_REGIONS" then tier = 3 end
@@ -105,7 +105,7 @@ local subcommands = {
 		if role then
 			lobbies[lobby.id]:setRole(interaction.option.options.role.value.id)
 		else
-			lobbies[lobby.id]:setRole(interaction.guild.defaultRole.id)
+			lobbies[lobby.id]:setRole(lobby.guild.defaultRole.id)
 		end
 		return "Lobby managed role set", okEmbed(locale.roleConfirm)
 	end

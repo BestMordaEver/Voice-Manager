@@ -46,6 +46,10 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
+	if not interaction.guild then
+		return "Command must be issued in guild", locale.notInGuild
+	end
+
 	if subcommand == "view" then
 		return "Sent server info", serverInfoEmbed(interaction.guild)
 	end
