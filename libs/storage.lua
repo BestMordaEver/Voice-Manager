@@ -426,7 +426,7 @@ local loadChannels = function (parent, parentType)
 						Overseer.resume(companion)
 					end
 				else
-					if rawChannel.parentType == 0 then
+					if parentType == 0 then
 						channel:delete()
 					end
 
