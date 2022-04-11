@@ -18,7 +18,7 @@ local botPermissions = require "utils/botPermissions"
 
 local unpack = table.unpack
 
-local guilds, lobbies, categories, channels
+local guilds, lobbies, categories, channels = {}, {}, {}, {}
 
 -- methods inherited by individual data structures
 local guildMeta = {
@@ -191,7 +191,7 @@ local channelMeta = {
 }
 
 -- global data handlers
-guilds = setmetatable({}, {
+setmetatable(guilds, {
 	__index = {
 		add = function (self, guildID, role, limit, permissions)
 			self[guildID] = setmetatable({
@@ -216,10 +216,11 @@ guilds = setmetatable({}, {
 				end
 			end
 		end
-	}
+	},
+	__tostring = function () return "GuildStorage" end
 })
 
-lobbies = setmetatable({}, {
+setmetatable(lobbies, {
 	__index = {
 		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity, bitrate, greeting, companionLog)
 			self[lobbyID] = setmetatable({id = lobbyID, guild = guilds[guildID],
@@ -250,12 +251,13 @@ lobbies = setmetatable({}, {
 		local count = 0
 		for _,_ in pairs(self) do count = count + 1 end
 		return count
-	end
+	end,
+	__tostring = function () return "LobbyStorage" end
 })
 
-local parents = {[0] = lobbies, guilds, categories}
+local parents = {[0] = lobbies, guilds, categories, channels}
 
-channels = setmetatable({}, {
+setmetatable(channels, {
 	__index = {
 		add = function (self, channelID, parentType, host, parentID, position, companion)
 			local parent = parents[tonumber(parentType)][parentID]
@@ -306,7 +308,8 @@ channels = setmetatable({}, {
 		local count = 0
 		for v,_ in pairs(self) do count = count + 1 end
 		return count
-	end
+	end,
+	__tostring = function () return "ChannelStorage" end
 })
 
 -- some actual db interaction
