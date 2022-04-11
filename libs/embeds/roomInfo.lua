@@ -10,7 +10,7 @@ local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
 local blurple = embeds.colors.blurple
 
-return embeds("roomInfo", function (room)
+return embeds("roomInfo", function (room, ephemeral)
 	local blocklist, reservations, muted = "","",""
 
 	for _,overwrite in pairs(room.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
@@ -36,5 +36,5 @@ return embeds("roomInfo", function (room)
 		title = locale.roomInfoTitle:format(room.name),
 		color = blurple,
 		description = locale.roomInfo:format(user.mentionString, reservations, blocklist, muted, commands)
-	}}}
+	}}, ephemeral = ephemeral}
 end)

@@ -2,14 +2,13 @@ local locale = require "locale"
 local client = require "client"
 local embeds = require "embeds"
 
-local guilds = require "storage".guilds
 local channels = require "storage".channels
 
 local availableCommands = require "embeds/availableCommands"
 
 local fuchsia = embeds.colors.fuchsia
 
-return embeds("greeting", function (room)
+return embeds("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
 	if not channelData then return end
 
@@ -39,5 +38,5 @@ return embeds("greeting", function (room)
 		title = companion.name,
 		color = fuchsia,
 		description = (channelData.parent.greeting or ""):gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
-	}}}
+	}}, ephemeral = ephemeral}
 end)

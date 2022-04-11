@@ -2,6 +2,8 @@ local logger = require "logger"
 
 local commands = require "commands/init"
 
+local errorEmbed = require "embeds/error"
+
 return function (interaction)
 
 	if interaction.guild then
@@ -18,5 +20,23 @@ return function (interaction)
 		primary = tonumber(primary) or primary -- help_1 or delete_nuke
 	end
 
-	return commands[command](interaction, primary, secondary)
+	local res, logMsg, reply = xpcall(commands[command], debug.traceback, interaction, primary, secondary)
+
+	if res then
+		if interaction.guild then
+			logger:log(4, "GUILD %s USER %s: %s", interaction.guild.id, interaction.user.id, logMsg)
+		else
+			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
+		end
+		if reply then interaction:reply(reply) end
+	else
+		interaction:reply(errorEmbed())
+		error(logMsg)
+	end
+
+	if interaction.guild then
+		logger:log(4, "GUILD %s USER %s: %s component interaction completed", interaction.guild.id, interaction.user.id, interaction.customId)
+	else
+		logger:log(4, "USER %s in DMs: %s component interaction completed", interaction.user.id, interaction.customId)
+	end
 end

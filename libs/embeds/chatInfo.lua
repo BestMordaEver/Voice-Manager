@@ -10,7 +10,7 @@ local permission = require "discordia".enums.permission
 local Permissions = require "discordia".Permissions
 local blurple = embeds.colors.blurple
 
-return embeds("chatInfo", function (room)
+return embeds("chatInfo", function (room, ephemeral)
 	local hidden, shown, muted = "","",""
 
 	local companion = client:getChannel(channels[room.id].companion)
@@ -38,5 +38,5 @@ return embeds("chatInfo", function (room)
 		title = locale.chatInfoTitle:format(companion.name),
 		color = blurple,
 		description = locale.chatInfo:format(user.mentionString, hidden, shown, muted, commands)
-	}}}
+	}}, ephemeral = ephemeral}
 end)

@@ -13,7 +13,8 @@ local articles = {
 
 return function (interaction, page)
 	if page then
-		return interaction:update(helpEmbed(page))
+		interaction:update(helpEmbed(page))
+		return "Help page switched"
 	else
 		local command = interaction.option and interaction.option.value or "help"
 		return command.." help message", helpEmbed(articles[command])

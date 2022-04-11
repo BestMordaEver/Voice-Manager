@@ -11,7 +11,7 @@ local channelType = require "discordia".enums.channelType
 local blurple = embeds.colors.blurple
 local insert = table.insert
 
-return embeds("matchmakingInfo", function (guild)
+return embeds("matchmakingInfo", function (guild, ephemeral)
 	local guildData = guilds[guild.id]
 
 	local embed = {
@@ -45,5 +45,5 @@ return embeds("matchmakingInfo", function (guild)
 		})
 	end
 
-	return {embeds = {embed}}
+	return {embeds = {embed}, ephemeral = ephemeral}
 end)

@@ -9,7 +9,7 @@ local tps = require "funcs/truePositionSorting"
 local blurple = embeds.colors.blurple
 local insert = table.insert
 
-return embeds("companionsInfo", function (guild)
+return embeds("companionsInfo", function (guild, ephemeral)
 	local guildData = guilds[guild.id]
 
 	local embed = {
@@ -42,5 +42,5 @@ return embeds("companionsInfo", function (guild)
 		})
 	end
 
-	return {embeds = {embed}}
+	return {embeds = {embed}, ephemeral = ephemeral}
 end)

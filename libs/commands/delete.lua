@@ -119,7 +119,8 @@ return function (interaction, action, argument)
 
 		if action == "key" then    -- delete provides four keys that need to be armed
 			components[#components].components[argument].style = 3
-			return interaction:update {content = interaction.message.content, components = components}
+			interaction:update {content = interaction.message.content, components = components}
+			return "Key is armed"
 
 		elseif action == "nuke" then   -- nuke will go off only when all keys are armed
 			local buttons, ready = components[#components].components, true
@@ -139,7 +140,8 @@ return function (interaction, action, argument)
 				end
 
 				local message = okEmbed(locale.deleteConfirm:format(count))
-				return interaction:followup {ephemeral = true, embeds = message.embeds}
+				interaction:followup {ephemeral = true, embeds = message.embeds}
+				return 
 			else
 				local message = warningEmbed(locale.deleteNotArmed)
 				return interaction:reply {ephemeral = true, embeds = message.embeds}

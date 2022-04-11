@@ -76,6 +76,6 @@ for i=0,#locale.helpTitle do
 	helps[i] = embed
 end
 
-return embeds("help", function (page)
-	return {embeds = {helps[tonumber(page)]}, components = buttons}
+return embeds("help", function (page, ephemeral)
+	return {embeds = {helps[tonumber(page)]}, components = buttons, ephemeral = ephemeral}
 end)

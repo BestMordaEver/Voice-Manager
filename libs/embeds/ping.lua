@@ -8,7 +8,7 @@ local stats = storage.stats
 
 local black = embeds.colors.black
 
-return embeds("ping", function (dt, guild)
+return embeds("ping", function (dt, guild, ephemeral)
 	local guildData = guilds[guild.id]
 	return {embeds = {{
 		color = black,
@@ -17,5 +17,5 @@ return embeds("ping", function (dt, guild)
 			stats.lobbies, #guildData.lobbies,
 			stats.channels, guildData:channels(),
 			stats.users, guildData:users())
-	}}}
+	}}, ephemeral = ephemeral}
 end)

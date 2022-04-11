@@ -6,7 +6,7 @@ local channels = require "storage".channels
 
 local blurple = embeds.colors.blurple
 
-return embeds("serverInfo", function (guild)
+return embeds("serverInfo", function (guild, ephemeral)
 	local guildData = guilds[guild.id]
 	if not guild:getRole(guildData.role) then guildData:setRole(guild.defaultRole.id) end
 
@@ -21,5 +21,5 @@ return embeds("serverInfo", function (guild)
 			guildData:channels(),
 			guildData.limit
 		)
-	}}}
+	}}, ephemeral = ephemeral}
 end)

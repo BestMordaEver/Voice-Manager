@@ -46,5 +46,9 @@ return function (interaction)
 		error(logMsg)
 	end
 
-	logger:log(4, "GUILD %s USER %s: %s command completed", interaction.guild.id, interaction.user.id, interaction.commandName)
+	if interaction.guild then
+		logger:log(4, "GUILD %s USER %s: %s command completed", interaction.guild.id, interaction.user.id, interaction.commandName)
+	else
+		logger:log(4, "USER %s in DMs: %s command completed", interaction.user.id, interaction.commandName)
+	end
 end
