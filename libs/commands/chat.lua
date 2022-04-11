@@ -103,13 +103,17 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	local member = interaction.member or interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end):getMember(interaction.user)
-	local voiceChannel = member.voiceChannel
+	local member = interaction.member
+	if not member then
+		local guild = interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end)
+		if guild then member = guild:getMember(interaction.user) end
+	end
 
-	if not (voiceChannel and channels[voiceChannel.id]) then
+	if not (member and member.voiceChannel and channels[member.voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
 	end
 
+	local voiceChannel = member.voiceChannel
 	local chat = client:getChannel(channels[voiceChannel.id].companion)
 	if not chat then
 		return "Room doesn't have a chat", warningEmbed(locale.noCompanion)

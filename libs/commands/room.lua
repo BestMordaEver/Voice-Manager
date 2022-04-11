@@ -246,13 +246,17 @@ local subcommands = {
 local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}
 
 return function (interaction, subcommand, argument)
-	local member = interaction.member or interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end):getMember(interaction.user)
-	local voiceChannel = member.voiceChannel
+	local member = interaction.member
+	if not member then
+		local guild = interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end)
+		if guild then member = guild:getMember(interaction.user) end
+	end
 
-	if not (voiceChannel and channels[voiceChannel.id]) then
+	if not (member and member.voiceChannel and channels[member.voiceChannel.id]) then
 		return "User not in room", warningEmbed(locale.notInRoom)
 	end
 
+	local voiceChannel = member.voiceChannel
 	if subcommand == "view" then
 		return "Sent room info", roomInfoEmbed(voiceChannel)
 	end

@@ -27,7 +27,8 @@ local client = discordia.Client{
 		intents.guildPresences +
 		intents.guildMessages +
 		intents.guildMessageReactions +
-		intents.messageContent
+		intents.messageContent +
+		intents.directMessage
 }
 
 local clock = discordia.Clock()
