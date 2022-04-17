@@ -139,12 +139,11 @@ return function (interaction, action, argument)
 					end
 				end
 
-				local message = okEmbed(locale.deleteConfirm:format(count))
-				interaction:followup {ephemeral = true, embeds = message.embeds}
-				return 
+				interaction:followup {ephemeral = true, embeds = okEmbed(locale.deleteConfirm:format(count)).embeds}
+				return "Deleted the channels"
 			else
-				local message = warningEmbed(locale.deleteNotArmed)
-				return interaction:reply {ephemeral = true, embeds = message.embeds}
+				interaction:reply {ephemeral = true, embeds = warningEmbed(locale.deleteNotArmed).embeds}
+				return "Not all keys are armed"
 			end
 
 		elseif action == "row" then    -- user edited delete list
@@ -158,6 +157,7 @@ return function (interaction, action, argument)
 			end
 
 			interaction:update {content = interaction.message.content, components = components}
+			return "Changes saved"
 		end
 	end
 end
