@@ -7,20 +7,19 @@ local channels = require "storage".channels
 local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
-local Permissions = require "discordia".Permissions
 local blurple = embeds.colors.blurple
 
 return embeds("roomInfo", function (room, ephemeral)
 	local blocklist, reservations, muted = "","",""
 
-	for _,overwrite in pairs(room.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
-		if overwrite:getObject().user ~= client.user and Permissions(overwrite.allowedPermissions):has(permission.connect) then
+	for _,overwrite in pairs(room.permissionOverwrites:toArray(function(overwrite) return overwrite.type == 1 end)) do
+		if overwrite:getObject().user ~= client.user and overwrite:getAllowedPermissions():has(permission.connect) then
 			reservations = reservations..overwrite:getObject().user.mentionString.." "
 		end
-		if Permissions(overwrite.deniedPermissions):has(permission.connect) then
+		if overwrite:getDeniedPermissions():has(permission.connect, permission.sendMessages) then
 			blocklist = blocklist..overwrite:getObject().user.mentionString.." "
 		end
-		if Permissions(overwrite.deniedPermissions):has(permission.speak) then
+		if overwrite:getDeniedPermissions():has(permission.speak) then
 			muted = muted..overwrite:getObject().user.mentionString.." "
 		end
 	end
