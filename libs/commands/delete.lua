@@ -139,10 +139,10 @@ return function (interaction, action, argument)
 					end
 				end
 
-				interaction:followup {ephemeral = true, embeds = okEmbed(locale.deleteConfirm:format(count)).embeds}
+				interaction:followup(okEmbed(locale.deleteConfirm:format(count)), true)
 				return "Deleted the channels"
 			else
-				interaction:reply {ephemeral = true, embeds = warningEmbed(locale.deleteNotArmed).embeds}
+				interaction:reply(warningEmbed(locale.deleteNotArmed), true)
 				return "Not all keys are armed"
 			end
 
