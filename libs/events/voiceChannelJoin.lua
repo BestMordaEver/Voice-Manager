@@ -87,19 +87,19 @@ local function lobbyJoin (member, lobby)
 		if lobbyData.companionTarget then
 			-- this might look familiar
 			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or newChannel.guild) or client:getChannel(lobbyData.companionTarget)
-			local name = lobbyData.companionTemplate or "private-chat"
 
 			if companionTarget then
+				local name = lobbyData.companionTemplate or "private-chat"
 				if name:match("%%.-%%") then
 					name = templateInterpreter(name, member, position):discordify()
 					if name == "" then name = "private-chat" end
 				end
 
-				companion = lobby.guild:createChannel({
+				companion = lobby.guild:createChannel {
 					name = name,
 					type = channelType.text,
 					parent_id = companionTarget.id
-				})
+				}
 			end
 		end
 
@@ -135,7 +135,7 @@ local function lobbyJoin (member, lobby)
 	else
 		-- something went wrong, most likely user error
 		lobbyData:detachChild(position)
-		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room", lobby.guild.id, lobby.id, member.user.id)
+		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room - %s", lobby.guild.id, lobby.id, member.user.id, err)
 	end
 end
 
