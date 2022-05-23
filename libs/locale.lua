@@ -52,6 +52,7 @@ return {
 		},
 		{
 			"/companion view",
+			"/companion enable|disable",
 			"/companion category",
 			"/companion name",
 			"/companion greeting",
@@ -147,6 +148,7 @@ You can put different `%combos%` in the name to customize it
 		},
 		{
 			"Show all lobies that have companion chats enabled",
+			"Enable or disable companion chat for selected lobby",
 			"Select a category in which chats will be created",
 			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `/lobby name`. Default is `private-chat`
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
