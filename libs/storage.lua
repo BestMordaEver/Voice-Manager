@@ -492,9 +492,10 @@ local load = function ()
 
 	statement = lobbyDB:prepare("SELECT * FROM lobbies")
 	rawData = statement:step()
+	local dummy = {id = "none"}
 	while rawData do
 		local lobby = lobbies:add(unpack(rawData, 1, LOBBY_FIELDS))
-		if not lobby.guild then lobby.guild = {id = "none"} end
+		if not lobby.guild then lobby.guild = dummy end
 		if not data.lobbies[lobby.guild.id] then data.lobbies[lobby.guild.id] = {} end
 		data.lobbies[lobby.guild.id][lobby.id] = lobby
 		rawData = statement:step()
