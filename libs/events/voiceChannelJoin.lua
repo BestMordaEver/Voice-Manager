@@ -1,6 +1,7 @@
 local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
+local locale = require "locale"
 
 local guilds = require "storage".guilds
 local lobbies = require "storage".lobbies
@@ -16,6 +17,7 @@ local enforceReservations = require "funcs/enforceReservations"
 local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
+local blurple = require "embeds".colors.blurple
 
 local processing = {}
 
@@ -182,11 +184,69 @@ end
 
 -- user joined a room
 local function roomJoin (member, channel)
+	local channelData = channels[channel.id]
+
+	if channelData.password and not (
+		member:hasPermission(channel, permission.administrator) or
+		channel:getPermissionOverwriteFor(member):getAllowedPermissions():has(permission.connect)
+ 	) then
+		logger:log(4, "GUILD %s ROOM %s USER %s: sending password prompt", channel.guild.id, channel.id, member.user.id)
+		channel:getPermissionOverwriteFor(member):denyPermissions(permission.connect)
+
+		local newChannel = member.guild:createChannel {
+			name = "Password verification",
+			parent_id = (channel.category or channel.guild).id,
+			type = channelType.voice,
+			permission_overwrites = {
+				{
+					id = client.user.id,
+					type = 1,
+					allow = "3146752"
+				},
+				{
+					id = member.guild.id,
+					type = 0,
+					deny = "3146752"
+				}
+			}
+		}
+
+		member:setVoiceChannel(newChannel)
+		channels:store(newChannel.id, 3, member.user.id, channel.id, 0)
+
+		return member.user:send{
+			ephemeral = true,
+			embeds = {
+				{
+					description = locale.passwordCheckText,
+					color = blurple,
+					author = {
+						name = channel.name,
+						proxy_icon_url = member.guild.iconURL
+					}
+				}
+			},
+			components = {
+				{
+					type = 1,
+					components = {
+						{
+							type = 2,
+							style = 1,
+							label = locale.passwordEnter,
+							custom_id = "room_passwordinit",
+						}
+					}
+				}
+			}
+		}
+	end
+
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 
 	enforceReservations(channel)
 
-	local companion = client:getChannel(channels[channel.id].companion)
+	local companion = client:getChannel(channelData.companion)
 	if companion and not companion:getPermissionOverwriteFor(member):getDeniedPermissions():has(permission.readMessages) then
 		companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 	end

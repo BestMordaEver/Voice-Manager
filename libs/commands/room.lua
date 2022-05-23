@@ -83,16 +83,16 @@ local subcommands = {
 		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
 
 		if subcommand == "add" then
-			overwrite:denyPermissions(permission.connect)
+			overwrite:denyPermissions(permission.connect, permission.sendMessages)	-- sendMessages is used as an indication of blocklist, to not conflict with password flow
 			return "Blocked mentioned members", okEmbed(locale.blockConfirm:format(user.mentionString))
 
 		elseif subcommand == "remove" then
-			overwrite:clearPermissions(permission.connect)
+			overwrite:clearPermissions(permission.connect, permission.sendMessages)
 			return "Unblocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
 			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite) return permissionOverwrite.type == "member" end)) do
-				permissionOverwrite:clearPermissions(permission.connect)
+				permissionOverwrite:clearPermissions(permission.connect, permission.sendMessages)
 			end
 			return "Cleared blocklist", okEmbed(locale.blocklistClear:format())
 		end
@@ -130,8 +130,8 @@ local subcommands = {
 			voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
 		end
 
-		local guild = voiceChannel.guild
-		voiceChannel:getPermissionOverwriteFor(guild:getRole(channels[voiceChannel.id].parent.role) or guild.defaultRole):denyPermissions(permission.connect)
+		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+		voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.connect)
 		return "Locked the room", okEmbed(locale.lockConfirm:format(mentionString))
 	end,
 
@@ -187,7 +187,7 @@ local subcommands = {
 			if silentRoom then member:setVoiceChannel(voiceChannel) end
 		end
 
-		if silentRoom ~= guild.afkChannel then silentRoom:delete() end
+		if silentRoom and silentRoom ~= guild.afkChannel then silentRoom:delete() end
 
 		return "Muted mentioned members", okEmbed(locale.muteConfirm:format(user.mentionString))
 	end,
@@ -207,20 +207,22 @@ local subcommands = {
 				if guild:getMember(user).voiceChannel == voiceChannel then
 					channelData:setHost(user.id)
 
-					local perms = channelData.parent.permissions:toDiscordia()
-					if #perms ~= 0 then
-						local member, oldMember = guild:getMember(user.id), guild:getMember(host.id)
+					if channelData.parent then
+						local perms = channelData.parent.permissions:toDiscordia()
+						if #perms ~= 0 then
+							local member, oldMember = guild:getMember(user.id), guild:getMember(host.id)
 
-						if guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
-							voiceChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-							voiceChannel:getPermissionOverwriteFor(oldMember):clearPermissions(table.unpack(perms))
-						end
+							if guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
+								voiceChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+								voiceChannel:getPermissionOverwriteFor(oldMember):clearPermissions(table.unpack(perms))
+							end
 
-						local companion = client:getChannel(channelData.companion)
-						if companion then
-							if #perms ~= 0 and guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
-								companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-								companion:getPermissionOverwriteFor(oldMember):allowPermissions(table.unpack(perms))
+							local companion = client:getChannel(channelData.companion)
+							if companion then
+								if #perms ~= 0 and guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+									companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+									companion:getPermissionOverwriteFor(oldMember):allowPermissions(table.unpack(perms))
+								end
 							end
 						end
 					end
@@ -240,7 +242,46 @@ local subcommands = {
 				return "Didn't find host", warningEmbed(locale.badHost)
 			end
 		end
-	end
+	end,
+
+	password = function (interaction, voiceChannel, password)
+		channels[voiceChannel.id]:setPassword(password)
+
+		if password then
+			return "New password set", okEmbed(locale.passwordConfirm:format(password))
+		else
+			return "Password reset", okEmbed(locale.passwordReset)
+		end
+	end,
+
+	passwordinit = function (interaction)	-- not exposed, access via componentInteraction
+		interaction:createModal("room_passwordcheck", locale.passwordEnter, {{type = 1, components = {{type = 4, custom_id = "password", label = locale.password, style = 1}}}})
+		return "Created password modal"
+	end,
+
+	passwordcheck = function (interaction, voiceChannel)	-- not exposed, access via modalInteraction
+		local channelData = channels[voiceChannel.id]
+		local channel = client:getChannel(channelData and channelData.parent.id)
+
+		if not channel then
+			if channelData and channelData.parentType == 3 then voiceChannel:delete() end
+			return "No parent channel", warningEmbed(locale.passwordNoChannel)
+		elseif interaction.components[1].components[1].value == channelData.parent.password then
+			local member = voiceChannel.guild:getMember(interaction.user)
+
+			-- sendMessages is used as an indication of blocklist, to not conflict with password flow
+			if channel:getPermissionOverwriteFor(member):getDeniedPermissions():has(permission.sendMessages) then
+				if channelData and channelData.parentType == 3 then voiceChannel:delete() end
+				return "User is banned", warningEmbed(locale.passwordBanned)
+			end
+
+			channel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
+			member:setVoiceChannel(channel.id)
+			return "Successfull password check", okEmbed(locale.passwordSuccess)
+		else
+			return "Failed password check", warningEmbed(locale.passwordFailure)
+		end
+	end,
 }
 
 local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}

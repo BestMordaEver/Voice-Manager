@@ -1,14 +1,21 @@
 local https = require "coro-http"
 local json = require "json"
-local token = "Bot "..require "token".token
 local timer = require "timer"
 
---local id = "601347755046076427" -- vm
+--[[
+local token = "Bot "..require "token".tokenTrue
+local id = "601347755046076427" -- vm
+--]]
+
+-- [[
+local token = "Bot "..require "token".token
 local id = "676787135650463764" -- rat
+--]]
+
 --local guild = "669676999211483144" -- playground
 local guild = "741645965869711410" -- test
 
-local domain = "https://discord.com/api/v8"
+local domain = "https://discord.com/api/v10"
 local GLOBAL_COMMANDS = string.format("%s/applications/%s/commands", domain, id)
 local GLOBAL_COMMAND = string.format("%s/applications/%s/commands/%s", domain, id,"%s")
 local GUILD_COMMANDS = string.format("%s/applications/%s/guilds/%s/commands", domain, id, "%s")
@@ -877,6 +884,18 @@ local commandsStructure = {
 				name = "lock",
 				description = "Set room to invite only mode",
 				type = commandOptionType.subcommand
+			},
+			{
+				name = "password",
+				description = "Set up a channel password",
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = "password",
+						description = "Password that users will have to enter upon connection",
+						type = commandOptionType.string
+					}
+				}
 			}
 		}
 	},
@@ -1508,8 +1527,10 @@ local debugCommands = {
 }
 
 coroutine.wrap(function ()
-	CommandManager.overwriteGuildCommands(guild,commandsStructure)
-	for _,command in ipairs(debugCommands) do CommandManager.createGuildCommand(guild, command) end
+	--print(CommandManager.overwriteGlobalCommands(commandsStructure))
+	--print(CommandManager.overwriteGuildCommands(guild, commandsStructure))
+	for _,command in ipairs(debugCommands) do print(CommandManager.createGuildCommand(guild, command)) end
+	--print(CommandManager.getGlobalCommands()[1].version)
 end)()
 
 return CommandManager

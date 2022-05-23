@@ -10,11 +10,12 @@ local requiredPerms = {
 	resize = "manage",
 	unmute = "moderate",
 	clear = "manage",
-	lock = "moderate"
+	lock = "moderate",
+	password = "moderate",
 }
 
 return function (member, channel, permissionName)
 	local permissions = channels[channel.id].parent.permissions
 
-	return channels[channel.id].host == member.user.id and (permissions:has(permissionName) or permissions:has(requiredPerms[permissionName]))
+	return permissions and channels[channel.id].host == member.user.id and (permissions:has(permissionName) or permissions:has(requiredPerms[permissionName]))
 end

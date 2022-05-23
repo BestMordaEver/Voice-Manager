@@ -67,6 +67,7 @@ return {
 			"/room blocklist add|remove|clear",
 			"/room reservations add|remove|clear",
 			"/room lock",
+			"/room password",
 			"/room host",
 			"/room invite"
 		},
@@ -171,6 +172,7 @@ You can put different `%combos%` in the greeting to customize it
 			[[Manage room's reservations
 Room won't let any more people in to ensure reservations]],
 			"Locks entry to the room, no new people will be able to join",
+			"Users will have to enter the password before connecting to the channel, unless they have a reservation",
 			"Ping current room host or transfer host privileges to the mentioned user",
 			[[Send invite to immediately connect to the room
 If specific user is mentioned - sends them a DM
@@ -315,6 +317,15 @@ You can enable companion channels with `/lobby companion enable`]],
 	badNewHost = "Can't promote users outside of the room",
 	hostIdentify = "%s is a room host",
 	badHost = "Can't identify the host",
+	passwordConfirm = "Password is set to `%s`",
+	passwordReset = "Password is removed",
+	passwordCheckText = "This channel is protected by password. Please enter the password to access the channel.",
+	passwordEnter = "Enter the password",
+	password = "Password",
+	passwordNoChannel = "This channel no longer exists",
+	passwordSuccess = "Correct password",
+	passwordFailure = "Wrong password",
+	passwordBanned = "You were banned in this channel!",
 
 	-- chat
 	chatInfoTitle = "Room info | %s",

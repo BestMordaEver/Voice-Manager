@@ -169,7 +169,7 @@ local channelMeta = {
 	__index = {
 		delete = function (self)
 			if channels[self.id] then
-				if self.parent.detachChild then self.parent:detachChild(self.position) end
+				if self.parent and self.parent.detachChild then self.parent:detachChild(self.position) end
 				channels[self.id] = nil
 				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end
@@ -185,7 +185,13 @@ local channelMeta = {
 			else
 				self:delete()
 			end
-		end
+		end,
+
+		setPassword = function (self, password)
+			self.password = password
+			logger:log(6, "GUILD %s ROOM %s: updated password to %s", self.guildID, self.id, password)
+			emitter:emit("setChannelPassword", password, self.id)	-- yes, password is saved as plaintext without any safety
+		end	-- if you don't understand why this is sufficient data protection, i recommend you review the use case
 	},
 	__tostring = function (self) return string.format("ChannelData: %s", self.id) end
 }
@@ -259,13 +265,21 @@ local parents = {[0] = lobbies, guilds, categories, channels}
 
 setmetatable(channels, {
 	__index = {
-		add = function (self, channelID, parentType, host, parentID, position, companion)
+		add = function (self, channelID, parentType, host, parentID, position, companion, password)
 			local parent = parents[tonumber(parentType)][parentID]
-			self[channelID] = setmetatable({
-				id = channelID, guildID = parent.guild and parent.guild.id or parent.id, parentType = tonumber(parentType),
-				host = host, parent = parent, position = tonumber(position), companion = companion
-			}, channelMeta)
-			logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
+			if parent then
+				self[channelID] = setmetatable({
+					id = channelID, guildID = parent.guild and parent.guild.id or parent.id, parentType = tonumber(parentType),
+					host = host, parent = parent, position = tonumber(position), companion = companion, password = password
+				}, channelMeta)
+				logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
+			else
+				self[channelID] = setmetatable({
+					id = channelID, parentID = parentID, parentType = tonumber(parentType),
+					host = host, position = tonumber(position), companion = companion, password = password
+				}, channelMeta)
+				logger:log(6, "ORPHAN ROOM %s: added", channelID)
+			end
 			return self[channelID]
 		end,
 
@@ -279,13 +293,13 @@ setmetatable(channels, {
 				local channel = client:getChannel(channelID)
 				if channel then
 					if #channel.connectedMembers == 0 then
-						if channelData.isPersistent then
+						if channelData.parentType == 1 or channelData.parentType == 2 then
 							channelData:delete()
 						else
 							channel:delete()
 						end
 					end
-				elseif not client:getGuild(channelData.guildID).unavailable then
+				elseif not (client:getGuild(channelData.guildID) and client:getGuild(channelData.guildID).unavailable) then
 					local companion = client:getChannel(channelData.companion)
 					if companion then companion:delete() end
 					channelData:delete()
@@ -351,7 +365,7 @@ end
 -- all statements that are gonna be used to interact with db
 -- naming convention is <action><scope>[key]
 -- second value is logger message
-local guildFields, lobbyFields, channelFields = 4, 13, 6
+local GUILD_FIELDS, LOBBY_FIELDS, CHANNEL_FIELDS = 4, 13, 7
 local storageStatements = {
 	addGuild = {"INSERT INTO guilds VALUES(?, NULL, 500, 0)", "ADD GUILD %s"},
 
@@ -389,11 +403,13 @@ local storageStatements = {
 
 	setLobbyCompanionLog = {"UPDATE lobbies SET companionLog = ? WHERE id = ?","SET COMPANION LOG %s => LOBBY %s"},
 
-	addChannel = {"INSERT INTO channels VALUES(?,?,?,?,?,?)", "ADD CHANNEL %s"},
+	addChannel = {"INSERT INTO channels VALUES(?,?,?,?,?,?,NULL)", "ADD CHANNEL %s"},
 
 	removeChannel = {"DELETE FROM channels WHERE id = ?", "DELETE CHANNEL %s"},
 
-	setChannelHost = {"UPDATE channels SET host = ? WHERE id = ?", "SET HOST %s => CHANNEL %s"}
+	setChannelHost = {"UPDATE channels SET host = ? WHERE id = ?", "SET HOST %s => CHANNEL %s"},
+
+	setChannelPassword = {"UPDATE channels SET password = ? WHERE id = ?", "SET PASSWORD %s => CHANNEL %s"}
 }
 
 -- tie up callbacks
@@ -409,77 +425,141 @@ for name, statement in pairs(storageStatements) do
 	end
 end
 
-local getGuild = guildDB:prepare("SELECT * FROM guilds WHERE id = ?")
-local getLobbies = lobbyDB:prepare("SELECT * FROM lobbies WHERE guild = ?")
-local getChannels = channelDB:prepare("SELECT * FROM channels WHERE parent = ? AND parentType = ?")
+-- cleanup reference, shrinks as guilds load
+local data = {guilds = {}, lobbies = {}, channels = {[0] = {},{},{},{}}}
 
 -- helper loader method
-local loadChannels = function (parent, parentType)
-	local rawChannel = getChannels:reset():bind(parent.id, parentType):step()
+local function loadChannels (parent, parentType)
+	local channelsByParent = data.channels[parentType][parent.id]
+	if channelsByParent then
+		for id, channelData in pairs(channelsByParent) do
+			channelsByParent[id] = nil
 
-	if rawChannel then
-		repeat
-			local channel, companion = client:getChannel(rawChannel[1]), client:getChannel(rawChannel[6])
+			local channel, companion = client:getChannel(id), client:getChannel(channelData.companion)
 			if channel then
 				if #channel.connectedMembers > 0 then
-					local channelData = channels:add(unpack(rawChannel, 1, channelFields))
-
 					if parentType == 0 then parent:attachChild(channelData, tonumber(channelData.position)) end
 					if companion and parent.companionLog then
 						Overseer.resume(companion)
 					end
+					loadChannels(channelData, 3)	-- password checkers
 				else
-					if parentType == 0 then
+					if parentType == 0 or parentType == 3 then
 						channel:delete()
 					end
 
 					if companion then companion:delete() end
-					emitter:emit("removeChannel", rawChannel[1])
+					emitter:emit("removeChannel", id)
 				end
 			else
 				if companion then companion:delete() end
-				emitter:emit("removeChannel", rawChannel[1])
+				emitter:emit("removeChannel", id)
 			end
-			rawChannel = getChannels:step()
-		until not rawChannel
+		end
 	end
 end
 
 -- main loader method that's used on bot startup
 local loadGuild = function (guild)
-	local rawGuild, guildData = getGuild:reset():bind(guild.id):step()
-
-	if rawGuild then
-		guildData = guilds:add(unpack(rawGuild, 1, guildFields))
-	else
-		guildData = guilds:store(guild.id)
-	end
+	local guildData = guilds[guild.id] or guilds:store(guild.id)
+	data.guilds[guild.id] = nil
 
 	loadChannels(guildData, 1)
 
-	local rawLobby = getLobbies:reset():bind(guild.id):step()
+	local lobbiesByGuild = data.lobbies[guild.id]
 
-	if rawLobby then
-		repeat
-			if client:getChannel(rawLobby[1]) then
-				local lobbyData = lobbies:add(unpack(rawLobby, 1, lobbyFields))
+	if lobbiesByGuild then
+		for id, lobbyData in pairs(lobbiesByGuild) do
+			lobbiesByGuild[id] = nil
+			if client:getChannel(id) then
 				guildData.lobbies:add(lobbyData)
 
 				loadChannels(lobbyData, 0)
 			else
-				emitter:emit("removeLobby", rawLobby[1])
+				emitter:emit("removeLobby", id)
 			end
-			rawLobby = getLobbies:step()
-		until not rawLobby
+		end
 	end
 end
 
+local load = function ()
+	local statement = guildDB:prepare("SELECT * FROM guilds")
+	local rawData = statement:step()
+	while rawData do
+		data.guilds[rawData[1]] = guilds:add(unpack(rawData, 1, GUILD_FIELDS))
+		rawData = statement:step()
+	end
+
+	statement = lobbyDB:prepare("SELECT * FROM lobbies")
+	rawData = statement:step()
+	while rawData do
+		local lobby = lobbies:add(unpack(rawData, 1, LOBBY_FIELDS))
+		if not data.lobbies[lobby.guild.id] then data.lobbies[lobby.guild.id] = {} end
+		data.lobbies[lobby.guild.id][lobby.id] = lobby
+		rawData = statement:step()
+	end
+
+	statement = channelDB:prepare("SELECT * FROM channels")
+	rawData = statement:step()
+	while rawData do
+		local channel = channels:add(unpack(rawData, 1, CHANNEL_FIELDS))
+		if not data.channels[channel.parentType][channel.parentID or channel.parent.id] then data.channels[channel.parentType][channel.parentID or channel.parent.id] = {} end
+		data.channels[channel.parentType][channel.parentID or channel.parent.id][channel.id] = channel
+		rawData = statement:step()
+	end
+end
+
+local cleanup = function ()
+	for id, guildData in pairs(data.guilds) do
+		if not client:getGuild(id) then
+			guildData:delete()
+		end
+	end
+
+	for guildID, lobbies in pairs(data.lobbies) do
+		for lobbyID, lobbyData in pairs(lobbies) do
+			if not (client:getChannel(lobbyID) or (client:getGuild(guildID) and client:getGuild(guildID).unavailable)) then
+				lobbyData:delete()
+			end
+		end
+	end
+
+	-- no parent or guild unavailable
+	for parentType, parents in pairs(data.channels) do
+		for parentID, channels in pairs(parents) do
+			for channelID, channelData in pairs(channels) do
+				local channel = client:getChannel(channelID)
+				if channel then
+					if #channel.connectedMembers == 0 then
+						if channelData.parentType == 1 or channelData.parentType == 2 then
+							channelData:delete()
+						else
+							channel:delete()
+						end
+					end
+				elseif parentType == 1 then
+					local guild = client:getGuild(parentID)
+					if not (guild and guild.unavailable) then
+						channelData:delete()
+					end
+				else
+					local parent = client:getChannel(parentID)
+					if not (parent and parent.guild and parent.guild.unavailable) then
+						channelData:delete()
+					end
+				end
+			end
+		end
+	end
+end
 
 return {
 	guilds = guilds,
 	lobbies = lobbies,
 	channels = channels,
 	loadGuild = loadGuild,
+	load = load,
+	cleanup = cleanup,
 	stats = {
 		lobbies = 0,
 		channels = 0,

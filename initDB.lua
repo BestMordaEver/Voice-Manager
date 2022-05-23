@@ -34,5 +34,6 @@ CREATE TABLE channels(
 	host VARCHAR NOT NULL,		/* mutable */
 	parent VARCHAR NOT NULL,	/* immutable */
 	position INTEGER NOT NULL,	/* immutable */
-	companion VARCHAR			/* immutable */
+	companion VARCHAR,			/* immutable */
+	password VARCHAR			/* mutable, default NULL */
 )]])

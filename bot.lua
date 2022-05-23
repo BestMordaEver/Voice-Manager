@@ -51,15 +51,16 @@ client:on(safeEvent("guildAvailable", function (guild)
 end))
 
 client:once(safeEvent("ready", function ()
+	storage:cleanup()
 	clock:start()
 
-	client:setGame(status())
 	if config.wakeUpFeed then
 		client:getChannel(config.wakeUpFeed):send("I'm listening")
 	end
 
 	client:on(safeEvent("commandInteraction", require "events/commandInteraction"))
 	client:on(safeEvent("componentInteraction", require "events/componentInteraction"))
+	client:on(safeEvent("modalInteraction", require "events/modalInteraction"))
 	client:on(safeEvent("messageUpdate", require "events/messageUpdate"))
 	client:on(safeEvent("guildCreate", require "events/guildCreate"))
 	client:on(safeEvent("guildDelete", require "events/guildDelete"))
@@ -73,14 +74,19 @@ client:once(safeEvent("ready", function ()
 	clock:on(safeEvent("day", require "events/day"))
 
 	if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
-	storage.guilds:cleanup()
-	storage.lobbies:cleanup()
-	storage.channels:cleanup()
 
 	storage.stats.lobbies = #storage.lobbies
 	storage.stats.channels = #storage.channels
 	storage.stats.users = storage.channels:users()
+	client:setGame(status())
+
+	storage.guilds:cleanup()
+	storage.lobbies:cleanup()
+	storage.channels:cleanup()
 end))
+
+-- pre-load db
+storage:load()
 
 -- bot starts working here
 client:run('Bot '..require "token".token)
