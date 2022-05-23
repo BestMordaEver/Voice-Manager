@@ -10,7 +10,7 @@ local enforceReservations = require "funcs/enforceReservations"
 local permission = require "discordia".enums.permission
 
 return function (member, channel) -- now remove the unwanted corpses!
-	local channelData = channels[channel.id]
+	local channelData = channel and channels[channel.id]
 	if channelData then
 		if #channel.connectedMembers == 0 then
 			if channelData.parentType == 0 then
