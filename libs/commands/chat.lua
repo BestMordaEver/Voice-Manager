@@ -68,30 +68,31 @@ local subcommands = {
 
 	clear = function (interaction, chat, amount)
 		local trueAmount, first = 0, chat:getFirstMessage()
-
-		if amount and amount > 0 then
-			repeat
-				local bulk = chat:getMessages(amount > 100 and 100 or amount)
-				if bulk:get(first.id) then bulk = chat:getMessagesAfter(first, 100) end
-				if #bulk == 0 then break end
-				trueAmount = trueAmount + #bulk
-				chat:bulkDelete(bulk)
-				amount = amount - 100
-			until amount <= 0
-		else
-			repeat
-				local bulk = chat:getMessagesAfter(first, 100)
-				if #bulk == 0 then
-					if first.author ~= client.user then
-						chat:bulkDelete({first})
-						trueAmount = trueAmount + 1
-					end
-					break
-				else
-					chat:bulkDelete(bulk)
+		if first then
+			if amount and amount > 0 then
+				repeat
+					local bulk = chat:getMessages(amount > 100 and 100 or amount)
+					if bulk:get(first.id) then bulk = chat:getMessagesAfter(first, 100) end
+					if #bulk == 0 then break end
 					trueAmount = trueAmount + #bulk
-				end
-			until false
+					chat:bulkDelete(bulk)
+					amount = amount - 100
+				until amount <= 0
+			else
+				repeat
+					local bulk = chat:getMessagesAfter(first, 100)
+					if #bulk == 0 then
+						if first.author ~= client.user then
+							chat:bulkDelete({first})
+							trueAmount = trueAmount + 1
+						end
+						break
+					else
+						chat:bulkDelete(bulk)
+						trueAmount = trueAmount + #bulk
+					end
+				until false
+			end
 		end
 
 		return "Successfully cleared "..trueAmount.." messages", okEmbed(locale.clearConfirm:format(trueAmount))
