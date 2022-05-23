@@ -8,6 +8,7 @@ local channels = require "storage".channels
 local enforceReservations = require "funcs/enforceReservations"
 
 local permission = require "discordia".enums.permission
+local overwriteType = require "discordia".enums.overwriteType
 
 return function (member, channel) -- now remove the unwanted corpses!
 	local channelData = channel and channels[channel.id]
@@ -41,7 +42,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 				local perms = guilds[channel.guild.id].permissions:toDiscordia()
 				if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
 					for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
-						if permissionOverwrite.type == "member" then permissionOverwrite:delete() end
+						if permissionOverwrite.type == overwriteType.member then permissionOverwrite:delete() end
 					end
 				end
 				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)

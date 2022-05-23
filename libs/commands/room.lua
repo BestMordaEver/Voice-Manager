@@ -14,6 +14,7 @@ local enforceReservations = require "funcs/enforceReservations"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
+local overwriteType = require "discordia".enums.overwriteType
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
@@ -91,7 +92,7 @@ local subcommands = {
 			return "Unblocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
-			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite) return permissionOverwrite.type == "member" end)) do
+			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite) return permissionOverwrite.type == overwriteType.member end)) do
 				permissionOverwrite:clearPermissions(permission.connect, permission.sendMessages)
 			end
 			return "Cleared blocklist", okEmbed(locale.blocklistClear:format())
@@ -115,7 +116,7 @@ local subcommands = {
 
 		elseif subcommand == "clear" then
 			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite)
-				return permissionOverwrite.type == "member" and permissionOverwrite:getObject() ~= permissionOverwrite.guild.me
+				return permissionOverwrite.type == overwriteType.member and permissionOverwrite:getObject() ~= permissionOverwrite.guild.me
 			end)) do
 				permissionOverwrite:clearPermissions(permission.connect, permission.readMessages)
 			end

@@ -3,13 +3,14 @@ local logger = require "logger"
 local channels = require "storage".channels
 
 local permission = require "discordia".enums.permission
+local overwriteType = require "discordia".enums.overwriteType
 
 return function (channel)
 	if channel.userLimit == 0 then return end
 
 	local reservations = #channel.permissionOverwrites:toArray(function (permissionOverwrite)
 		return permissionOverwrite:getObject() ~= channel.guild.me and
-			permissionOverwrite.type == "member" and
+			permissionOverwrite.type == overwriteType.member and
 			permissionOverwrite:getObject().voiceChannel ~= channel and
 			permissionOverwrite:getAllowedPermissions():has(permission.connect)
 	end)

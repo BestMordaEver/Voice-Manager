@@ -7,6 +7,8 @@ local channels = require "storage".channels
 local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
+local overwriteType = require "discordia".enums.overwriteType
+
 local blurple = embeds.colors.blurple
 
 return embeds("chatInfo", function (room, ephemeral)
@@ -14,7 +16,7 @@ return embeds("chatInfo", function (room, ephemeral)
 
 	local companion = client:getChannel(channels[room.id].companion)
 
-	for _,overwrite in pairs(companion.permissionOverwrites:toArray(function(overwrite) return overwrite.type == "member" end)) do
+	for _,overwrite in pairs(companion.permissionOverwrites:toArray(function(overwrite) return overwrite.type == overwriteType.member end)) do
 		if overwrite:getObject().user ~= client.user and overwrite:getAllowedPermissions():has(permission.readMessages) then
 			hidden = hidden..overwrite:getObject().user.mentionString.." "
 		end
