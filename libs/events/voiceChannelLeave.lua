@@ -39,10 +39,12 @@ return function (member, channel) -- now remove the unwanted corpses!
 				end
 			else
 				channelData:delete()
-				local perms = guilds[channel.guild.id].permissions:toDiscordia()
-				if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
-					for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
-						if permissionOverwrite.type == overwriteType.member then permissionOverwrite:delete() end
+				if channelData.parent then
+					local perms = channelData.parent.permissions:toDiscordia()
+					if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+						for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
+							if permissionOverwrite.type == overwriteType.member then permissionOverwrite:delete() end
+						end
 					end
 				end
 				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)
@@ -63,9 +65,9 @@ return function (member, channel) -- now remove the unwanted corpses!
 					logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
 					channelData:setHost(newHost.user.id)
 
-					if channelData.parent and client:getChannel(channelData.parent.id) then
-						local perms = lobbies[channelData.parent.id].permissions:toDiscordia()
-						if #perms ~= 0 and client:getChannel(channelData.parent.id).guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+					if channelData.parent then
+						local perms = channelData.parent.permissions:toDiscordia()
+						if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
 							channel:getPermissionOverwriteFor(member):delete()
 							channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
 						end
