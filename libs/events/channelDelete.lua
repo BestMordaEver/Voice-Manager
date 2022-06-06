@@ -22,7 +22,7 @@ return function (channel) -- and make sure there are no traces!
 			if channelData.parent and channelData.parent.companionLog then
 				local logChannel = client:getChannel(channelData.parent.companionLog)
 				if logChannel then
-					local log = Overseer.stop(companionID)
+					local log = Overseer.finalize(companionID)
 					logChannel:send{
 						content = locale.logName:format(channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent),
 						file = {string.format("%s.txt", companionID), log}

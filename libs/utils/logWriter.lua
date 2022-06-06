@@ -138,7 +138,7 @@ Overseer.resume = function (channel)
 	end
 end
 
-Overseer.stop = function (channelID)
+Overseer.finalize = function (channelID)
 	local writer = writers[channelID]
 	writers[channelID] = nil
 	return concat(writer, "\n")
