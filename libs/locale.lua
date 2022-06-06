@@ -229,7 +229,7 @@ If category is selected, all it's channels are used]],
 **Room limit:** %d]],
 
 	limitConfirm = "Limit is set to %d",
-	roleConfirm = "New managed role set to %s",
+	roleConfirm = "New managed role set",
 
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
