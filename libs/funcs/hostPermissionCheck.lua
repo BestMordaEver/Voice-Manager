@@ -12,6 +12,7 @@ local requiredPerms = {
 	clear = "manage",
 	lock = "moderate",
 	password = "moderate",
+	widget = "moderate",
 }
 
 return function (member, channel, permissionName)

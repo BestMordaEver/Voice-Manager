@@ -2,22 +2,40 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
-local guilds = require "storage".guilds
 local channels = require "storage".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local chatInfoEmbed = require "embeds/chatInfo"
+local greetingEmbed = require "embeds/greeting"
 
 local hostPermissionCheck = require "funcs/hostPermissionCheck"
 local templateInterpreter = require "funcs/templateInterpreter"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
+local overwriteType = require "discordia".enums.overwriteType
 
 ratelimiter("companionName", 2, 600)
 
-local subcommands = {
+local function reprivilegify (voiceChannel, chat)
+	for _, permissionOverwrite in pairs(chat.permissionOverwrites) do
+		if permissionOverwrite.type == overwriteType.member and
+			permissionOverwrite:getObject().voiceChannel ~= voiceChannel and
+			permissionOverwrite:getObject() ~= voiceChannel.guild.me then
+
+			permissionOverwrite:delete()
+		end
+	end
+
+	for _, member in pairs(voiceChannel.connectedMembers) do
+		chat:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
+	end
+end
+
+local transference = {open = "hide", lock = "open", hide = "lock"}
+local subcommands
+subcommands = {
 	rename = function (interaction, chat, name)
 		local limit, retryIn = ratelimiter:limit("companionName", chat.id)
 		local success, err
@@ -100,6 +118,28 @@ local subcommands = {
 
 	save = function (interaction, chat, amount)
 		return "unfinished", warningEmbed(locale.unfinishedCommand)
+	end,
+
+	widget = function (interaction, chat, argument)	-- not exposed, access via componentInteraction
+		local channel, log = interaction.member.voiceChannel
+		local guild, parent = chat.guild, channels[channel.id].parent
+		if argument == "lock" then
+			reprivilegify(channel, chat)
+
+			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.sendMessages)
+			log = "Chat is locked"
+		elseif argument == "hide" then
+			reprivilegify(channel, chat)
+
+			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
+			log = "Chat is hidden"
+		elseif argument == "open" then
+			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.sendMessages, permission.readMessages)
+			log = "Opened the chat"
+		end
+
+		interaction:update(greetingEmbed(channel, transference[interaction.message.components[1].components[2].custom_id:match("^room_widget_(.-)$")], argument))
+		return log
 	end
 }
 

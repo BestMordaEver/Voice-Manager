@@ -14,7 +14,7 @@ return function (interaction)
 
 	local command, primary, secondary = interaction.customId:match("^(.-)_(.-)_(.-)$")
 	if secondary then
-		secondary = tonumber(secondary) -- delete_row_1
+		secondary = tonumber(secondary) or secondary -- delete_row_1 or room_widget_lock
 	else
 		command, primary = interaction.customId:match("^(.-)_(.-)$")
 		primary = tonumber(primary) or primary -- help_1 or delete_nuke

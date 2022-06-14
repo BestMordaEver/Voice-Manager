@@ -7,6 +7,7 @@ local channels = require "storage".channels
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
+local greetingEmbed = require "embeds/greeting"
 
 local hostPermissionCheck = require "funcs/hostPermissionCheck"
 local templateInterpreter = require "funcs/templateInterpreter"
@@ -23,7 +24,24 @@ ratelimiter("channelName", 2, 600)
 local inviteText = [[%s invited you to join %s!
 https://discord.gg/%s]]
 
-local subcommands = {
+local function reprivilegify (voiceChannel)
+	for _, permissionOverwrite in pairs(voiceChannel.permissionOverwrites) do
+		if permissionOverwrite.type == overwriteType.member and
+			permissionOverwrite:getObject().voiceChannel ~= voiceChannel and
+			permissionOverwrite:getObject() ~= voiceChannel.guild.me then
+
+			permissionOverwrite:delete()
+		end
+	end
+
+	for _, member in pairs(voiceChannel.connectedMembers) do
+		voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
+	end
+end
+
+local transference = {open = "hide", lock = "open", hide = "lock"}
+local subcommands
+subcommands = {
 	rename = function (interaction, voiceChannel, name)
 		local limit, retryIn = ratelimiter:limit("channelName", voiceChannel.id)
 		if limit == -1 then
@@ -126,14 +144,11 @@ local subcommands = {
 	end,
 
 	lock = function (interaction, voiceChannel)
-		local mentionString = ""
-		for _, member in pairs(voiceChannel.connectedMembers) do
-			voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
-		end
+		reprivilegify(voiceChannel)
 
 		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
 		voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.connect)
-		return "Locked the room", okEmbed(locale.lockConfirm:format(mentionString))
+		return "Locked the room", okEmbed(locale.lockConfirm)
 	end,
 
 	kick = function (interaction, voiceChannel, user)
@@ -283,6 +298,26 @@ local subcommands = {
 			return "Failed password check", warningEmbed(locale.passwordFailure)
 		end
 	end,
+
+	widget = function (interaction, voiceChannel, argument)	-- not exposed, access via componentInteraction
+		local log, msg
+		if argument == "lock" then
+			log = subcommands.lock(interaction, voiceChannel)
+		elseif argument == "hide" then
+			reprivilegify(voiceChannel)
+
+			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
+			log = "Room is hidden"
+		elseif argument == "open" then
+			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.readMessages)
+			log = "Opened the room"
+		end
+
+		interaction:update(greetingEmbed(voiceChannel, argument, transference[interaction.message.components[1].components[2].custom_id:match("^chat_widget_(.-)$")]))
+		return log
+	end
 }
 
 local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}

@@ -108,7 +108,7 @@ local function lobbyJoin (member, lobby)
 		lobbyData:attachChild(channels[newChannel.id], position)
 
 		-- yes, sometimes required
-		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect)
+		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect, permission.readMessages)
 
 		-- provide host permissions if any
 		local perms = lobbyData.permissions:toDiscordia()
@@ -118,7 +118,7 @@ local function lobbyJoin (member, lobby)
 
 		if companion then
 			-- companions are private by default
-			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages)
+			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 
