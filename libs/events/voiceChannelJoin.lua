@@ -111,9 +111,16 @@ local function lobbyJoin (member, lobby)
 		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect, permission.readMessages)
 
 		-- provide host permissions if any
-		local perms = lobbyData.permissions:toDiscordia()
-		if #perms ~= 0 and lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms)) then
+		local perms, isAdmin, needsManage =
+			lobbyData.permissions:toDiscordia(),
+			lobby.guild.me:getPermissions():has(permission.administrator),
+			lobbyData.permissions.bitfield:has(lobbyData.permissions.bits.moderate)
+
+		if #perms ~= 0 and (isAdmin or lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms))) then
 			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+			if isAdmin and needsManage then
+				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageRoles)
+			end
 		end
 
 		if companion then
@@ -122,12 +129,15 @@ local function lobbyJoin (member, lobby)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 
-			if #perms ~= 0 and lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+			if #perms ~= 0 and (isAdmin or lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms))) then
 				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
+				if isAdmin and needsManage then
+					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageRoles)
+				end
 			end
 
 			if lobbyData.companionLog then Overseer.track(companion) end
-			if lobbyData.greeting or lobbyData.companionLog then print(companion:send(greetingEmbed(newChannel))) end
+			if lobbyData.greeting or lobbyData.companionLog then companion:send(greetingEmbed(newChannel)) end
 		end
 
 		processing[newChannel.id]:unlock()
