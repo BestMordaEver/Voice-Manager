@@ -10,62 +10,68 @@ local enums = require "discordia".enums
 local componentType, buttonStyle = enums.componentType, enums.buttonStyle
 local fuchsia = embeds.colors.fuchsia
 
-local roombuttons = {
-	open = {
-		type = componentType.button,
-		label = "Public",
-		emoji = {name = "🔊"},
-		custom_id = "room_widget_lock",
-		style = buttonStyle.primary
-	},
-	lock = {
-		type = componentType.button,
-		label = "Locked",
-		emoji = {name = "🔒"},
-		custom_id = "room_widget_hide",
-		style = buttonStyle.primary
-	},
-	hide = {
-		type = componentType.button,
-		label = "Invisible",
-		emoji = {name = "⛔"},
-		custom_id = "room_widget_open",
-		style = buttonStyle.primary
+local selects = {
+	{
+		type = componentType.row,
+		components = {{
+			type = componentType.select,
+			custom_id = "room_widget",
+			options = {
+				{
+					label = "Public",
+					value = "open",
+					description = "Anybody can enter the room",
+					emoji = {name = "🔊"},
+					default = true
+				},{
+					label = "Locked",
+					value = "lock",
+					description = "Only people you invite can enter the room",
+					emoji = {name = "🔒"}
+				},{
+					label = "Invisible",
+					value = "hide",
+					description = "Only people you invite can see the room",
+					emoji = {name = "⛔"}
+				}
+			}
+		}}
+	},{
+		type = componentType.row,
+		components = {{
+			type = componentType.select,
+			custom_id = "chat_widget",
+			options = {
+				{
+					label = "Public",
+					value = "open",
+					description = "Anybody can write in your chat",
+					emoji = {name = "✒"}
+				},{
+					label = "Visible",
+					value = "lock",
+					description = "Everybody can see the chat, but only room members can write",
+					emoji = {name = "📄"}
+				},{
+					label = "Invisible",
+					value = "hide",
+					description = "Only room members can see the chat",
+					emoji = {name = "🥷"},
+					default = true
+				}
+			}
+		}}
 	}
 }
 
-local chatbuttons = {
-	open = {
-		type = componentType.button,
-		label = "Public",
-		emoji = {name = "✒"},
-		custom_id = "chat_widget_lock",
-		style = buttonStyle.primary
-	},
-	lock = {
-		type = componentType.button,
-		label = "Visible",
-		emoji = {name = "📄"},
-		custom_id = "chat_widget_hide",
-		style = buttonStyle.primary
-	},
-	hide = {
-		type = componentType.button,
-		label = "Invisible",
-		emoji = {name = "🥷"},
-		custom_id = "chat_widget_open",
-		style = buttonStyle.primary
-	}
-}
-
-return embeds("greeting", function (room, roombutton, chatbutton, ephemeral)
+return embeds("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
 	if not channelData then return end
 
+	if not channelData.parent.greeting then return end
+
 	local companion = client:getChannel(channelData.companion)
 	if not companion then return end
-
-	if not channelData.parent.greeting then return end
 
 	local roomC, chatC = availableCommands(room)
 
@@ -87,13 +93,12 @@ return embeds("greeting", function (room, roombutton, chatbutton, ephemeral)
 		buttons = ""
 	}
 
-	return {embeds = {{
+	return {
+	embeds = {{
 		title = companion.name,
 		color = fuchsia,
 		description = channelData.parent.greeting:gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
 	}},
-	components = channelData.parent.greeting:match("%%buttons%%") and {{
-		type = componentType.row,
-		components = {roombuttons[roombutton or "open"], chatbuttons[chatbutton or "hide"]}
-	}} or nil, ephemeral = ephemeral}
+	components = channelData.parent.greeting:match("%%buttons%%") and selects or nil,
+	ephemeral = ephemeral}
 end)

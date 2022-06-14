@@ -39,7 +39,6 @@ local function reprivilegify (voiceChannel)
 	end
 end
 
-local transference = {open = "hide", lock = "open", hide = "lock"}
 local subcommands
 subcommands = {
 	rename = function (interaction, voiceChannel, name)
@@ -299,23 +298,23 @@ subcommands = {
 		end
 	end,
 
-	widget = function (interaction, voiceChannel, argument)	-- not exposed, access via componentInteraction
+	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
 		local log, msg
-		if argument == "lock" then
+		if interaction.values[1] == "lock" then
 			log = subcommands.lock(interaction, voiceChannel)
-		elseif argument == "hide" then
+		elseif interaction.values[1] == "hide" then
 			reprivilegify(voiceChannel)
 
 			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
 			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
 			log = "Room is hidden"
-		elseif argument == "open" then
+		elseif interaction.values[1] == "open" then
 			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
 			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.readMessages)
 			log = "Opened the room"
 		end
 
-		interaction:update(greetingEmbed(voiceChannel, argument, transference[interaction.message.components[1].components[2].custom_id:match("^chat_widget_(.-)$")]))
+		interaction:deferUpdate()
 		return log
 	end
 }
