@@ -299,17 +299,16 @@ subcommands = {
 	end,
 
 	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
-		local log, msg
-		if interaction.values[1] == "lock" then
-			log = subcommands.lock(interaction, voiceChannel)
-		elseif interaction.values[1] == "hide" then
-			reprivilegify(voiceChannel)
+		local guild, channel, argument, log = voiceChannel.guild, interaction.member.voiceChannel, interaction.values[1]
+		local parent = channels[channel.id].parent
 
-			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+		if argument == "lock" then
+			log = subcommands.lock(interaction, voiceChannel)
+		elseif argument == "hide" then
+			reprivilegify(voiceChannel)
 			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
 			log = "Room is hidden"
-		elseif interaction.values[1] == "open" then
-			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+		elseif argument == "open" then
 			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.readMessages)
 			log = "Opened the room"
 		end

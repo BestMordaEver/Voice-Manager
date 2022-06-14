@@ -120,18 +120,18 @@ subcommands = {
 	end,
 
 	widget = function (interaction, chat)	-- not exposed, access via componentInteraction
-		local channel, log = interaction.member.voiceChannel
-		local guild, parent = chat.guild, channels[channel.id].parent
+		local guild, channel, argument, log = chat.guild, interaction.member.voiceChannel, interaction.values[1]
+		local parent = channels[channel.id].parent
 
-		if interaction.values[1] == "lock" then
+		if argument == "lock" then
 			reprivilegify(channel, chat)
 			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.sendMessages)
 			log = "Chat is locked"
-		elseif interaction.values[1] == "hide" then
+		elseif argument == "hide" then
 			reprivilegify(channel, chat)
 			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
 			log = "Chat is hidden"
-		elseif interaction.values[1] == "open" then
+		elseif argument == "open" then
 			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.sendMessages, permission.readMessages)
 			log = "Opened the chat"
 		end
