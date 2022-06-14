@@ -229,15 +229,19 @@ setmetatable(guilds, {
 setmetatable(lobbies, {
 	__index = {
 		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity, bitrate, greeting, companionLog)
-			self[lobbyID] = setmetatable({id = lobbyID, guild = guilds[guildID],
+			local lobby = setmetatable({id = lobbyID, guild = guilds[guildID],
 				isMatchmaking = tonumber(isMatchmaking) == 1, role = role, permissions = botPermissions(tonumber(permissions) or 0),
 				template = template, target = target, capacity = tonumber(capacity), bitrate = tonumber(bitrate),
 				companionTemplate = companionTemplate, companionTarget = companionTarget == "true" or companionTarget,
 				greeting = greeting, companionLog = companionLog,
 				children = hollowArray(), mutex = discordia.Mutex()
 			}, lobbyMeta)
+
+			if lobby.guild then lobby.guild.lobbies:add(lobby) end
+			self[lobbyID] = lobby
+
 			logger:log(6, "GUILD %s LOBBY %s: added", guildID, lobbyID)
-			return self[lobbyID]
+			return lobby
 		end,
 
 		store = function (self, lobby)
@@ -272,6 +276,8 @@ setmetatable(channels, {
 					id = channelID, guildID = parent.guild and parent.guild.id or parent.id, parentType = tonumber(parentType),
 					host = host, parent = parent, position = tonumber(position), companion = companion, password = password
 				}, channelMeta)
+				if parent.attachChild then parent:attachChild(self[channelID], tonumber(position)) end
+
 				logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
 			else
 				self[channelID] = setmetatable({
@@ -438,7 +444,7 @@ local function loadChannels (parent, parentType)
 			local channel, companion = client:getChannel(id), client:getChannel(channelData.companion)
 			if channel then
 				if #channel.connectedMembers > 0 then
-					if parentType == 0 then parent:attachChild(channelData, tonumber(channelData.position)) end
+					if parentType == 0 then parent:attachChild(channelData, channelData.position) end
 					if companion and parent.companionLog then
 						Overseer.resume(companion)
 					end
@@ -482,6 +488,7 @@ local loadGuild = function (guild)
 	end
 end
 
+-- preloader, the one that has a special place in hell reserved for me
 local load = function ()
 	local statement = guildDB:prepare("SELECT * FROM guilds")
 	local rawData = statement:step()

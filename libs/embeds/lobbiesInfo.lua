@@ -2,7 +2,6 @@ local locale = require "locale"
 local client = require "client"
 local embeds = require "embeds"
 
-local guilds = require "storage".guilds
 local lobbies = require "storage".lobbies
 
 local tps = require "funcs/truePositionSorting"
@@ -11,15 +10,6 @@ local blurple = embeds.colors.blurple
 local insert = table.insert
 
 return embeds("lobbiesInfo", function (guild, channel, ephemeral)
-	local guildData = guilds[guild.id]
-
-	local embed = {
-		title = locale.lobbiesInfoTitle:format(guild.name),
-		color = blurple,
-		description = #guildData.lobbies == 0 and locale.lobbiesNoInfo or nil,
-		fields = {}
-	}
-
 	local sortedLobbies
 	if channel then
 		sortedLobbies = {lobbies[channel.id]}
@@ -32,6 +22,13 @@ return embeds("lobbiesInfo", function (guild, channel, ephemeral)
 			sortedLobbies[i] = lobbies[lobby.id]
 		end
 	end
+
+	local embed = {
+		title = locale.lobbiesInfoTitle:format(guild.name),
+		color = blurple,
+		description = #sortedLobbies == 0 and locale.lobbiesNoInfo or nil,
+		fields = {}
+	}
 
 	for _, lobbyData in pairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.target)
