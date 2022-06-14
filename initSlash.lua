@@ -1527,9 +1527,9 @@ local debugCommands = {
 }
 
 coroutine.wrap(function ()
-	--print(CommandManager.overwriteGlobalCommands(commandsStructure))
+	print(CommandManager.overwriteGlobalCommands(commandsStructure))
 	--print(CommandManager.overwriteGuildCommands(guild, commandsStructure))
-	for _,command in ipairs(debugCommands) do print(CommandManager.createGuildCommand(guild, command)) end
+	--for _,command in ipairs(debugCommands) do print(CommandManager.createGuildCommand(guild, command)) end
 	--print(CommandManager.getGlobalCommands()[1].version)
 end)()
 
