@@ -159,7 +159,8 @@ You can put different `%combos%` in the greeting to customize it
 `%commands%` - formatted list of `/room` and `/chat` commands
 `%roomcommands%` - raw list of `/room` commands
 `%chatcommands%` - raw list of `/chat` commands
-`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobby name`]],
+`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobby name`
+`%buttons%` - blank, attaches privacy control buttons to the greeting message]],
 			"Enable chat logging. Logs will be sent as files to a channel of your choosing"
 		},
 		{
