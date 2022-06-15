@@ -39,8 +39,7 @@ local function reprivilegify (voiceChannel)
 	end
 end
 
-local subcommands
-subcommands = {
+local subcommands = {
 	rename = function (interaction, voiceChannel, name)
 		local limit, retryIn = ratelimiter:limit("channelName", voiceChannel.id)
 		if limit == -1 then
@@ -299,17 +298,20 @@ subcommands = {
 	end,
 
 	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
-		local guild, channel, argument, log = voiceChannel.guild, interaction.member.voiceChannel, interaction.values[1]
-		local parent = channels[channel.id].parent
+		local guild, argument, parent, log = voiceChannel.guild, interaction.values[1], channels[voiceChannel.id].parent
 
 		if argument == "lock" then
-			log = subcommands.lock(interaction, voiceChannel)
+			reprivilegify(voiceChannel)
+			local ov = voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
+			ov:denyPermissions(permission.connect, permission.sendMessages)
+			ov:clearPermissions(permission.readMessages)
+			log = "Locked the room"
 		elseif argument == "hide" then
 			reprivilegify(voiceChannel)
 			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
 			log = "Room is hidden"
 		elseif argument == "open" then
-			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.readMessages)
+			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.sendMessages, permission.readMessages)
 			log = "Opened the room"
 		end
 

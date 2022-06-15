@@ -125,7 +125,9 @@ subcommands = {
 
 		if argument == "lock" then
 			reprivilegify(channel, chat)
-			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.sendMessages)
+			local ov = chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
+			ov:denyPermissions(permission.sendMessages)
+			ov:clearPermissions(permission.readMessages)
 			log = "Chat is locked"
 		elseif argument == "hide" then
 			reprivilegify(channel, chat)
