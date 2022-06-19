@@ -155,7 +155,7 @@ return function (interaction, subcommand, argument)
 	end
 
 	local voiceChannel = member.voiceChannel
-	local chat = client:getChannel(channels[voiceChannel.id].companion)
+	local chat = client:getChannel(channels[voiceChannel.id].companion) or (voiceChannel.textEnabled and voiceChannel)
 	if not chat then
 		return "Room doesn't have a chat", warningEmbed(locale.noCompanion)
 	end
