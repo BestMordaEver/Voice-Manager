@@ -79,7 +79,12 @@ subcommands = {
 	end,
 
 	unmute = function (interaction, chat, user)
-		chat:getPermissionOverwriteFor(chat.guild:getMember(user)):clearPermissions(permission.sendMessages)
+		local ov = chat:getPermissionOverwriteFor(chat.guild:getMember(user))
+		if chat.parent ~= chat.guild and ov:getAllowedPermissions():has(permission.sendMessages) then
+			ov:allowPermissions(permission.sendMessages)
+		else
+			ov:clearPermissions(permission.sendMessages)
+		end
 		return "Unmuted mentioned members", okEmbed(locale.unmuteConfirm:format(user.mentionString))
 	end,
 
@@ -120,21 +125,34 @@ subcommands = {
 	end,
 
 	widget = function (interaction, chat)	-- not exposed, access via componentInteraction
-		local guild, channel, argument, log = chat.guild, interaction.member.voiceChannel, interaction.values[1]
-		local parent = channels[channel.id].parent
+		local argument, channel,  log, ov = interaction.values[1], interaction.member.voiceChannel
+		do
+			local guild, parent = channel.guild, channels[channel.id].parent
+			ov = chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
+		end
 
 		if argument == "lock" then
 			reprivilegify(channel, chat)
-			local ov = chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
 			ov:denyPermissions(permission.sendMessages)
-			ov:clearPermissions(permission.readMessages)
+			if chat.parent ~= chat.guild and ov:getAllowedPermissions():has(permission.readMessages) then
+				ov:allowPermissions(permission.readMessages)
+			else
+				ov:clearPermissions(permission.readMessages)
+			end
+
 			log = "Chat is locked"
 		elseif argument == "hide" then
 			reprivilegify(channel, chat)
-			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
+			ov:denyPermissions(permission.readMessages)
+
 			log = "Chat is hidden"
 		elseif argument == "open" then
-			chat:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.sendMessages, permission.readMessages)
+			if chat.parent ~= chat.guild and ov:getAllowedPermissions():has(permission.sendMessages, permission.readMessages) then
+				ov:allowPermissions(permission.sendMessages, permission.readMessages)
+			else
+				ov:clearPermissions(permission.sendMessages, permission.readMessages)
+			end
+
 			log = "Opened the chat"
 		end
 

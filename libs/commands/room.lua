@@ -153,7 +153,13 @@ local subcommands = {
 		reprivilegify(voiceChannel)
 
 		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
-		voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect)
+		local role = parent and guild:getRole(parent.role) or guild.defaultRole
+		if voiceChannel.parent ~= voiceChannel.guild and voiceChannel.parent:getPermissionOverwriteFor(role):getAllowedPermissions():has(permission.connect) then
+			voiceChannel:getPermissionOverwriteFor(role):allowPermissions(permission.connect)
+		else
+			voiceChannel:getPermissionOverwriteFor(role):clearPermissions(permission.connect)
+		end
+
 		return "Unlocked the room", okEmbed(locale.unlockConfirm)
 	end,
 
@@ -306,20 +312,35 @@ local subcommands = {
 	end,
 
 	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
-		local guild, argument, parent, log = voiceChannel.guild, interaction.values[1], channels[voiceChannel.id].parent
+		local argument, log, ov = interaction.values[1]
+
+		do
+			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+			ov = voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
+		end
 
 		if argument == "lock" then
 			reprivilegify(voiceChannel)
-			local ov = voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
 			ov:denyPermissions(permission.connect, permission.sendMessages)
-			ov:clearPermissions(permission.readMessages)
+			if voiceChannel.parent ~= voiceChannel.guild and ov:getAllowedPermissions():has(permission.readMessages) then
+				ov:allowPermissions(permission.readMessages)
+			else
+				ov:clearPermissions(permission.readMessages)
+			end
+
 			log = "Locked the room"
 		elseif argument == "hide" then
 			reprivilegify(voiceChannel)
-			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.readMessages)
+			ov:denyPermissions(permission.readMessages)
+
 			log = "Room is hidden"
 		elseif argument == "open" then
-			voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect, permission.sendMessages, permission.readMessages)
+			if voiceChannel.parent ~= voiceChannel.guild and ov:getAllowedPermissions():has(permission.connect, permission.sendMessages, permission.readMessages) then
+				ov:allowPermissions(permission.connect, permission.sendMessages, permission.readMessages)
+			else
+				ov:clearPermissions(permission.connect, permission.sendMessages, permission.readMessages)
+			end
+
 			log = "Opened the room"
 		end
 

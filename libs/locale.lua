@@ -68,6 +68,7 @@ return {
 			"/room blocklist add|remove|clear",
 			"/room reservations add|remove|clear",
 			"/room lock",
+			"/room unlock",
 			"/room password",
 			"/room host",
 			"/room invite"
@@ -175,6 +176,7 @@ You can put different `%combos%` in the greeting to customize it
 			[[Manage room's reservations
 Room won't let any more people in to ensure reservations]],
 			"Locks entry to the room, no new people will be able to join",
+			"Reverts the lock command",
 			"Users will have to enter the password before connecting to the channel, unless they have a reservation",
 			"Ping current room host or transfer host privileges to the mentioned user",
 			[[Send invite to immediately connect to the room
