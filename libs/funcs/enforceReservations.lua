@@ -6,19 +6,17 @@ local permission = require "discordia".enums.permission
 local overwriteType = require "discordia".enums.overwriteType
 
 return function (channel)
-	if channel.userLimit == 0 then return end
-
-	local reservations = #channel.permissionOverwrites:toArray(function (permissionOverwrite)
+	local reservations = channel.userLimit == 0 and 0 or #channel.permissionOverwrites:toArray(function (permissionOverwrite)
 		return permissionOverwrite:getObject() ~= channel.guild.me and
 			permissionOverwrite.type == overwriteType.member and
 			permissionOverwrite:getObject().voiceChannel ~= channel and
 			permissionOverwrite:getAllowedPermissions():has(permission.connect)
 	end)
-	if reservations == 0 then return end
 
-	local roleOverwrite = channel:getPermissionOverwriteFor(channel.guild:getRole(channels[channel.id].parent.role) or channel.guild.defaultRole)
+	local parent = channels[channel.id].parent
+	local roleOverwrite = channel:getPermissionOverwriteFor(parent and channel.guild:getRole(parent.role) or channel.guild.defaultRole)
 
-	if reservations >= channel.userLimit - #channel.connectedMembers then
+	if reservations ~= 0 and reservations >= channel.userLimit - #channel.connectedMembers then
 		if not roleOverwrite:getDeniedPermissions():has(permission.connect) then
 			logger:log(4, "GUILD %s ROOM %s: locked", channel.guild.id, channel.id)
 			roleOverwrite:denyPermissions(permission.connect)

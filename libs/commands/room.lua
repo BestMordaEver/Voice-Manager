@@ -149,6 +149,14 @@ local subcommands = {
 		return "Locked the room", okEmbed(locale.lockConfirm)
 	end,
 
+	unlock = function (interaction, voiceChannel)
+		reprivilegify(voiceChannel)
+
+		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
+		voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):clearPermissions(permission.connect)
+		return "Unlocked the room", okEmbed(locale.unlockConfirm)
+	end,
+
 	kick = function (interaction, voiceChannel, user)
 		local member = voiceChannel.guild:getMember(user)
 		if member.voiceChannel == voiceChannel then

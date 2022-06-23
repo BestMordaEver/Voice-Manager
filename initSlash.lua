@@ -886,6 +886,11 @@ local commandsStructure = {
 				type = commandOptionType.subcommand
 			},
 			{
+				name = "unlock",
+				description = "Make room public",
+				type = commandOptionType.subcommand
+			},
+			{
 				name = "password",
 				description = "Set up a channel password",
 				type = commandOptionType.subcommand,
