@@ -1,6 +1,8 @@
 local client = require "client"
 local config = require "config"
 
+local mercy = require "utils/mercy"
+
 local storage = require "storage"
 local channels = storage.channels
 local stats = storage.stats
@@ -16,6 +18,6 @@ return function (date)
 	client:setGame(status())
 
 	if config.heartbeat then
-		client:emit("sendHeartbeat")
+		if mercy:tick() or (config.dailyreboot and stats.users == 0 and os.clock() > 86000) then mercy:kill() end
 	end
 end
