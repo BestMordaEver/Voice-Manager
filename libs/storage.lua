@@ -299,11 +299,10 @@ setmetatable(channels, {
 				local channel = client:getChannel(channelID)
 				if channel then
 					if #channel.connectedMembers == 0 then
-						if channelData.parentType == 1 or channelData.parentType == 2 then
-							channelData:delete()
-						else
+						if channelData.parentType == 0 or channelData.parentType == 3 then
 							channel:delete()
 						end
+						channelData:delete()
 					end
 				elseif not (client:getGuild(channelData.guildID) and client:getGuild(channelData.guildID).unavailable) then
 					local companion = client:getChannel(channelData.companion)
