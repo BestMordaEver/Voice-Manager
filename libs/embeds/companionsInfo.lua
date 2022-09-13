@@ -15,7 +15,7 @@ return embeds("companionsInfo", function (guild, channel, ephemeral)
 	else
 		---@diagnostic disable-next-line: undefined-field
 		sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
-			return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
+			return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget and not lobbies[voiceChannel.id].isMatchmaking
 		end), tps)
 		for i,lobby in ipairs(sortedLobbies) do
 			sortedLobbies[i] = lobbies[lobby.id]
@@ -28,11 +28,6 @@ return embeds("companionsInfo", function (guild, channel, ephemeral)
 		description = #sortedLobbies == 0 and locale.companionsNoInfo or nil,
 		fields = {}
 	}
-
----@diagnostic disable-next-line: undefined-field
-	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
-		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget
-	end), tps)
 
 	for _, lobbyData in pairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.companionTarget)
