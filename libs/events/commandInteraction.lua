@@ -41,11 +41,20 @@ return function (interaction)
 
 		if reply then
 			reply.ephemeral = true
-        	local ok, msg = interaction:reply(reply)
+        	local ok, msg
+			if interaction.isReplied then
+				ok, msg = interaction:updateReply(reply)
+			else
+				ok, msg = interaction:reply(reply)
+			end
 			if not ok then error(msg) end
 		end
 	else
-		interaction:reply(errorEmbed(true))
+		if interaction.isReplied then
+			interaction:updateReply(errorEmbed(true))
+		else
+			interaction:reply(errorEmbed(true))
+		end
 		error(logMsg)
 	end
 
