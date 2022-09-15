@@ -14,7 +14,7 @@ local blurple = embeds.colors.blurple
 return embeds("chatInfo", function (room, ephemeral)
 	local hidden, shown, muted = "","",""
 
-	local companion = client:getChannel(channels[room.id].companion)
+	local companion = client:getChannel(channels[room.id].companion) or room
 
 	for _,overwrite in pairs(companion.permissionOverwrites:toArray(function(overwrite) return overwrite.type == overwriteType.member end)) do
 		if overwrite:getObject().user ~= client.user and overwrite:getAllowedPermissions():has(permission.readMessages) then
