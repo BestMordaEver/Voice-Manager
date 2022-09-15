@@ -78,7 +78,6 @@ subcommands = {
 	end,
 
 	greetingwidget = function (interaction, channel)
-		print(interaction.components[1].components[1].value)
 		return subcommands.greeting(interaction, channel, interaction.components[1].components[1].value)
 	end,
 
