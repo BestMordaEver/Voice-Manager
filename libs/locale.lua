@@ -162,7 +162,7 @@ You can put different `%combos%` in the greeting to customize it
 `%chatcommands%` - raw list of `/chat` commands
 `%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobby name`
 `%buttons%` - blank, attaches privacy control buttons to the greeting message]],
-			"Enable chat logging. Logs will be sent as files to a channel of your choosing"
+			"Enable chat logging. Logs will be sent as files to a channel of your choosing. Users will be notified about chat logging with a generic greeting message in chat"
 		},
 		{
 			"Show room info and available commands",
@@ -290,6 +290,8 @@ You can enable companion channels with `/lobby companion enable`]],
 
 	greetingConfirm = "Set new greeting",
 	greetingReset = "Disabled the greeting",
+	greetingModalTitle = "Companion greeting",
+	greetingModalLabel = "Greeting message",
 	roomCommands = "Available `/room` commands: ",
 	chatCommands = "Available `/chat` commands: ",
 	logConfirm = "Chat logs will be sent to %s",

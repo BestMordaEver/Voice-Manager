@@ -656,9 +656,8 @@ local commandsStructure = {
 					},
 					{
 						name = "greeting",
-						description = "A message that will be automatically sent to chat when it's created",
-						type = commandOptionType.string,
-						required = true
+						description = "Skip this to enter multiline greeting",
+						type = commandOptionType.string
 					}
 				}
 			},

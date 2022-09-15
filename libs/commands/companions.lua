@@ -1,4 +1,8 @@
 local locale = require "locale"
+local client = require "client"
+
+local enums = require "discordia".enums
+local componentType, inputStyle, interactionType = enums.componentType, enums.inputStyle, enums.interactionType
 
 local lobbies = require "storage".lobbies
 
@@ -9,7 +13,22 @@ local companionsInfoEmbed = require "embeds/companionsInfo"
 local permissionCheck = require "funcs/permissionCheck"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
-local subcommands = {
+local greetingComponents = {
+	{
+		type = componentType.row,
+		components = {
+			{
+				type = componentType.input,
+				custom_id = "greeting",
+				style = inputStyle.paragraph,
+				label = locale.greetingModalTitle
+			}
+		}
+	}
+}
+
+local subcommands
+subcommands = {
 	enable = function (interaction, channel)
 		lobbies[channel.id]:setCompanionTarget(true)
 		return "Lobby companion enabled", okEmbed(locale.companionEnable)
@@ -43,13 +62,24 @@ local subcommands = {
 	end,
 
 	greeting = function (interaction, channel, greeting)
+		if interaction.commandName == "reset" then greeting = "" end
+
 		if greeting then
-			lobbies[channel.id]:setGreeting(interaction.option.options.greeting.value)
+			if greeting == "" then
+				lobbies[channel.id]:setGreeting(nil)
+			else
+				lobbies[channel.id]:setGreeting(greeting)
+			end
 			return "Companion greeting set", okEmbed(locale.greetingConfirm)
 		end
 
-		lobbies[channel.id]:setGreeting()
-		return "Companion greeting reset", okEmbed(locale.greetingReset)
+		interaction:createModal("companion_greetingwidget_"..channel.id, locale.greetingModalTitle, greetingComponents)
+		return "Sent greeting setup modal"
+	end,
+
+	greetingwidget = function (interaction, channel)
+		print(interaction.components[1].components[1].value)
+		return subcommands.greeting(interaction, channel, interaction.components[1].components[1].value)
 	end,
 
 	log = function (interaction, channel, logChannel)
@@ -69,7 +99,7 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	local channel, embed = lobbyPreProcess(interaction, companionsInfoEmbed)
-	if embed then return channel, embed end
+	local channel, error = interaction.type == interactionType.modalSubmit and client:getChannel(argument) or lobbyPreProcess(interaction, companionsInfoEmbed)
+	if error then return channel, error end
 	return subcommands[subcommand](interaction, channel, argument)
 end
