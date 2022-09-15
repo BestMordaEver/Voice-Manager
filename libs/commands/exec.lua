@@ -20,6 +20,8 @@ return function (interaction)
     local fn, syntaxError = load(interaction.option.value, "Bot", "t", sandbox)
     if not fn then return "Syntax error", warningEmbed(code(syntaxError)) end
 
+    interaction:deferReply()
+
     local success, runtimeError = pcall(fn)
     if not success then return "Runtime error", warningEmbed(code(runtimeError)) end
 

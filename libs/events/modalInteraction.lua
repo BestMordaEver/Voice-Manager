@@ -9,12 +9,9 @@ return function (interaction)
 
 	logger:log(4, "USER %s: %s modal submitted", interaction.user.id, interaction.customId)
 
-	local command, primary, secondary = interaction.customId:match("^(.-)_(.-)_(.-)$")
-	if secondary then
-		secondary = tonumber(secondary) -- delete_row_1
-	else
-		command, primary = interaction.customId:match("^(.-)_(.-)$")
-		primary = tonumber(primary) or primary -- help_1 or delete_nuke
+	local command, primary, secondary = interaction.customId:match("^(.-)_(.-)_(.-)$") -- delete_row_1
+	if not secondary then
+		command, primary = interaction.customId:match("^(.-)_(.-)$") -- help_1 or delete_nuke
 	end
 
 	local res, logMsg, reply = xpcall(commands[command], debug.traceback, interaction, primary, secondary)

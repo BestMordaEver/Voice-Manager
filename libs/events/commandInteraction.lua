@@ -20,8 +20,6 @@ local function stringer (strings, options)
 end
 
 return function (interaction)
-    interaction:deferReply(true)
-
 	local commandString = interaction.options and concat(stringer({interaction.commandName}, interaction.options), " ") or interaction.commandName
 
 	if interaction.guild then
@@ -40,9 +38,14 @@ return function (interaction)
 		else
 			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
 		end
-        interaction:updateReply(reply or errorEmbed())	-- reply mustn't be empty
+
+		if reply then
+			reply.ephemeral = true
+        	local ok, msg = interaction:reply(reply)
+			if not ok then error(msg) end
+		end
 	else
-		interaction:updateReply(errorEmbed())
+		interaction:reply(errorEmbed(true))
 		error(logMsg)
 	end
 

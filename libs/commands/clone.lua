@@ -19,6 +19,8 @@ return function (interaction)
 		return "Create aborted, category overflow", warningEmbed(locale.createCategoryOverflow)
 	end
 
+	interaction:deferReply()
+
 	local success, start = 0, tonumber(name:match("%%counter%((%d+)%)%%")) or 1
 	for i=1, amount do
 		if source.guild:createChannel({
