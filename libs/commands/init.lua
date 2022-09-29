@@ -4,6 +4,8 @@ local function invite ()
 	return "Sent support invite", "https://discord.gg/tqj6jvT"
 end
 
+local undeferrable = {greeting = true}
+
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return setmetatable({
 	help = require "commands/help",
@@ -30,6 +32,9 @@ return setmetatable({
 				if optionName ~= "lobby" then argument = option end
 			end
 		end
+
+		if not undeferrable[subcommand] then interaction:deferReply(true) end
+
 		return self[command](interaction, subcommand, argument and (argument.value or argument))
 	elseif interaction.type == commandType.user then
 		if interaction.commandName == "Invite" then
