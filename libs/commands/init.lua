@@ -1,7 +1,7 @@
 local commandType = require "discordia".enums.applicationCommandType
 
 local function invite ()
-	return "Sent support invite", "https://discord.gg/tqj6jvT"
+	return "Sent support invite", {content = "https://discord.gg/tqj6jvT"}
 end
 
 local undeferrable = {greeting = true}

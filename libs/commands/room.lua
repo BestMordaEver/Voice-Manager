@@ -21,8 +21,6 @@ local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
 
 ratelimiter("channelName", 2, 600)
-local inviteText = [[%s invited you to join %s!
-https://discord.gg/%s]]
 
 local function reprivilegify (voiceChannel)
 	for _, permissionOverwrite in pairs(voiceChannel.permissionOverwrites) do
@@ -179,16 +177,16 @@ local subcommands = {
 		if invite then
 			if user then
 				if user:getPrivateChannel() then
-					user:getPrivateChannel():sendf(inviteText, interaction.user.tag, voiceChannel.name, invite.code)
+					user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
 					if tryReservation then
 						voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.connect, permission.speak)
 					end
 					return "Sent invites to mentioned user", okEmbed(locale.inviteConfirm:format(user.mentionString))
 				else
-					return "Can't contact user", warningEmbed(locale.noDMs:format(invite))
+					return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
 				end
 			else
-				return "Created invite in room", invite
+				return "Created invite in room", okEmbed(locale.inviteCreated:format(invite.code))
 			end
 		else
 			return "Bot isn't permitted to create invites", warningEmbed(locale.inviteError)
