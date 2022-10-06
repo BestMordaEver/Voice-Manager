@@ -7,7 +7,7 @@ local warningEmbed = require "embeds/warning"
 return function (interaction)
 	if interaction then
 		if not config.owners[interaction.user.id] then return "Not owner", warningEmbed("You're not my father") end
-		interaction:reply("Shutting down gracefully")
+		interaction:updateReply("Shutting down gracefully")
 	end
 
 	local status, msg = xpcall(function()
