@@ -98,7 +98,12 @@ subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	local channel, error = interaction.type == interactionType.modalSubmit and client:getChannel(argument) or lobbyPreProcess(interaction, companionsInfoEmbed)
-	if error then return channel, error end
+	local channel, embed
+	if interaction.type == interactionType.modalSubmit then
+		channel = client:getChannel(argument)
+	else
+		channel, embed = lobbyPreProcess(interaction, companionsInfoEmbed)
+	end
+	if embed then return channel, embed end
 	return subcommands[subcommand](interaction, channel, argument)
 end
