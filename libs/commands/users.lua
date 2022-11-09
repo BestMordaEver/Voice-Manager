@@ -30,6 +30,7 @@ local commands = {
             end
 
             names = table.concat(names, separator)
+            if #names == 0 then names = locale.none end
         end
 
         local embeds, index, len = {}, 1, #names
