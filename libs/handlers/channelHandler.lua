@@ -25,6 +25,7 @@ channelHandler.adjustPermissions = function (channel, newHost, oldHost)
             if oldHost then channel:getPermissionOverwriteFor(oldHost):clearPermissions(permission.manageRoles) end
         end
 
+        if not channel or not channels[channel.id] then return end
         local companion = client:getChannel(channels[channel.id].companion)
         if companion then
             if isAdmin or channel.guild.me:getPermissions(companion):has(table.unpack(perms)) then
