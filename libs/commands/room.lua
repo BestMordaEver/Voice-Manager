@@ -223,37 +223,50 @@ local subcommands = {
 		return "Unmuted mentioned members", okEmbed(locale.unmuteConfirm:format(user.mentionString))
 	end,
 
-	host = function (interaction, voiceChannel, user)
+	host = function (interaction, voiceChannel, newHost)
 		local channelData = channels[voiceChannel.id]
 		local host = client:getUser(channelData.host)
 
-		if user then
+		if newHost then
 			if interaction.user == host then
 				local guild = voiceChannel.guild
-				if guild:getMember(user).voiceChannel == voiceChannel then
-					channelData:setHost(user.id)
+				newHost = guild:getMember(newHost)
+				if newHost.voiceChannel == voiceChannel then
+					channelData:setHost(newHost.user.id)
 
 					if channelData.parent then
-						local perms = channelData.parent.permissions:toDiscordia()
-						if #perms ~= 0 then
-							local member, oldMember = guild:getMember(user.id), guild:getMember(host.id)
+						local perms, isAdmin, needsManage =
+						channelData.parent.permissions:toDiscordia(),
+						guild.me:getPermissions():has(permission.administrator),
+						channelData.parent.permissions.bitfield:has(channelData.parent.permissions.bits.moderate)
 
-							if guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
-								voiceChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-								voiceChannel:getPermissionOverwriteFor(oldMember):clearPermissions(table.unpack(perms))
+						if #perms ~= 0 then
+							if isAdmin or guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
+								voiceChannel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
+								voiceChannel:getPermissionOverwriteFor(interaction.member):clearPermissions(table.unpack(perms))
+							end
+
+							if isAdmin and needsManage then
+								voiceChannel:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
+								voiceChannel:getPermissionOverwriteFor(interaction.member):clearPermissions(permission.manageRoles)
 							end
 
 							local companion = client:getChannel(channelData.companion)
 							if companion then
-								if #perms ~= 0 and guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
-									companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-									companion:getPermissionOverwriteFor(oldMember):allowPermissions(table.unpack(perms))
+								if isAdmin or guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+									companion:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
+									companion:getPermissionOverwriteFor(interaction.member):clearPermissions(table.unpack(perms))
+								end
+
+								if isAdmin and needsManage then
+									companion:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
+									companion:getPermissionOverwriteFor(interaction.member):clearPermissions(permission.manageRoles)
 								end
 							end
 						end
 					end
 
-					return "Promoted a new host", okEmbed(locale.hostConfirm:format(user.mentionString))
+					return "Promoted a new host", okEmbed(locale.hostConfirm:format(newHost.user.mentionString))
 
 				else
 					return "Can't promote person not in a room", warningEmbed(locale.badNewHost)

@@ -13,17 +13,18 @@ local overwriteType = require "discordia".enums.overwriteType
 return function (member, channel) -- now remove the unwanted corpses!
 	local channelData = channel and channels[channel.id]
 	if channelData then
+		local guild = channel.guild
 		if #channel.connectedMembers == 0 then
 			if channelData.parentType == 0 then
 				local parent = channelData.parent
 				if parent and parent.mutex then
 					parent.mutex:lock()
 					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: deleted", channel.guild.id, channel.id)
+					logger:log(4, "GUILD %s ROOM %s: deleted", guild.id, channel.id)
 					parent.mutex:unlock()
 				else
 					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: deleted without sync, parent missing", channel.guild.id, channel.id)
+					logger:log(4, "GUILD %s ROOM %s: deleted without sync, parent missing", guild.id, channel.id)
 				end
 			elseif channelData.parentType == 3 then
 				if channelData.parent then
@@ -35,19 +36,19 @@ return function (member, channel) -- now remove the unwanted corpses!
 						end
 					end
 					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: finished password flow", channel.guild.id, channel.id)
+					logger:log(4, "GUILD %s ROOM %s: finished password flow", guild.id, channel.id)
 				end
 			else
 				channelData:delete()
 				if channelData.parent then
 					local perms = channelData.parent.permissions:toDiscordia()
-					if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+					if #perms ~= 0 and guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
 						for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
 							if permissionOverwrite.type == overwriteType.member then permissionOverwrite:delete() end
 						end
 					end
 				end
-				logger:log(4, "GUILD %s CHANNEL %s: reset", channel.guild.id, channel.id)
+				logger:log(4, "GUILD %s CHANNEL %s: reset", guild.id, channel.id)
 			end
 		else
 			enforceReservations(channel)
@@ -62,14 +63,37 @@ return function (member, channel) -- now remove the unwanted corpses!
 				local newHost = channel.connectedMembers:random()
 
 				if newHost then
-					logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", channel.guild.id, channel.id, member.user.id, newHost.user.id)
+					logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", guild.id, channel.id, member.user.id, newHost.user.id)
 					channelData:setHost(newHost.user.id)
 
 					if channelData.parent then
-						local perms = channelData.parent.permissions:toDiscordia()
-						if #perms ~= 0 and channel.guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
-							channel:getPermissionOverwriteFor(member):delete()
-							channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
+						local perms, isAdmin, needsManage =
+						channelData.parent.permissions:toDiscordia(),
+						guild.me:getPermissions():has(permission.administrator),
+						channelData.parent.permissions.bitfield:has(channelData.parent.permissions.bits.moderate)
+
+						if #perms ~= 0 then
+							if isAdmin or guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
+								channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
+								channel:getPermissionOverwriteFor(member):clearPermissions(table.unpack(perms))
+							end
+
+							if isAdmin and needsManage then
+								channel:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
+								channel:getPermissionOverwriteFor(member):clearPermissions(permission.manageRoles)
+							end
+
+							if companion then
+								if isAdmin or guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
+									companion:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
+									companion:getPermissionOverwriteFor(member):clearPermissions(table.unpack(perms))
+								end
+
+								if isAdmin and needsManage then
+									companion:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
+									companion:getPermissionOverwriteFor(member):clearPermissions(permission.manageRoles)
+								end
+							end
 						end
 					end
 				end
