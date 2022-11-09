@@ -7,7 +7,8 @@ local channels = require "storage".channels
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
-local greetingEmbed = require "embeds/greeting"
+
+local channelHandler = require "handlers/channelHandler"
 
 local hostPermissionCheck = require "funcs/hostPermissionCheck"
 local templateInterpreter = require "funcs/templateInterpreter"
@@ -235,35 +236,7 @@ local subcommands = {
 					channelData:setHost(newHost.user.id)
 
 					if channelData.parent then
-						local perms, isAdmin, needsManage =
-						channelData.parent.permissions:toDiscordia(),
-						guild.me:getPermissions():has(permission.administrator),
-						channelData.parent.permissions.bitfield:has(channelData.parent.permissions.bits.moderate)
-
-						if #perms ~= 0 then
-							if isAdmin or guild.me:getPermissions(voiceChannel):has(permission.manageRoles, table.unpack(perms)) then
-								voiceChannel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
-								voiceChannel:getPermissionOverwriteFor(interaction.member):clearPermissions(table.unpack(perms))
-							end
-
-							if isAdmin and needsManage then
-								voiceChannel:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
-								voiceChannel:getPermissionOverwriteFor(interaction.member):clearPermissions(permission.manageRoles)
-							end
-
-							local companion = client:getChannel(channelData.companion)
-							if companion then
-								if isAdmin or guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
-									companion:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
-									companion:getPermissionOverwriteFor(interaction.member):clearPermissions(table.unpack(perms))
-								end
-
-								if isAdmin and needsManage then
-									companion:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
-									companion:getPermissionOverwriteFor(interaction.member):clearPermissions(permission.manageRoles)
-								end
-							end
-						end
+						channelHandler.adjustPermissions(voiceChannel, newHost, interaction.member)
 					end
 
 					return "Promoted a new host", okEmbed(locale.hostConfirm:format(newHost.user.mentionString))

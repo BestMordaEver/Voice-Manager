@@ -1,9 +1,9 @@
 local client = require "client"
 local logger = require "logger"
 
-local guilds = require "storage".guilds
-local lobbies = require "storage".lobbies
 local channels = require "storage".channels
+
+local channelHandler = require "handlers/channelHandler"
 
 local enforceReservations = require "funcs/enforceReservations"
 
@@ -67,34 +67,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 					channelData:setHost(newHost.user.id)
 
 					if channelData.parent then
-						local perms, isAdmin, needsManage =
-						channelData.parent.permissions:toDiscordia(),
-						guild.me:getPermissions():has(permission.administrator),
-						channelData.parent.permissions.bitfield:has(channelData.parent.permissions.bits.moderate)
-
-						if #perms ~= 0 then
-							if isAdmin or guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
-								channel:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
-								channel:getPermissionOverwriteFor(member):clearPermissions(table.unpack(perms))
-							end
-
-							if isAdmin and needsManage then
-								channel:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
-								channel:getPermissionOverwriteFor(member):clearPermissions(permission.manageRoles)
-							end
-
-							if companion then
-								if isAdmin or guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms)) then
-									companion:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))
-									companion:getPermissionOverwriteFor(member):clearPermissions(table.unpack(perms))
-								end
-
-								if isAdmin and needsManage then
-									companion:getPermissionOverwriteFor(newHost):allowPermissions(permission.manageRoles)
-									companion:getPermissionOverwriteFor(member):clearPermissions(permission.manageRoles)
-								end
-							end
-						end
+						channelHandler.adjustPermissions(channel, newHost, member)
 					end
 				end
 			end
