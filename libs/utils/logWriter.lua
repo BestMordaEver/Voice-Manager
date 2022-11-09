@@ -141,8 +141,10 @@ end
 Overseer.finalize = function (channelID)
 	local writer = writers[channelID]
 	writers[channelID] = nil
-	return concat(writer, "\n")
+	if writer then return concat(writer, "\n") end
 end
+
+Overseer.finalize("nothing")
 
 Overseer.events = {
 	messageCreate = function (message)
