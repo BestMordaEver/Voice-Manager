@@ -9,6 +9,8 @@ local channels = require "storage".channels
 
 local greetingEmbed = require "embeds/greeting"
 
+local channelHandler = require "handlers/channelHandler"
+
 local Overseer = require "utils/logWriter"
 local matchmakers = require "utils/matchmakers"
 local templateInterpreter = require "funcs/templateInterpreter"
@@ -25,17 +27,11 @@ local processing = {}
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
+	local guildData = guilds[lobby.guild.id]
+	if guildData.limit <= guildData:channels() then return end
+
 	-- parent to which a new channel will be attached
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
-
-	-- target is voice channel? user error, nothing to do here!
-	if target.type == channelType.voice then
-		member:setVoiceChannel()
-	end
-
-	local guildData = guilds[lobby.guild.id]
-
-	if guildData.limit <= guildData:channels() then return end
 
 	-- determine new channel name
 	local lobbyData = lobbies[lobby.id]
@@ -63,16 +59,17 @@ local function lobbyJoin (member, lobby)
 
 		if position + distance > children.max then
 			needsMove = nil
+		else
+			distance = client:getChannel(lobbyData.children[position + distance].id).position - 1
 		end
 	end
 
-	-- TODO: create channel with initialized permissions
 	local newChannel, err = lobby.guild:createChannel({
 		name = name,
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
-		position = needsMove and client:getChannel(lobbyData.children[position + distance].id).position - 1 or nil,
+		position = needsMove and distance or nil,
 		parent_id = target.id
 	})
 
@@ -107,34 +104,14 @@ local function lobbyJoin (member, lobby)
 		channels:store(newChannel.id, 0, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(channels[newChannel.id], position)
 
-		-- yes, sometimes required
 		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect, permission.readMessages)
-
-		-- provide host permissions if any
-		local perms, isAdmin, needsManage =
-			lobbyData.permissions:toDiscordia(),
-			lobby.guild.me:getPermissions():has(permission.administrator),
-			lobbyData.permissions.bitfield:has(lobbyData.permissions.bits.moderate)
-
-		if #perms ~= 0 and (isAdmin or lobby.guild.me:getPermissions(newChannel):has(permission.manageRoles, table.unpack(perms))) then
-			newChannel:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-			if isAdmin and needsManage then
-				newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageRoles)
-			end
-		end
+		channelHandler.adjustPermissions(newChannel, member)
 
 		if companion then
 			-- companions are private by default
 			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
-
-			if #perms ~= 0 and (isAdmin or lobby.guild.me:getPermissions(companion):has(permission.manageRoles, table.unpack(perms))) then
-				companion:getPermissionOverwriteFor(member):allowPermissions(table.unpack(perms))
-				if isAdmin and needsManage then
-					newChannel:getPermissionOverwriteFor(member):allowPermissions(permission.manageRoles)
-				end
-			end
 
 			if lobbyData.companionLog then Overseer.track(companion) end
 			if lobbyData.greeting or lobbyData.companionLog then companion:send(greetingEmbed(newChannel)) end
