@@ -7,14 +7,14 @@ local channels = require "storage".channels
 local availableCommands = require "embeds/availableCommands"
 
 local enums = require "discordia".enums
-local componentType, buttonStyle = enums.componentType, enums.buttonStyle
+local componentType = enums.componentType
 local fuchsia = embeds.colors.fuchsia
 
 local selects = {
 	{
 		type = componentType.row,
 		components = {{
-			type = componentType.select,
+			type = componentType.stringSelect,
 			custom_id = "room_widget",
 			options = {
 				{
@@ -39,7 +39,7 @@ local selects = {
 	},{
 		type = componentType.row,
 		components = {{
-			type = componentType.select,
+			type = componentType.stringSelect,
 			custom_id = "chat_widget",
 			options = {
 				{

@@ -18,7 +18,7 @@ local greetingComponents = {
 		type = componentType.row,
 		components = {
 			{
-				type = componentType.input,
+				type = componentType.textInput,
 				custom_id = "greeting",
 				style = inputStyle.paragraph,
 				label = locale.greetingModalTitle
