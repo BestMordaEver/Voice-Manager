@@ -89,6 +89,7 @@ local subcommands = {
 			local permissionBits = lobbyData.permissions
 			for permissionName, permission in pairs(interaction.option.options) do
 				if permissionBits.bits[permissionName] then
+					-- metamethods resolve this as bit operations
 					permissionBits.bitfield = permission.value and (permissionBits.bitfield + permissionBits.bits[permissionName]) or (permissionBits.bitfield - permissionBits.bits[permissionName])
 				end
 			end

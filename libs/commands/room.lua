@@ -175,23 +175,24 @@ local subcommands = {
 			hostPermissionCheck(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
 		local invite = voiceChannel:createInvite()
 
-		if invite then
-			if user then
-				if user:getPrivateChannel() then
-					user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
-					if tryReservation then
-						voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.connect, permission.speak)
-					end
-					return "Sent invites to mentioned user", okEmbed(locale.inviteConfirm:format(user.mentionString))
-				else
-					return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
-				end
-			else
-				return "Created invite in room", okEmbed(locale.inviteCreated:format(invite.code))
-			end
-		else
+		if not invite then
 			return "Bot isn't permitted to create invites", warningEmbed(locale.inviteError)
 		end
+
+		if not user then
+			return "Created invite in room", okEmbed(locale.inviteCreated:format(invite.code))
+		end
+
+		if not user:getPrivateChannel() then
+			return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
+		end
+
+		user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
+
+		if tryReservation then
+			voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.connect, permission.speak)
+		end
+		return "Sent invite to mentioned user", okEmbed(locale.inviteConfirm:format(user.mentionString))
 	end,
 
 	mute = function (interaction, voiceChannel, user)
@@ -229,24 +230,23 @@ local subcommands = {
 		local host = client:getUser(channelData.host)
 
 		if newHost then
-			if interaction.user == host then
-				local guild = voiceChannel.guild
-				newHost = guild:getMember(newHost)
-				if newHost.voiceChannel == voiceChannel then
-					channelData:setHost(newHost.user.id)
-
-					if channelData.parent then
-						channelHandler.adjustPermissions(voiceChannel, newHost, interaction.member)
-					end
-
-					return "Promoted a new host", okEmbed(locale.hostConfirm:format(newHost.user.mentionString))
-
-				else
-					return "Can't promote person not in a room", warningEmbed(locale.badNewHost)
-				end
-			else
+			if interaction.user ~= host then
 				return "Not a host", warningEmbed(locale.notHost)
 			end
+
+			local guild = voiceChannel.guild
+			newHost = guild:getMember(newHost)
+			if newHost.voiceChannel ~= voiceChannel then
+				return "Can't promote person not in a room", warningEmbed(locale.badNewHost)
+			end
+
+			channelData:setHost(newHost.user.id)
+
+			if channelData.parent then
+				channelHandler.adjustPermissions(voiceChannel, newHost, interaction.member)
+			end
+
+			return "Promoted a new host", okEmbed(locale.hostConfirm:format(newHost.user.mentionString))
 		else
 			if host then
 				return "Pinged the host", okEmbed(locale.hostIdentify:format(host.mentionString))

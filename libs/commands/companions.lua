@@ -77,7 +77,7 @@ subcommands = {
 		return "Sent greeting setup modal"
 	end,
 
-	greetingwidget = function (interaction, channel)
+	greetingwidget = function (interaction, channel)	-- not exposed, access via modalInteraction
 		return subcommands.greeting(interaction, channel, interaction.components[1].components[1].value)
 	end,
 
