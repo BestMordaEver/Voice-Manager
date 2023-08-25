@@ -1,5 +1,5 @@
 return function (template, member, position, replacement)
-	local uname = member.user.name
+	local uname = member.user.globalName or member.user.name
 	local nickname = member.nickname or uname
 	local game =
 		member.playing and member.playing.name or
@@ -12,7 +12,7 @@ return function (template, member, position, replacement)
 	local rt = {
 		nickname = nickname,
 		name = uname,
-		tag = member.user.tag,
+		tag = member.user.discriminator == "0" and member.user.name or member.user.tag,
 		game = game,
 		counter = position,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
