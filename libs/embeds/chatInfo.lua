@@ -1,17 +1,17 @@
 local client = require "client"
 local locale = require "locale"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
 local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
 local overwriteType = require "discordia".enums.overwriteType
 
-local blurple = embeds.colors.blurple
+local blurple = embedHandler.colors.blurple
 
-return embeds("chatInfo", function (room, ephemeral)
+return embedHandler("chatInfo", function (room, ephemeral)
 	local hidden, shown, muted = "","",""
 
 	local companion = client:getChannel(channels[room.id].companion) or room

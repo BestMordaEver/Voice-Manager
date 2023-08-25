@@ -40,11 +40,11 @@ package.loaded.logger = discordia.Logger(6, '%F %T')
 
 local config = require "config"
 
-local storage = require "storage"
+local storage = require "handlers/storageHandler"
 local guilds = storage.guilds
 
-local status = require "funcs/status"
-local safeEvent = require "funcs/safeEvent"
+local status = require "handlers/statusHandler"
+local safeEvent = require "utils/safeEvent"
 
 client:on(safeEvent("guildAvailable", function (guild)
 	if not guilds[guild.id] then storage.loadGuild(guild) end

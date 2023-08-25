@@ -1,7 +1,7 @@
 local discordia = require "discordia"
 local client = require "client"
 
-local safeEvent = require "funcs/safeEvent"
+local safeEvent = require "utils/safeEvent"
 
 local json = require "json"
 

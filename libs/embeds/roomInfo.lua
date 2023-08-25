@@ -1,15 +1,15 @@
 local client = require "client"
 local locale = require "locale"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
 local availableCommands = require "embeds/availableCommands"
 
 local permission = require "discordia".enums.permission
-local blurple = embeds.colors.blurple
+local blurple = embedHandler.colors.blurple
 
-return embeds("roomInfo", function (room, ephemeral)
+return embedHandler("roomInfo", function (room, ephemeral)
 	local blocklist, reservations, muted = "","",""
 
 	for _,overwrite in pairs(room.permissionOverwrites:toArray(function(overwrite) return overwrite.type == 1 end)) do

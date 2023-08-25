@@ -1,13 +1,13 @@
 local locale = require "locale"
 
-local guilds = require "storage".guilds
+local guilds = require "handlers/storageHandler".guilds
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 
 local subcommands = {
 	role = function (interaction, role)

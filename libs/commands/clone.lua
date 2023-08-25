@@ -3,7 +3,7 @@ local locale = require "locale"
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 
 return function (interaction)
 	local options = interaction.options

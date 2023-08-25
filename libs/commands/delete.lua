@@ -4,8 +4,7 @@ local locale = require "locale"
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
-local permissionCheck = require "funcs/permissionCheck"
-local tps = require "funcs/truePositionSorting"
+local channelHandler = require "handlers/channelHandler"
 
 local interactionType = require "discordia".enums.interactionType
 
@@ -58,7 +57,7 @@ return function (interaction, action, argument)
 		local name = options.name and options.name.value
 		local only_empty = options.only_empty and options.only_empty.value
 
-		local isPermitted, logMsg, userMsg = permissionCheck(interaction, category)
+		local isPermitted, logMsg, userMsg = channelHandler.permissionCheck(interaction, category)
 		if not isPermitted then
 			return logMsg, warningEmbed(userMsg)
 		end
@@ -80,7 +79,7 @@ return function (interaction, action, argument)
 				end
 			end
 			return true
-		end), tps)
+		end), channelHandler.tps)
 
 		if #channels == 0 then return "No channels to delete", warningEmbed(locale.deleteNone) end
 

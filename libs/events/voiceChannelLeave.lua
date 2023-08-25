@@ -1,11 +1,10 @@
 local client = require "client"
 local logger = require "logger"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
-local channelHandler = require "handlers/channelHandler"
-
-local enforceReservations = require "funcs/enforceReservations"
+local adjustPermissions = require "handlers/channelHandler".adjustPermissions
+local enforceReservations = require "handlers/channelHandler".enforceReservations
 
 local permission = require "discordia".enums.permission
 local overwriteType = require "discordia".enums.overwriteType
@@ -67,7 +66,7 @@ return function (member, channel) -- now remove the unwanted corpses!
 					channelData:setHost(newHost.user.id)
 
 					if channelData.parent then
-						channelHandler.adjustPermissions(channel, newHost, member)
+						adjustPermissions(channel, newHost, member)
 					end
 				end
 			end

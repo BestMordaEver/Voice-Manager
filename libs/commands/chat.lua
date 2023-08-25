@@ -2,15 +2,14 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local chatInfoEmbed = require "embeds/chatInfo"
 local greetingEmbed = require "embeds/greeting"
 
-local hostPermissionCheck = require "funcs/hostPermissionCheck"
-local templateInterpreter = require "funcs/templateInterpreter"
+local channelHandler = require "handlers/channelHandler"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
@@ -47,7 +46,7 @@ subcommands = {
 			local parent = channelData.parent
 
 			if parent and parent.companionTemplate and parent.companionTemplate:match("%%rename%%") then
-				success, err = chat:setName(templateInterpreter(parent.companionTemplate, member, channelData.position, name):discordify())
+				success, err = chat:setName(channelHandler.handleTemplate(parent.companionTemplate, member, channelData.position, name):discordify())
 			else
 				success, err = chat:setName(name:discordify())
 			end
@@ -185,7 +184,7 @@ return function (interaction, subcommand, argument)
 	if member:hasPermission(chat, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, chat, argument)
 	elseif channels[voiceChannel.id].host == interaction.user.id then
-		if hostPermissionCheck(member, voiceChannel, subcommand) then
+		if channelHandler.checkHostPermissions(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, chat, argument)
 		end
 		return "Insufficient permissions", warningEmbed(locale.badHostPermission)

@@ -1,6 +1,6 @@
 local client = require "client"
 
-local stats = require "storage".stats
+local stats = require "handlers/storageHandler".stats
 
 --[[
 status generating function

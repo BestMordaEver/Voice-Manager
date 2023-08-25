@@ -1,6 +1,6 @@
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
-local enforceReservations = require "funcs/enforceReservations"
+local enforceReservations = require "handlers/channelHandler".enforceReservations
 
 return function (channel)
 	if channel and channels[channel.id] then

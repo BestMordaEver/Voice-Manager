@@ -1,14 +1,14 @@
 local locale = require "locale"
 local client = require "client"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local lobbies = require "storage".lobbies
+local lobbies = require "handlers/storageHandler".lobbies
 
-local tps = require "funcs/truePositionSorting"
-local blurple = embeds.colors.blurple
+local tps = require "handlers/channelHandler".truePositionSort
+local blurple = embedHandler.colors.blurple
 local insert = table.insert
 
-return embeds("companionsInfo", function (guild, channel, ephemeral)
+return embedHandler("companionsInfo", function (guild, channel, ephemeral)
 	local sortedLobbies
 	if channel then
 		sortedLobbies = {lobbies[channel.id]}

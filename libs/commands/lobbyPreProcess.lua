@@ -1,9 +1,9 @@
 local locale = require "locale"
 
-local lobbies = require "storage".lobbies
+local lobbies = require "handlers/storageHandler".lobbies
 
 local warningEmbed = require "embeds/warning"
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 
 local soloArged = {add = true, remove = true, enable = true, disable = true}
 

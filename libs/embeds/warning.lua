@@ -1,9 +1,9 @@
 local locale = require "locale"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local yellow = embeds.colors.yellow
+local yellow = embedHandler.colors.yellow
 
-return embeds("warning", function (msg, ephemeral)
+return embedHandler("warning", function (msg, ephemeral)
 	return {embeds = {{
 		title = locale.embedWarning,
 		color = yellow,

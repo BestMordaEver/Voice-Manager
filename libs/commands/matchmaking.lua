@@ -1,13 +1,13 @@
 local locale = require "locale"
 
-local lobbies = require "storage".lobbies
-local channels = require "storage".channels
+local lobbies = require "handlers/storageHandler".lobbies
+local channels = require "handlers/storageHandler".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local matchmakingInfoEmbed = require "embeds/matchmakingInfo"
 
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType

@@ -1,11 +1,11 @@
 local locale = require "locale"
 local config = require "config"
 
-local lobbies = require "storage".lobbies
+local lobbies = require "handlers/storageHandler".lobbies
 
 local warningEmbed = require "embeds/warning"
 
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 
 local commands = {
 	lobby = require "commands/lobbies",

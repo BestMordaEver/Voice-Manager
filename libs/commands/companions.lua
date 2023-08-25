@@ -4,13 +4,13 @@ local client = require "client"
 local enums = require "discordia".enums
 local componentType, inputStyle, interactionType = enums.componentType, enums.inputStyle, enums.interactionType
 
-local lobbies = require "storage".lobbies
+local lobbies = require "handlers/storageHandler".lobbies
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
-local permissionCheck = require "funcs/permissionCheck"
+local permissionCheck = require "handlers/channelHandler".checkPermissions
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local greetingComponents = {

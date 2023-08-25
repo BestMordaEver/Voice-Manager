@@ -1,14 +1,14 @@
 local locale = require "locale"
 local client = require "client"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
 local availableCommands = require "embeds/availableCommands"
 
 local enums = require "discordia".enums
 local componentType = enums.componentType
-local fuchsia = embeds.colors.fuchsia
+local fuchsia = embedHandler.colors.fuchsia
 
 local selects = {
 	{
@@ -64,7 +64,7 @@ local selects = {
 	}
 }
 
-return embeds("greeting", function (room, ephemeral)
+return embedHandler("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
 	if not channelData then return end
 

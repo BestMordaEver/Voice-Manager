@@ -3,11 +3,11 @@ local config = require "config"
 
 local mercy = require "utils/mercy"
 
-local storage = require "storage"
+local storage = require "handlers/storageHandler"
 local channels = storage.channels
 local stats = storage.stats
 
-local status = require "funcs/status"
+local status = require "handlers/statusHandler"
 
 return function (date)
 	channels:cleanup()

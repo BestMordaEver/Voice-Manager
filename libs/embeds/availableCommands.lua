@@ -1,7 +1,7 @@
 local locale = require "locale"
 
-local guilds = require "storage".guilds
-local channels = require "storage".channels
+local guilds = require "handlers/storageHandler".guilds
+local channels = require "handlers/storageHandler".channels
 
 local chatCommands = {
 	moderate = "mute, unmute, hide, show",

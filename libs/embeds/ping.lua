@@ -1,14 +1,14 @@
 local locale = require "locale"
 local client = require "client"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local storage = require "storage"
+local storage = require "handlers/storageHandler"
 local guilds = storage.guilds
 local stats = storage.stats
 
-local black = embeds.colors.black
+local black = embedHandler.colors.black
 
-return embeds("ping", function (dt, guild, ephemeral)
+return embedHandler("ping", function (dt, guild, ephemeral)
 	local guildData = guilds[guild.id]
 	return {embeds = {{
 		color = black,

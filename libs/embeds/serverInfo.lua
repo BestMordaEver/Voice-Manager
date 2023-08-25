@@ -1,12 +1,12 @@
 local locale = require "locale"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
-local guilds = require "storage".guilds
-local channels = require "storage".channels
+local guilds = require "handlers/storageHandler".guilds
+local channels = require "handlers/storageHandler".channels
 
-local blurple = embeds.colors.blurple
+local blurple = embedHandler.colors.blurple
 
-return embeds("serverInfo", function (guild, ephemeral)
+return embedHandler("serverInfo", function (guild, ephemeral)
 	local guildData = guilds[guild.id]
 	if not guild:getRole(guildData.role) then guildData:setRole(guild.defaultRole.id) end
 

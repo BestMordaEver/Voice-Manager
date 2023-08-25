@@ -1,10 +1,10 @@
 local locale = require "locale"
-local embeds = require "embeds"
+local embedHandler = require "handlers/embedHandler"
 
 local enums = require "discordia".enums
 
 local componentType, buttonStyle = enums.componentType, enums.buttonStyle
-local blurple = embeds.colors.blurple
+local blurple = embedHandler.colors.blurple
 local insert = table.insert
 
 local buttons = {
@@ -76,6 +76,6 @@ for i=0,#locale.helpTitle do
 	helps[i] = embed
 end
 
-return embeds("help", function (page, ephemeral)
+return embedHandler("help", function (page, ephemeral)
 	return {embeds = {helps[tonumber(page)]}, components = buttons, ephemeral = ephemeral}
 end)

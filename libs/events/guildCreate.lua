@@ -1,7 +1,7 @@
 local client = require "client"
 local config = require "config"
 
-local guilds = require "storage".guilds
+local guilds = require "handlers/storageHandler".guilds
 
 return function (guild) -- triggers whenever new guild appears in bot's scope
 	guilds:store(guild.id)

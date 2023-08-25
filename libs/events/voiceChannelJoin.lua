@@ -3,23 +3,23 @@ local client = require "client"
 local logger = require "logger"
 local locale = require "locale"
 
-local guilds = require "storage".guilds
-local lobbies = require "storage".lobbies
-local channels = require "storage".channels
+local guilds = require "handlers/storageHandler".guilds
+local lobbies = require "handlers/storageHandler".lobbies
+local channels = require "handlers/storageHandler".channels
 
 local greetingEmbed = require "embeds/greeting"
 
-local channelHandler = require "handlers/channelHandler"
+local enforceReservations = require "handlers/channelHandler".enforceReservations
+local adjustPermissions = require "handlers/channelHandler".adjustPermissions
+local handleTemplate = require "handlers/channelHandler".handleTemplate
 
 local Overseer = require "utils/logWriter"
 local matchmakers = require "utils/matchmakers"
-local templateInterpreter = require "funcs/templateInterpreter"
-local enforceReservations = require "funcs/enforceReservations"
 
 local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
-local blurple = require "embeds".colors.blurple
+local blurple = require "handlers/embedHandler".colors.blurple
 
 local processing = {}
 
@@ -42,8 +42,8 @@ local function lobbyJoin (member, lobby)
 
 	if name:match("%%.-%%") then
 		needsMove = name:match("%%counter%%") and true
-		name = templateInterpreter(name, member, position):match("^%s*(.-)%s*$")
-		if name == "" then name = templateInterpreter("%nickname's% room", member) end
+		name = handleTemplate(name, member, position):match("^%s*(.-)%s*$")
+		if name == "" then name = handleTemplate("%nickname's% room", member) end
 	end
 
 	-- determine channel position if %counter% is detected
@@ -88,7 +88,7 @@ local function lobbyJoin (member, lobby)
 			if companionTarget then
 				local name = lobbyData.companionTemplate or "private-chat"
 				if name:match("%%.-%%") then
-					name = templateInterpreter(name, member, position):discordify()
+					name = handleTemplate(name, member, position):discordify()
 					if name == "" then name = "private-chat" end
 				end
 
@@ -105,7 +105,7 @@ local function lobbyJoin (member, lobby)
 		lobbyData:attachChild(channels[newChannel.id], position)
 
 		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect, permission.readMessages)
-		channelHandler.adjustPermissions(newChannel, member)
+		adjustPermissions(newChannel, member)
 
 		if companion then
 			-- companions are private by default
@@ -244,7 +244,7 @@ local function channelJoin (member, channel)
 	logger:log(4, "GUILD %s CHANNEL %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 
 	--[[ TODO
-	local name = templateInterpreter(guilds[channel.guild.id].template, member, position):match("^%s*(.-)%s*$")
+	local name = handleTemplate(guilds[channel.guild.id].template, member, position):match("^%s*(.-)%s*$")
 
 	local position = #(channel.category and 
 		channel.category.voiceChannels:toArray("position", function (vchannel) return vchannel.position <= channel.position end)

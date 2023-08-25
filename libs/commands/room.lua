@@ -2,17 +2,13 @@ local client = require "client"
 local locale = require "locale"
 local config = require "config"
 
-local channels = require "storage".channels
+local channels = require "handlers/storageHandler".channels
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
 local channelHandler = require "handlers/channelHandler"
-
-local hostPermissionCheck = require "funcs/hostPermissionCheck"
-local templateInterpreter = require "funcs/templateInterpreter"
-local enforceReservations = require "funcs/enforceReservations"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
@@ -49,7 +45,7 @@ local subcommands = {
 		local parent = channelData.parent
 
 		if parent and parent.template and parent.template:match("%%rename%%") then
-			success, err = voiceChannel:setName(templateInterpreter(parent.template, interaction.member or voiceChannel.guild:getMember(interaction.user), channelData.position, name))
+			success, err = voiceChannel:setName(channelHandler.handleTemplate(parent.template, interaction.member or voiceChannel.guild:getMember(interaction.user), channelData.position, name))
 		else
 			success, err = voiceChannel:setName(name)
 		end
@@ -121,12 +117,12 @@ local subcommands = {
 
 		if subcommand == "add" then
 			overwrite:allowPermissions(permission.connect, permission.readMessages)
-			enforceReservations(voiceChannel)
+			channelHandler.enforceReservations(voiceChannel)
 			return "Reserved mentioned members", okEmbed(locale.reserveConfirm:format(user.mentionString))
 
 		elseif subcommand == "remove" then
 			overwrite:clearPermissions(permission.connect, permission.readMessages)
-			enforceReservations(voiceChannel)
+			channelHandler.enforceReservations(voiceChannel)
 			return "Unreserved mentioned members", okEmbed(locale.unreserveConfirm:format(user.mentionString))
 
 		elseif subcommand == "clear" then
@@ -135,7 +131,7 @@ local subcommands = {
 			end)) do
 				permissionOverwrite:clearPermissions(permission.connect, permission.readMessages)
 			end
-			enforceReservations(voiceChannel)
+			channelHandler.enforceReservations(voiceChannel)
 			return "Cleared reservations", okEmbed(locale.reservationsClear:format())
 		end
 	end,
@@ -172,7 +168,7 @@ local subcommands = {
 
 	invite = function (interaction, voiceChannel, user)
 		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and
-			hostPermissionCheck(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
+			channelHandler.checkHostPermissions(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
 		local invite = voiceChannel:createInvite()
 
 		if not invite then
@@ -354,7 +350,7 @@ return function (interaction, subcommand, argument)
 	if noAdmin[subcommand] or member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, voiceChannel, argument)
 	elseif channels[voiceChannel.id].host == interaction.user.id then
-		if hostPermissionCheck(member, voiceChannel, subcommand) then
+		if channelHandler.checkHostPermissions(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end
 		return "Insufficient permissions", warningEmbed(locale.badHostPermission)
