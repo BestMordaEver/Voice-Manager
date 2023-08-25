@@ -26,13 +26,25 @@ return setmetatable({
 	exec = require "commands/exec"
 },{__call = function (self, interaction)
 	if interaction.commandType == commandType.chatInput then
+		-- /lobby add channelname or /room lock or any other command
+
 		local command, subcommand, argument = interaction.commandName, interaction.option and not interaction.option.value and interaction.option.name
+		-- for /lobby add channelname, command is lobby, subcommand is add
+		-- for /help lobby, command is help, subcommand is nil, since lobby is a name-value pair of article-lobby, which is resolved later as an argument
+
 		if not undeferrable[subcommand] then interaction:deferReply(true) end
+		-- undeferrable commands that might need to send a modal
+
+		-- resolving the argument here
 		if interaction.option and interaction.option.options then
 			for optionName, option in pairs(interaction.option.options) do
 				if optionName ~= "lobby" then argument = option end
 			end
 		end
+		-- the argument can be used as indication of work to be done, and actual arguments will be resolved by the command function itself
+		-- like /lobby permissions ...
+
+		-- most commands will treat argument nil as a call for reset
 		return self[command](interaction, subcommand, argument and (argument.value or argument))
 	elseif interaction.type == commandType.user then
 		if interaction.commandName == "Invite" then
