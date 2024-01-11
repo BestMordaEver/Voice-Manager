@@ -99,11 +99,11 @@ return {
 
 	helpFieldValues = {
 		[0] = {
-			"Setup and configure lobbies - `/lobby`",
-			"Setup and configure matchmaking in lobbies or normal channels - `/matchmaking`",
-			"Configure companion chats (see `Lobby commands` first) - `/companion`",
-			"Allow users to moderate and configure their rooms - `/room`",
-			"Allow users to moderate and configure their private chats - `/chat`",
+			"Setup and configure lobbies - **/lobby**",
+			"Setup and configure matchmaking in lobbies or normal channels - **/matchmaking**",
+			"Configure companion chats (see **Lobby commands** first) - **/companion**",
+			"Allow users to moderate and configure their rooms - **/room**",
+			"Allow users to moderate and configure their private chats - **/chat**",
 			"Different helpful commands for users and administrators"
 		},
 		{
@@ -112,25 +112,25 @@ return {
 			"Remove an existing lobby",
 			"Select a category in which rooms will be created. By default, rooms are created in the same category as the lobby",
 			[[Configure what name a room will have when it's created
-Default name is `%nickname's% room`
-You can put different `%combos%` in the name to customize it
-`%name%` - user's name
-`%nickname%` - user's nickname (name is used if nickname is not set)
-`%name's%`, `%nickname's%` - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
-`%tag%` - user's tag (for example **Riddles#2773**)
-`%game%` - user's currently played game (**no game** if user's not playing anything)
-`%game(text)%` - same as %game%, but shows **text** instead of **no game**
-`%counter%` - room position. Keeps rooms ordered
-`%rename%` - blank when room is created. When host uses `/room rename`, gets replaced by host's input]],
+Default name is **%nickname's% room**
+You can put different **%combos%** in the name to customize it
+**%name%** - user's name
+**%nickname%** - user's nickname (name is used if nickname is not set)
+**%name's%**, **%nickname's%** - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
+**%tag%** - user's tag (for example **Riddles#2773**)
+**%game%** - user's currently played game (**no game** if user's not playing anything)
+**%game(text)%** - same as %game%, but shows **text** instead of **no game**
+**%counter%** - room position. Keeps rooms ordered
+**%rename%** - blank when room is created. When host uses **/room rename**, gets replaced by host's input]],
 			"Select new rooms' capacity. By default, capacity will be copied over from the lobby",
 			"Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respect server boost status, so you may want to try bigger numbers",
 			[[Give room hosts' access to different commands
-`rename` - allows use of `/room rename` and `/chat rename`
-`resize` - allows use of `/room resize`
-`bitrate` - allows use of `/room bitrate`
-`manage` - all of the above, plus gives host **Manage Channels** permission in their room
-`mute` - allows use of `/room mute|unmute` and `/chat mute|unmute`
-`moderate` - same as `mute`, plus gives host **Move Members** permission in their room, `/room kick`, `/room block|reserve` and `/chat hide|show`]],
+**rename** - allows use of **/room rename** and **/chat rename**
+**resize** - allows use of **/room resize**
+**bitrate** - allows use of **/room bitrate**
+**manage** - all of the above, plus gives host **Manage Channels** permission in their room
+**mute** - allows use of **/room mute|unmute** and **/chat mute|unmute**
+**moderate** - same as **mute**, plus gives host **Move Members** permission in their room, **/room kick**, **/room block|reserve** and **/chat hide|show**]],
 			"Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone",
 		},
 		{
@@ -141,27 +141,27 @@ You can put different `%combos%` in the name to customize it
 **If target is a lobby**, then matchmaking pool is rooms that are created by that lobby. If no room is available, a new one is created using that lobby's settings
 **If target is a category**, then matchmaking pool is its voice channels. If no channel is available, user is kicked from matchmaking lobby]],
 			[[Select the matchmaking mode. All modes respect channel capacity and blocklists/reservations
-`random` - selects a random available channel
-`max` - selects a most filled channel
-`min` - selects a least filled channel
-`first` - selects the first available channel
-`last` - selects the last available channel]],
+**random** - selects a random available channel
+**max** - selects a most filled channel
+**min** - selects a least filled channel
+**first** - selects the first available channel
+**last** - selects the last available channel]],
 		},
 		{
 			"Show all lobies that have companion chats enabled",
 			"Enable or disable companion chat for selected lobby",
 			"Select a category in which chats will be created",
-			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to `/lobby name`. Default is `private-chat`
+			[[Configure what name a chat will have when it's created and customize it with %combos% similarly to **/lobby name**. Default is **private-chat**
 Text chat names have default formatting enforced by Discord, name template will be automatically converted to conform to it]],
 			[[Configure a message that will be automatically sent to chat when it's created
-You can put different `%combos%` in the greeting to customize it
-`%roomname%` - name of the room chat belongs to
-`%chatname%` - name of the chat
-`%commands%` - formatted list of `/room` and `/chat` commands
-`%roomcommands%` - raw list of `/room` commands
-`%chatcommands%` - raw list of `/chat` commands
-`%nickname%`, `%name%`, `%tag%`, `%nickname's%`, `%name's%` - similar to `/lobby name`
-`%buttons%` - blank, attaches privacy control buttons to the greeting message]],
+You can put different **%combos%** in the greeting to customize it
+**%roomname%** - name of the room chat belongs to
+**%chatname%** - name of the chat
+**%commands%** - formatted list of **/room** and **/chat** commands
+**%roomcommands%** - raw list of **/room** commands
+**%chatcommands%** - raw list of **/chat** commands
+**%nickname%**, **%name%**, **%tag%**, **%nickname's%**, **%name's%** - similar to **/lobby name**
+**%buttons%** - blank, attaches privacy control buttons to the greeting message]],
 			"Enable chat logging. Logs will be sent as files to a channel of your choosing. Users will be notified about chat logging with a generic greeting message in chat"
 		},
 		{
@@ -196,7 +196,7 @@ By default, deletes all messages]]
 		{
 			"Show server settings",
 			"Set the maximum amount of channels bot will create on the server",
-			[[Enable room commands in normal voice channels, similar to `/lobby permissions`
+			[[Enable room commands in normal voice channels, similar to **/lobby permissions**
 Bot will start deleting user permission overwrites in all channels once this is enabled, use at your own risk!]],
 			"Change the default role that's used to inflict restrictions in channels"
 		},
@@ -205,15 +205,15 @@ Bot will start deleting user permission overwrites in all channels once this is 
 You can specify the page to show instead of table of contents]],
 			"Send invite to the support server",
 			[[Reset any setting to its default value
-Example: `/reset companions greeting`]],
-			[[Clone a channel. You can add `%counter%` to channel name to make the cloned channels numbered, and `%counter(number)%` to start counting from a specific number
+Example: **/reset companions greeting**]],
+			[[Clone a channel. You can add **%counter%** to channel name to make the cloned channels numbered, and **%counter(number)%** to start counting from a specific number
 This command will not carry over any permission overrides from the cloned channel - all clones will spawn synced with the parent category]],
 			[[Delete several channels. Optionally select several filters - category, name, whether to consider channels with messages (for test) or connected members (for voice).
 This command will not immediately delete the selected channels, instead helper tool will appear. Handle with care, since channels are deleted irreversibly!]],
 			[[Create a handy list of users in a selected channel.
 If selected channel is a lobby, prints users in lobby's rooms or matchmaking pool channels
 If category is selected, all it's channels are used]],
-			"Give or remove a role to/from users in a selected channel. Selection rules are similar to `/users print`"
+			"Give or remove a role to/from users in a selected channel. Selection rules are similar to **/users print**"
 		}
 	},
 
@@ -237,7 +237,7 @@ If category is selected, all it's channels are used]],
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
-You can add a lobby with `/lobby add`]],
+You can add a lobby with **/lobby add**]],
 	lobbiesInfo = "Select lobbies to change their settings",
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
@@ -267,7 +267,7 @@ You can add a lobby with `/lobby add`]],
 	-- matchmaking
 	matchmakingInfoTitle = "Matchmaking info | %s",
 	matchmakingNoInfo = [[There are no registered matchmaking lobbies
-You can create a matchmaking lobby with `/matchmaking add`]],
+You can create a matchmaking lobby with **/matchmaking add**]],
 	matchmakingField = [[**Target:** %s
 **Mode:** %s
 **Matchmaking pool:** %d channels]],
@@ -281,7 +281,7 @@ You can create a matchmaking lobby with `/matchmaking add`]],
 	-- companion
 	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
-You can enable companion channels with `/lobby companion enable`]],
+You can enable companion channels with **/lobby companion enable**]],
 	companionsField = [[**Category:** %s
 **Name:** %s
 **Logging:** %s
@@ -292,11 +292,11 @@ You can enable companion channels with `/lobby companion enable`]],
 	greetingReset = "Disabled the greeting",
 	greetingModalTitle = "Companion greeting",
 	greetingModalLabel = "Greeting message",
-	roomCommands = "Available `/room` commands: ",
-	chatCommands = "Available `/chat` commands: ",
+	roomCommands = "Available **/room** commands: ",
+	chatCommands = "Available **/chat** commands: ",
 	logConfirm = "Chat logs will be sent to %s",
 	logReset = "Disabled the chatlogs",
-	logName = "`%s` room of `%s` lobby\n",
+	logName = "**%s** room of **%s** lobby\n",
 	loggerWarning = "\n\n*This text chat will be logged*",
 
 	-- room
@@ -329,7 +329,7 @@ https://discord.gg/%s]],
 	badNewHost = "Can't promote users outside of the room",
 	hostIdentify = "%s is a room host",
 	badHost = "Can't identify the host",
-	passwordConfirm = "Password is set to `%s`",
+	passwordConfirm = "Password is set to **%s**",
 	passwordReset = "Password is removed",
 	passwordCheckText = "This channel is protected by password. Please enter the password to access the channel.",
 	passwordEnter = "Enter the password",
@@ -386,11 +386,11 @@ https://discord.gg/%s]],
 	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
 	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 
-	ping = [[:green_circle: `%dms`
-`%d` servers 
-`%d | %d` lobbies
-`%d | %d` channels
-`%d | %d` users]],
+	ping = [[:green_circle: **%dms**
+**%d** servers 
+**%d | %d** lobbies
+**%d | %d** channels
+**%d | %d** users]],
 
 	-- errors
 	notLobby = "Selected channel is not a lobby",
