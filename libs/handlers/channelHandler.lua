@@ -126,7 +126,7 @@ channelHandler.handleTemplate = function (template, member, position, replacemen
 		(member.competing and member.competing.name) or
 		template:match("%%game%((.-)%)%%") or "no game"
 
-	template = template:gsub("%%game%(.-%)%%", "%%game%%")
+	template = template:gsub("%%game%(.-%)%%", game:demagic())
 
 	local rt = {
 		nickname = nickname,
