@@ -302,7 +302,7 @@ local subcommands = {
 		if argument == "lock" then
 			reprivilegify(voiceChannel)
 			ov:denyPermissions(permission.connect, permission.sendMessages)
-			if voiceChannel.parent ~= voiceChannel.guild and ov:getAllowedPermissions():has(permission.readMessages) then
+			if voiceChannel.category and voiceChannel.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions():has(permission.readMessages) then
 				ov:allowPermissions(permission.readMessages)
 			else
 				ov:clearPermissions(permission.readMessages)
@@ -315,8 +315,15 @@ local subcommands = {
 
 			log = "Room is hidden"
 		elseif argument == "open" then
-			if voiceChannel.parent ~= voiceChannel.guild and ov:getAllowedPermissions():has(permission.connect, permission.sendMessages, permission.readMessages) then
-				ov:allowPermissions(permission.connect, permission.sendMessages, permission.readMessages)
+			if voiceChannel.category then
+				local allowed = voiceChannel.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions()
+				for _,perm in pairs({permission.connect, permission.sendMessages, permission.readMessages}) do
+					if allowed:has(perm) then
+						ov:allowPermissions(perm)
+					else
+						ov:clearPermissions(perm)
+					end
+				end
 			else
 				ov:clearPermissions(permission.connect, permission.sendMessages, permission.readMessages)
 			end

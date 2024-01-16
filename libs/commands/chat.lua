@@ -133,7 +133,7 @@ subcommands = {
 		if argument == "lock" then
 			reprivilegify(channel, chat)
 			ov:denyPermissions(permission.sendMessages)
-			if chat.parent ~= chat.guild and ov:getAllowedPermissions():has(permission.readMessages) then
+			if chat.category and chat.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions():has(permission.readMessages) then
 				ov:allowPermissions(permission.readMessages)
 			else
 				ov:clearPermissions(permission.readMessages)
@@ -146,8 +146,15 @@ subcommands = {
 
 			log = "Chat is hidden"
 		elseif argument == "open" then
-			if chat.parent ~= chat.guild and ov:getAllowedPermissions():has(permission.sendMessages, permission.readMessages) then
-				ov:allowPermissions(permission.sendMessages, permission.readMessages)
+			if chat.category then
+				local allowed = chat.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions()
+				for _,perm in pairs({permission.sendMessages, permission.readMessages}) do
+					if allowed:has(perm) then
+						ov:allowPermissions(perm)
+					else
+						ov:clearPermissions(perm)
+					end
+				end
 			else
 				ov:clearPermissions(permission.sendMessages, permission.readMessages)
 			end
