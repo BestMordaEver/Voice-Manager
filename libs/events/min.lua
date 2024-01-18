@@ -15,7 +15,7 @@ return function (date)
 	stats.lobbies = #storage.lobbies
 	stats.channels = #storage.channels
 	stats.users = storage.channels:users()
-	client:setGame(status())
+	client:setActivity(status())
 
 	if config.heartbeat then
 		if mercy:tick() or (config.dailyreboot and stats.users == 0 and os.clock() > 86000) then mercy:kill() end

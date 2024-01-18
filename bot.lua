@@ -21,7 +21,7 @@ end
 
 local intents = discordia.enums.gatewayIntent
 local client = discordia.Client{
-	intents =
+	gatewayIntents =
 		intents.guilds +
 		intents.guildVoiceStates +
 		intents.guildPresences +
@@ -78,7 +78,7 @@ client:once(safeEvent("ready", function ()
 	storage.stats.lobbies = #storage.lobbies
 	storage.stats.channels = #storage.channels
 	storage.stats.users = storage.channels:users()
-	client:setGame(status())
+	client:setActivity(status())
 
 	storage.guilds:cleanup()
 	storage.lobbies:cleanup()

@@ -10,7 +10,7 @@ local channelType = require "discordia".enums.channelType
 local insert = table.insert
 
 local modes = {
-    username = function (member) return member.username end,
+    username = function (member) return member.user.name end,
     tag = function (member) return member.user.tag end,
     nickname = function (member) return member.name end,
     mention = function (member) return member.user.mentionString end,
