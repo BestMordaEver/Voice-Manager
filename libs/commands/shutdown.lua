@@ -11,7 +11,7 @@ return function (interaction)
 	end
 
 	local status, msg = xpcall(function()
-		client:setGame({name = "the maintenance", type = 3})
+		client:setActivity({name = "the maintenance", type = 3})
 		clock:stop()
 		client:stop()
 	end, debug.traceback)
