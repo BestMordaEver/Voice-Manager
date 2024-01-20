@@ -1405,7 +1405,7 @@ local commandsStructure = {
 						required = true,
 						channel_types = {
 							channelType.voice,
-							channelType.stage,
+							channelType.stageVoice,
 							channelType.category
 						}
 					},
@@ -1455,7 +1455,7 @@ local commandsStructure = {
 						required = true,
 						channel_types = {
 							channelType.voice,
-							channelType.stage,
+							channelType.stageVoice,
 							channelType.category
 						}
 					},
@@ -1479,7 +1479,7 @@ local commandsStructure = {
 						required = true,
 						channel_types = {
 							channelType.voice,
-							channelType.stage,
+							channelType.stageVoice,
 							channelType.category
 						}
 					},
