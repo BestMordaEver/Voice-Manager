@@ -752,10 +752,12 @@ local commandsStructure = {
 						description = "Change the name of the voice channel",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "name",
 							description = "New voice channel name",
 							type = commandOptionType.string,
 							required = true
+							}
 						}
 					},
 					{
@@ -763,10 +765,12 @@ local commandsStructure = {
 						description = "Change the name of the companion text channel, if there is one",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "name",
 							description = "New text channel name",
 							type = commandOptionType.string,
 							required = true
+							}
 						}
 					}
 				}
@@ -824,9 +828,11 @@ local commandsStructure = {
 						description = "Prevent the new users from speaking in this voice chat",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Mute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -834,9 +840,11 @@ local commandsStructure = {
 						description = "Prevent the new users from typing in the text chat",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Mute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -844,9 +852,11 @@ local commandsStructure = {
 						description = "Prevent the new users to both write and speak in this room",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Mute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					}
 				}
@@ -861,9 +871,11 @@ local commandsStructure = {
 						description = "Allow the new users to speak",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Unmute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -871,9 +883,11 @@ local commandsStructure = {
 						description = "Allow the new users to type in the text chat",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Unmute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -881,9 +895,11 @@ local commandsStructure = {
 						description = "Allow the new users to write and speak in this room",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Unmute a specific user",
 							type = commandOptionType.user
+							}
 						}
 					}
 				}
@@ -898,9 +914,11 @@ local commandsStructure = {
 						description = "Hide only the voice channel",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Hide the channel from a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -908,9 +926,11 @@ local commandsStructure = {
 						description = "Hide only the text channel",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Hide the channel from a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -918,9 +938,11 @@ local commandsStructure = {
 						description = "Hide all the channels relevant to the room",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Hide the channels from a specific user",
 							type = commandOptionType.user
+							}
 						}
 					}
 				}
@@ -935,9 +957,11 @@ local commandsStructure = {
 						description = "Reveal only the voice channel",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Reveal the channel to a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -945,9 +969,11 @@ local commandsStructure = {
 						description = "Reveal only the text channel",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Reveal the channel to a specific user",
 							type = commandOptionType.user
+							}
 						}
 					},
 					{
@@ -955,9 +981,11 @@ local commandsStructure = {
 						description = "Reveal all the channels relevant to the room",
 						type = commandOptionType.subcommand,
 						options = {
+							{
 							name = "user",
 							description = "Reveal the channels to a specific user",
 							type = commandOptionType.user
+							}
 						}
 					}
 				}
@@ -965,7 +993,7 @@ local commandsStructure = {
 			{
 				name = "block",
 				description = "Prevent the user from connecting to the room",
-				type = commandOptionType.subcommandGroup,
+				type = commandOptionType.subcommand,
 				options = {
 					{
 						name = "user",
@@ -978,7 +1006,7 @@ local commandsStructure = {
 			{
 				name = "unblock",
 				description = "Allow the user to connect to the room",
-				type = commandOptionType.subcommandGroup,
+				type = commandOptionType.subcommand,
 				options = {
 					{
 						name = "user",
