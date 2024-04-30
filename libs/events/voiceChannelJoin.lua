@@ -231,8 +231,6 @@ local function roomJoin (member, channel)
 
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)
 
-	enforceReservations(channel)
-
 	local companion = client:getChannel(channelData.companion)
 	if companion and not companion:getPermissionOverwriteFor(member):getDeniedPermissions():has(permission.readMessages) then
 		companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)

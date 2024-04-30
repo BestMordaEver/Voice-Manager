@@ -15,7 +15,6 @@ return setmetatable({
 	companion = require "commands/companions",
 	matchmaking = require "commands/matchmaking",
 	room = require "commands/room",
-	chat = require "commands/chat",
 	clone = require "commands/clone",
 	delete = require "commands/delete",
 	users = require "commands/users",

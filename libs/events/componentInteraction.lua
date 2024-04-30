@@ -30,7 +30,11 @@ return function (interaction)
 		end
 		if reply then interaction:reply(reply) end
 	else
-		interaction:reply(errorEmbed())
+		if interaction.isReplied then
+			interaction:followup(errorEmbed())
+		else
+			interaction:reply(errorEmbed())
+		end
 		error(logMsg)
 	end
 
