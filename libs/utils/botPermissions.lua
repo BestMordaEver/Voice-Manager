@@ -6,35 +6,49 @@ local botPermissions
 local botPermissionsMT = {
 	__index = {
 		bits = {
-			--deafen = 0x01,
-			mute = 0x02,
-			moderate = 0x04,
-			manage = 0x08,
-			rename = 0x10,
-			resize = 0x20,
-			bitrate = 0x40
+			--superhost = 0x0001,
+			mute      = 0x0002,
+			moderate  = 0x0004,
+			manage    = 0x0008,
+			rename    = 0x0010,
+			resize    = 0x0020,
+			bitrate   = 0x0040,
+			--unmute    = 0x0080,
+			kick      = 0x0100,
+			hide      = 0x0200,
+			--show      = 0x0400,
+			lock      = 0x0800,
+			--unlock    = 0x1000,
+			password  = 0x2000,
 		},
 
 		perms = {
-			--[0x01] = "deafen",
-			[0x02] = "mute",
-			[0x04] = "moderate",
-			[0x08] = "manage",
-			[0x10] = "rename",
-			[0x20] = "resize",
-			[0x40] = "bitrate"
+			--[0x0001] = "superhost",
+			[0x0002] = "mute",
+			[0x0004] = "moderate",
+			[0x0008] = "manage",
+			[0x0010] = "rename",
+			[0x0020] = "resize",
+			[0x0040] = "bitrate",
+			--[0x0080] = "unmute",
+			[0x0100] = "kick",
+			[0x0200] = "hide",
+			--[0x0400] = "show",
+			[0x0800] = "lock",
+			--[0x1000] = "unlock",
+			[0x2000] = "password"
 		},
 
 		toDiscordia = function (self)
 			local perms = {}
-			if self.bitfield:has(self.bits.moderate) then table.insert(perms, permission.moveMembers) end
+			if self.bitfield:has(self.bits.moderate) or self.bitfield:has(self.bits.kick) then table.insert(perms, permission.moveMembers) end
 			if self.bitfield:has(self.bits.manage) then table.insert(perms, permission.manageChannels) end
 
 			return perms
 		end,
 
 		has = function (self, permission)
-			return (self.bits[permission] or tonumber(permission)) and self.bitfield:has(self.bits[permission] or permission) or false
+			return (self.bits[permission] or tonumber(permission)) and self.bitfield:has(self.bits[permission] or tonumber(permission)) or false
 		end,
 
 		value = function (self)

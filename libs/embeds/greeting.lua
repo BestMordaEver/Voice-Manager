@@ -7,60 +7,69 @@ local channels = require "handlers/storageHandler".channels
 local availableCommands = require "embeds/availableCommands"
 
 local enums = require "discordia".enums
+local buttonStyle = enums.buttonStyle
 local componentType = enums.componentType
 local fuchsia = embedHandler.colors.fuchsia
 
 local selects = {
 	{
 		type = componentType.row,
-		components = {{
-			type = componentType.stringSelect,
-			custom_id = "room_widget",
-			options = {
-				{
-					label = "Public",
-					value = "open",
-					description = "Anybody can enter the room",
-					emoji = {name = "🔊"},
-					default = true
-				},{
-					label = "Locked",
-					value = "lock",
-					description = "Only people you invite can enter the room",
-					emoji = {name = "🔒"}
-				},{
-					label = "Invisible",
-					value = "hide",
-					description = "Only people you invite can see the room",
-					emoji = {name = "⛔"}
-				}
+		components = {
+			{
+				type = componentType.button,
+				style = buttonStyle.success,
+				label = "Show",
+				custom_id = "room_widget_show_both",
+				emoji = {name = "👁"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.success,
+				label = "Unlock",
+				custom_id = "room_widget_unlock",
+				emoji = {name = "🔓"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.success,
+				label = "Unmute voice",
+				custom_id = "room_widget_unmute_voice",
+				emoji = {name = "🔉"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.success,
+				label = "Unmute text",
+				custom_id = "room_widget_unmute_text",
+				emoji = {name = "🖊"}
 			}
-		}}
+		}
 	},{
 		type = componentType.row,
-		components = {{
-			type = componentType.stringSelect,
-			custom_id = "chat_widget",
-			options = {
-				{
-					label = "Public",
-					value = "open",
-					description = "Anybody can write in your chat",
-					emoji = {name = "✒"}
-				},{
-					label = "Visible",
-					value = "lock",
-					description = "Everybody can see the chat, but only room members can write",
-					emoji = {name = "📄"}
-				},{
-					label = "Invisible",
-					value = "hide",
-					description = "Only room members can see the chat",
-					emoji = {name = "🥷"},
-					default = true
-				}
+		components = {
+			{
+				type = componentType.button,
+				style = buttonStyle.secondary,
+				label = "Hide",
+				custom_id = "room_widget_hide_both",
+				emoji = {name = "🥷"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.secondary,
+				label = "Lock",
+				custom_id = "room_widget_lock",
+				emoji = {name = "🔒"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.secondary,
+				label = "Mute voice",
+				custom_id = "room_widget_mute_voice",
+				emoji = {name = "🔇"}
+			},{
+				type = componentType.button,
+				style = buttonStyle.secondary,
+				label = "Mute text",
+				custom_id = "room_widget_mute_text",
+				emoji = {name = "📵"}
 			}
-		}}
+		}
 	}
 }
 
@@ -72,8 +81,6 @@ return embedHandler("greeting", function (room, ephemeral)
 
 	local companion = client:getChannel(channelData.companion)
 	if not companion then return end
-
-	local roomC, chatC = availableCommands(room)
 
 	local member = room.guild:getMember(channelData.host)
 	local uname = member.user.name
@@ -87,9 +94,7 @@ return embedHandler("greeting", function (room, ephemeral)
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = locale.roomCommands .. roomC .."\n" .. locale.chatCommands .. chatC,
-		roomcommands = roomC,
-		chatcommands = chatC,
+		commands = locale.roomCommands .. availableCommands(room),
 		buttons = ""
 	}
 

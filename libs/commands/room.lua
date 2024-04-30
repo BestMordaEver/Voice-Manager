@@ -12,49 +12,46 @@ local channelHandler = require "handlers/channelHandler"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
-local overwriteType = require "discordia".enums.overwriteType
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
 
 ratelimiter("channelName", 2, 600)
 
-local function reprivilegify (voiceChannel)
-	for _, permissionOverwrite in pairs(voiceChannel.permissionOverwrites) do
-		if permissionOverwrite.type == overwriteType.member and
-			permissionOverwrite:getObject().voiceChannel ~= voiceChannel and
-			permissionOverwrite:getObject() ~= voiceChannel.guild.me then
+local subcommands
+subcommands = {
+	rename = function (interaction, channel)
+		local type, name = interaction.option.option.name, interaction.option.option.option.value
+		local channelData = channels[channel.id]
+		local template = channelData.parent and channelData.parent.template
 
-			permissionOverwrite:delete()
+		if type == "text" then
+			local companion = client:getChannel(channelData.companion)
+			if not companion or companion == channel then
+				return "No text channel to rename", warningEmbed(locale.renameNoText)
+			end
+			channel = companion
+			template = channelData.parent and channelData.parent.companionTemplate
 		end
-	end
 
-	for _, member in pairs(voiceChannel.connectedMembers) do
-		voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect, permission.readMessages)
-	end
-end
-
-local subcommands = {
-	rename = function (interaction, voiceChannel, name)
-		local limit, retryIn = ratelimiter:limit("channelName", voiceChannel.id)
+		local limit, retryIn = ratelimiter:limit("channelName", channel.id)
 		if limit == -1 then
 			return "Ratelimit reached", warningEmbed(locale.ratelimitReached:format(retryIn))
 		end
 
-		local channelData, success, err = channels[voiceChannel.id]
-		local parent = channelData.parent
+		local success, err
 
-		if parent and parent.template and parent.template:match("%%rename%%") then
-			success, err = voiceChannel:setName(channelHandler.handleTemplate(parent.template, interaction.member or voiceChannel.guild:getMember(interaction.user), channelData.position, name))
+		if template and template:match("%%rename.-%%") then
+			success, err = channel:setName(channelHandler.handleTemplate(template, interaction.member or channel.guild:getMember(interaction.user), channelData.position, name))
 		else
-			success, err = voiceChannel:setName(name)
+			success, err = channel:setName(name)
 		end
 
 		if success then
-			return "Successfully changed room name", okEmbed(locale.nameConfirm:format(voiceChannel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn))
+			return "Successfully changed channel name", okEmbed(locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn))
 		end
 
-		return "Couldn't change room name: "..err, warningEmbed(locale.renameError)
+		return "Couldn't change channel name: "..err, warningEmbed(locale.renameError)
 	end,
 
 	resize = function (interaction, voiceChannel, size)
@@ -83,142 +80,6 @@ local subcommands = {
 		else
 			return "Couldn't change room bitrate: "..err, warningEmbed(locale.bitrateError)
 		end
-	end,
-
-	blocklist = function (interaction, voiceChannel)
-		local user, subcommand = interaction.option.option.option, interaction.option.option.name
-		user = user and user.value
-		if user == client.user then
-			return "Attempt to block the bot", warningEmbed(locale.shame)
-		end
-
-		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
-
-		if subcommand == "add" then
-			overwrite:denyPermissions(permission.connect, permission.sendMessages)	-- sendMessages is used as an indication of blocklist, to not conflict with password flow
-			return "Blocked mentioned members", okEmbed(locale.blockConfirm:format(user.mentionString))
-
-		elseif subcommand == "remove" then
-			overwrite:clearPermissions(permission.connect, permission.sendMessages)
-			return "Unblocked mentioned members", okEmbed(locale.unblockConfirm:format(user.mentionString))
-
-		elseif subcommand == "clear" then
-			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite) return permissionOverwrite.type == overwriteType.member end)) do
-				permissionOverwrite:clearPermissions(permission.connect, permission.sendMessages)
-			end
-			return "Cleared blocklist", okEmbed(locale.blocklistClear:format())
-		end
-	end,
-
-	reservations = function (interaction, voiceChannel)
-		local user, subcommand = interaction.option.option.option, interaction.option.option.name
-		user = user and user.value
-		local overwrite = user and voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user))
-
-		if subcommand == "add" then
-			overwrite:allowPermissions(permission.connect, permission.readMessages)
-			channelHandler.enforceReservations(voiceChannel)
-			return "Reserved mentioned members", okEmbed(locale.reserveConfirm:format(user.mentionString))
-
-		elseif subcommand == "remove" then
-			overwrite:clearPermissions(permission.connect, permission.readMessages)
-			channelHandler.enforceReservations(voiceChannel)
-			return "Unreserved mentioned members", okEmbed(locale.unreserveConfirm:format(user.mentionString))
-
-		elseif subcommand == "clear" then
-			for _, permissionOverwrite in ipairs(voiceChannel.permissionOverwrites:toArray(function (permissionOverwrite)
-				return permissionOverwrite.type == overwriteType.member and permissionOverwrite:getObject() ~= permissionOverwrite.guild.me
-			end)) do
-				permissionOverwrite:clearPermissions(permission.connect, permission.readMessages)
-			end
-			channelHandler.enforceReservations(voiceChannel)
-			return "Cleared reservations", okEmbed(locale.reservationsClear:format())
-		end
-	end,
-
-	lock = function (interaction, voiceChannel)
-		reprivilegify(voiceChannel)
-
-		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
-		voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole):denyPermissions(permission.connect)
-		return "Locked the room", okEmbed(locale.lockConfirm)
-	end,
-
-	unlock = function (interaction, voiceChannel)
-		reprivilegify(voiceChannel)
-
-		local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
-		local role = parent and guild:getRole(parent.role) or guild.defaultRole
-		if voiceChannel.parent ~= voiceChannel.guild and voiceChannel.parent:getPermissionOverwriteFor(role):getAllowedPermissions():has(permission.connect) then
-			voiceChannel:getPermissionOverwriteFor(role):allowPermissions(permission.connect)
-		else
-			voiceChannel:getPermissionOverwriteFor(role):clearPermissions(permission.connect)
-		end
-
-		return "Unlocked the room", okEmbed(locale.unlockConfirm)
-	end,
-
-	kick = function (interaction, voiceChannel, user)
-		local member = voiceChannel.guild:getMember(user)
-		if member.voiceChannel == voiceChannel then
-			member:setVoiceChannel()
-		end
-		return "Kicked member", okEmbed(locale.kickConfirm:format(user.mentionString))
-	end,
-
-	invite = function (interaction, voiceChannel, user)
-		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and
-			channelHandler.checkHostPermissions(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
-		local invite = voiceChannel:createInvite()
-
-		if not invite then
-			return "Bot isn't permitted to create invites", warningEmbed(locale.inviteError)
-		end
-
-		if not user then
-			return "Created invite in room", okEmbed(locale.inviteCreated:format(invite.code))
-		end
-
-		if not user:getPrivateChannel() then
-			return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
-		end
-
-		user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
-
-		if tryReservation then
-			voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.connect, permission.speak)
-		end
-		return "Sent invite to mentioned user", okEmbed(locale.inviteConfirm:format(user.mentionString))
-	end,
-
-	mute = function (interaction, voiceChannel, user)
-		local guild, silentRoom = voiceChannel.guild
-		local member = guild:getMember(user)
-
-		if guild.afkChannel then
-			silentRoom = guild.afkChannel
-		else
-			silentRoom = voiceChannel.category:createVoiceChannel("Silent room")
-			if not silentRoom then
-				silentRoom = guild:createVoiceChannel("Silent room")
-			end
-			if not silentRoom then silentRoom = nil end
-		end
-
-		voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.speak)
-		if member.voiceChannel == voiceChannel then
-			member:setVoiceChannel(silentRoom)
-			if silentRoom then member:setVoiceChannel(voiceChannel) end
-		end
-
-		if silentRoom and silentRoom ~= guild.afkChannel then silentRoom:delete() end
-
-		return "Muted mentioned members", okEmbed(locale.muteConfirm:format(user.mentionString))
-	end,
-
-	unmute = function (interaction, voiceChannel, user)
-		voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):clearPermissions(permission.speak)
-		return "Unmuted mentioned members", okEmbed(locale.unmuteConfirm:format(user.mentionString))
 	end,
 
 	host = function (interaction, voiceChannel, newHost)
@@ -250,6 +111,294 @@ local subcommands = {
 				return "Didn't find host", warningEmbed(locale.badHost)
 			end
 		end
+	end,
+
+	kick = function (interaction, voiceChannel, user)
+		local member = voiceChannel.guild:getMember(user)
+		if member.voiceChannel == voiceChannel then
+			member:setVoiceChannel()
+			return "Kicked member", okEmbed(locale.kickConfirm:format(user.mentionString))
+		else
+			return "Can't kick the user from a different room", warningEmbed(locale.kickNotInRoom)
+		end
+	end,
+
+	mute = function (interaction, voiceChannel, scope)
+		local user
+		if not scope then
+			scope = interaction.option.option.name
+			user = interaction.option.option.option and interaction.option.option.option.value
+		end
+
+		local overwriteTarget
+		if user then
+			overwriteTarget = voiceChannel.guild:getMember(user)
+		else
+			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
+		end
+
+		if scope == "voice" or scope == "both" then
+			if user then
+				local guild = voiceChannel.guild
+
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.speak)
+
+				if overwriteTarget.voiceChannel == voiceChannel then
+					local silentRoom
+					if guild.afkChannel then
+						silentRoom = guild.afkChannel
+					else
+						silentRoom = voiceChannel.category:createVoiceChannel("Silent room")
+						if not silentRoom then
+							silentRoom = guild:createVoiceChannel("Silent room")
+						end
+						if not silentRoom then silentRoom = nil end
+					end
+
+					overwriteTarget:setVoiceChannel(silentRoom)
+					if silentRoom then
+						overwriteTarget:setVoiceChannel(voiceChannel)
+						if silentRoom ~= guild.afkChannel then
+							silentRoom:delete()
+						end
+					end
+				end
+			else
+				for _, member in pairs(voiceChannel.connectedMembers) do
+					local po = voiceChannel:getPermissionOverwriteFor(member)
+					if not po:getAllowedPermissions():has(permission.speak) and member:hasPermission(permission.speak) then
+						po:allowPermissions(permission.speak)
+					end
+				end
+
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.speak)
+			end
+		end
+
+		local companion = client:getChannel(channels[voiceChannel.id].companion)
+		if scope == "text" or scope == "both" then
+			if user then
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+
+				if channels[voiceChannel.id].companion then
+					if companion then
+						companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+					end
+				end
+			else
+				for _, member in pairs(voiceChannel.connectedMembers) do
+					local po = voiceChannel:getPermissionOverwriteFor(member)
+					if not po:getAllowedPermissions():has(permission.sendMessages) and member:hasPermission(permission.sendMessages) then
+						po:allowPermissions(permission.sendMessages)
+						if companion then
+							companion:getPermissionOverwriteFor(member):allowPermissions(permission.sendMessages)
+						end
+					end
+				end
+
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+				if companion then
+					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+				end
+			end
+		end
+
+		if user then
+			return "Muted mentioned user", okEmbed(locale.muteConfirm:format(user.mentionString))
+		else
+			return "Muted all users outside the room", okEmbed(locale.muteAllConfirm)
+		end
+	end,
+
+	unmute = function (interaction, voiceChannel, scope)
+		local user
+		if not scope then
+			scope = interaction.option.option.name
+			user = interaction.option.option.option and interaction.option.option.option.value
+		end
+
+		local overwriteTarget
+		if user then
+			overwriteTarget = voiceChannel.guild:getMember(user)
+		else
+			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
+		end
+
+		if scope == "voice" or scope == "both" then
+			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.speak)
+		end
+
+		local companion = client:getChannel(channels[voiceChannel.id].companion)
+		if scope == "text" or scope == "both" then
+			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.sendMessages)
+
+			if companion then
+					companion:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.sendMessages)
+			end
+		end
+
+		if user then
+			return "Unmuted mentioned user", okEmbed(locale.unmuteConfirm:format(user.mentionString))
+		else
+			return "Unmuted all users outside the room", okEmbed(locale.unmuteAllConfirm)
+		end
+	end,
+
+	hide = function (interaction, voiceChannel, scope)
+		local user
+		if not scope then
+			scope = interaction.option.option.name
+			user = interaction.option.option.option and interaction.option.option.option.value
+		end
+
+		local overwriteTarget
+		if user then
+			overwriteTarget = voiceChannel.guild:getMember(user)
+		else
+			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
+		end
+
+		if scope == "voice" or scope == "both" then
+			if user then
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+			else
+				for _, member in pairs(voiceChannel.connectedMembers) do
+					local po = voiceChannel:getPermissionOverwriteFor(member)
+					if not po:getAllowedPermissions():has(permission.readMessages) and member:hasPermission(permission.readMessages) then
+						po:allowPermissions(permission.readMessages)
+					end
+				end
+
+				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+			end
+		end
+
+		local companion = client:getChannel(channels[voiceChannel.id].companion)
+		if scope == "text" or scope == "both" then
+			if companion then
+				if user then
+					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+				else
+					for _, member in pairs(voiceChannel.connectedMembers) do
+						local po = companion:getPermissionOverwriteFor(member)
+						if not po:getAllowedPermissions():has(permission.readMessages) and member:hasPermission(permission.readMessages) then
+							po:allowPermissions(permission.readMessages)
+						end
+					end
+					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+				end
+			elseif scope == "text" then
+				return "No companion to hide", warningEmbed(locale.hideNoCompanion)
+			end
+		end
+
+		if user then
+			return "Hid the channel from the mentioned user", okEmbed(locale.hideConfirm:format(user.mentionString))
+		else
+			return "Hid the channel from all users outside the room", okEmbed(locale.hideAllConfirm)
+		end
+	end,
+
+	show = function (interaction, voiceChannel, scope)
+		local user
+		if not scope then
+			scope = interaction.option.option.name
+			user = interaction.option.option.option and interaction.option.option.option.value
+		end
+
+		local overwriteTarget
+		if user then
+			overwriteTarget = voiceChannel.guild:getMember(user)
+		else
+			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
+		end
+
+		if scope == "voice" or scope == "both" then
+			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.readMessages)
+		end
+
+		local companion = client:getChannel(channels[voiceChannel.id].companion)
+		if scope == "text" or scope == "both" then
+			if companion then
+				companion:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.readMessages)
+			elseif scope == "text" then
+				return "No companion to show", warningEmbed(locale.showNoCompanion)
+			end
+		end
+
+		if user then
+			return "Channel is made visible to the mentioned user", okEmbed(locale.showConfirm:format(user.mentionString))
+		else
+			return "Channel is made visible to everyone", okEmbed(locale.showAllConfirm)
+		end
+	end,
+
+	block = function (interaction, voiceChannel, user)
+		if user == client.user then
+			return "Attempt to block the bot", warningEmbed(locale.shame)
+		end
+
+		local member = voiceChannel.guild:getMember(user)
+		voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.connect)
+		if member.voiceChannel == voiceChannel then
+			member:setVoiceChannel()
+		end
+		return "Blocked the user", okEmbed(locale.blockConfirm:format(user.mentionString))
+	end,
+
+	unblock = function (interaction, voiceChannel, user)
+		local member = voiceChannel.guild:getMember(user)
+		voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
+
+		return "Unblocked the user", okEmbed(locale.unblockConfirm:format(user.mentionString))
+	end,
+
+	lock = function (interaction, voiceChannel)
+		for _, member in pairs(voiceChannel.connectedMembers) do
+			local po = voiceChannel:getPermissionOverwriteFor(member)
+			if not po:getAllowedPermissions():has(permission.connect) and member:hasPermission(permission.connect) then
+				po:allowPermissions(permission.connect)
+			end
+		end
+
+		local parent = channels[voiceChannel.id].parent
+		local role = parent and voiceChannel.guild:getRole(parent.role) or voiceChannel.guild.defaultRole
+		voiceChannel:getPermissionOverwriteFor(role):denyPermissions(permission.connect)
+
+		return "Locked the room", okEmbed(locale.lockConfirm)
+	end,
+
+	unlock = function (interaction, voiceChannel)
+		local parent = channels[voiceChannel.id].parent
+		local role = parent and voiceChannel.guild:getRole(parent.role) or voiceChannel.guild.defaultRole
+		voiceChannel:getPermissionOverwriteFor(role):allowPermissions(permission.connect)
+
+		return "Unblocked the user", okEmbed(locale.unlockConfirm)
+	end,
+
+	invite = function (interaction, voiceChannel, user)
+		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and
+			channelHandler.checkHostPermissions(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
+		local invite = voiceChannel:createInvite()
+
+		if not invite then
+			return "Bot isn't permitted to create invites", warningEmbed(locale.inviteError)
+		end
+
+		if not user then
+			return "Created invite in room", okEmbed(locale.inviteCreated:format(invite.code))
+		end
+
+		if not user:getPrivateChannel() then
+			return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
+		end
+
+		user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
+
+		if tryReservation then
+			voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.readMessages, permission.connect, permission.speak)
+		end
+		return "Sent invite to mentioned user", okEmbed(locale.inviteConfirm:format(user.mentionString))
 	end,
 
 	password = function (interaction, voiceChannel, password)
@@ -291,48 +440,27 @@ local subcommands = {
 		end
 	end,
 
-	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
-		local argument, log, ov = interaction.values[1]
+	widget = function (interaction, voiceChannel, scope)	-- not exposed, access via componentInteraction
+		local argument = interaction.values[1]
+		interaction:deferReply()
 
-		do
-			local guild, parent = voiceChannel.guild, channels[voiceChannel.id].parent
-			ov = voiceChannel:getPermissionOverwriteFor(parent and guild:getRole(parent.role) or guild.defaultRole)
-		end
-
-		if argument == "lock" then
-			reprivilegify(voiceChannel)
-			ov:denyPermissions(permission.connect, permission.sendMessages)
-			if voiceChannel.category and voiceChannel.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions():has(permission.readMessages) then
-				ov:allowPermissions(permission.readMessages)
+		if argument == "open" then
+			subcommands.show(interaction, voiceChannel, scope)
+			if scope == "voice" then
+				subcommands.unlock(interaction, voiceChannel)
 			else
-				ov:clearPermissions(permission.readMessages)
+				subcommands.unmute(interaction, voiceChannel, scope)
 			end
-
-			log = "Locked the room"
+			return "Opened the room", okEmbed(locale.unlockConfirm)
+		elseif argument == "lock" then
+			if scope == "voice" then
+				subcommands.lock(interaction, voiceChannel)
+			else
+				subcommands.mute(interaction, voiceChannel, scope)
+			end
 		elseif argument == "hide" then
-			reprivilegify(voiceChannel)
-			ov:denyPermissions(permission.readMessages)
-
-			log = "Room is hidden"
-		elseif argument == "open" then
-			if voiceChannel.category then
-				local allowed = voiceChannel.category:getPermissionOverwriteFor(ov:getObject()):getAllowedPermissions()
-				for _,perm in pairs({permission.connect, permission.sendMessages, permission.readMessages}) do
-					if allowed:has(perm) then
-						ov:allowPermissions(perm)
-					else
-						ov:clearPermissions(perm)
-					end
-				end
-			else
-				ov:clearPermissions(permission.connect, permission.sendMessages, permission.readMessages)
-			end
-
-			log = "Opened the room"
+			return subcommands.hide(interaction, voiceChannel, scope)
 		end
-
-		interaction:deferUpdate()
-		return log
 	end
 }
 

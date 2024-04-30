@@ -13,7 +13,8 @@ local id = "676787135650463764" -- rat
 --]]
 
 --local guild = "669676999211483144" -- playground
-local guild = "741645965869711410" -- test
+--local guild = "741645965869711410" -- test
+local guild = "273094432377667586" -- the last bastion
 
 local domain = "https://discord.com/api/v10"
 local GLOBAL_COMMANDS = string.format("%s/applications/%s/commands", domain, id)
@@ -366,32 +367,52 @@ local commandsStructure = {
 					},
 					{
 						name = "moderate",
-						description = "Permission to use moderation commands",
+						description = "Access to all moderation tools",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "manage",
-						description = "Permission to manage room properties",
+						description = "Access to all room settings",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "rename",
-						description = "Permission to rename room",
+						description = "Access to /room rename",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "resize",
-						description = "Permission to change room capacity",
+						description = "Access to /room resize",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "bitrate",
-						description = "Permission to change room bitrate",
+						description = "Access to /room bitrate",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "kick",
+						description = 'Access to /room kick and "Move Members" permission',
 						type = commandOptionType.boolean
 					},
 					{
 						name = "mute",
-						description = "Permission to mute users in room",
+						description = "Access to /room mute|unmute",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "hide",
+						description = "Access to /room hide|show",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "lock",
+						description = "Access to /room lock|unlock and /room block|unblock",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "password",
+						description = "Access to /room password",
 						type = commandOptionType.boolean
 					}
 				}
@@ -724,13 +745,29 @@ local commandsStructure = {
 			{
 				name = "rename",
 				description = "Change the name of the room",
-				type = commandOptionType.subcommand,
+				type = commandOptionType.subcommandGroup,
 				options = {
 					{
-						name = "name",
-						description = "New room name",
-						type = commandOptionType.string,
-						required = true
+						name = "voice",
+						description = "Change the name of the voice channel",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "name",
+							description = "New voice channel name",
+							type = commandOptionType.string,
+							required = true
+						}
+					},
+					{
+						name = "text",
+						description = "Change the name of the companion text channel, if there is one",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "name",
+							description = "New text channel name",
+							type = commandOptionType.string,
+							required = true
+						}
 					}
 				}
 			},
@@ -765,32 +802,6 @@ local commandsStructure = {
 				}
 			},
 			{
-				name = "mute",
-				description = "Mute a user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to mute",
-						type = commandOptionType.user,
-						required = true
-					}
-				}
-			},
-			{
-				name = "unmute",
-				description = "Unmute a user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to unmute",
-						type = commandOptionType.user,
-						required = true
-					}
-				}
-			},
-			{
 				name = "kick",
 				description = "Kick a user from your room",
 				type = commandOptionType.subcommand,
@@ -804,89 +815,187 @@ local commandsStructure = {
 				}
 			},
 			{
-				name = "blocklist",
-				description = "Manage the blocklist in your room",
+				name = "mute",
+				description = "Mute newly connected users",
 				type = commandOptionType.subcommandGroup,
 				options = {
 					{
-						name = "add",
-						description = "Add users to the blocklist",
+						name = "voice",
+						description = "Prevent the new users from speaking in this voice chat",
 						type = commandOptionType.subcommand,
 						options = {
-							{
-								name = "user",
-								description = "User that you want to add to blocklist",
-								type = commandOptionType.user,
-								required = true
-							}
+							name = "user",
+							description = "Mute a specific user",
+							type = commandOptionType.user
 						}
 					},
 					{
-						name = "remove",
-						description = "Remove users from the blocklist",
+						name = "text",
+						description = "Prevent the new users from typing in the text chat",
 						type = commandOptionType.subcommand,
 						options = {
-							{
-								name = "user",
-								description = "User that you want to remove from the blocklist",
-								type = commandOptionType.user,
-								required = true
-							}
+							name = "user",
+							description = "Mute a specific user",
+							type = commandOptionType.user
 						}
 					},
 					{
-						name = "clear",
-						description = "Clear the blocklist",
-						type = commandOptionType.subcommand
+						name = "both",
+						description = "Prevent the new users to both write and speak in this room",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Mute a specific user",
+							type = commandOptionType.user
+						}
 					}
 				}
 			},
 			{
-				name = "reservations",
-				description = "Manage the reservations in your room",
+				name = "unmute",
+				description = "Allow the newly connected users to speak",
 				type = commandOptionType.subcommandGroup,
 				options = {
 					{
-						name = "add",
-						description = "Reserve a place for a user",
+						name = "voice",
+						description = "Allow the new users to speak",
 						type = commandOptionType.subcommand,
 						options = {
-							{
-								name = "user",
-								description = "User that you want to add to reservations",
-								type = commandOptionType.user,
-								required = true
-							}
+							name = "user",
+							description = "Unmute a specific user",
+							type = commandOptionType.user
 						}
 					},
 					{
-						name = "remove",
-						description = "Remove a reservation for a user",
+						name = "text",
+						description = "Allow the new users to type in the text chat",
 						type = commandOptionType.subcommand,
 						options = {
-							{
-								name = "user",
-								description = "User that you want to remove from reservations",
-								type = commandOptionType.user,
-								required = true
-							}
+							name = "user",
+							description = "Unmute a specific user",
+							type = commandOptionType.user
 						}
 					},
 					{
-						name = "clear",
-						description = "Clear the reservations",
-						type = commandOptionType.subcommand
+						name = "both",
+						description = "Allow the new users to write and speak in this room",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Unmute a specific user",
+							type = commandOptionType.user
+						}
+					}
+				}
+			},
+			{
+				name = "hide",
+				description = "Hide the room",
+				type = commandOptionType.subcommandGroup,
+				options = {
+					{
+						name = "voice",
+						description = "Hide only the voice channel",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Hide the channel from a specific user",
+							type = commandOptionType.user
+						}
+					},
+					{
+						name = "text",
+						description = "Hide only the text channel",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Hide the channel from a specific user",
+							type = commandOptionType.user
+						}
+					},
+					{
+						name = "both",
+						description = "Hide all the channels relevant to the room",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Hide the channels from a specific user",
+							type = commandOptionType.user
+						}
+					}
+				}
+			},
+			{
+				name = "show",
+				description = "Make the room visible",
+				type = commandOptionType.subcommandGroup,
+				options = {
+					{
+						name = "voice",
+						description = "Reveal only the voice channel",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Reveal the channel to a specific user",
+							type = commandOptionType.user
+						}
+					},
+					{
+						name = "text",
+						description = "Reveal only the text channel",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Reveal the channel to a specific user",
+							type = commandOptionType.user
+						}
+					},
+					{
+						name = "both",
+						description = "Reveal all the channels relevant to the room",
+						type = commandOptionType.subcommand,
+						options = {
+							name = "user",
+							description = "Reveal the channels to a specific user",
+							type = commandOptionType.user
+						}
+					}
+				}
+			},
+			{
+				name = "block",
+				description = "Prevent the user from connecting to the room",
+				type = commandOptionType.subcommandGroup,
+				options = {
+					{
+						name = "user",
+						description = "User that you want to block",
+						type = commandOptionType.user,
+						required = true
+					}
+				}
+			},
+			{
+				name = "unblock",
+				description = "Allow the user to connect to the room",
+				type = commandOptionType.subcommandGroup,
+				options = {
+					{
+						name = "user",
+						description = "User that you want to unblock",
+						type = commandOptionType.user,
+						required = true
 					}
 				}
 			},
 			{
 				name = "lock",
-				description = "Set room to invite only mode",
+				description = "Set the room to invite only mode",
 				type = commandOptionType.subcommand
 			},
 			{
 				name = "unlock",
-				description = "Make room public",
+				description = "Make the room public",
 				type = commandOptionType.subcommand
 			},
 			{
@@ -898,82 +1007,6 @@ local commandsStructure = {
 						name = "password",
 						description = "Password that users will have to enter upon connection",
 						type = commandOptionType.string
-					}
-				}
-			}
-		}
-	},
-	{ -- 5
-		name = "chat",
-		description = "Configure chat settings",
-		options = {
-			{
-				name = "view",
-				description = "Show chat settings",
-				type = commandOptionType.subcommand
-			},
-			{
-				name = "rename",
-				description = "Change the name of the chat",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "name",
-						description = "New chat name",
-						type = commandOptionType.string,
-						required = true
-					}
-				}
-			},
-			{
-				name = "mute",
-				description = "Mute a user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to mute",
-						type = commandOptionType.user,
-						required = true
-					}
-				}
-			},
-			{
-				name = "unmute",
-				description = "Unmute a user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to unmute",
-						type = commandOptionType.user,
-						required = true
-					}
-				}
-			},
-			{
-				name = "hide",
-				description = "Hide the chat from mentioned user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to hide the chat from",
-						type = commandOptionType.user,
-						required = true
-					}
-				}
-			},
-			{
-				name = "show",
-				description = "Show the chat to mentioned user",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "user",
-						description = "User that you want to show the chat to",
-						type = commandOptionType.user,
-						required = true
 					}
 				}
 			},
@@ -992,7 +1025,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 6
+	{ -- 5
 		name = "server",
 		description = "Configure global server settings",
 		options = {
@@ -1023,32 +1056,67 @@ local commandsStructure = {
 				options = {
 					{
 						name = "moderate",
-						description = "Permission to use moderation commands",
+						description = "Access to all moderation tools",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "manage",
-						description = "Permission to manage room properties",
+						description = "Access to all room settings",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "rename",
-						description = "Permission to rename room",
+						description = "Access to /room rename",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "resize",
-						description = "Permission to change room capacity",
+						description = "Access to /room resize",
 						type = commandOptionType.boolean
 					},
 					{
 						name = "bitrate",
-						description = "Permission to change room bitrate",
+						description = "Access to /room bitrate",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "kick",
+						description = 'Access to /room kick and "Move Members" permission',
 						type = commandOptionType.boolean
 					},
 					{
 						name = "mute",
-						description = "Permission to mute users in room",
+						description = "Access to /room mute|unmute",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "unmute",
+						description = "Superhost enabled /room mute|unmute",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "hide",
+						description = "Access to /room hide|show",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "show",
+						description = "Superhost enabled /room hide|show",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "lock",
+						description = "Access to /room lock|unlock and /room block|unblock",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "unlock",
+						description = "Superhost enabled /room lock|unlock and /room block|unblock",
+						type = commandOptionType.boolean
+					},
+					{
+						name = "password",
+						description = "Access to /room password",
 						type = commandOptionType.boolean
 					}
 				}
@@ -1068,7 +1136,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 7
+	{ -- 6
 		name = "reset",
 		description = "Reset bot settings",
 		options = {
@@ -1309,11 +1377,11 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 8
+	{ -- 7
 		name = "support",
 		description = "Send invite to the support server",
 	},
-	{ -- 9
+	{ -- 8
 		name = "clone",
 		description = "Spawn multiple clones of a channel",
 		options = {
@@ -1342,7 +1410,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 10
+	{ -- 9
 		name = "delete",
 		description = "Quickly delete several channels",
 		options = {
@@ -1389,7 +1457,7 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 11
+	{ -- 10
 		name = "users",
 		description = "Miscellaneous moderation and helper commands",
 		options = {
@@ -1493,19 +1561,19 @@ local commandsStructure = {
 			}
 		}
 	},
-	{ -- 12
+	{ -- 11
 		name = "ping",
 		description = "Check up on bot's status!"
 	},
-	{ -- 13
+	{ -- 12
 		name = "Invite",
 		type = commandType.user
 	},
-	--[[{ -- 14
+	--[[{ -- 13
 		name = "Clear messages above",
 		type = commandType.message
 	},
-	{ -- 15
+	{ -- 14
 		name = "Clear messages below",
 		type = commandType.message
 	}]]

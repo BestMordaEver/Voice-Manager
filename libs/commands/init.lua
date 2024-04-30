@@ -31,6 +31,7 @@ return setmetatable({
 		local command, subcommand, argument = interaction.commandName, interaction.option and not interaction.option.value and interaction.option.name
 		-- for /lobby add channelname, command is lobby, subcommand is add
 		-- for /help lobby, command is help, subcommand is nil, since lobby is a name-value pair of article-lobby, which is resolved later as an argument
+		-- for /room rename voice newname, command is room, subcommand is rename, argument is nil. Both "voice" and new name are resolved by command script later
 
 		if not undeferrable[subcommand] then interaction:deferReply(true) end
 		-- undeferrable commands that might need to send a modal
