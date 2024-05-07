@@ -12,6 +12,7 @@ local channelHandler = require "handlers/channelHandler"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
+local interactionType = require "discordia".enums.interactionType
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
@@ -125,8 +126,8 @@ subcommands = {
 
 	mute = function (interaction, voiceChannel, scope)
 		local user
-		if not scope then
-			scope = interaction.option.option.name
+		if interaction.type == interactionType.applicationCommand then
+			scope = scope.name
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
@@ -212,8 +213,8 @@ subcommands = {
 
 	unmute = function (interaction, voiceChannel, scope)
 		local user
-		if not scope then
-			scope = interaction.option.option.name
+		if interaction.type == interactionType.applicationCommand then
+			scope = scope.name
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
@@ -246,8 +247,8 @@ subcommands = {
 
 	hide = function (interaction, voiceChannel, scope)
 		local user
-		if not scope then
-			scope = interaction.option.option.name
+		if interaction.type == interactionType.applicationCommand then
+			scope = scope.name
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
@@ -264,7 +265,7 @@ subcommands = {
 			else
 				for _, member in pairs(voiceChannel.connectedMembers) do
 					local po = voiceChannel:getPermissionOverwriteFor(member)
-					if not po:getAllowedPermissions():has(permission.readMessages) and member:hasPermission(permission.readMessages) then
+					if not po:getAllowedPermissions():has(permission.readMessages) then
 						po:allowPermissions(permission.readMessages)
 					end
 				end
@@ -281,7 +282,7 @@ subcommands = {
 				else
 					for _, member in pairs(voiceChannel.connectedMembers) do
 						local po = companion:getPermissionOverwriteFor(member)
-						if not po:getAllowedPermissions():has(permission.readMessages) and member:hasPermission(permission.readMessages) then
+						if not po:getAllowedPermissions():has(permission.readMessages) then
 							po:allowPermissions(permission.readMessages)
 						end
 					end
@@ -301,8 +302,8 @@ subcommands = {
 
 	show = function (interaction, voiceChannel, scope)
 		local user
-		if not scope then
-			scope = interaction.option.option.name
+		if interaction.type == interactionType.applicationCommand then
+			scope = scope.name
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
@@ -356,7 +357,7 @@ subcommands = {
 	lock = function (interaction, voiceChannel)
 		for _, member in pairs(voiceChannel.connectedMembers) do
 			local po = voiceChannel:getPermissionOverwriteFor(member)
-			if not po:getAllowedPermissions():has(permission.connect) and member:hasPermission(permission.connect) then
+			if not po:getAllowedPermissions():has(permission.connect) then
 				po:allowPermissions(permission.connect)
 			end
 		end
@@ -393,7 +394,7 @@ subcommands = {
 			return "Can't contact user", warningEmbed(locale.noDMs:format(invite.code))
 		end
 
-		user:getPrivateChannel():sendf(locale.inviteText, interaction.user.tag, voiceChannel.name, invite.code)
+		user:getPrivateChannel():sendf(locale.inviteText, interaction.user.name, voiceChannel.name, invite.code)
 
 		if tryReservation then
 			voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.readMessages, permission.connect, permission.speak)
@@ -440,27 +441,15 @@ subcommands = {
 		end
 	end,
 
-	widget = function (interaction, voiceChannel, scope)	-- not exposed, access via componentInteraction
-		local argument = interaction.values[1]
-		interaction:deferReply()
+	widget = function (interaction, voiceChannel, argument)	-- not exposed, access via componentInteraction
+		local action, scope = argument:match("^(.-)_(.-)$")
+		if not action then action = argument end
+		interaction:deferReply(true)
 
-		if argument == "open" then
-			subcommands.show(interaction, voiceChannel, scope)
-			if scope == "voice" then
-				subcommands.unlock(interaction, voiceChannel)
-			else
-				subcommands.unmute(interaction, voiceChannel, scope)
-			end
-			return "Opened the room", okEmbed(locale.unlockConfirm)
-		elseif argument == "lock" then
-			if scope == "voice" then
-				subcommands.lock(interaction, voiceChannel)
-			else
-				subcommands.mute(interaction, voiceChannel, scope)
-			end
-		elseif argument == "hide" then
-			return subcommands.hide(interaction, voiceChannel, scope)
-		end
+		local log, embed = subcommands[action](interaction, voiceChannel, scope)
+		interaction:updateReply(embed)
+
+		return log
 	end
 }
 
