@@ -373,7 +373,7 @@ subcommands = {
 		local role = parent and voiceChannel.guild:getRole(parent.role) or voiceChannel.guild.defaultRole
 		voiceChannel:getPermissionOverwriteFor(role):allowPermissions(permission.connect)
 
-		return "Unblocked the user", okEmbed(locale.unlockConfirm)
+		return "Unlocked the room", okEmbed(locale.unlockConfirm)
 	end,
 
 	invite = function (interaction, voiceChannel, user)

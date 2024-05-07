@@ -9,7 +9,6 @@ local channels = require "handlers/storageHandler".channels
 
 local greetingEmbed = require "embeds/greeting"
 
-local enforceReservations = require "handlers/channelHandler".enforceReservations
 local adjustPermissions = require "handlers/channelHandler".adjustPermissions
 local handleTemplate = require "handlers/channelHandler".handleTemplate
 

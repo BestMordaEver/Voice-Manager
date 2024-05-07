@@ -4,7 +4,6 @@ local logger = require "logger"
 local channels = require "handlers/storageHandler".channels
 
 local adjustPermissions = require "handlers/channelHandler".adjustPermissions
-local enforceReservations = require "handlers/channelHandler".enforceReservations
 
 local permission = require "discordia".enums.permission
 local overwriteType = require "discordia".enums.overwriteType
@@ -50,8 +49,6 @@ return function (member, channel) -- now remove the unwanted corpses!
 				logger:log(4, "GUILD %s CHANNEL %s: reset", guild.id, channel.id)
 			end
 		else
-			enforceReservations(channel)
-
 			if not channelData then return end
 			local companion = client:getChannel(channelData.companion)
 			if companion then
