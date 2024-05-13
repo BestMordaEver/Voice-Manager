@@ -209,7 +209,7 @@ local commandsStructure = {
 	{ -- 1
 		name = "lobby",
 		description = "Configure lobby settings",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "view",
@@ -446,7 +446,7 @@ local commandsStructure = {
 	{ -- 2
 		name = "matchmaking",
 		description = "Configure matchmaking lobby settings",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "view",
@@ -569,7 +569,7 @@ local commandsStructure = {
 	{ -- 3
 		name = "companion",
 		description = "Configure lobby companion settings",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "view",
@@ -1047,7 +1047,7 @@ local commandsStructure = {
 	{ -- 5
 		name = "server",
 		description = "Configure global server settings",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "view",
@@ -1159,7 +1159,7 @@ local commandsStructure = {
 	{ -- 6
 		name = "reset",
 		description = "Reset bot settings",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "lobby",
@@ -1405,7 +1405,7 @@ local commandsStructure = {
 	{ -- 8
 		name = "clone",
 		description = "Spawn multiple clones of a channel",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "source",
@@ -1435,7 +1435,7 @@ local commandsStructure = {
 	{ -- 9
 		name = "delete",
 		description = "Quickly delete several channels",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "type",
@@ -1483,7 +1483,7 @@ local commandsStructure = {
 	{ -- 10
 		name = "users",
 		description = "Miscellaneous moderation and helper commands",
-		contexts = contextType.guild,
+		contexts = {contextType.guild},
 		options = {
 			{
 				name = "print",
