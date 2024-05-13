@@ -111,10 +111,10 @@ local function lobbyJoin (member, lobby)
 			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
-
-			if lobbyData.companionLog then Overseer.track(companion) end
-			if lobbyData.greeting or lobbyData.companionLog then companion:send(greetingEmbed(newChannel)) end
 		end
+
+		if lobbyData.companionLog then Overseer.track(companion or newChannel) end
+		if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(newChannel)) end
 
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
