@@ -9,18 +9,21 @@ local channels = require "handlers/storageHandler".channels
 
 local greetingEmbed = require "embeds/greeting"
 local passwordEmbed = require "embeds/password"
+local warningEmbed = require "embeds/warning"
 
 local adjustPermissions = require "handlers/channelHandler".adjustPermissions
 local handleTemplate = require "handlers/channelHandler".handleTemplate
 
 local Overseer = require "utils/logWriter"
 local matchmakers = require "utils/matchmakers"
+local ratelimiter = require "utils/ratelimiter"
 
 local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
 
 local processing = {}
+ratelimiter("channelCreate", 2, 20)
 
 -- user joined a lobby
 local function lobbyJoin (member, lobby)
@@ -244,6 +247,13 @@ return function (member, channel)
 			if lobbyData.isMatchmaking then
 				matchmakingJoin(member, channel)
 			else
+				local limit, retryIn = ratelimiter:limit("channelCreate", member.user.id)
+				if limit == -1 then
+					member:setVoiceChannel()
+					member.user:send(warningEmbed(locale.wait:format(retryIn)))
+					return
+				end
+
 				lobbyData.mutex:lock()
 				local ok, err = xpcall(lobbyJoin, debug.traceback, member, channel)
 				lobbyData.mutex:unlock()

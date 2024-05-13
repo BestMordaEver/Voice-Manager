@@ -413,6 +413,7 @@ https://discord.gg/%s]],
 	shame = "Why would you need to do this?",
 	interactionTimeout = "Interaction time out!",
 	notInGuild = "This command can be issued only from within a server",
+	wait = "Wait for %s before creating another channel",
 
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {
