@@ -18,6 +18,7 @@ local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
 
 ratelimiter("channelName", 2, 600)
+ratelimiter("companionName", 2, 600)
 
 local subcommands
 subcommands = {
@@ -25,19 +26,21 @@ subcommands = {
 		local type, name = interaction.option.option.name, interaction.option.option.option.value
 		local channelData = channels[channel.id]
 		local template = channelData.parent and channelData.parent.template
+		local ratelimit = "channelName"
 
 		if type == "text" then
 			local companion = client:getChannel(channelData.companion)
 			if not companion or companion == channel then
-				return "No text channel to rename", warningEmbed(locale.renameNoText)
+				return "No text channel to rename", warningEmbed(locale.noCompanion)
 			end
 			channel = companion
 			template = channelData.parent and channelData.parent.companionTemplate
+			ratelimit = "companionName"
 		end
 
-		local limit, retryIn = ratelimiter:limit("channelName", channel.id)
+		local limit, retryIn = ratelimiter:limit(ratelimit, channel.id)
 		if limit == -1 then
-			return "Ratelimit reached", warningEmbed(locale.ratelimitReached:format(retryIn))
+			return "Ratelimit reached", warningEmbed(locale.nameRatelimitReached:format(retryIn))
 		end
 
 		local success, err
@@ -49,7 +52,7 @@ subcommands = {
 		end
 
 		if success then
-			return "Successfully changed channel name", okEmbed(locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "ratelimitReached" or "ratelimitRemaining"]:format(retryIn))
+			return "Successfully changed channel name", okEmbed(locale.nameConfirm:format(channel.name).."\n"..locale[limit == 0 and "nameRatelimitReached" or "nameRatelimitRemaining"]:format(retryIn))
 		end
 
 		return "Couldn't change channel name: "..err, warningEmbed(locale.renameError)

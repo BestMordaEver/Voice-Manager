@@ -361,17 +361,10 @@ https://discord.gg/%s]],
 	passwordSuccess = "Correct password",
 	passwordFailure = "Wrong password",
 	passwordBanned = "You were banned in this channel!",
-
-	-- chat
-	chatInfoTitle = "Room info | %s",
-	chatInfo = [[**Host:** %s
-**Visible to:** %s
-**Hidden from:** %s
-**Muted:** %s
-
-**Available commands:** %s]],
 	noCompanion = "Your room doesn't have companion chat",
 	clearConfirm = "Deleted %d messages",
+	nameRatelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
+	nameRatelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 
 	notHost = "You're not a channel host",
 	badHostPermission = "You're not permitted to perform this command",
@@ -403,9 +396,6 @@ https://discord.gg/%s]],
 	embedError = "❗ Error",
 
 	inCategory = "in %s category",
-
-	ratelimitRemaining = "This command is ratelimited. You can do this **1** more time in next **%s**",
-	ratelimitReached = "This command is ratelimited. You will be able to perform this command after **%s**",
 
 	ping = [[:green_circle: **%dms**
 **%d** servers 
