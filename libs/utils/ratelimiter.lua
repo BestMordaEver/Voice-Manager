@@ -14,7 +14,7 @@ end
 
 return setmetatable(ratelimiter,{
 	__index = {
-		-- returns remeaining attempts and tostring of how much time left until ratelimit is reset
+		-- returns remaining attempts and tostring of how much time left until ratelimit is reset
 		limit = function (self, name, point, ...)
 			if not self[name] then error ("No ratelimits on event "..tostring(name)) end
 
