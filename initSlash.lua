@@ -1041,19 +1041,6 @@ local commandsStructure = {
 						type = commandOptionType.string
 					}
 				}
-			},
-			{
-				name = "clear",
-				description = "Delete messages in the chat",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "amount",
-						description = "How many messages to delete",
-						type = commandOptionType.integer,
-						min_value = 0
-					}
-				}
 			}
 		}
 	},
