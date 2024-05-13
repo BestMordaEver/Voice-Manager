@@ -10,7 +10,7 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
-local permissionCheck = require "handlers/channelHandler".checkPermissions
+local checkPermissions = require "handlers/channelHandler".checkPermissions
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local greetingComponents = {
@@ -45,7 +45,7 @@ subcommands = {
 			return "Companion target category reset", okEmbed(locale.categoryReset)
 		end
 
-		local isPermitted, logMsg, msg = permissionCheck(interaction, category)
+		local isPermitted, logMsg, msg = checkPermissions(interaction, category)
 		if isPermitted then
 			lobbies[channel.id]:setCompanionTarget(category.id)
 			return "Companion target category set", okEmbed(locale.categoryConfirm:format(category.name))
@@ -83,7 +83,7 @@ subcommands = {
 
 	log = function (interaction, channel, logChannel)
 		if logChannel then
-			local isPermitted, logMsg, msg = permissionCheck(interaction, logChannel)
+			local isPermitted, logMsg, msg = checkPermissions(interaction, logChannel)
 			if isPermitted then
 				lobbies[channel.id]:setCompanionLog(logChannel.id)
 				return "Companion log channel set", okEmbed(locale.logConfirm:format(logChannel.name))

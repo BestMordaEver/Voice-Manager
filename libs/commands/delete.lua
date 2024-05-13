@@ -57,7 +57,7 @@ return function (interaction, action, argument)
 		local name = options.name and options.name.value
 		local only_empty = options.only_empty and options.only_empty.value
 
-		local isPermitted, logMsg, userMsg = channelHandler.permissionCheck(interaction, category)
+		local isPermitted, logMsg, userMsg = channelHandler.checkPermissions(interaction, category)
 		if not isPermitted then
 			return logMsg, warningEmbed(userMsg)
 		end
