@@ -162,6 +162,7 @@ local enums = require "discordia".enums
 local channelType = enums.channelType
 local commandType = enums.applicationCommandType
 local commandOptionType = enums.applicationCommandOptionType
+local contextType = enums.interactionContextType
 
 local commandsStructure = {
 	{ -- 0
@@ -208,6 +209,7 @@ local commandsStructure = {
 	{ -- 1
 		name = "lobby",
 		description = "Configure lobby settings",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "view",
@@ -444,6 +446,7 @@ local commandsStructure = {
 	{ -- 2
 		name = "matchmaking",
 		description = "Configure matchmaking lobby settings",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "view",
@@ -566,6 +569,7 @@ local commandsStructure = {
 	{ -- 3
 		name = "companion",
 		description = "Configure lobby companion settings",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "view",
@@ -753,10 +757,10 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "name",
-							description = "New voice channel name",
-							type = commandOptionType.string,
-							required = true
+								name = "name",
+								description = "New voice channel name",
+								type = commandOptionType.string,
+								required = true
 							}
 						}
 					},
@@ -766,10 +770,10 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "name",
-							description = "New text channel name",
-							type = commandOptionType.string,
-							required = true
+								name = "name",
+								description = "New text channel name",
+								type = commandOptionType.string,
+								required = true
 							}
 						}
 					}
@@ -829,9 +833,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Mute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Mute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -841,9 +845,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Mute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Mute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -853,9 +857,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Mute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Mute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					}
@@ -872,9 +876,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Unmute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Unmute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -884,9 +888,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Unmute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Unmute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -896,9 +900,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Unmute a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Unmute a specific user",
+								type = commandOptionType.user
 							}
 						}
 					}
@@ -915,9 +919,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Hide the channel from a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Hide the channel from a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -927,9 +931,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Hide the channel from a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Hide the channel from a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -939,9 +943,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Hide the channels from a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Hide the channels from a specific user",
+								type = commandOptionType.user
 							}
 						}
 					}
@@ -958,9 +962,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Reveal the channel to a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Reveal the channel to a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -970,9 +974,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Reveal the channel to a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Reveal the channel to a specific user",
+								type = commandOptionType.user
 							}
 						}
 					},
@@ -982,9 +986,9 @@ local commandsStructure = {
 						type = commandOptionType.subcommand,
 						options = {
 							{
-							name = "user",
-							description = "Reveal the channels to a specific user",
-							type = commandOptionType.user
+								name = "user",
+								description = "Reveal the channels to a specific user",
+								type = commandOptionType.user
 							}
 						}
 					}
@@ -1056,6 +1060,7 @@ local commandsStructure = {
 	{ -- 5
 		name = "server",
 		description = "Configure global server settings",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "view",
@@ -1167,6 +1172,7 @@ local commandsStructure = {
 	{ -- 6
 		name = "reset",
 		description = "Reset bot settings",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "lobby",
@@ -1412,6 +1418,7 @@ local commandsStructure = {
 	{ -- 8
 		name = "clone",
 		description = "Spawn multiple clones of a channel",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "source",
@@ -1441,6 +1448,7 @@ local commandsStructure = {
 	{ -- 9
 		name = "delete",
 		description = "Quickly delete several channels",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "type",
@@ -1488,6 +1496,7 @@ local commandsStructure = {
 	{ -- 10
 		name = "users",
 		description = "Miscellaneous moderation and helper commands",
+		contexts = contextType.guild,
 		options = {
 			{
 				name = "print",
