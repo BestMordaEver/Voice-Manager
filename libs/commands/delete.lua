@@ -5,42 +5,11 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
 local channelHandler = require "handlers/channelHandler"
+local buttons = require "handlers/componentHandler".deleteButtons
 
 local interactionType = require "discordia".enums.interactionType
 
 local insert, modf = table.insert, math.modf
-
-local buttons = {
-	type = 1,
-	components = {
-		{
-			type = 2,
-			style = 2,
-			label = "🔑",
-			custom_id = "delete_key_1"
-		},{
-			type = 2,
-			style = 2,
-			label = "🔑",
-			custom_id = "delete_key_2"
-		},{
-			type = 2,
-			style = 2,
-			label = "🔑",
-			custom_id = "delete_key_3"
-		},{
-			type = 2,
-			style = 2,
-			label = "🔑",
-			custom_id = "delete_key_4"
-		},{
-			type = 2,
-			style = 4,
-			label = "☢",
-			custom_id = "delete_nuke"
-		}
-	}
-}
 
 --[[
 delete components follow two structures

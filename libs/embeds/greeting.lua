@@ -3,75 +3,11 @@ local client = require "client"
 local embedHandler = require "handlers/embedHandler"
 
 local channels = require "handlers/storageHandler".channels
+local roomButtons = require "handlers/componentHandler".roomButtons
 
 local availableCommands = require "embeds/availableCommands"
 
-local enums = require "discordia".enums
-local buttonStyle = enums.buttonStyle
-local componentType = enums.componentType
 local fuchsia = embedHandler.colors.fuchsia
-
-local selects = {
-	{
-		type = componentType.row,
-		components = {
-			{
-				type = componentType.button,
-				style = buttonStyle.success,
-				label = "Show",
-				custom_id = "room_widget_show_both",
-				emoji = {name = "👁"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.success,
-				label = "Unlock",
-				custom_id = "room_widget_unlock",
-				emoji = {name = "🔓"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.success,
-				label = "Unmute voice",
-				custom_id = "room_widget_unmute_voice",
-				emoji = {name = "🔉"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.success,
-				label = "Unmute text",
-				custom_id = "room_widget_unmute_text",
-				emoji = {name = "🖊"}
-			}
-		}
-	},{
-		type = componentType.row,
-		components = {
-			{
-				type = componentType.button,
-				style = buttonStyle.secondary,
-				label = "Hide",
-				custom_id = "room_widget_hide_both",
-				emoji = {name = "🥷"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.secondary,
-				label = "Lock",
-				custom_id = "room_widget_lock",
-				emoji = {name = "🔒"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.secondary,
-				label = "Mute voice",
-				custom_id = "room_widget_mute_voice",
-				emoji = {name = "🔇"}
-			},{
-				type = componentType.button,
-				style = buttonStyle.secondary,
-				label = "Mute text",
-				custom_id = "room_widget_mute_text",
-				emoji = {name = "📵"}
-			}
-		}
-	}
-}
 
 return embedHandler("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
@@ -104,6 +40,6 @@ return embedHandler("greeting", function (room, ephemeral)
 		color = fuchsia,
 		description = channelData.parent.greeting:gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
 	}},
-	components = channelData.parent.greeting:match("%%buttons%%") and selects or nil,
+	components = channelData.parent.greeting:match("%%buttons%%") and roomButtons or nil,
 	ephemeral = ephemeral}
 end)

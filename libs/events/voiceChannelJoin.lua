@@ -8,6 +8,7 @@ local lobbies = require "handlers/storageHandler".lobbies
 local channels = require "handlers/storageHandler".channels
 
 local greetingEmbed = require "embeds/greeting"
+local passwordEmbed = require "embeds/password"
 
 local adjustPermissions = require "handlers/channelHandler".adjustPermissions
 local handleTemplate = require "handlers/channelHandler".handleTemplate
@@ -18,7 +19,6 @@ local matchmakers = require "utils/matchmakers"
 local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
-local blurple = require "handlers/embedHandler".colors.blurple
 
 local processing = {}
 
@@ -66,7 +66,7 @@ local function lobbyJoin (member, lobby)
 	local newChannel, err = lobby.guild:createChannel({
 		name = name,
 		type = channelType.voice,
-		bitrate = lobbyData.bitrate,
+		bitrate = lobbyData.bitrate or lobby.bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
 		position = needsMove and distance or nil,
 		parent_id = target.id
@@ -179,7 +179,7 @@ local function roomJoin (member, channel)
 		logger:log(4, "GUILD %s ROOM %s USER %s: sending password prompt", channel.guild.id, channel.id, member.user.id)
 		channel:getPermissionOverwriteFor(member):denyPermissions(permission.connect)
 
-		local newChannel = member.guild:createChannel {
+		local newChannel = channel.guild:createChannel {
 			name = "Password verification",
 			parent_id = (channel.category or channel.guild).id,
 			type = channelType.voice,
@@ -190,7 +190,7 @@ local function roomJoin (member, channel)
 					allow = "3146752"
 				},
 				{
-					id = member.guild.id,
+					id = channel.guild.id,
 					type = 0,
 					deny = "3146752"
 				}
@@ -200,32 +200,7 @@ local function roomJoin (member, channel)
 		member:setVoiceChannel(newChannel)
 		channels:store(newChannel.id, 3, member.user.id, channel.id, 0)
 
-		return member.user:send{
-			ephemeral = true,
-			embeds = {
-				{
-					description = locale.passwordCheckText,
-					color = blurple,
-					author = {
-						name = channel.name,
-						proxy_icon_url = member.guild.iconURL
-					}
-				}
-			},
-			components = {
-				{
-					type = 1,
-					components = {
-						{
-							type = 2,
-							style = 1,
-							label = locale.passwordEnter,
-							custom_id = "room_passwordinit",
-						}
-					}
-				}
-			}
-		}
+		return member.user:send(passwordEmbed(channel))
 	end
 
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)

@@ -9,6 +9,7 @@ local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
 local channelHandler = require "handlers/channelHandler"
+local passwordModal = require "handlers/componentHandler".passwordModal
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
@@ -416,7 +417,7 @@ subcommands = {
 	end,
 
 	passwordinit = function (interaction)	-- not exposed, access via componentInteraction
-		interaction:createModal("room_passwordcheck", locale.passwordEnter, {{type = 1, components = {{type = 4, custom_id = "password", label = locale.password, style = 1}}}})
+		interaction:createModal("room_passwordcheck", locale.passwordEnter, passwordModal)
 		return "Created password modal"
 	end,
 

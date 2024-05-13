@@ -1,8 +1,7 @@
 local locale = require "locale"
 local client = require "client"
 
-local enums = require "discordia".enums
-local componentType, inputStyle, interactionType = enums.componentType, enums.inputStyle, enums.interactionType
+local interactionType = require "discordia".enums.interactionType
 
 local lobbies = require "handlers/storageHandler".lobbies
 
@@ -11,21 +10,8 @@ local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
 local checkPermissions = require "handlers/channelHandler".checkPermissions
+local greetingComponents = require "handlers/componentHandler".greetingComponents
 local lobbyPreProcess = require "commands/lobbyPreProcess"
-
-local greetingComponents = {
-	{
-		type = componentType.row,
-		components = {
-			{
-				type = componentType.textInput,
-				custom_id = "greeting",
-				style = inputStyle.paragraph,
-				label = locale.greetingModalTitle
-			}
-		}
-	}
-}
 
 local subcommands
 subcommands = {
