@@ -43,7 +43,7 @@ local statservers = {
 	},
 
 	["discords.com"] = {
-		endpoint = "https://discords.com/bots/api/bot/"..client.user.id,
+		endpoint = "https://discords.com/bots/api/bot/"..client.user.id.."/setservers",
 		body = "server_count"
 	},
 
@@ -57,9 +57,9 @@ local statservers = {
 		body = "guildCount"
 	},
 
-	["botdesignerlist.com"] = {
-		endpoint = "https://botdesignerlist.com/api/exposed/bot/update",
-		body = "servers"
+	["discordlist.gg"] = {
+		endpoint = "https://api.discordlist.gg/v0/bots/"..client.user.id.."/guilds",
+		body = "count"
 	}
 }
 
