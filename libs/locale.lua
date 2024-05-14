@@ -244,6 +244,7 @@ You can add a lobby with **/lobby add**]],
 **Permissions:** %s
 **Managed role:** %s
 **Capacity:** %s
+**Bitrate:** %s
 **Companion:** %s
 **Channels:** %d]],
 

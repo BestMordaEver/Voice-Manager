@@ -42,6 +42,7 @@ return embedHandler("lobbiesInfo", function (guild, channel, ephemeral)
 				lobbyData.permissions,
 				guild:getRole(lobbyData.role).mentionString,
 				lobbyData.capacity or "default",
+				lobbyData.bitrate or "default",
 				lobbyData.companionTarget and "enabled" or "disabled",
 				#lobbyData.children
 			),
