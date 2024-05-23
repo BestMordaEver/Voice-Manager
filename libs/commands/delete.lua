@@ -48,7 +48,7 @@ return function (interaction, action, argument)
 				end
 			end
 			return true
-		end), channelHandler.tps)
+		end), channelHandler.truePositionSort)
 
 		if #channels == 0 then return "No channels to delete", warningEmbed(locale.deleteNone) end
 
@@ -107,10 +107,10 @@ return function (interaction, action, argument)
 					end
 				end
 
-				interaction:followup(okEmbed(locale.deleteConfirm:format(count)), true)
+				interaction:followup(okEmbed(locale.deleteConfirm:format(count), true))
 				return "Deleted the channels"
 			else
-				interaction:reply(warningEmbed(locale.deleteNotArmed), true)
+				interaction:reply(warningEmbed(locale.deleteNotArmed, true))
 				return "Not all keys are armed"
 			end
 
