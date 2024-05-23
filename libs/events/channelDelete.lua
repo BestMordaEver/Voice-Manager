@@ -16,7 +16,7 @@ return function (channel) -- and make sure there are no traces!
 		lobbyData:delete()
 	end
 	if channelData then
-		local companion = client:getChannel(channelData.companion)
+		local companion = client:getChannel(channelData.companion) or channel
 		if companion then
 			local companionID = companion.id
 			if channelData.parent and channelData.parent.companionLog then

@@ -15,8 +15,7 @@ return embedHandler("greeting", function (room, ephemeral)
 
 	if not channelData.parent.greeting then return end
 
-	local companion = client:getChannel(channelData.companion)
-	if not companion then return end
+	local companion = client:getChannel(channelData.companion) or room
 
 	local member = room.guild:getMember(channelData.host)
 	local uname = member.user.name
@@ -24,7 +23,7 @@ return embedHandler("greeting", function (room, ephemeral)
 
 	local rt = {
 		roomname = room.name,
-		chatname = companion and companion.name or nil,
+		chatname = companion.name,
 		nickname = nickname,
 		name = uname,
 		tag = member.user.tag,
