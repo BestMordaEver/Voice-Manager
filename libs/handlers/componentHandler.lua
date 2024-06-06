@@ -148,17 +148,17 @@ local handler = {
 				{
 					type = componentType.button,
 					label = "Lobbies",
-					custom_id = "help_1",
+					custom_id = "help_lobby",
 					style = buttonStyle.primary
 				},{
 					type = componentType.button,
 					label = "Matchmaking",
-					custom_id = "help_2",
+					custom_id = "help_matchmaking",
 					style = buttonStyle.primary
 				},{
 					type = componentType.button,
 					label = "Companion",
-					custom_id = "help_3",
+					custom_id = "help_companion",
 					style = buttonStyle.primary
 				}
 			}
@@ -168,22 +168,17 @@ local handler = {
 				{
 					type = componentType.button,
 					label = "Room",
-					custom_id = "help_4",
-					style = buttonStyle.primary
-				},{
-					type = componentType.button,
-					label = "Chat",
-					custom_id = "help_5",
+					custom_id = "help_room",
 					style = buttonStyle.primary
 				},{
 					type = componentType.button,
 					label = "Server",
-					custom_id = "help_6",
+					custom_id = "help_server",
 					style = buttonStyle.primary
 				},{
 					type = componentType.button,
 					label = "Other",
-					custom_id = "help_7",
+					custom_id = "help_other",
 					style = buttonStyle.primary
 				}
 			}

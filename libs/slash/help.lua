@@ -26,16 +26,12 @@ return {
 					value = "room"
 				},
 				{
-					name = "chat",
-					value = "chat"
-				},
-				{
 					name = "server",
 					value = "server"
 				},
 				{
-					name = "misc",
-					value = "misc"
+					name = "other",
+					value = "other"
 				}
 			}
 		}

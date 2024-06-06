@@ -296,13 +296,13 @@ return {
 			}
 		},
 		{
-			name = "unblock",
+			name = "allow",
 			description = "Allow the user to connect to the room",
 			type = commandOptionType.subcommand,
 			options = {
 				{
 					name = "user",
-					description = "User that you want to unblock",
+					description = "User that you want to allow to join",
 					type = commandOptionType.user,
 					required = true
 				}

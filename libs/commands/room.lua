@@ -351,11 +351,11 @@ subcommands = {
 		return "Blocked the user", okEmbed(locale.blockConfirm:format(user.mentionString))
 	end,
 
-	unblock = function (interaction, voiceChannel, user)
+	allow = function (interaction, voiceChannel, user)
 		local member = voiceChannel.guild:getMember(user)
 		voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
 
-		return "Unblocked the user", okEmbed(locale.unblockConfirm:format(user.mentionString))
+		return "Allowed the user", okEmbed(locale.allowConfirm:format(user.mentionString))
 	end,
 
 	lock = function (interaction, voiceChannel)
