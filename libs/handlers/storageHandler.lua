@@ -99,6 +99,12 @@ local lobbyMeta = {
 			emitter:emit("setLobbyRole", role, self.id)
 		end,
 
+		setLimit = function (self, limit)
+			self.limit = limit
+			logger:log(6, "GUILD %s LOBBY %s: updated limit to %d", self.guild.id, self.id, limit)
+			emitter:emit("setLobbyLimit", limit, self.id)
+		end,
+
 		setPermissions = function (self, permissions)
 			self.permissions = permissions
 			logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guild.id, self.id, permissions)
@@ -228,12 +234,13 @@ setmetatable(guilds, {
 
 setmetatable(lobbies, {
 	__index = {
-		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, role, permissions, capacity, bitrate, greeting, companionLog)
+		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, role, limit, permissions, capacity, bitrate, greeting, companionLog)
 			local lobby = setmetatable({id = lobbyID, guild = guilds[guildID],
 				isMatchmaking = tonumber(isMatchmaking) == 1, role = role, permissions = botPermissions(tonumber(permissions) or 0),
-				template = template, target = target, capacity = tonumber(capacity), bitrate = tonumber(bitrate),
+				template = template, target = target,
+				limit = tonumber(limit) or 500, capacity = tonumber(capacity), bitrate = tonumber(bitrate),
 				companionTemplate = companionTemplate, companionTarget = companionTarget == "true" or companionTarget,
-				greeting = greeting, companionLog = companionLog,
+				greeting = greeting, companionLog = companionLog, 
 				children = hollowArray(), mutex = discordia.Mutex()
 			}, lobbyMeta)
 
@@ -372,7 +379,7 @@ end
 -- second value is logger message
 local GUILD_FIELDS, LOBBY_FIELDS, CHANNEL_FIELDS = 4, 13, 7
 local storageStatements = {
-	addGuild = {"INSERT INTO guilds VALUES(?, NULL, 500, 0)", "ADD GUILD %s"},
+	addGuild = {"INSERT INTO guilds(id) VALUES(?)", "ADD GUILD %s"},
 
 	removeGuild = {"DELETE FROM guilds WHERE id = ?", "DELETE GUILD %s"},
 
@@ -382,13 +389,15 @@ local storageStatements = {
 
 	setGuildPermissions = {"UPDATE guilds SET permissions = ? WHERE id = ?", "SET PERMISSIONS %s => GUILD %s"},
 
-	addLobby = {"INSERT INTO lobbies VALUES(?,?,FALSE,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL)", "ADD LOBBY %s"},
+	addLobby = {"INSERT INTO lobbies(id, guild) VALUES(?,?)", "ADD LOBBY %s"},
 
 	removeLobby = {"DELETE FROM lobbies WHERE id = ?", "DELETE LOBBY %s"},
 
 	setLobbyMatchmaking = {"UPDATE lobbies SET isMatchmaking = ? WHERE id = ?","SET MATCHMAKING %s => LOBBY %s"},
 
 	setLobbyRole = {"UPDATE lobbies SET role = ? WHERE id = ?","SET ROLE %s => LOBBY %s"},
+
+	setLobbyLimit = {"UPDATE lobbies SET cLimit = ? WHERE id = ?", "SET LIMIT %s => LOBBY %s"},
 
 	setLobbyPermissions = {"UPDATE lobbies SET permissions = ? WHERE id = ?","SET PERMISSIONS %s => LOBBY %s"},
 
@@ -408,7 +417,7 @@ local storageStatements = {
 
 	setLobbyCompanionLog = {"UPDATE lobbies SET companionLog = ? WHERE id = ?","SET COMPANION LOG %s => LOBBY %s"},
 
-	addChannel = {"INSERT INTO channels VALUES(?,?,?,?,?,?,NULL)", "ADD CHANNEL %s"},
+	addChannel = {"INSERT INTO channels(id, parentType, host, parent, position, companion) VALUES(?,?,?,?,?,?)", "ADD CHANNEL %s"},
 
 	removeChannel = {"DELETE FROM channels WHERE id = ?", "DELETE CHANNEL %s"},
 

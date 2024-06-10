@@ -240,6 +240,30 @@ return {
 					required = true
 				}
 			}
-		}
+		},
+		{
+			name = "limit",
+			description = "Limit the amount of rooms bot is permitted to create",
+			type = commandOptionType.subcommand,
+			options = {
+				{
+					name = "lobby",
+					description = "A lobby to be configured",
+					type = commandOptionType.channel,
+					required = true,
+					channel_types = {
+						channelType.voice
+					}
+				},
+				{
+					name = "limit",
+					description = "The amount of rooms bot will be able to create",
+					type = commandOptionType.integer,
+					required = true,
+					min_value = 0,
+					max_value = 500
+				}
+			}
+		},
 	}
 }

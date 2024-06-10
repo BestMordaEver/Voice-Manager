@@ -7,35 +7,36 @@ local channelsData = sqlite.open("channelsData.db")
 guildsData:exec([[
 CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
-	role VARCHAR,					/* mutable, default NULL */
-	cLimit INTEGER NOT NULL,		/* mutable, default 500 */
-	permissions INTEGER NOT NULL	/* mutable, default 0 */
+	role VARCHAR,
+	cLimit INTEGER DEFAULT 500,
+	permissions INTEGER DEFAULT 0
 )]])
 
 lobbiesData:exec([[
 CREATE TABLE lobbies(
 	id VARCHAR PRIMARY KEY,
-	guild VARCHAR NOT NULL,			/* immutable */
-	isMatchmaking BOOL NOT NULL,	/* mutable, default FALSE */
-	template VARCHAR,				/* mutable, default NULL */
-	companionTemplate VARCHAR,		/* mutable, default NULL */
-	target VARCHAR,					/* mutable, default NULL */
-	companionTarget VARCHAR,		/* mutable, default NULL */
-	role VARCHAR,					/* mutable, default NULL */
-	permissions INTEGER NOT NULL,	/* mutable, default 0 */
-	capacity INTEGER,				/* mutable, default NULL */
-	bitrate INTEGER,				/* mutable, default NULL */
-	greeting VARCHAR,				/* mutable, default NULL */
-	companionLog VARCHAR			/* mutable, default NULL */
+	guild VARCHAR NOT NULL,
+	isMatchmaking BOOL DEFAULT 0,
+	template VARCHAR,
+	companionTemplate VARCHAR,
+	target VARCHAR,
+	companionTarget VARCHAR,
+	role VARCHAR,
+	cLimit INTEGER DEFAULT 500,
+	permissions INTEGER DEFAULT 0,
+	capacity INTEGER,
+	bitrate INTEGER,
+	greeting VARCHAR,
+	companionLog VARCHAR
 )]])
 
 channelsData:exec([[
 CREATE TABLE channels(
 	id VARCHAR PRIMARY KEY,
-	parentType BOOL, 			/* immutable */
-	host VARCHAR NOT NULL,		/* mutable */
-	parent VARCHAR NOT NULL,	/* immutable */
-	position INTEGER NOT NULL,	/* immutable */
-	companion VARCHAR,			/* immutable */
-	password VARCHAR			/* mutable, default NULL */
+	parentType BOOL,
+	host VARCHAR NOT NULL,
+	parent VARCHAR NOT NULL,
+	position INTEGER NOT NULL,
+	companion VARCHAR,
+	password VARCHAR
 )]])

@@ -29,14 +29,14 @@ ratelimiter("channelCreate", 2, 20)
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
+	local lobbyData = lobbies[lobby.id]
 	local guildData = guilds[lobby.guild.id]
-	if guildData.limit <= guildData:channels() then return end
+	if guildData.limit <= guildData:channels() or lobbyData.limit <= #lobbyData.children then return end
 
 	-- parent to which a new channel will be attached
 	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
 
 	-- determine new channel name
-	local lobbyData = lobbies[lobby.id]
 	local name = lobbyData.template or "%nickname's% room"
 	-- potential position may change in process of name generation, so rather than query lobby for position several times, reservation is made and used throughout
 	local position = lobbyData:attachChild(true)

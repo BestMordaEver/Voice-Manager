@@ -109,6 +109,13 @@ local subcommands = {
 			lobbies[lobby.id]:setRole(lobby.guild.defaultRole.id)
 		end
 		return "Lobby managed role set", okEmbed(locale.roleConfirm)
+	end,
+
+	limit = function (interaction, lobby, limit)
+		if not limit then limit = 500 end
+
+		lobbies[lobby.id]:setLimit(limit)
+		return "Lobby limit set", okEmbed(locale.limitConfirm:format(limit))
 	end
 }
 
