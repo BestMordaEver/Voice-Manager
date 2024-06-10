@@ -1,7 +1,7 @@
 local client = require "client"
 local logger = require "logger"
 
-local channels = require "handlers/storageHandler".channels
+local channels = require "storage/channels"
 
 local adjustPermissions = require "handlers/channelHandler".adjustPermissions
 

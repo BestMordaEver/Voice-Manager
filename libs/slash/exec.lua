@@ -6,9 +6,9 @@ local warningEmbed = require "embeds/warning"
 
 local sandbox = setmetatable({
 	client = require "client",
-	guilds = require "handlers/storageHandler".guilds,
-	lobbies = require "handlers/storageHandler".lobbies,
-	channels = require "handlers/storageHandler".channels
+	guilds = require "storage/guilds",
+	lobbies = require "storage/lobbies",
+	channels = require "storage/channels"
 },{ __index = _G})
 
 local function code (s)

@@ -2,9 +2,8 @@ local locale = require "locale"
 local client = require "client"
 local embedHandler = require "handlers/embedHandler"
 
-local storage = require "handlers/storageHandler"
-local guilds = storage.guilds
-local stats = storage.stats
+local guilds = require "storage/guilds"
+local stats = require "handlers/storageHandler".stats
 
 local black = embedHandler.colors.black
 

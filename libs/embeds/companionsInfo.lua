@@ -2,7 +2,7 @@ local locale = require "locale"
 local client = require "client"
 local embedHandler = require "handlers/embedHandler"
 
-local lobbies = require "handlers/storageHandler".lobbies
+local lobbies = require "storage/lobbies"
 
 local tps = require "handlers/channelHandler".truePositionSort
 local blurple = embedHandler.colors.blurple

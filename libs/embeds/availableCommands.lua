@@ -1,5 +1,5 @@
-local guilds = require "handlers/storageHandler".guilds
-local channels = require "handlers/storageHandler".channels
+local guilds = require "storage/guilds"
+local channels = require "storage/channels"
 
 local commands = {
 	moderate = "mute, block, kick, hide, lock, password",

@@ -7,9 +7,14 @@ local channelsData = sqlite.open("channelsData.db")
 guildsData:exec([[
 CREATE TABLE guilds(
 	id VARCHAR PRIMARY KEY,
-	role VARCHAR,
 	cLimit INTEGER DEFAULT 500,
 	permissions INTEGER DEFAULT 0
+);
+
+CREATE TABLE roles(
+	id VARCHAR PRIMARY KEY,
+	guildID VARCHAR NOT NULL,
+	FOREIGN KEY(guildID) REFERENCES guilds(id)
 )]])
 
 lobbiesData:exec([[
@@ -21,13 +26,18 @@ CREATE TABLE lobbies(
 	companionTemplate VARCHAR,
 	target VARCHAR,
 	companionTarget VARCHAR,
-	role VARCHAR,
 	cLimit INTEGER DEFAULT 500,
 	permissions INTEGER DEFAULT 0,
 	capacity INTEGER,
 	bitrate INTEGER,
 	greeting VARCHAR,
 	companionLog VARCHAR
+);
+
+CREATE TABLE roles(
+	id VARCHAR PRIMARY KEY,
+	lobbyID VARCHAR NOT NULL,
+	FOREIGN KEY(lobbyID) REFERENCES lobbies(id)
 )]])
 
 channelsData:exec([[

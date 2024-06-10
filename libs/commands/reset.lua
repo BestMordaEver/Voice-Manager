@@ -1,7 +1,7 @@
 local locale = require "locale"
 local config = require "config"
 
-local lobbies = require "handlers/storageHandler".lobbies
+local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
 

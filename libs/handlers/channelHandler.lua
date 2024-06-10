@@ -3,7 +3,7 @@ local locale = require "locale"
 local config = require "config"
 local client = require "client"
 
-local channels = require "handlers/storageHandler".channels
+local channels = require "storage/channels"
 
 local permission = enums.permission
 local channelType = enums.channelType

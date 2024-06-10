@@ -37,13 +37,33 @@ return {
 		{
 			name = "role",
 			description = "Change the default role bot uses to enforce user commands",
-			type = commandOptionType.subcommand,
+			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "role",
-					description = "The role bot will use to enforce user commands",
-					type = commandOptionType.role,
-					required = true
+					name = "add",
+					description = "Add another role to be used",
+					type = commandOptionType.subcommand,
+					options = {
+						{
+							name = "role",
+							description = "The role to be added",
+							type = commandOptionType.role,
+							required = true
+						}
+					}
+				},
+				{
+					name = "remove",
+					description = "Remove the role from the managed list",
+					type = commandOptionType.subcommand,
+					options = {
+						{
+							name = "role",
+							description = "The role to be removed",
+							type = commandOptionType.role,
+							required = true
+						}
+					}
 				}
 			}
 		}

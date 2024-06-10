@@ -1,6 +1,6 @@
 local locale = require "locale"
 
-local lobbies = require "handlers/storageHandler".lobbies
+local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
 local checkPermissions = require "handlers/channelHandler".checkPermissions

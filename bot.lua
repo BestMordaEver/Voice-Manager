@@ -41,7 +41,9 @@ package.loaded.logger = discordia.Logger(6, '%F %T')
 local config = require "config"
 
 local storage = require "handlers/storageHandler"
-local guilds = storage.guilds
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 
 local status = require "handlers/statusHandler"
 local safeEvent = require "utils/safeEvent"
@@ -73,14 +75,14 @@ client:once(safeEvent("ready", function ()
 
 	if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
 
-	storage.stats.lobbies = #storage.lobbies
-	storage.stats.channels = #storage.channels
-	storage.stats.users = storage.channels:users()
+	storage.stats.lobbies = #lobbies
+	storage.stats.channels = #channels
+	storage.stats.users = channels:users()
 	client:setActivity(status())
 
-	storage.guilds:cleanup()
-	storage.lobbies:cleanup()
-	storage.channels:cleanup()
+	guilds:cleanup()
+	lobbies:cleanup()
+	channels:cleanup()
 end))
 
 -- pre-load db

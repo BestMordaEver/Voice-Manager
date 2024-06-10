@@ -2,7 +2,7 @@ local locale = require "locale"
 local client = require "client"
 local embedHandler = require "handlers/embedHandler"
 
-local channels = require "handlers/storageHandler".channels
+local channels = require "storage/channels"
 local roomButtons = require "handlers/componentHandler".roomButtons
 
 local availableCommands = require "embeds/availableCommands"

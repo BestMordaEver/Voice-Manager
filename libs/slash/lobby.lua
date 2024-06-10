@@ -168,7 +168,7 @@ return {
 				table.unpack(permissionList)
 			}
 		},
-		--[[{
+		{
 			name = "role",
 			description = "Change the default role bot uses to enforce user commands",
 			type = commandOptionType.subcommandGroup,
@@ -216,28 +216,6 @@ return {
 							required = true
 						}
 					}
-				}
-			}
-		}]]
-		{
-			name = "role",
-			description = "Change the default role bot uses to enforce user commands",
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = "lobby",
-					description = "A lobby to be configured",
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
-				{
-					name = "role",
-					description = "The role to be used",
-					type = commandOptionType.role,
-					required = true
 				}
 			}
 		},

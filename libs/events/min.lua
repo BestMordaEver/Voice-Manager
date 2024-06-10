@@ -4,7 +4,8 @@ local config = require "config"
 local mercy = require "utils/mercy"
 
 local storage = require "handlers/storageHandler"
-local channels = storage.channels
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 local stats = storage.stats
 
 local status = require "handlers/statusHandler"
@@ -12,9 +13,9 @@ local status = require "handlers/statusHandler"
 return function (date)
 	channels:cleanup()
 
-	stats.lobbies = #storage.lobbies
-	stats.channels = #storage.channels
-	stats.users = storage.channels:users()
+	storage.stats.lobbies = #lobbies
+	storage.stats.channels = #channels
+	storage.stats.users = channels:users()
 	client:setActivity(status())
 
 	if config.heartbeat then

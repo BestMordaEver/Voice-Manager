@@ -3,7 +3,7 @@ local client = require "client"
 
 local interactionType = require "discordia".enums.interactionType
 
-local lobbies = require "handlers/storageHandler".lobbies
+local lobbies = require "storage/lobbies"
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"

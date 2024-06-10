@@ -1,9 +1,9 @@
 local client = require "client"
 local locale = require "locale"
 
-local guilds = require "handlers/storageHandler".guilds
-local lobbies = require "handlers/storageHandler".lobbies
-local channels = require "handlers/storageHandler".channels
+local guilds = require "storage/guilds"
+local lobbies = require "storage/lobbies"
+local channels = require "storage/channels"
 
 local Overseer = require "utils/logWriter"
 

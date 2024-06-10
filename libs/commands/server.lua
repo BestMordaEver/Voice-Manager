@@ -1,6 +1,6 @@
 local locale = require "locale"
 
-local guilds = require "handlers/storageHandler".guilds
+local guilds = require "storage/guilds"
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"

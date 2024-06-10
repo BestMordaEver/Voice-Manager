@@ -1,8 +1,7 @@
 local locale = require "locale"
 local embedHandler = require "handlers/embedHandler"
 
-local guilds = require "handlers/storageHandler".guilds
-local channels = require "handlers/storageHandler".channels
+local guilds = require "storage/guilds"
 
 local blurple = embedHandler.colors.blurple
 
