@@ -303,14 +303,14 @@ If category is selected, all it's channels are used]],
 	-- server
 	serverInfoTitle = "Server info | %s",
 	serverInfo = [[**Permissions:** %s
-**Managed role:** %s
+**Managed roles:** %s
 **Lobbies:** %d
 **Active users:** %d
 **Channels:** %d
 **Room limit:** %d]],
 
 	limitConfirm = "Limit is set to %d",
-	roleConfirm = "New managed role set",
+	roleConfirm = "Updated role list: %s",
 
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",
@@ -320,7 +320,7 @@ You can add a lobby with **/lobby add**]],
 	lobbiesField = [[**Target category:** %s
 **Name template:** %s
 **Permissions:** %s
-**Managed role:** %s
+**Managed roles:** %s
 **Capacity:** %s
 **Bitrate:** %s
 **Companion:** %s

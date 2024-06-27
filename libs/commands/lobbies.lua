@@ -1,3 +1,4 @@
+local client = require "client"
 local locale = require "locale"
 
 local lobbies = require "storage/lobbies"
@@ -102,13 +103,32 @@ local subcommands = {
 		return "Lobby permissions reset", okEmbed(locale.permissionsReset)
 	end,
 
-	role = function (interaction, lobby, role)
-		if role then
-			lobbies[lobby.id]:setRole(interaction.option.options.role.value.id)
+	role = function (interaction, lobby, action)
+		local lobbyData = lobbies[lobby.id]
+
+		if action then
+			action = action.name
+			local role = interaction.option.option.options.role.value
+
+			if action == "add" and not lobbyData.roles[role.id] then
+				lobbyData:addRole(role.id)
+			elseif action == "remove" and lobbyData.roles[role.id] then
+				lobbyData:removeRole(role.id)
+			end
 		else
-			lobbies[lobby.id]:setRole(lobby.guild.defaultRole.id)
+			lobbyData:removeRoles()
 		end
-		return "Lobby managed role set", okEmbed(locale.roleConfirm)
+
+		local roles = {}
+		for roleID, _ in pairs(lobbyData.roles) do
+			local role = client:getRole(roleID)
+			if role then
+				table.insert(roles, role.mentionString)
+			else
+				lobbyData:removeRole(roleID)
+			end
+		end
+		return "Changed managed lobby roles", okEmbed(locale.roleConfirm:format(table.concat(roles," ")))
 	end,
 
 	limit = function (interaction, lobby, limit)

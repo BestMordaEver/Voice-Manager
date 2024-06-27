@@ -1,3 +1,4 @@
+local client = require "client"
 local locale = require "locale"
 
 local guilds = require "storage/guilds"
@@ -10,11 +11,32 @@ local botPermissions = require "utils/botPermissions"
 local checkPermissions = require "handlers/channelHandler".checkPermissions
 
 local subcommands = {
-	role = function (interaction, role)
-		if not role then role = interaction.guild.defaultRole end
+	role = function (interaction, action)
+		local guildData = guilds[interaction.guild.id]
 
-		guilds[interaction.guild.id]:setRole(role.id)
-		return "Server managed role set", okEmbed(locale.roleConfirm:format(role.mentionString))
+		if action then
+			action = action.name
+			local role = interaction.option.option.option.value
+
+			if action == "add" and not guildData.roles[role.id] then
+				guildData:addRole(role.id)
+			elseif action == "remove" and guildData.roles[role.id] then
+				guildData:removeRole(role.id)
+			end
+		else
+			guildData:removeRoles()
+		end
+
+		local roles = {}
+		for roleID, _ in pairs(guildData.roles) do
+			local role = client:getRole(roleID)
+			if role then
+				table.insert(roles, role.mentionString)
+			else
+				guildData:removeRole(roleID)
+			end
+		end
+		return "Changed managed server roles", okEmbed(locale.roleConfirm:format(table.concat(roles," ")))
 	end,
 
 	limit = function (interaction, limit)
