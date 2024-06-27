@@ -13,6 +13,18 @@ local setMT = {
 
 			self[o] = nil
 			self.n = self.n - 1
+		end,
+
+		random = function (self)
+			local index, key = math.random(self.n)
+
+			repeat
+				index = index - 1
+				key = next(self, key)
+				if key == "n" then key = next(self, key) end
+			until index <= 1
+
+			return key
 		end
 	},
 	__len = function (self) return self.n end,
@@ -25,6 +37,10 @@ local setMT = {
 	end
 }
 
-return function ()
-	return setmetatable({n = 0},setMT)
+return function (init)
+	local set = setmetatable({n = 0},setMT)
+	for k, _ in pairs(init) do
+		set:add(k)
+	end
+	return set
 end
