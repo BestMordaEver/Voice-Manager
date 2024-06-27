@@ -29,12 +29,13 @@ ratelimiter("channelCreate", 2, 20)
 local function lobbyJoin (member, lobby)
 	logger:log(4, "GUILD %s LOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
+	local guild = lobby.guild
 	local lobbyData = lobbies[lobby.id]
-	local guildData = guilds[lobby.guild.id]
+	local guildData = guilds[guild.id]
 	if guildData.limit <= guildData:channels() or lobbyData.limit <= #lobbyData.children then return end
 
 	-- parent to which a new channel will be attached
-	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category or guild
 
 	-- determine new channel name
 	local name = lobbyData.template or "%nickname's% room"
@@ -66,7 +67,7 @@ local function lobbyJoin (member, lobby)
 		end
 	end
 
-	local newChannel, err = lobby.guild:createChannel({
+	local newChannel, err = guild:createChannel({
 		name = name,
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate or lobby.bitrate,
@@ -85,7 +86,7 @@ local function lobbyJoin (member, lobby)
 		local companion
 		if lobbyData.companionTarget then
 			-- this might look familiar
-			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or newChannel.guild) or client:getChannel(lobbyData.companionTarget)
+			local companionTarget = lobbyData.companionTarget == true and (newChannel.category or guild) or client:getChannel(lobbyData.companionTarget)
 
 			if companionTarget then
 				local name = lobbyData.companionTemplate or "private-chat"
@@ -94,7 +95,7 @@ local function lobbyJoin (member, lobby)
 					if name == "" then name = "private-chat" end
 				end
 
-				companion = lobby.guild:createChannel {
+				companion = guild:createChannel {
 					name = name,
 					type = channelType.text,
 					parent_id = companionTarget.id
@@ -106,12 +107,12 @@ local function lobbyJoin (member, lobby)
 		channels:store(newChannel.id, 0, member.user.id, lobby.id, position, companion and companion.id or nil)
 		lobbyData:attachChild(channels[newChannel.id], position)
 
-		newChannel:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.connect, permission.readMessages)
+		newChannel:getPermissionOverwriteFor(guild.me):allowPermissions(permission.connect, permission.readMessages)
 		adjustPermissions(newChannel, member)
 
 		if companion then
 			-- companions are private by default
-			companion:getPermissionOverwriteFor(lobby.guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
+			companion:getPermissionOverwriteFor(guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
 		end
@@ -124,7 +125,7 @@ local function lobbyJoin (member, lobby)
 	else
 		-- something went wrong, most likely user error
 		lobbyData:detachChild(position)
-		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room - %s", lobby.guild.id, lobby.id, member.user.id, err)
+		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room - %s", guild.id, lobby.id, member.user.id, err)
 	end
 end
 
