@@ -45,6 +45,7 @@ for name, statement in pairs(storageStatements) do
 	emitter:on(name, storageCall(lobbiesDB:prepare(statement[1]), statement[2]))
 end
 
+local set = require "utils/set"
 local hollowArray = require "utils/hollowArray"
 local botPermissions = require "utils/botPermissions"
 local Mutex = discordia.Mutex
@@ -179,7 +180,7 @@ setmetatable(lobbies, {
 				id = lobbyID,
 				guild = guilds[guildID],
 				isMatchmaking = tonumber(isMatchmaking) == 1,
-				roles = roles or {},
+				roles = set(roles),
 				limit = limit,
 				permissions = botPermissions(tonumber(permissions) or 0),
 				template = template,

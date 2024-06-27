@@ -135,20 +135,14 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local overwriteTarget
-		if user then
-			overwriteTarget = voiceChannel.guild:getMember(user)
-		else
-			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
-		end
+		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
+		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
 
 		if scope == "voice" or scope == "both" then
 			if user then
-				local guild = voiceChannel.guild
+				voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.speak)
 
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.speak)
-
-				if overwriteTarget.voiceChannel == voiceChannel then
+				if member.voiceChannel == voiceChannel then
 					local silentRoom
 					if guild.afkChannel then
 						silentRoom = guild.afkChannel
@@ -160,9 +154,9 @@ subcommands = {
 						if not silentRoom then silentRoom = nil end
 					end
 
-					overwriteTarget:setVoiceChannel(silentRoom)
+					member:setVoiceChannel(silentRoom)
 					if silentRoom then
-						overwriteTarget:setVoiceChannel(voiceChannel)
+						member:setVoiceChannel(voiceChannel)
 						if silentRoom ~= guild.afkChannel then
 							silentRoom:delete()
 						end
@@ -176,18 +170,22 @@ subcommands = {
 					end
 				end
 
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.speak)
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.speak)
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.speak)
+				end end
 			end
 		end
 
 		local companion = client:getChannel(channels[voiceChannel.id].companion)
 		if scope == "text" or scope == "both" then
 			if user then
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+				voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.sendMessages)
 
 				if channels[voiceChannel.id].companion then
 					if companion then
-						companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
+						companion:getPermissionOverwriteFor(member):denyPermissions(permission.sendMessages)
 					end
 				end
 			else
@@ -201,10 +199,17 @@ subcommands = {
 					end
 				end
 
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
-				if companion then
-					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.sendMessages)
-				end
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.sendMessages)
+					if companion then
+						companion:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.sendMessages)
+					end
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.sendMessages)
+					if companion then
+						companion:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.sendMessages)
+					end
+				end end
 			end
 		end
 
@@ -222,23 +227,40 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local overwriteTarget
-		if user then
-			overwriteTarget = voiceChannel.guild:getMember(user)
-		else
-			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
-		end
+		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
+		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
 
 		if scope == "voice" or scope == "both" then
-			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.speak)
+			if user then
+				voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.speak)
+			else
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.speak)
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.speak)
+				end end
+			end
 		end
 
-		local companion = client:getChannel(channels[voiceChannel.id].companion)
 		if scope == "text" or scope == "both" then
-			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.sendMessages)
-
-			if companion then
-					companion:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.sendMessages)
+			local companion = client:getChannel(channels[voiceChannel.id].companion)
+			if user then
+				voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.sendMessages)
+				if companion then
+					companion:getPermissionOverwriteFor(member):allowPermissions(permission.sendMessages)
+				end
+			else
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.sendMessages)
+					if companion then
+						companion:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.sendMessages)
+					end
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.sendMessages)
+					if companion then
+						companion:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.sendMessages)
+					end
+				end end
 			end
 		end
 
@@ -256,16 +278,12 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local overwriteTarget
-		if user then
-			overwriteTarget = voiceChannel.guild:getMember(user)
-		else
-			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
-		end
+		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
+		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
 
 		if scope == "voice" or scope == "both" then
 			if user then
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+				voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.readMessages)
 			else
 				for _, member in pairs(voiceChannel.connectedMembers) do
 					local po = voiceChannel:getPermissionOverwriteFor(member)
@@ -274,15 +292,19 @@ subcommands = {
 					end
 				end
 
-				voiceChannel:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.readMessages)
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.readMessages)
+				end end
 			end
 		end
 
-		local companion = client:getChannel(channels[voiceChannel.id].companion)
 		if scope == "text" or scope == "both" then
+			local companion = client:getChannel(channels[voiceChannel.id].companion)
 			if companion then
 				if user then
-					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+					companion:getPermissionOverwriteFor(member):denyPermissions(permission.readMessages)
 				else
 					for _, member in pairs(voiceChannel.connectedMembers) do
 						local po = companion:getPermissionOverwriteFor(member)
@@ -290,7 +312,12 @@ subcommands = {
 							po:allowPermissions(permission.readMessages)
 						end
 					end
-					companion:getPermissionOverwriteFor(overwriteTarget):denyPermissions(permission.readMessages)
+
+					if #roles == 0 then
+						companion:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.readMessages)
+					else for role in pairs(roles) do
+						companion:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.readMessages)
+					end end
 				end
 			elseif scope == "text" then
 				return "No companion to hide", warningEmbed(locale.hideNoCompanion)
@@ -311,21 +338,29 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local overwriteTarget
-		if user then
-			overwriteTarget = voiceChannel.guild:getMember(user)
-		else
-			overwriteTarget = channels[voiceChannel.id].parent and client:getRole(channels[voiceChannel.id].parent.role) or voiceChannel.guild.defaultRole
-		end
+		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
+		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
 
 		if scope == "voice" or scope == "both" then
-			voiceChannel:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.readMessages)
+			if user then
+				voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+			else
+				if #roles == 0 then
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.readMessages)
+				else for role in pairs(roles) do
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.readMessages)
+				end end
+			end
 		end
 
-		local companion = client:getChannel(channels[voiceChannel.id].companion)
 		if scope == "text" or scope == "both" then
+			local companion = client:getChannel(channels[voiceChannel.id].companion)
 			if companion then
-				companion:getPermissionOverwriteFor(overwriteTarget):allowPermissions(permission.readMessages)
+				if #roles == 0 then
+					companion:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.readMessages)
+				else for role in pairs(roles) do
+					companion:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.readMessages)
+				end end
 			elseif scope == "text" then
 				return "No companion to show", warningEmbed(locale.showNoCompanion)
 			end
@@ -366,17 +401,27 @@ subcommands = {
 			end
 		end
 
-		local parent = channels[voiceChannel.id].parent
-		local role = parent and voiceChannel.guild:getRole(parent.role) or voiceChannel.guild.defaultRole
-		voiceChannel:getPermissionOverwriteFor(role):denyPermissions(permission.connect)
+		local guild = voiceChannel.guild
+		local roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+
+		if #roles == 0 then
+			voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.connect)
+		else for role in pairs(roles) do
+			voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.connect)
+		end end
 
 		return "Locked the room", okEmbed(locale.lockConfirm)
 	end,
 
 	unlock = function (interaction, voiceChannel)
-		local parent = channels[voiceChannel.id].parent
-		local role = parent and voiceChannel.guild:getRole(parent.role) or voiceChannel.guild.defaultRole
-		voiceChannel:getPermissionOverwriteFor(role):allowPermissions(permission.connect)
+		local guild = voiceChannel.guild
+		local roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+
+		if #roles == 0 then
+			voiceChannel:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.connect)
+		else for role in pairs(roles) do
+			voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.connect)
+		end end
 
 		return "Unlocked the room", okEmbed(locale.unlockConfirm)
 	end,

@@ -83,7 +83,7 @@ end
 
 return embedHandler("roomInfo", function (room, ephemeral)
 	local companion = client:getChannel(channels[room.id].companion)
-	local role = channels[room.id].parent and client:getRole(channels[room.id].parent.role) or room.guild.defaultRole
+	local role = channels[room.id].parent and client:getRole(channels[room.id].parent.roles:random()) or room.guild.defaultRole
 	local roomPO = room:getPermissionOverwriteFor(role)
 	local chatPO = companion and companion:getPermissionOverwriteFor(role)
 

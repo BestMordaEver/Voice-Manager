@@ -103,7 +103,7 @@ setmetatable(guilds, {
 		add = function (self, guildID, limit, permissions, roles)
 			self[guildID] = setmetatable({
 				id = guildID,
-				roles = roles or {},
+				roles = set(roles),
 				limit = tonumber(limit) or 500,
 				permissions = botPermissions(tonumber(permissions) or 0),
 				lobbies = set()

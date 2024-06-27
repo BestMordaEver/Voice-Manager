@@ -114,7 +114,12 @@ local function lobbyJoin (member, lobby)
 			-- companions are private by default
 			companion:getPermissionOverwriteFor(guild.me):allowPermissions(permission.readMessages, permission.sendMessages)
 			companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
-			companion:getPermissionOverwriteFor(lobby.guild:getRole(lobbyData.role or guildData.role) or lobby.guild.defaultRole):denyPermissions(permission.readMessages)
+
+			if #lobbyData.roles == 0 then
+				companion:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.readMessages)
+			else for role in pairs(lobbyData.roles) do
+				companion:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.readMessages)
+			end end
 		end
 
 		if lobbyData.companionLog then Overseer.track(companion or newChannel) end
