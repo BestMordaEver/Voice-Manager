@@ -17,6 +17,8 @@ local storageStatements = {
 
 	removeLobbyRole = {"DELETE FROM roles WHERE id = ? and lobbyID = ?", "DELETE ROLE %s => LOBBY %s"},
 
+	removeLobbyRoles = {"DELETE FROM roles WHERE lobbyID = ?", "DELETE ROLES => LOBBY %s"},
+
 	setLobbyLimit = {"UPDATE lobbies SET cLimit = ? WHERE id = ?", "SET LIMIT %s => LOBBY %s"},
 
 	setLobbyPermissions = {"UPDATE lobbies SET permissions = ? WHERE id = ?","SET PERMISSIONS %s => LOBBY %s"},
@@ -61,6 +63,7 @@ local lobbyMeta = {
 					logger:log(6, "GUILD %s LOBBY %s: deleted", self.guild.id, self.id)
 				end
 			end
+			emitter:emit("removeLobbyRoles", self.id)
 			emitter:emit("removeLobby", self.id)
 		end,
 
@@ -70,16 +73,22 @@ local lobbyMeta = {
 			emitter:emit("setLobbyMatchmaking", isMatchmaking and 1 or 0, self.id)
 		end,
 
-		addRole = function (self, role)
-			self.roles[role] = true
-			logger:log(6, "GUILD %s LOBBY %s: added managed role %s", self.guild.id, self.id, role)
-			emitter:emit("addLobbyRole", role, self.id)
+		addRole = function (self, roleID)
+			self.roles[roleID] = true
+			logger:log(6, "GUILD %s LOBBY %s: added managed role %s", self.guild.id, self.id, roleID)
+			emitter:emit("addLobbyRole", roleID, self.id)
 		end,
 
-		removeRole = function (self, role)
-			self.roles[role] = nil
-			logger:log(6, "GUILD %s LOBBY %s: removed managed role %s", self.guild.id, self.id, role)
-			emitter:emit("removeLobbyRole", role, self.id)
+		removeRole = function (self, roleID)
+			self.roles[roleID] = nil
+			logger:log(6, "GUILD %s LOBBY %s: removed managed role %s", self.guild.id, self.id, roleID)
+			emitter:emit("removeLobbyRole", roleID, self.id)
+		end,
+
+		removeRoles = function (self)
+			self.roles = {}
+			logger:log(6, "GUILD %s LOBBY %s: removed all managed roles", self.guild.id, self.id)
+			emitter:emit("removeLobbyRoles", self.id)
 		end,
 
 		setLimit = function (self, limit)
@@ -156,15 +165,33 @@ local lobbyMeta = {
 
 setmetatable(lobbies, {
 	__index = {
-		loadStatement = lobbiesDB:prepare("SELECT * FROM lobbies"),
+		loadLobbiesStatement = lobbiesDB:prepare([[SELECT
+			id, guild, isMatchmaking,
+			template, companionTemplate,
+			target, companionTarget,
+			cLimit, permissions, capacity, bitrate,
+			greeting, companionLog
+		FROM lobbies]]),
+		loadRolesStatement = lobbiesDB:prepare("SELECT id, lobbyID FROM roles WHERE lobbyID = ?"),
 
-		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, roles, permissions, capacity, bitrate, greeting, companionLog)
-			local lobby = setmetatable({id = lobbyID, guild = guilds[guildID],
-				isMatchmaking = tonumber(isMatchmaking) == 1, roles = roles, permissions = botPermissions(tonumber(permissions) or 0),
-				template = template, target = target, capacity = tonumber(capacity), bitrate = tonumber(bitrate),
-				companionTemplate = companionTemplate, companionTarget = companionTarget == "true" or companionTarget,
-				greeting = greeting, companionLog = companionLog,
-				children = hollowArray(), mutex = Mutex()
+		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, limit, permissions, capacity, bitrate, greeting, companionLog, roles)
+			local lobby = setmetatable({
+				id = lobbyID,
+				guild = guilds[guildID],
+				isMatchmaking = tonumber(isMatchmaking) == 1,
+				roles = roles or {},
+				limit = limit,
+				permissions = botPermissions(tonumber(permissions) or 0),
+				template = template,
+				target = target,
+				capacity = tonumber(capacity),
+				bitrate = tonumber(bitrate),
+				companionTemplate = companionTemplate,
+				companionTarget = companionTarget == "true" or companionTarget,
+				greeting = greeting,
+				companionLog = companionLog,
+				children = hollowArray(),
+				mutex = Mutex()
 			}, lobbyMeta)
 
 			if lobby.guild then lobby.guild.lobbies:add(lobby) end
@@ -182,7 +209,7 @@ setmetatable(lobbies, {
 		cleanup = function (self)
 			for lobbyID, lobbyData in pairs(self) do
 				if not (client:getChannel(lobbyID) or client:getGuild(lobbyData.guild.id).unavailable) then
-					emitter:emit("removeLobby", lobbyID)
+					lobbyData:delete()
 				end
 			end
 		end

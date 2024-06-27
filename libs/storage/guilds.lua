@@ -12,7 +12,9 @@ local storageStatements = {
 
 	addGuildRole = {"INSERT INTO roles VALUES(?, ?)", "ADD ROLE %s => GUILD %s"},
 
-	removeGuildRole = {"DELETE FROM roles WHERE id = ? and guildID", "DELETE ROLE %s => GUILD %s"},
+	removeGuildRole = {"DELETE FROM roles WHERE id = ? and guildID = ?", "DELETE ROLE %s => GUILD %s"},
+
+	removeGuildRoles = {"DELETE FROM roles WHERE guildID = ?", "DELETE ROLES GUILD %s"},
 
 	setGuildLimit = {"UPDATE guilds SET cLimit = ? WHERE id = ?", "SET LIMIT %s => GUILD %s"},
 
@@ -35,19 +37,26 @@ local guildMeta = {
 				guilds[self.id] = nil
 				logger:log(6, "GUILD %s: deleted", self.id)
 			end
+			emitter:emit("removeGuildRoles", self.id)
 			emitter:emit("removeGuild", self.id)
 		end,
 
-		addRole = function (self, role)
-			self.roles[role] = true
-			logger:log(6, "GUILD %s: added managed role %d", self.id, role)
-			emitter:emit("addGuildRole", role, self.id)
+		addRole = function (self, roleID)
+			self.roles[roleID] = true
+			logger:log(6, "GUILD %s: added managed role %d", self.id, roleID)
+			emitter:emit("addGuildRole", roleID, self.id)
 		end,
 
-		removeRole = function (self, role)
-			self.roles[role] = nil
-			logger:log(6, "GUILD %s: removed managed role %d", self.id, role)
-			emitter:emit("removeGuildRole", role, self.id)
+		removeRole = function (self, roleID)
+			self.roles[roleID] = nil
+			logger:log(6, "GUILD %s: removed managed role %d", self.id, roleID)
+			emitter:emit("removeGuildRole", roleID, self.id)
+		end,
+
+		removeRoles = function (self)
+			self.roles = {}
+			logger:log(6, "GUILD %s: removed all managed roles", self.id)
+			emitter:emit("removeGuildRoles", self.id)
 		end,
 
 		setLimit = function (self, limit)
@@ -88,15 +97,17 @@ local guildMeta = {
 
 setmetatable(guilds, {
 	__index = {
-		loadStatement = guildsDB:prepare("SELECT * FROM guilds"),
+		loadGuildsStatement = guildsDB:prepare("SELECT id, cLimit, permissions FROM guilds"),
+		loadRolesStatement = guildsDB:prepare("SELECT id, guildID FROM roles WHERE guildID = ?"),
 
-		add = function (self, guildID, role, limit, permissions)
+		add = function (self, guildID, limit, permissions, roles)
 			self[guildID] = setmetatable({
 				id = guildID,
-				role = role,
+				roles = roles or {},
 				limit = tonumber(limit) or 500,
 				permissions = botPermissions(tonumber(permissions) or 0),
-				lobbies = set()}, guildMeta)
+				lobbies = set()
+			}, guildMeta)
 			logger:log(6, "GUILD %s: added", guildID)
 			return self[guildID]
 		end,
@@ -107,9 +118,9 @@ setmetatable(guilds, {
 		end,
 
 		cleanup = function (self)
-			for guildID, _ in pairs(self) do
+			for guildID, guildData in pairs(self) do
 				if not client:getGuild(guildID) then
-					emitter:emit("removeGuild", guildID)
+					guildData:delete()
 				end
 			end
 		end

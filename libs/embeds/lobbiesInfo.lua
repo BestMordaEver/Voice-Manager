@@ -32,7 +32,16 @@ return embedHandler("lobbiesInfo", function (guild, channel, ephemeral)
 
 	for _, lobbyData in pairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.target)
-		if not guild:getRole(lobbyData.role) then lobbyData:setRole(guild.defaultRole.id) end
+		local roles = {}
+		for roleID, _ in pairs(lobbyData.roles) do
+			local role = guild:getRole(roleID)
+			if role then
+				table.insert(roles, role.mentionString)
+			else
+				lobbyData:removeRole(roleID)
+			end
+		end
+		if #roles == 0 then roles[1] = guild.defaultRole.mentionString end
 
 		insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
@@ -40,7 +49,7 @@ return embedHandler("lobbiesInfo", function (guild, channel, ephemeral)
 				target and target.name or "default",
 				lobbyData.template or "%nickname's% room",
 				lobbyData.permissions,
-				guild:getRole(lobbyData.role).mentionString,
+				table.concat(roles, " "),
 				lobbyData.capacity or "default",
 				lobbyData.bitrate or "default",
 				lobbyData.companionTarget and "enabled" or "disabled",

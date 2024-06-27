@@ -55,22 +55,33 @@ local parents = {[0] = require "storage/lobbies", require "storage/guilds", nil 
 
 setmetatable(channels, {
 	__index = {
-		loadStatement = channelsDB:prepare("SELECT * FROM channels"),
+		loadStatement = channelsDB:prepare("SELECT id, parentType, host, parent, position, companion, password FROM channels"),
 
 		add = function (self, channelID, parentType, host, parentID, position, companion, password)
 			local parent = parents[tonumber(parentType)][parentID]
 			if parent then
 				self[channelID] = setmetatable({
-					id = channelID, guildID = parent.guild and parent.guild.id or parent.id, parentType = tonumber(parentType),
-					host = host, parent = parent, position = tonumber(position), companion = companion, password = password
+					id = channelID,
+					guildID = parent.guild and parent.guild.id or parent.id,
+					parentType = tonumber(parentType),
+					host = host,
+					parent = parent,
+					position = tonumber(position),
+					companion = companion,
+					password = password
 				}, channelMeta)
 				if parent.attachChild then parent:attachChild(self[channelID], tonumber(position)) end
 
 				logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
 			else
 				self[channelID] = setmetatable({
-					id = channelID, parentID = parentID, parentType = tonumber(parentType),
-					host = host, position = tonumber(position), companion = companion, password = password
+					id = channelID,
+					parentID = parentID,
+					parentType = tonumber(parentType),
+					host = host,
+					position = tonumber(position),
+					companion = companion,
+					password = password
 				}, channelMeta)
 				logger:log(6, "ORPHAN ROOM %s: added", channelID)
 			end

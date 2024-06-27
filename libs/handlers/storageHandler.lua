@@ -1,6 +1,5 @@
 local client = require "client"
 local Overseer = require "utils/logWriter"
-local unpack = table.unpack
 
 local guilds = require "storage/guilds"
 local lobbies, lobbiesEmitter = require "storage/lobbies"
@@ -58,7 +57,7 @@ local loadGuild = function (guild)
 
 				loadChannels(lobbyData, 0)
 			else
-				lobbiesEmitter:emit("removeLobby", id)
+				lobbyData:delete()
 			end
 		end
 	end
@@ -66,23 +65,43 @@ end
 
 -- preloader, the one that has a special place in hell reserved for me
 local load = function ()
-	local rawData, columns = guilds.loadStatement:step({},{})
+	local rawData, columns = guilds.loadGuildsStatement:step({},{})
 	while rawData do
-		data.guilds[rawData[1]] = guilds:add(unpack(rawData, 1, #columns))	-- many fields may be null, unpack would halt on them
-		rawData = guilds.loadStatement:step()
-	end
-	guilds.loadStatement = nil
+		local rolesData = guilds.loadRolesStatement:reset():bind(rawData[1]):step()
+		if rolesData then
+			local roles = {}
+			rawData[#columns+1] = roles
+			repeat
+				roles[rolesData[1]] = true
+			until not guilds.loadRolesStatement:step(rolesData)
+		end
 
-	rawData, columns = lobbies.loadStatement:step({},{})
+		data.guilds[rawData[1]] = guilds:add(unpack(rawData, 1, #columns + (rolesData and 1 or 0)))	-- many fields may be null, unpack would halt on them
+		rawData = guilds.loadGuildsStatement:step()
+	end
+	guilds.loadRolesStatement = nil
+	guilds.loadGuildsStatement = nil
+
+	rawData, columns = lobbies.loadLobbiesStatement:step({},{})
 	local dummy = {id = "none"}
 	while rawData do
-		local lobby = lobbies:add(unpack(rawData, 1, #columns))
+		local rolesData = lobbies.loadRolesStatement:reset():bind(rawData[1]):step()
+		if rolesData then
+			local roles = {}
+			rawData[#columns+1] = roles
+			repeat
+				roles[rolesData[1]] = true
+			until not lobbies.loadRolesStatement:step(rolesData)
+		end
+
+		local lobby = lobbies:add(unpack(rawData, 1, #columns + (rolesData and 1 or 0)))
 		if not lobby.guild then lobby.guild = dummy end
 		if not data.lobbies[lobby.guild.id] then data.lobbies[lobby.guild.id] = {} end
 		data.lobbies[lobby.guild.id][lobby.id] = lobby
-		rawData = lobbies.loadStatement:step()
+		rawData = lobbies.loadLobbiesStatement:step()
 	end
-	lobbies.loadStatement = nil
+	lobbies.loadRolesStatement = nil
+	lobbies.loadLobbiesStatement = nil
 
 	rawData, columns = channels.loadStatement:step({},{})
 	while rawData do
