@@ -39,8 +39,16 @@ local setMT = {
 
 return function (init)
 	local set = setmetatable({n = 0},setMT)
-	for k, _ in pairs(init) do
-		set:add(k)
+	if init then
+		if #init ~= 0 then
+			for _, k in ipairs(init) do
+				set:add(k)
+			end
+		else
+			for k, _ in pairs(init) do
+				set:add(k)
+			end
+		end
 	end
 	return set
 end
