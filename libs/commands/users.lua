@@ -76,7 +76,7 @@ local commands = {
                 end
             end
         end
-        return "Added roles to users", okEmbed(locale.usersRolesRemoved:format(count))
+        return "Removed roles from users", okEmbed(locale.usersRolesRemoved:format(count))
     end
 }
 
