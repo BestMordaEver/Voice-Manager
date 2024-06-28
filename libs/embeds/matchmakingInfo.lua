@@ -17,7 +17,7 @@ return embedHandler("matchmakingInfo", function (guild, channel, ephemeral)
 	else
 		---@diagnostic disable-next-line: undefined-field
 		sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
-			return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
+			return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].isMatchmaking
 		end), tps)
 		for i,lobby in ipairs(sortedLobbies) do
 			sortedLobbies[i] = lobbies[lobby.id]
