@@ -128,6 +128,7 @@ local subcommands = {
 				lobbyData:removeRole(roleID)
 			end
 		end
+		if #roles == 0 then roles[1] = lobby.guild.defaultRole.mentionString end
 		return "Changed managed lobby roles", okEmbed(locale.roleConfirm:format(table.concat(roles," ")))
 	end,
 
