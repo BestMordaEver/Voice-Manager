@@ -235,9 +235,9 @@ subcommands = {
 				voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.speak)
 			else
 				if #roles == 0 then
-					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):denyPermissions(permission.speak)
+					voiceChannel:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.speak)
 				else for role in pairs(roles) do
-					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.speak)
+					voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.speak)
 				end end
 			end
 		end
