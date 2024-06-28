@@ -42,19 +42,19 @@ local guildMeta = {
 		end,
 
 		addRole = function (self, roleID)
-			self.roles[roleID] = true
+			self.roles:add(roleID)
 			logger:log(6, "GUILD %s: added managed role %d", self.id, roleID)
 			emitter:emit("addGuildRole", roleID, self.id)
 		end,
 
 		removeRole = function (self, roleID)
-			self.roles[roleID] = nil
+			self.roles:remove(roleID)
 			logger:log(6, "GUILD %s: removed managed role %d", self.id, roleID)
 			emitter:emit("removeGuildRole", roleID, self.id)
 		end,
 
 		removeRoles = function (self)
-			self.roles = {}
+			self.roles = set()
 			logger:log(6, "GUILD %s: removed all managed roles", self.id)
 			emitter:emit("removeGuildRoles", self.id)
 		end,

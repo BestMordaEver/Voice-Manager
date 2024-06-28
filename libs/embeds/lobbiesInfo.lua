@@ -33,7 +33,7 @@ return embedHandler("lobbiesInfo", function (guild, channel, ephemeral)
 	for _, lobbyData in pairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.target)
 		local roles = {}
-		for roleID, _ in pairs(lobbyData.roles) do
+		for roleID in pairs(lobbyData.roles) do
 			local role = guild:getRole(roleID)
 			if role then
 				table.insert(roles, role.mentionString)

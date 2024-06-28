@@ -75,19 +75,19 @@ local lobbyMeta = {
 		end,
 
 		addRole = function (self, roleID)
-			self.roles[roleID] = true
+			self.roles:add(roleID)
 			logger:log(6, "GUILD %s LOBBY %s: added managed role %s", self.guild.id, self.id, roleID)
 			emitter:emit("addLobbyRole", roleID, self.id)
 		end,
 
 		removeRole = function (self, roleID)
-			self.roles[roleID] = nil
+			self.roles:remove(roleID)
 			logger:log(6, "GUILD %s LOBBY %s: removed managed role %s", self.guild.id, self.id, roleID)
 			emitter:emit("removeLobbyRole", roleID, self.id)
 		end,
 
 		removeRoles = function (self)
-			self.roles = {}
+			self.roles = set()
 			logger:log(6, "GUILD %s LOBBY %s: removed all managed roles", self.guild.id, self.id)
 			emitter:emit("removeLobbyRoles", self.id)
 		end,
