@@ -12,7 +12,7 @@ CREATE TABLE guilds(
 );
 
 CREATE TABLE roles(
-	id VARCHAR PRIMARY KEY,
+	id VARCHAR,
 	guildID VARCHAR NOT NULL,
 	FOREIGN KEY(guildID) REFERENCES guilds(id)
 )]])
@@ -35,7 +35,7 @@ CREATE TABLE lobbies(
 );
 
 CREATE TABLE roles(
-	id VARCHAR PRIMARY KEY,
+	id VARCHAR,
 	lobbyID VARCHAR NOT NULL,
 	FOREIGN KEY(lobbyID) REFERENCES lobbies(id)
 )]])
