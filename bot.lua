@@ -60,6 +60,7 @@ client:once(safeEvent("ready", function ()
 		client:getChannel(config.wakeUpFeed):send("I'm listening")
 	end
 
+	require "utils/mercy".initialize(client.shardCount)
 	client:on(safeEvent("commandInteraction", require "events/commandInteraction"))
 	client:on(safeEvent("componentInteraction", require "events/componentInteraction"))
 	client:on(safeEvent("modalInteraction", require "events/modalInteraction"))

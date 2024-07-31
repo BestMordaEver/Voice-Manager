@@ -8,9 +8,15 @@ local shutdown = function () heroesNeverDie:emit("shutdown") end -- ensures grac
 process:on('sigterm', shutdown)
 process:on('sigint', shutdown)
 
-local shards = {[0] = 3}
+local shards = {}
 
 return {
+	initialize = function (shardcount)
+		for i=0,shardcount-1 do
+			shards[i] = 3
+		end
+	end,
+
 	reset = function (shard)
 		shards[shard] = 3
 	end,
