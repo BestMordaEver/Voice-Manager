@@ -2,15 +2,22 @@ local client = require "client"
 local Overseer = require "utils/logWriter"
 
 local guilds = require "storage/guilds"
-local lobbies, lobbiesEmitter = require "storage/lobbies"
+local lobbies = require "storage/lobbies"
 --local categories, categoriesEmitter = require "storage/categories"
-local channels, channelsEmitter = require "storage/channels"
+local channels = require "storage/channels"
 
 -- cleanup reference, shrinks as guilds load
-local data = {guilds = {}, lobbies = {}, channels = {[0] = {},{},{},{}}}
+local data = {
+	-- guildID = guildData
+	guilds = {},
+	-- guildID = {lobbyID = lobbyData}
+	lobbies = {},
+	-- parentType = {parentID = {channelID = channelData}}
+	channels = {[0] = {},{},{},{}}}
 
--- helper loader method
+-- helper loader method, called once per guild, per lobby and per channel
 local function loadChannels (parent, parentType)
+	-- find all children of the parent
 	local channelsByParent = data.channels[parentType][parent.id]
 	if channelsByParent then
 		for id, channelData in pairs(channelsByParent) do
@@ -19,28 +26,31 @@ local function loadChannels (parent, parentType)
 			local channel, companion = client:getChannel(id), client:getChannel(channelData.companion)
 			if channel then
 				if #channel.connectedMembers > 0 then
+					-- required for position tracking
 					if parentType == 0 then parent:attachChild(channelData, channelData.position) end
-					if companion and parent.companionLog then
-						Overseer.resume(companion)
-					end
-					loadChannels(channelData, 3)	-- password checkers
+					-- continue logger if needed
+					if parent.companionLog then Overseer.resume(companion) end
+					-- load in password checker channels
+					loadChannels(channelData, 3)
 				else
+					if companion then companion:delete() end
+					-- lobby children are rooms, rooms' children are password checkers
 					if parentType == 0 or parentType == 3 then
 						channel:delete()
+					else	-- guild and category children are persistent
+						channelData:delete()
 					end
-
-					if companion then companion:delete() end
-					channelsEmitter:emit("removeChannel", id)
 				end
 			else
 				if companion then companion:delete() end
-				channelsEmitter:emit("removeChannel", id)
+				channelData:delete()
 			end
 		end
 	end
 end
 
 -- main loader method that's used on bot startup
+-- this might be called on reconnects
 local loadGuild = function (guild)
 	local guildData = guilds[guild.id] or guilds:store(guild.id)
 	data.guilds[guild.id] = nil
