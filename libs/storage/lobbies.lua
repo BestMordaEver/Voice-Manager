@@ -181,7 +181,7 @@ setmetatable(lobbies, {
 				guild = guilds[guildID],
 				isMatchmaking = tonumber(isMatchmaking) == 1,
 				roles = set(roles),
-				limit = limit,
+				limit = tonumber(limit) or 500,
 				permissions = botPermissions(tonumber(permissions) or 0),
 				template = template,
 				target = target,

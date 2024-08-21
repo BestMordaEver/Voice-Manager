@@ -40,7 +40,7 @@ local setMT = {
 return function (init)
 	local set = setmetatable({n = 0},setMT)
 	if init then
-		if #init ~= 0 then
+		if init[1] ~= nil then
 			for _, k in ipairs(init) do
 				set:add(k)
 			end
