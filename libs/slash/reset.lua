@@ -108,7 +108,23 @@ return {
 							}
 						}
 					}
-				}
+				},
+				{
+					name = "limit",
+					description = "Reset the limit to 500",
+					type = commandOptionType.subcommand,
+					options = {
+						{
+							name = "lobby",
+							description = "A lobby to be configured",
+							type = commandOptionType.channel,
+							required = true,
+							channel_types = {
+								channelType.voice
+							}
+						}
+					}
+				},
 			}
 		},
 		{
