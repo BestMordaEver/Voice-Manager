@@ -1,6 +1,3 @@
--- a static storage for everything the bot displays as text to user
--- may be used as a foundation for translation
-
 return {
 	-- help
 	help = {
@@ -57,16 +54,16 @@ return {
 				{
 					name = "/lobby name",
 					value = [[Configure what name a room will have when it's created
-		Default name is **%nickname's% room**
-		You can put different **%combos%** in the name to customize it
-		**%name%** - user's name
-		**%nickname%** - user's nickname (name is used if nickname is not set)
-		**%name's%**, **%nickname's%** - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
-		**%tag%** - user's tag (for example **Riddles#2773**)
-		**%game%** - user's currently played game (**no game** if user's not playing anything)
-		**%game(text)%** - same as %game%, but shows **text** instead of **no game**
-		**%counter%** - room position. Keeps rooms ordered
-		**%rename%** - blank when room is created. When host uses **/room rename**, gets replaced by host's input]]
+Default name is **%nickname's% room**
+You can put different **%combos%** in the name to customize it
+**%name%** - user's name
+**%nickname%** - user's nickname (name is used if nickname is not set)
+**%name's%**, **%nickname's%** - corresponding combo with **'s** or **'** attached (difference between **Riddles's** and **Riddles'**)
+**%tag%** - user's tag (for example **Riddles#2773**)
+**%game%** - user's currently played game (**no game** if user's not playing anything)
+**%game(text)%** - same as %game%, but shows **text** instead of **no game**
+**%counter%** - room position. Keeps rooms ordered
+**%rename%** - blank when room is created. When host uses **/room rename**, gets replaced by host's input]]
 				},
 				{
 					name = "/lobby capacity",
