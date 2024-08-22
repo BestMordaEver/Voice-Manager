@@ -256,7 +256,7 @@ return function (member, channel)
 				local limit, retryIn = ratelimiter:limit("channelCreate", member.user.id)
 				if limit == -1 then
 					member:setVoiceChannel()
-					member.user:send(warningEmbed(locale.wait:format(retryIn)))
+					member.user:send(warningEmbed(member.user, "wait", retryIn))
 					return
 				end
 

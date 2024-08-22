@@ -19,13 +19,13 @@ local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"
 local subcommands = {
 	add = function (interaction, channel)
 		if lobbies[channel.id] then
-			return "Already registered", warningEmbed(locale.lobbyDupe)
+			return "Already registered", warningEmbed(interaction, "lobbyDupe")
 		elseif channels[channel.id] and not channels[channel.id].isPersistent then
-			return "Rooms can't be lobbies", warningEmbed(locale.channelDupe)
+			return "Rooms can't be lobbies", warningEmbed(interaction, "channelDupe")
 		end
 
 		lobbies:store(channel)
-		return "New lobby added", okEmbed(locale.addConfirm:format(channel.name))
+		return "New lobby added", okEmbed(interaction, "addConfirm", channel.name)
 	end,
 
 	remove = function (interaction, channel)
@@ -33,7 +33,7 @@ local subcommands = {
 			lobbies[channel.id]:delete()
 		end
 
-		return "Lobby removed", okEmbed(locale.removeConfirm:format(channel.name))
+		return "Lobby removed", okEmbed(interaction, "removeConfirm", channel.name)
 	end,
 
 	category = function (interaction, channel, category)
@@ -41,30 +41,30 @@ local subcommands = {
 			local isPermitted, logMsg, msg = checkPermissions(interaction, category)
 			if isPermitted then
 				lobbies[channel.id]:setTarget(category.id)
-				return "Lobby target category set", okEmbed(locale.categoryConfirm:format(category.name))
+				return "Lobby target category set", okEmbed(interaction, "categoryConfirm", category.name)
 			end
 
 			return logMsg, warningEmbed(msg)
 		end
 
 		lobbies[channel.id]:setTarget()
-		return "Lobby target category reset", okEmbed(locale.categoryReset)
+		return "Lobby target category reset", okEmbed(interaction, "categoryReset")
 	end,
 
 	name = function (interaction, channel, name)
 		if not name then name = "%nickname's% room" end
 		lobbies[channel.id]:setTemplate(name)
-		return "Lobby name template set", okEmbed(locale.nameConfirm:format(name))
+		return "Lobby name template set", okEmbed(interaction, "nameConfirm", name)
 	end,
 
 	capacity = function (interaction, channel, capacity)
 		if capacity then
 			lobbies[channel.id]:setCapacity(capacity)
-			return "Lobby capacity set", okEmbed(locale.capacityConfirm:format(capacity))
+			return "Lobby capacity set", okEmbed(interaction, "capacityConfirm", capacity)
 		end
 
 		lobbies[channel.id]:setCapacity()
-		return "Lobby capacity reset", okEmbed(locale.capacityReset)
+		return "Lobby capacity reset", okEmbed(interaction, "capacityReset")
 	end,
 
 	bitrate = function (interaction, channel, bitrate)
@@ -76,11 +76,11 @@ local subcommands = {
 		end
 
 		if bitrate > tierRate[tier] then
-			return "Bitrate OOB", warningEmbed(locale[tierLocale[tier]])
+			return "Bitrate OOB", warningEmbed(locale(interaction.locale, tierLocale[tier]))
 		end
 
 		lobbies[channel.id]:setBitrate(bitrate*1000)
-		return "Lobby bitrate set", okEmbed(locale.bitrateConfirm:format(bitrate))
+		return "Lobby bitrate set", okEmbed(interaction, "bitrateConfirm", bitrate)
 	end,
 
 	permissions = function (interaction, channel, perm)
@@ -96,11 +96,11 @@ local subcommands = {
 			end
 
 			lobbyData:setPermissions(permissionBits)
-			return "Lobby permissions set", okEmbed(locale.permissionsConfirm)
+			return "Lobby permissions set", okEmbed(interaction, "permissionsConfirm")
 		end
 
 		lobbyData:setPermissions(botPermissions())
-		return "Lobby permissions reset", okEmbed(locale.permissionsReset)
+		return "Lobby permissions reset", okEmbed(interaction, "permissionsReset")
 	end,
 
 	role = function (interaction, lobby, action)
@@ -129,15 +129,15 @@ local subcommands = {
 			end
 		end
 		if #roles == 0 then roles[1] = lobby.guild.defaultRole.mentionString end
-		return "Changed managed lobby roles", okEmbed(locale.roleConfirm:format(table.concat(roles," ")))
+		return "Changed managed lobby roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
 	end,
 
 	limit = function (interaction, lobby, limit)
 		if not limit then limit = 500 end
 
 		lobbies[lobby.id]:setLimit(limit)
-		return "Lobby limit set", okEmbed(locale.limitConfirm:format(limit))
-	end
+		return "Lobby limit set", okEmbed(interaction, "limitConfirm", limit)
+	end,
 }
 
 return function (interaction, subcommand, argument)

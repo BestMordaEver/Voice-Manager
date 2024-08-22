@@ -4,12 +4,12 @@ local embedHandler = require "handlers/embedHandler"
 local passwordButton = require "handlers/componentHandler".passwordInputButton
 local blurple = embedHandler.colors.blurple
 
-return embedHandler("password", function (channel)
+return embedHandler("password", function (interaction, channel)
 	return {
 		ephemeral = true,
 		embeds = {
 			{
-				description = locale.passwordCheckText,
+				description = locale(interaction.locale, "passwordCheckText"),
 				color = blurple,
 				author = {
 					name = channel.name,
@@ -17,6 +17,6 @@ return embedHandler("password", function (channel)
 				}
 			}
 		},
-		components = passwordButton
+		components = passwordButton(interaction)
 	}
 end)

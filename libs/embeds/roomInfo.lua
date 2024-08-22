@@ -54,25 +54,25 @@ local lines = {
 	}
 }
 
-local function liner (channel, rolePO, type, perm)
+local function liner (loc, channel, rolePO, type, perm)
 	local field = {value = ""}
 	if rolePO:getDeniedPermissions():has(perm) then
-		field.name = locale[lines[type][perm].denied]
+		field.name = locale(loc, lines[type][perm].denied)
 		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getAllowedPermissions():has(perm) end)
 		if #POs ~= 0 then
 			local line = {}
-			table.insert(line, locale[lines[type][perm].deniedExceptions])
+			table.insert(line, locale(loc, lines[type][perm].deniedExceptions))
 			for _, po in pairs(POs) do
 				table.insert(line, po:getObject().user.mentionString)
 			end
 			field.value = table.concat(line, " ")
 		end
 	else
-		field.name = locale[lines[type][perm].allowed]
+		field.name = locale(loc, lines[type][perm].allowed)
 		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getDeniedPermissions():has(perm) end)
 		if #POs ~= 0 then
 			local line = {}
-			table.insert(line, locale[lines[type][perm].allowedExceptions])
+			table.insert(line, locale(loc, lines[type][perm].allowedExceptions))
 			for _, po in pairs(POs) do
 				table.insert(line, po:getObject().user.mentionString)
 			end
@@ -81,27 +81,28 @@ local function liner (channel, rolePO, type, perm)
 	return field
 end
 
-return embedHandler("roomInfo", function (room, ephemeral)
+return embedHandler("roomInfo", function (interaction, room, ephemeral)
 	local companion = client:getChannel(channels[room.id].companion)
 	local role = channels[room.id].parent and client:getRole(channels[room.id].parent.roles:random()) or room.guild.defaultRole
 	local roomPO = room:getPermissionOverwriteFor(role)
 	local chatPO = companion and companion:getPermissionOverwriteFor(role)
+	local loc = interaction.locale
 
 	local fields = {
-		liner(room, roomPO, "voice", permission.readMessages),
-		liner(room, roomPO, "voice", permission.connect),
-		liner(room, roomPO, "voice", permission.speak),
-		liner(room, roomPO, "voice", permission.sendMessages),
+		liner(loc, room, roomPO, "voice", permission.readMessages),
+		liner(loc, room, roomPO, "voice", permission.connect),
+		liner(loc, room, roomPO, "voice", permission.speak),
+		liner(loc, room, roomPO, "voice", permission.sendMessages),
 		companion and liner(companion, chatPO, "text", permission.readMessages),
 		companion and liner(companion, chatPO, "text", permission.sendMessages)
 	}
 
-	table.insert(fields, {name = locale.roomInfoCommands, value = availableCommands(room)})
+	table.insert(fields, {name = locale(loc, "roomInfoCommands"), value = availableCommands(room)})
 
 	return {embeds = {{
-		title = locale.roomInfoTitle:format(room.name),
+		title = locale(loc, "roomInfoTitle", room.name),
 		color = blurple,
-		description = locale.roomInfoHost .. client:getUser(channels[room.id].host).mentionString .. "\n",
+		description = locale(loc, "roomInfoHost") .. client:getUser(channels[room.id].host).mentionString .. "\n",
 		fields = fields,
 	}}, ephemeral = ephemeral}
 end)

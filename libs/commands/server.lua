@@ -36,14 +36,14 @@ local subcommands = {
 				guildData:removeRole(roleID)
 			end
 		end
-		return "Changed managed server roles", okEmbed(locale.roleConfirm:format(table.concat(roles," ")))
+		return "Changed managed server roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
 	end,
 
 	limit = function (interaction, limit)
 		if not limit then limit = 500 end
 
 		guilds[interaction.guild.id]:setLimit(limit)
-		return "Server limit set", okEmbed(locale.limitConfirm:format(limit))
+		return "Server limit set", okEmbed(interaction, "limitConfirm", limit)
 	end,
 
 	permissions = function (interaction, perm)
@@ -59,21 +59,21 @@ local subcommands = {
 			end
 
 			guildData:setPermissions(permissionBits)
-			return "Server permissions set", okEmbed(locale.permissionsConfirm)
+			return "Server permissions set", okEmbed(interaction, "permissionsConfirm")
 		end
 
 		guildData:setPermissions(botPermissions())
-		return "Server permissions reset", okEmbed(locale.permissionsReset)
+		return "Server permissions reset", okEmbed(interaction, "permissionsReset")
 	end
 }
 
 return function (interaction, subcommand, argument)
 	if not interaction.guild then
-		return "Command must be issued in guild", locale.notInGuild
+		return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
 	end
 
 	if subcommand == "view" then
-		return "Sent server info", serverInfoEmbed(interaction.guild)
+		return "Sent server info", serverInfoEmbed(interaction)
 	end
 
 	local isPermitted, logMsg, userMsg = checkPermissions(interaction)

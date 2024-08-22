@@ -76,7 +76,7 @@ end
 
 channelHandler.checkPermissions = function (interaction, channel)
 	if not interaction.guild.me:hasPermission(channel, permission.manageChannels) then
-		return false, "Bad bot permissions", locale.badBotPermissions
+		return false, "Bad bot permissions", locale(interaction.locale, "badBotPermissions")
 	end
 
 	if config.owners[interaction.user.id] then return true end
@@ -86,7 +86,7 @@ channelHandler.checkPermissions = function (interaction, channel)
 		channel.permissions and
 		channel.permissions:has(permission.manageChannels) or
 			(interaction.member or channel.guild:getMember(interaction.user)):hasPermission(channel, permission.manageChannels))then
-		return false, "Bad user permissions", locale.badUserPermissions
+		return false, "Bad user permissions", locale(interaction.locale, "badUserPermissions")
 	end
 
 	return true

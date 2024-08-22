@@ -3,10 +3,10 @@ local embedHandler = require "handlers/embedHandler"
 
 local green = embedHandler.colors.green
 
-return embedHandler("ok", function (msg, ephemeral)
+return embedHandler("ok", function (localeCarrier, msg, ephemeral)
 	return {embeds = {{
-		title = locale.embedOK,
+		title = locale(localeCarrier.locale, "embedOK"),
 		color = green,
-		description = msg
+		description = locale(localeCarrier.locale, msg)
 	}}, ephemeral = ephemeral}
 end)

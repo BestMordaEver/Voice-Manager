@@ -30,7 +30,7 @@ local commands = {
             end
 
             names = table.concat(names, separator)
-            if #names == 0 then names = locale.none end
+            if #names == 0 then names = locale(interaction.locale, "none") end
         end
 
         local embeds, index, len = {}, 1, #names
@@ -43,7 +43,7 @@ local commands = {
                     embeds = {}
                 end
             until index >= len
-            return "Sent names list", okEmbed(locale.usersSent)
+            return "Sent names list", okEmbed(interaction, "usersSent")
         end
 
         repeat
@@ -63,7 +63,7 @@ local commands = {
                 end
             end
         end
-        return "Added roles to users", okEmbed(locale.usersRolesAdded:format(count))
+        return "Added roles to users", okEmbed(interaction, "usersRolesAdded", count)
 
     end,
 
@@ -76,7 +76,7 @@ local commands = {
                 end
             end
         end
-        return "Removed roles from users", okEmbed(locale.usersRolesRemoved:format(count))
+        return "Removed roles from users", okEmbed(interaction, "usersRolesRemoved", count)
     end
 }
 
@@ -110,7 +110,7 @@ return function (interaction, subcommand)
     end
 
     if #channels == 0 then
-        return "No channels to query", warningEmbed(locale.noChildChannels)
+        return "No channels to query", warningEmbed(interaction, "noChildChannels")
     end
 
     return commands[subcommand](interaction, channels, options)

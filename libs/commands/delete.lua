@@ -32,7 +32,7 @@ return function (interaction, action, argument)
 		end
 
 		if not (category or interaction.guild) then
-			return "Command must be issued in guild", locale.notInGuild
+			return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
 		end
 
 		---@diagnostic disable-next-line: undefined-field
@@ -50,7 +50,7 @@ return function (interaction, action, argument)
 			return true
 		end), channelHandler.truePositionSort)
 
-		if #channels == 0 then return "No channels to delete", warningEmbed(locale.deleteNone) end
+		if #channels == 0 then return "No channels to delete", warningEmbed(interaction, "deleteNone") end
 
 		local channels = table.move(channels, 1, amount, 1, {})
 
@@ -66,7 +66,7 @@ return function (interaction, action, argument)
 			insert(components[row].components[1].options, {
 				label = channel.name,
 				value = channel.id,
-				description = channel.category and locale.inCategory:format(channel.category.name),
+				description = channel.category and locale(interaction.locale, "inCategory", channel.category.name),
 				default = true
 			})
 			storage[row][channel.id] = true
@@ -78,7 +78,7 @@ return function (interaction, action, argument)
 
 		insert(components, buttons)
 
-		return "Deletion list is formed", {content = locale.deleteForm:format(#channels), components = components}
+		return "Deletion list is formed", {content = locale(interaction.locale, "deleteForm", #channels), components = components}
 
 	else	-- sent from component, absolute anarchy
 		-- no perm check, since component is on ephemeral message, that was sent to permed user
@@ -95,7 +95,7 @@ return function (interaction, action, argument)
 			for i=1,4 do if buttons[i].style ~= 3 then ready = false end end
 
 			if ready then
-				interaction:update {content = locale.deleteProcessing, components = {}}
+				interaction:update {content = locale(interaction.locale, "deleteProcessing"), components = {}}
 
 				local count = 0
 				for i=1,#components-1 do
@@ -107,10 +107,10 @@ return function (interaction, action, argument)
 					end
 				end
 
-				interaction:followup(okEmbed(locale.deleteConfirm:format(count), true))
+				interaction:followup(okEmbed(interaction, "deleteConfirm", count), true)
 				return "Deleted the channels"
 			else
-				interaction:reply(warningEmbed(locale.deleteNotArmed, true))
+				interaction:reply(warningEmbed(interaction, "deleteNotArmed"), true)
 				return "Not all keys are armed"
 			end
 

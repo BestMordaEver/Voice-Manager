@@ -7,11 +7,11 @@ local stats = require "handlers/storageHandler".stats
 
 local black = embedHandler.colors.black
 
-return embedHandler("ping", function (dt, guild, ephemeral)
+return embedHandler("ping", function (interaction, dt, guild, ephemeral)
 	local guildData = guilds[guild.id]
 	return {embeds = {{
 		color = black,
-		description = locale.ping:format(dt:toMilliseconds(),
+		description = locale(interaction.locale, "ping", dt:toMilliseconds(),
 			#client.guilds,
 			stats.lobbies, #guildData.lobbies,
 			stats.channels, guildData:channels(),

@@ -19,17 +19,17 @@ return function (interaction)
 
 	if command == "server" then
 		if not interaction.guild then
-			return "Command must be issued in guild", locale.notInGuild
+			return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
 		end
 
 		if not (interaction.member:hasPermission("manageChannels") or config.owners[interaction.user.id]) then
-			return "Bad user permissions", warningEmbed(locale.badUserPermissions)
+			return "Bad user permissions", warningEmbed(interaction, "badUserPermissions")
 		end
 
 		return commands.server(interaction, subcommand)
 	else
 		local lobby = interaction.option.option.option.value
-		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(locale.notLobby) end
+		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(interaction, "notLobby") end
 
 		local isPermitted, logMsg, userMsg = checkPermissions(interaction, lobby)
 		if not isPermitted then

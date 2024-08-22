@@ -31,9 +31,9 @@ return function (interaction)
 		if reply then interaction:reply(reply) end
 	else
 		if interaction.isReplied then
-			interaction:followup(errorEmbed())
+			interaction:followup(errorEmbed(interaction))
 		else
-			interaction:reply(errorEmbed())
+			interaction:reply(errorEmbed(interaction))
 		end
 		error(logMsg)
 	end

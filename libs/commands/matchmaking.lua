@@ -15,13 +15,13 @@ local channelType = require "discordia".enums.channelType
 local subcommands = {
 	add = function (interaction, channel)
 		if lobbies[channel.id] then
-			return "Already registered", warningEmbed(locale.lobbyDupe)
+			return "Already registered", warningEmbed(interaction, "lobbyDupe")
 		elseif channels[channel.id] and not channels[channel.id].isPersistent then
-			return "Rooms can't be lobbies", warningEmbed(locale.channelDupe)
+			return "Rooms can't be lobbies", warningEmbed(interaction, "channelDupe")
 		end
 
 		lobbies:store(channel):setMatchmaking(true)
-		return "New matchmaking lobby added", okEmbed(locale.matchmakingAddConfirm:format(channel.name))
+		return "New matchmaking lobby added", okEmbed(interaction, "matchmakingAddConfirm", channel.name)
 	end,
 
 	remove = function (interaction, channel)
@@ -29,33 +29,33 @@ local subcommands = {
 			lobbies[channel.id]:delete()
 		end
 
-		return "Matchmaking lobby removed", okEmbed(locale.matchmakingRemoveConfirm:format(channel.name))
+		return "Matchmaking lobby removed", okEmbed(interaction, "matchmakingRemoveConfirm", channel.name)
 	end,
 
 	target = function (interaction, channel, target)
 		if target and target ~= channel then
 			if target.type == channelType.voice and not lobbies[target.id] then
-				return "Selected target is not lobby or category", warningEmbed(locale.notLobby)
+				return "Selected target is not lobby or category", warningEmbed(interaction, "notLobby")
 			end
 
 			local isPermitted, logMsg, msg = checkPermissions(interaction, target)
 			if isPermitted then
 				lobbies[channel.id]:setTarget(target.id)
-				return "Lobby target set", okEmbed(locale.targetConfirm:format(target.name))
+				return "Lobby target set", okEmbed(interaction, "targetConfirm", target.name)
 			end
 
 			return logMsg, warningEmbed(msg)
 		end
 
 		lobbies[channel.id]:setTarget()
-		return "Lobby target reset", okEmbed(locale.targetReset)
+		return "Lobby target reset", okEmbed(interaction, "targetReset")
 	end,
 
 	mode = function (interaction, channel, mode)
 		if not mode then mode = "random" end
 
 		lobbies[channel.id]:setTemplate(mode)
-		return "Matchmaking mode set", okEmbed(locale.modeConfirm:format(mode))
+		return "Matchmaking mode set", okEmbed(interaction, "modeConfirm", mode)
 	end
 }
 

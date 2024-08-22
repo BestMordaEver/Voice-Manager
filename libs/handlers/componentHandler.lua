@@ -4,22 +4,26 @@ local buttonStyle = enums.buttonStyle
 local componentType = enums.componentType
 local inputStyle = enums.inputStyle
 
+local meta = {__call = function (self) return self end}
+
 local handler = {
-	greetingComponents = {
-		{
-			type = componentType.row,
-			components = {
-				{
-					type = componentType.textInput,
-					custom_id = "greeting",
-					style = inputStyle.paragraph,
-					label = locale.greetingModalTitle
+	greetingComponents = function (interaction)
+		return {
+			{
+				type = componentType.row,
+				components = {
+					{
+						type = componentType.textInput,
+						custom_id = "greeting",
+						style = inputStyle.paragraph,
+						label = locale(interaction.locale, "greetingModalTitle")
+					}
 				}
 			}
 		}
-	},
+	end,
 
-	deleteButtons = {
+	deleteButtons = setmetatable({
 		type = componentType.row,
 		components = {
 			{
@@ -49,37 +53,41 @@ local handler = {
 				custom_id = "delete_nuke"
 			}
 		}
-	},
+	}, meta),
 
-	passwordModal = {
-		{
-			type = componentType.row,
-			components = {
-				{
-					type = componentType.textInput,
-					custom_id = "password",
-					label = locale.password,
-					style = inputStyle.short
+	passwordModal = function (interaction)
+		return {
+			{
+				type = componentType.row,
+				components = {
+					{
+						type = componentType.textInput,
+						custom_id = "password",
+						label = locale(interaction.locale, "password"),
+						style = inputStyle.short
+					}
 				}
 			}
 		}
-	},
+	end,
 
-	passwordInputButton = {
-		{
-			type = componentType.row,
-			components = {
-				{
-					type = componentType.button,
-					style = buttonStyle.primary,
-					label = locale.passwordEnter,
-					custom_id = "room_passwordinit",
+	passwordInputButton = function (interaction)
+		return {
+			{
+				type = componentType.row,
+				components = {
+					{
+						type = componentType.button,
+						style = buttonStyle.primary,
+						label = locale(interaction.locale, "passwordEnter"),
+						custom_id = "room_passwordinit",
+					}
 				}
 			}
 		}
-	},
+	end,
 
-	roomButtons = {
+	roomButtons = setmetatable({
 		{
 			type = componentType.row,
 			components = {
@@ -139,9 +147,9 @@ local handler = {
 				}
 			}
 		}
-	},
+	}, meta),
 
-	helpButtons = {
+	helpButtons = setmetatable({
 		{
 			type = componentType.row,
 			components = {
@@ -183,7 +191,7 @@ local handler = {
 				}
 			}
 		}
-	}
+	}, meta)
 }
 
 return handler

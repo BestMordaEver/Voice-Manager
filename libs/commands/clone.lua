@@ -16,7 +16,7 @@ return function (interaction)
 	end
 
 	if category and #category.textChannels + #category.voiceChannels + amount > 50 then
-		return "Create aborted, category overflow", warningEmbed(locale.createCategoryOverflow)
+		return "Create aborted, category overflow", warningEmbed(interaction, "createCategoryOverflow")
 	end
 
 	local success, start = 0, tonumber(name:match("%%counter%((%d+)%)%%")) or 1
@@ -30,5 +30,5 @@ return function (interaction)
 		end
 	end
 
-	return "Created channels", okEmbed(locale.createConfirm:format(success))
+	return "Created channels", okEmbed(interaction, "createConfirm", success)
 end

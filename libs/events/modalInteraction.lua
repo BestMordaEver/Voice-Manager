@@ -18,9 +18,9 @@ return function (interaction)
 
 	if res then
 		logger:log(4, "USER %s: %s", interaction.user.id, logMsg)
-        interaction:updateReply(reply or errorEmbed())	-- reply mustn't be empty
+        interaction:updateReply(reply or errorEmbed(interaction))	-- reply mustn't be empty
 	else
-		interaction:updateReply(errorEmbed())
+		interaction:updateReply(errorEmbed(interaction))
 		error(logMsg)
 	end
 

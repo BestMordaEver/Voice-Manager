@@ -51,9 +51,9 @@ return function (interaction)
 		end
 	else
 		if interaction.isReplied then
-			interaction:updateReply(errorEmbed(true))
+			interaction:updateReply(errorEmbed(interaction, true))
 		else
-			interaction:reply(errorEmbed(true))
+			interaction:reply(errorEmbed(interaction, true))
 		end
 		error(logMsg)
 	end

@@ -24,7 +24,10 @@ return function (channel) -- and make sure there are no traces!
 				if logChannel then
 					local log = Overseer.finalize(companionID)
 					logChannel:send{
-						content = locale.logName:format(channel.name, channelData.parent and client:getChannel(channelData.parent.id).name or locale.noParent),
+						content = locale(channel.guild.preferred_locale,
+							"logName",
+							channel.name,
+							channelData.parent and client:getChannel(channelData.parent.id).name or locale(channel.guild.preferred_locale, "noParent")),
 						file = {string.format("%s.txt", companionID), log}
 					}
 				end

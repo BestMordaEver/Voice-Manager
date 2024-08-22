@@ -29,7 +29,7 @@ return embedHandler("greeting", function (room, ephemeral)
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = locale.roomCommands .. availableCommands(room),
+		commands = locale(member.user.locale, "roomCommands") .. availableCommands(room),
 		buttons = ""
 	}
 
@@ -37,7 +37,7 @@ return embedHandler("greeting", function (room, ephemeral)
 	embeds = {{
 		title = companion.name,
 		color = fuchsia,
-		description = channelData.parent.greeting:gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale.loggerWarning or "")
+		description = channelData.parent.greeting:gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale(member.user.locale, "loggerWarning") or "")
 	}},
 	components = channelData.parent.greeting:match("%%buttons%%") and roomButtons or nil,
 	ephemeral = ephemeral}

@@ -5,7 +5,8 @@ local guilds = require "storage/guilds"
 
 local blurple = embedHandler.colors.blurple
 
-return embedHandler("serverInfo", function (guild, ephemeral)
+return embedHandler("serverInfo", function (interaction, ephemeral)
+	local guild = interaction.guild
 	local guildData = guilds[guild.id]
 
 	local roles = {}
@@ -20,9 +21,9 @@ return embedHandler("serverInfo", function (guild, ephemeral)
 	if #roles == 0 then roles[1] = guild.defaultRole.mentionString end
 
 	return {embeds = {{
-		title = locale.serverInfoTitle:format(guild.name),
+		title = locale(interaction.locale, "serverInfoTitle", guild.name),
 		color = blurple,
-		description = locale.serverInfo:format(
+		description = locale(interaction.locale, "serverInfo",
 			guildData.permissions,
 			table.concat(roles, " "),
 			#guildData.lobbies,

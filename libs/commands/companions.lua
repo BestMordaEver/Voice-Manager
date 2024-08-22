@@ -17,24 +17,24 @@ local subcommands
 subcommands = {
 	enable = function (interaction, channel)
 		lobbies[channel.id]:setCompanionTarget(true)
-		return "Lobby companion enabled", okEmbed(locale.companionEnable)
+		return "Lobby companion enabled", okEmbed(interaction, "companionEnable")
 	end,
 
 	disable = function (interaction, channel)
 		lobbies[channel.id]:setCompanionTarget(nil)
-		return "Lobby companion disabled", okEmbed(locale.companionDisable)
+		return "Lobby companion disabled", okEmbed(interaction, "companionDisable")
 	end,
 
 	category = function (interaction, channel, category)
 		if not category then
 			lobbies[channel.id]:setCompanionTarget(true)
-			return "Companion target category reset", okEmbed(locale.categoryReset)
+			return "Companion target category reset", okEmbed(interaction, "categoryReset")
 		end
 
 		local isPermitted, logMsg, msg = checkPermissions(interaction, category)
 		if isPermitted then
 			lobbies[channel.id]:setCompanionTarget(category.id)
-			return "Companion target category set", okEmbed(locale.categoryConfirm:format(category.name))
+			return "Companion target category set", okEmbed(interaction, "categoryConfirm", category.name)
 		end
 
 		return logMsg, warningEmbed(msg)
@@ -44,7 +44,7 @@ subcommands = {
 		if not name then name = "private-chat" end
 
 		lobbies[channel.id]:setCompanionTemplate(name)
-		return "Companion name template set", okEmbed(locale.nameConfirm:format(name))
+		return "Companion name template set", okEmbed(interaction, "nameConfirm", name)
 	end,
 
 	greeting = function (interaction, channel, greeting)
@@ -56,10 +56,10 @@ subcommands = {
 			else
 				lobbies[channel.id]:setGreeting(greeting)
 			end
-			return "Companion greeting set", okEmbed(locale.greetingConfirm)
+			return "Companion greeting set", okEmbed(interaction, "greetingConfirm")
 		end
 
-		interaction:createModal("companion_greetingwidget_"..channel.id, locale.greetingModalTitle, greetingComponents)
+		interaction:createModal("companion_greetingwidget_"..channel.id, locale(interaction.locale, "greetingModalTitle"), greetingComponents(interaction))
 		return "Sent greeting setup modal"
 	end,
 
@@ -72,14 +72,14 @@ subcommands = {
 			local isPermitted, logMsg, msg = checkPermissions(interaction, logChannel)
 			if isPermitted then
 				lobbies[channel.id]:setCompanionLog(logChannel.id)
-				return "Companion log channel set", okEmbed(locale.logConfirm:format(logChannel.name))
+				return "Companion log channel set", okEmbed(interaction, "logConfirm", logChannel.name)
 			end
 
 			return logMsg, warningEmbed(msg)
 		end
 
 		lobbies[channel.id]:setCompanionLog()
-		return "Companion log channel reset", okEmbed(locale.logReset)
+		return "Companion log channel reset", okEmbed(interaction, "logReset")
 	end
 }
 
