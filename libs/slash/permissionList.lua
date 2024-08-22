@@ -43,7 +43,7 @@ return {
 	},
 	{
 		name = "lock",
-		description = "Access to /room lock|unlock and /room block|unblock",
+		description = "Access to /room lock|unlock and /room block|allow",
 		type = commandOptionType.boolean
 	},
 	{
