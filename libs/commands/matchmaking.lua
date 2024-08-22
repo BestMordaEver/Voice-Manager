@@ -1,5 +1,3 @@
-local locale = require "locale"
-
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
@@ -44,7 +42,7 @@ local subcommands = {
 				return "Lobby target set", okEmbed(interaction, "targetConfirm", target.name)
 			end
 
-			return logMsg, warningEmbed(msg)
+			return logMsg, warningEmbed(interaction, msg)
 		end
 
 		lobbies[channel.id]:setTarget()

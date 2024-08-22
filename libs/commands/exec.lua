@@ -34,7 +34,7 @@ local function prettyLine(...)
 end
 
 return function (interaction)
-    if not config.owners[interaction.user.id] then return "Not owner", warningEmbed("You're not my father") end
+    if not config.owners[interaction.user.id] then return "Not owner", warningEmbed(interaction, "veryNotPermitted") end
 
     local lines = {}
 
@@ -47,11 +47,11 @@ return function (interaction)
     end
 
     local fn, syntaxError = load(interaction.option.value, "Bot", "t", sandbox)
-    if not fn then return "Syntax error", warningEmbed(code(syntaxError)) end
+    if not fn then return "Syntax error", warningEmbed:compose(interaction)(code(syntaxError))() end
 
     local success, runtimeError = pcall(fn)
-    if not success then return "Runtime error", warningEmbed(code(runtimeError)) end
+    if not success then return "Runtime error", warningEmbed:compose(interaction)(code(runtimeError))() end
 
     lines = table.concat(lines, '\n') -- bring all the lines together
-    return "Code executed", okEmbed(code(lines))
+    return "Code executed", okEmbed(interaction)(code(lines))()
 end

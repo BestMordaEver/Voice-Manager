@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
@@ -28,11 +28,7 @@ return function (interaction, action, argument)
 
 		local isPermitted, logMsg, userMsg = channelHandler.checkPermissions(interaction, category)
 		if not isPermitted then
-			return logMsg, warningEmbed(userMsg)
-		end
-
-		if not (category or interaction.guild) then
-			return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
+			return logMsg, warningEmbed(interaction, userMsg)
 		end
 
 		---@diagnostic disable-next-line: undefined-field

@@ -1,4 +1,4 @@
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local embedHandler = require "handlers/embedHandler"
 
 local green = embedHandler.colors.green

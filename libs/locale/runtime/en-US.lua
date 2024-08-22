@@ -470,6 +470,7 @@ https://discord.gg/%s]],
 	embedOK = "✅ OK",
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
+	newline = "\n",
 
 	inCategory = "in %s category",
 
@@ -490,6 +491,7 @@ https://discord.gg/%s]],
 	interactionTimeout = "Interaction time out!",
 	notInGuild = "This command can be issued only from within a server",
 	wait = "Wait for %s before creating another channel",
+	veryNotPermitted = "You're not my father",
 
 	error = "*%s*\nThis issue was reported the moment it occured. Contact us if you need additional help - https://discord.gg/tqj6jvT",
 	errorReaction = {

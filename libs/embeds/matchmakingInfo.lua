@@ -1,4 +1,4 @@
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local client = require "client"
 local embedHandler = require "handlers/embedHandler"
 

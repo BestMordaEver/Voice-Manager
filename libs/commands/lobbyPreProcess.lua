@@ -1,5 +1,3 @@
-local locale = require "locale"
-
 local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
@@ -15,7 +13,7 @@ return function (interaction, embed)
 	if soloArged[subcommand] or #options > 1 then
 		local isPermitted, logMsg, userMsg = checkPermissions(interaction, channel)
 		if not isPermitted then
-			return logMsg, warningEmbed(userMsg)
+			return logMsg, warningEmbed(interaction, userMsg)
 		end
 	end
 

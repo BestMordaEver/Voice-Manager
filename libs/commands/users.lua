@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 
 local lobbies = require "storage/lobbies"
 

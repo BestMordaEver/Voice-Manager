@@ -1,5 +1,4 @@
 local client = require "client"
-local locale = require "locale"
 
 local guilds = require "storage/guilds"
 
@@ -68,17 +67,13 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	if not interaction.guild then
-		return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
-	end
-
 	if subcommand == "view" then
 		return "Sent server info", serverInfoEmbed(interaction)
 	end
 
 	local isPermitted, logMsg, userMsg = checkPermissions(interaction)
 	if not isPermitted then
-		return logMsg, warningEmbed(userMsg)
+		return logMsg, warningEmbed(interaction, userMsg)
 	end
 
 	return subcommands[subcommand](interaction, argument)

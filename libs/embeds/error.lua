@@ -1,4 +1,4 @@
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local embedHandler = require "handlers/embedHandler"
 
 local red = embedHandler.colors.red
@@ -8,6 +8,6 @@ return embedHandler("error", function (interaction, ephemeral)
 	return {embeds = {{
 		title = locale(interaction.locale, "embedError"),
 		color = red,
-		description = locale(interaction.locale, error, errorReactions[math.random(1, errorReactions)])
+		description = locale(interaction.locale, error, errorReactions[math.random(1, #errorReactions)])
 	}}, ephemeral = ephemeral}
 end)

@@ -1,5 +1,5 @@
 local handler = {
-	["en-US"] = require "locale/en-US",
+	["en-US"] = require "locale/runtime/en-US",
 }
 
 return function (locale, line, ...)

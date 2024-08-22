@@ -1,5 +1,4 @@
 local client = require "client"
-local locale = require "locale"
 
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
@@ -44,7 +43,7 @@ local subcommands = {
 				return "Lobby target category set", okEmbed(interaction, "categoryConfirm", category.name)
 			end
 
-			return logMsg, warningEmbed(msg)
+			return logMsg, warningEmbed(interaction, msg)
 		end
 
 		lobbies[channel.id]:setTarget()
@@ -76,7 +75,7 @@ local subcommands = {
 		end
 
 		if bitrate > tierRate[tier] then
-			return "Bitrate OOB", warningEmbed(locale(interaction.locale, tierLocale[tier]))
+			return "Bitrate OOB", warningEmbed(interaction, tierLocale[tier])
 		end
 
 		lobbies[channel.id]:setBitrate(bitrate*1000)
@@ -137,6 +136,20 @@ local subcommands = {
 
 		lobbies[lobby.id]:setLimit(limit)
 		return "Lobby limit set", okEmbed(interaction, "limitConfirm", limit)
+	end,
+
+	position = function (interaction, lobby)
+		local order, type
+		if interaction.name == "lobby" then
+			order = interaction.option.options.order.value
+			type = interaction.option.options.position.value
+		else -- reset
+			order = "desc"
+			type = "bottom"
+		end
+
+		lobbies[lobby.id]:setPosition(order, type)
+		return "Lobby target position set", okEmbed(interaction, "positionConfirm")
 	end,
 }
 

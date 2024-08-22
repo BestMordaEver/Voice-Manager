@@ -1,4 +1,3 @@
-local locale = require "locale"
 local config = require "config"
 
 local lobbies = require "storage/lobbies"
@@ -19,7 +18,7 @@ return function (interaction)
 
 	if command == "server" then
 		if not interaction.guild then
-			return "Command must be issued in guild", locale(interaction.locale, "notInGuild")
+			return "Command must be issued in guild", warningEmbed(interaction, "notInGuild")
 		end
 
 		if not (interaction.member:hasPermission("manageChannels") or config.owners[interaction.user.id]) then
@@ -33,7 +32,7 @@ return function (interaction)
 
 		local isPermitted, logMsg, userMsg = checkPermissions(interaction, lobby)
 		if not isPermitted then
-			return logMsg, warningEmbed(userMsg)
+			return logMsg, warningEmbed(interaction, userMsg)
 		end
 
 		return commands[command](interaction, subcommand)

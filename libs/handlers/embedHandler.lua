@@ -5,11 +5,33 @@ https://leovoel.github.io/embed-visualizer/
 https://discord.com/developers/docs/resources/channel#embed-object
 ]]
 
+local locale = "locale/runtime/localeHandler"
+
 local wrapper = {
 	__call = function (self, ...)
 		return self.factory(...)
 	end
 }
+-- this is so ugly :/
+local composeMeta = {
+	__call = function (self, msg, ...)
+		if msg then
+			table.insert(locale(self.locale, msg, ...))
+		else
+			local embed = self.parentEmbed(self.locale, "none")
+			embed.embeds[1].description = table.concat(self.description)
+			return embed
+		end
+	end
+}
+
+local compose = function (self, localeStorage)
+	return setmetatable({
+		parentEmbed = self,
+		locale = localeStorage.locale,
+		description = {}
+	}, composeMeta)
+end
 
 return setmetatable({}, {
 	__index = {
@@ -27,7 +49,10 @@ return setmetatable({}, {
 
 	__call = function (self, name, embedFactory)
 		if not self.types[name] then
-			self.types[name] = setmetatable({factory = embedFactory}, wrapper)
+			self.types[name] = setmetatable({
+				factory = embedFactory,
+				compose = compose
+			}, wrapper)
 		end
 
 		return self.types[name]

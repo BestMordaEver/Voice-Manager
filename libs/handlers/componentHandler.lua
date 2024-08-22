@@ -1,4 +1,4 @@
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local enums = require "discordia".enums
 local buttonStyle = enums.buttonStyle
 local componentType = enums.componentType

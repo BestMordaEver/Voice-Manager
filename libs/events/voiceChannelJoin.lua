@@ -1,7 +1,6 @@
 local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
-local locale = require "locale"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
@@ -123,7 +122,7 @@ local function lobbyJoin (member, lobby)
 		end
 
 		if lobbyData.companionLog then Overseer.track(companion or newChannel) end
-		if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(newChannel)) end
+		if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(member.user, newChannel)) end
 
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
@@ -209,7 +208,7 @@ local function roomJoin (member, channel)
 		member:setVoiceChannel(newChannel)
 		channels:store(newChannel.id, 3, member.user.id, channel.id, 0)
 
-		return member.user:send(passwordEmbed(channel))
+		return member.user:send(passwordEmbed(member.user, channel))
 	end
 
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)

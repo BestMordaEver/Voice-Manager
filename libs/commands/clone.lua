@@ -1,5 +1,3 @@
-local locale = require "locale"
-
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
@@ -12,7 +10,7 @@ return function (interaction)
 
 	local isPermitted, logMsg, userMsg = checkPermissions(interaction, category)
 	if not isPermitted then
-		return logMsg, warningEmbed(userMsg)
+		return logMsg, warningEmbed(interaction, userMsg)
 	end
 
 	if category and #category.textChannels + #category.voiceChannels + amount > 50 then

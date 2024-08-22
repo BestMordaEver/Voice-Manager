@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local config = require "config"
 
 local channels = require "storage/channels"
@@ -53,10 +53,11 @@ subcommands = {
 		end
 
 		if success then
-			return "Successfully changed channel name", okEmbed(
-				locale(interaction.locale, "nameConfirm", channel.name) ..
-				"\n" ..
-				locale(interaction.locale, limit == 0 and "nameRatelimitReached" or "nameRatelimitRemaining", retryIn))
+			return "Successfully changed channel name", okEmbed:compose(interaction)
+				("nameConfirm", channel.name)
+				("newline")
+				(limit == 0 and "nameRatelimitReached" or "nameRatelimitRemaining", retryIn)
+				()
 		end
 
 		return "Couldn't change channel name: "..err, warningEmbed(interaction, "renameError")
@@ -79,7 +80,7 @@ subcommands = {
 		end
 
 		if bitrate > tierRate[tier] then
-			return "Bitrate OOB", warningEmbed(locale(interaction.locale, tierLocale[tier]))
+			return "Bitrate OOB", warningEmbed(interaction.locale, tierLocale[tier])
 		end
 
 		local success, err = voiceChannel:setBitrate(bitrate * 1000)

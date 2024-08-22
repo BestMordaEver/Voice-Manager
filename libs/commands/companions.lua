@@ -1,4 +1,4 @@
-local locale = require "locale"
+local locale = require "locale/runtime/localeHandler"
 local client = require "client"
 
 local interactionType = require "discordia".enums.interactionType
@@ -37,7 +37,7 @@ subcommands = {
 			return "Companion target category set", okEmbed(interaction, "categoryConfirm", category.name)
 		end
 
-		return logMsg, warningEmbed(msg)
+		return logMsg, warningEmbed(interaction, msg)
 	end,
 
 	name = function (interaction, channel, name)
@@ -75,7 +75,7 @@ subcommands = {
 				return "Companion log channel set", okEmbed(interaction, "logConfirm", logChannel.name)
 			end
 
-			return logMsg, warningEmbed(msg)
+			return logMsg, warningEmbed(interaction, msg)
 		end
 
 		lobbies[channel.id]:setCompanionLog()
