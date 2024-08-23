@@ -3,19 +3,22 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-    name = "users",
-    description = "Miscellaneous moderation and helper commands",
+    name = locale.users,
+    description = locale.usersDesc,
     contexts = {contextType.guild},
     options = {
         {
-            name = "print",
-            description = "Create a list of users that are in the channel",
+            name = locale.usersPrint,
+            description = locale.usersPrintDesc,
             type = commandOptionType.subcommand,
             options = {
                 {
-                    name = "channel",
-                    description = "Channels to be queried",
+                    name = locale.channel,
+                    description = locale.usersPrintChannelDesc,
                     type = commandOptionType.channel,
                     required = true,
                     channel_types = {
@@ -25,47 +28,47 @@ return {
                     }
                 },
                 {
-                    name = "print_as",
-                    description = "Output mode, default is mention (will never ping)",
+                    name = locale.usersPrintPrint_as,
+                    description = locale.usersPrintPrint_asDesc,
                     type = commandOptionType.string,
                     choices = {
                         {
-                            name = "username",
+                            name = locale.usersPrintPrint_asUsername,
                             value = "username"
                         },
                         {
-                            name = "tag",
+                            name = locale.usersPrintPrint_asTag,
                             value = "tag"
                         },
                         {
-                            name = "nickname",
+                            name = locale.usersPrintPrint_asNickname,
                             value = "nickname"
                         },
                         {
-                            name = "mention",
+                            name = locale.usersPrintPrint_asMention,
                             value = "mention"
                         },
                         {
-                            name = "id",
+                            name = locale.usersPrintPrint_asId,
                             value = "id"
                         }
                     }
                 },
                 {
-                    name = "separator",
-                    description = "Separator string that will be put between entries of a list, default is space",
+                    name = locale.usersPrintSeparator,
+                    description = locale.usersPrintSeparatorDesc,
                     type = commandOptionType.string
                 }
             }
         },
         {
-            name = "give",
-            description = "Give users in a channel or lobby rooms a role",
+            name = locale.usersGive,
+            description = locale.usersGiveDesc,
             type = commandOptionType.subcommand,
             options = {
                 {
-                    name = "channel",
-                    description = "Channel or lobby to be queried",
+                    name = locale.channel,
+                    description = locale.usersGiveChannelDesc,
                     type = commandOptionType.channel,
                     required = true,
                     channel_types = {
@@ -75,21 +78,21 @@ return {
                     }
                 },
                 {
-                    name = "role",
-                    description = "Role to be given out",
+                    name = locale.role,
+                    description = locale.usersGiveRoleDesc,
                     type = commandOptionType.role,
                     required = true
                 }
             }
         },
         {
-            name = "remove",
-            description = "Give users in a channel or lobby rooms a role",
+            name = locale.remove,
+            description = locale.usersGiveDesc,
             type = commandOptionType.subcommand,
             options = {
                 {
-                    name = "channel",
-                    description = "Channel or lobby to be queried",
+                    name = locale.channel,
+                    description = locale.usersGiveChannelDesc,
                     type = commandOptionType.channel,
                     required = true,
                     channel_types = {
@@ -99,8 +102,8 @@ return {
                     }
                 },
                 {
-                    name = "role",
-                    description = "Role to be given out",
+                    name = locale.role,
+                    description = locale.usersGiveRoleDesc,
                     type = commandOptionType.role,
                     required = true
                 }

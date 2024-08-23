@@ -3,19 +3,22 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-		name = "companion",
-		description = "Configure lobby companion settings",
+		name = locale.companion,
+		description = locale.companionDesc,
 		contexts = {contextType.guild},
 		options = {
 			{
-				name = "view",
-				description = "Show lobbies with enabled companion chats",
+				name = locale.view,
+				description = locale.companionViewDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "A lobby to be viewed",
+						name = locale.lobby,
+						description = locale.lobbyViewLobbyDesc,
 						type = commandOptionType.channel,
 						channel_types = {
 							channelType.voice
@@ -24,29 +27,13 @@ return {
 				}
 			},
 			{
-				name = "enable",
-				description = "Enable companion chats for selected lobby",
+				name = locale.enable,
+				description = locale.companionEnableDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "Selected lobby",
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					}
-				}
-			},
-			{
-				name = "disable",
-				description = "Disable companion chats for selected lobby",
-				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = "lobby",
-						description = "Selected lobby",
+						name = locale.lobby,
+						description = locale.companionEnableLobbyDesc,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -56,13 +43,29 @@ return {
 				}
 			},
 			{
-				name = "category",
-				description = "Select a category in which a companion chat will be created",
+				name = locale.disable,
+				description = locale.companionDisableDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "A lobby to be configured",
+						name = locale.lobby,
+						description = locale.companionEnableLobbyDesc,
+						type = commandOptionType.channel,
+						required = true,
+						channel_types = {
+							channelType.voice
+						}
+					}
+				}
+			},
+			{
+				name = locale.category,
+				description = locale.companionCategoryDesc,
+				type = commandOptionType.subcommand,
+				options = {
+					{
+						name = locale.lobby,
+						description = locale.lobbyConfigured,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -70,8 +73,8 @@ return {
 						}
 					},
 					{
-						name = "category",
-						description = "A category in which a companion chat will be created",
+						name = locale.category,
+						description = locale.companionCategoryCategoryDesc,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -81,13 +84,13 @@ return {
 				}
 			},
 			{
-				name = "name",
-				description = "Configure what name a chat will have when it's created",
+				name = locale.name,
+				description = locale.companionNameDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "A lobby to be configured",
+						name = locale.lobby,
+						description = locale.lobbyConfigured,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -95,21 +98,21 @@ return {
 						}
 					},
 					{
-						name = "name",
-						description = "Name a chat will have when it's created",
+						name = locale.name,
+						description = locale.companionNameNameDesc,
 						type = commandOptionType.string,
 						required = true
 					}
 				}
 			},
 			{
-				name = "greeting",
-				description = "Configure a message that will be automatically sent to chat when it's created",
+				name = locale.companionGreeting,
+				description = locale.companionGreetingDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "A lobby to be configured",
+						name = locale.lobby,
+						description = locale.lobbyConfigured,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -117,20 +120,20 @@ return {
 						}
 					},
 					{
-						name = "greeting",
-						description = "Skip this to enter multiline greeting",
+						name = locale.companionGreeting,
+						description = locale.companionGreetingGreetingDesc,
 						type = commandOptionType.string
 					}
 				}
 			},
 			{
-				name = "log",
-				description = "Enable chat logging. Logs will be sent as files to a channel of your choosing",
+				name = locale.companionLog,
+				description = locale.companionLogDesc,
 				type = commandOptionType.subcommand,
 				options = {
 					{
-						name = "lobby",
-						description = "A lobby to be configured",
+						name = locale.lobby,
+						description = locale.lobbyConfigured,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {
@@ -138,8 +141,8 @@ return {
 						}
 					},
 					{
-						name = "channel",
-						description = "A channel where logs will be sent",
+						name = locale.channel,
+						description = locale.companionLogChannelDesc,
 						type = commandOptionType.channel,
 						required = true,
 						channel_types = {

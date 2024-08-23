@@ -1,65 +1,67 @@
-local enums = require "discordia".enums
-local commandOptionType = enums.applicationCommandOptionType
+local commandOptionType = require "discordia".enums.applicationCommandOptionType
+
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
 
 return {
-	name = "room",
-	description = "Configure room settings",
+	name = locale.room,
+	description = locale.roomDesc,
 	options = {
 		{
-			name = "view",
-			description = "Show room settings",
+			name = locale.view,
+			description = locale.roomViewDesc,
 			type = commandOptionType.subcommand
 		},
 		{
-			name = "host",
-			description = "Ping current room host and transfer room ownership",
+			name = locale.roomHost,
+			description = locale.roomHostDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "user",
-					description = "User that you want to transfer ownership to",
+					name = locale.roomHostUser,
+					description = locale.roomHostUserDesc,
 					type = commandOptionType.user
 				}
 			}
 		},
 		{
-			name = "invite",
-			description = "Send people an invite to immediately connect to the room",
+			name = locale.roomInvite,
+			description = locale.roomInviteDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "user",
-					description = "User that you want to send an invite to",
+					name = locale.roomHostUser,
+					description = locale.roomInviteUserDesc,
 					type = commandOptionType.user
 				}
 			}
 		},
 		{
-			name = "rename",
-			description = "Change the name of the room",
+			name = locale.rename,
+			description = locale.roomRenameDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "voice",
-					description = "Change the name of the voice channel",
+					name = locale.voice,
+					description = locale.roomRenameVoiceDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "name",
-							description = "New voice channel name",
+							name = locale.name,
+							description = locale.roomRenameVoiceNameDesc,
 							type = commandOptionType.string,
 							required = true
 						}
 					}
 				},
 				{
-					name = "text",
-					description = "Change the name of the companion text channel, if there is one",
+					name = locale.text,
+					description = locale.roomRenameTextDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "name",
-							description = "New text channel name",
+							name = locale.name,
+							description = locale.roomRenameTextNameDesc,
 							type = commandOptionType.string,
 							required = true
 						}
@@ -68,13 +70,13 @@ return {
 			}
 		},
 		{
-			name = "resize",
-			description = "Change the capacity of the room",
+			name = locale.resize,
+			description = locale.roomResizeDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "capacity",
-					description = "New room capacity",
+					name = locale.lobbyCapacity,
+					description = locale.roomResizeCapacityDesc,
 					type = commandOptionType.integer,
 					min_value = 0,
 					max_value = 99,
@@ -83,13 +85,13 @@ return {
 			}
 		},
 		{
-			name = "bitrate",
-			description = "Change the bitrate",
+			name = locale.bitrate,
+			description = locale.roomBitrateDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "bitrate",
-					description = "New room bitrate",
+					name = locale.bitrate,
+					description = locale.roomBitrateBitrateDesc,
 					type = commandOptionType.integer,
 					min_value = 8,
 					max_value = 384,
@@ -98,55 +100,55 @@ return {
 			}
 		},
 		{
-			name = "kick",
-			description = "Kick a user from your room",
+			name = locale.kick,
+			description = locale.roomKickDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "user",
-					description = "User that you want to kick",
+					name = locale.roomHostUser,
+					description = locale.roomKickUserDesc,
 					type = commandOptionType.user,
 					required = true
 				}
 			}
 		},
 		{
-			name = "mute",
-			description = "Mute newly connected users",
+			name = locale.mute,
+			description = locale.roomMuteDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "voice",
-					description = "Prevent the new users from speaking in this voice chat",
+					name = locale.voice,
+					description = locale.roomMuteVoiceDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Mute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomMuteBothUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "text",
-					description = "Prevent the new users from typing in the text chat",
+					name = locale.text,
+					description = locale.roomMuteTextDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Mute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomMuteBothUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "both",
-					description = "Prevent the new users to both write and speak in this room",
+					name = locale.roomMuteBoth,
+					description = locale.roomMuteBothDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Mute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomMuteBothUserDesc,
 							type = commandOptionType.user
 						}
 					}
@@ -154,42 +156,42 @@ return {
 			}
 		},
 		{
-			name = "unmute",
-			description = "Allow the newly connected users to speak",
+			name = locale.roomUnmute,
+			description = locale.roomUnmuteDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "voice",
-					description = "Allow the new users to speak",
+					name = locale.voice,
+					description = locale.roomUnmuteVoiceDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Unmute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomUnmuteTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "text",
-					description = "Allow the new users to type in the text chat",
+					name = locale.text,
+					description = locale.roomUnmuteTextDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Unmute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomUnmuteTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "both",
-					description = "Allow the new users to write and speak in this room",
+					name = locale.roomMuteBoth,
+					description = locale.roomUnmuteBothDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Unmute a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomUnmuteTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
@@ -197,42 +199,42 @@ return {
 			}
 		},
 		{
-			name = "hide",
-			description = "Hide the room",
+			name = locale.hide,
+			description = locale.roomHideDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "voice",
-					description = "Hide only the voice channel",
+					name = locale.voice,
+					description = locale.roomHideVoiceDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Hide the channel from a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomHideTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "text",
-					description = "Hide only the text channel",
+					name = locale.text,
+					description = locale.roomHideTextDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Hide the channel from a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomHideTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "both",
-					description = "Hide all the channels relevant to the room",
+					name = locale.roomMuteBoth,
+					description = locale.roomHideBothDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Hide the channels from a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomHideBothUserDesc,
 							type = commandOptionType.user
 						}
 					}
@@ -240,42 +242,42 @@ return {
 			}
 		},
 		{
-			name = "show",
-			description = "Make the room visible",
+			name = locale.roomShow,
+			description = locale.roomShowDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "voice",
-					description = "Reveal only the voice channel",
+					name = locale.voice,
+					description = locale.roomShowVoiceDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Reveal the channel to a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomShowTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "text",
-					description = "Reveal only the text channel",
+					name = locale.text,
+					description = locale.roomShowTextDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Reveal the channel to a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomShowTextUserDesc,
 							type = commandOptionType.user
 						}
 					}
 				},
 				{
-					name = "both",
-					description = "Reveal all the channels relevant to the room",
+					name = locale.roomMuteBoth,
+					description = locale.roomShowBothDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "user",
-							description = "Reveal the channels to a specific user",
+							name = locale.roomHostUser,
+							description = locale.roomShowBothUserDesc,
 							type = commandOptionType.user
 						}
 					}
@@ -283,49 +285,49 @@ return {
 			}
 		},
 		{
-			name = "block",
-			description = "Prevent the user from connecting to the room",
+			name = locale.roomBlock,
+			description = locale.roomBlockDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "user",
-					description = "User that you want to block",
+					name = locale.roomHostUser,
+					description = locale.roomBlockUserDesc,
 					type = commandOptionType.user,
 					required = true
 				}
 			}
 		},
 		{
-			name = "allow",
-			description = "Allow the user to connect to the room",
+			name = locale.roomAllow,
+			description = locale.roomAllowDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "user",
-					description = "User that you want to allow to join",
+					name = locale.roomHostUser,
+					description = locale.roomAllowUserDesc,
 					type = commandOptionType.user,
 					required = true
 				}
 			}
 		},
 		{
-			name = "lock",
-			description = "Set the room to invite only mode",
+			name = locale.lock,
+			description = locale.roomLockDesc,
 			type = commandOptionType.subcommand
 		},
 		{
-			name = "unlock",
-			description = "Make the room public",
+			name = locale.roomUnlock,
+			description = locale.roomUnlockDesc,
 			type = commandOptionType.subcommand
 		},
 		{
-			name = "password",
-			description = "Set up a channel password",
+			name = locale.password,
+			description = locale.roomPasswordDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "password",
-					description = "Password that users will have to enter upon connection",
+					name = locale.password,
+					description = locale.roomPasswordPasswordDesc,
 					type = commandOptionType.string
 				}
 			}

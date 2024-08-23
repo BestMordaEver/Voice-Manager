@@ -1,36 +1,39 @@
 local commandOptionType = require "discordia".enums.applicationCommandOptionType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-	name = "help",
-	description = "A help command!",
+	name = locale.help,
+	description = locale.helpDesc,
 	options = {
 		{
-			name = "article",
-			description = "Which help article do you need?",
+			name = locale.helpArticle,
+			description = locale.helpArticleDesc,
 			type = commandOptionType.string,
 			choices = {
 				{
-					name = "lobby",
+					name = locale.lobby,
 					value = "lobby"
 				},
 				{
-					name = "matchmaking",
+					name = locale.matchmaking,
 					value = "matchmaking"
 				},
 				{
-					name = "companion",
+					name = locale.companion,
 					value = "companion"
 				},
 				{
-					name = "room",
+					name = locale.room,
 					value = "room"
 				},
 				{
-					name = "server",
+					name = locale.server,
 					value = "server"
 				},
 				{
-					name = "other",
+					name = locale.helpArticleOther,
 					value = "other"
 				}
 			}

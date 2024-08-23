@@ -3,50 +3,53 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-	name = "delete",
-	description = "Quickly delete several channels",
+	name = locale.delete,
+	description = locale.deleteDesc,
 	contexts = {contextType.guild},
 	options = {
 		{
-			name = "type",
-			description = "Channel type",
+			name = locale.deleteType,
+			description = locale.deleteTypeDesc,
 			type = commandOptionType.string,
 			required = true,
 			choices = {
 				{
-					name = "text",
+					name = locale.text,
 					value = "text"
 				},
 				{
-					name = "voice",
+					name = locale.voice,
 					value = "voice"
 				}
 			}
 		},
 		{
-			name = "category",
-			description = "Category where channels will be deleted",
+			name = locale.category,
+			description = locale.deleteCategoryDesc,
 			type = commandOptionType.channel,
 			channel_types = {
 				channelType.category
 			}
 		},
 		{
-			name = "amount",
-			description = "How many channels to delete",
+			name = locale.cloneAmount,
+			description = locale.deleteAmountDesc,
 			type = commandOptionType.integer,
 			min_value = 1,
 			max_value = 100
 		},
 		{
-			name = "name",
-			description = "Delete all the channels that match the name",
+			name = locale.name,
+			description = locale.deleteNameDesc,
 			type = commandOptionType.string
 		},
 		{
-			name = "only_empty",
-			description = "Whether to delete voice channels with connected users. Defaults to false",
+			name = locale.deleteOnly_empty,
+			description = locale.deleteOnly_emptyDesc,
 			type = commandOptionType.boolean
 		}
 	}

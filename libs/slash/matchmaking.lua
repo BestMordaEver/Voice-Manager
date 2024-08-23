@@ -3,19 +3,22 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-	name = "matchmaking",
-	description = "Configure matchmaking lobby settings",
+	name = locale.matchmaking,
+	description = locale.matchmakingDesc,
 	contexts = {contextType.guild},
 	options = {
 		{
-			name = "view",
-			description = "Show registered matchmaking lobbies",
+			name = locale.view,
+			description = locale.matchmakingViewDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "lobby",
-					description = "A lobby to be viewed",
+					name = locale.lobby,
+					description = locale.lobbyViewLobbyDesc,
 					type = commandOptionType.channel,
 					channel_types = {
 						channelType.voice
@@ -24,29 +27,13 @@ return {
 			}
 		},
 		{
-			name = "add",
-			description = "Register a new matchmaking lobby",
+			name = locale.add,
+			description = locale.matchmakingAddDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "channel",
-					description = "A channel to be registered",
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				}
-			}
-		},
-		{
-			name = "remove",
-			description = "Remove an existing matchmaking lobby",
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = "lobby",
-					description = "A matchmaking lobby to be removed",
+					name = locale.channel,
+					description = locale.lobbyAddChannelDesc,
 					type = commandOptionType.channel,
 					required = true,
 					channel_types = {
@@ -56,13 +43,29 @@ return {
 			}
 		},
 		{
-			name = "target",
-			description = "Select a target for matchmaking pool",
+			name = locale.remove,
+			description = locale.matchmakingRemoveDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "lobby",
-					description = "A lobby to be configured",
+					name = locale.lobby,
+					description = locale.matchmakingRemoveLobbyDesc,
+					type = commandOptionType.channel,
+					required = true,
+					channel_types = {
+						channelType.voice
+					}
+				}
+			}
+		},
+		{
+			name = locale.matchmakingTarget,
+			description = locale.matchmakingTargetDesc,
+			type = commandOptionType.subcommand,
+			options = {
+				{
+					name = locale.lobby,
+					description = locale.lobbyConfigured,
 					type = commandOptionType.channel,
 					required = true,
 					channel_types = {
@@ -70,8 +73,8 @@ return {
 					}
 				},
 				{
-					name = "target",
-					description = "A target for matchmaking pool",
+					name = locale.matchmakingTarget,
+					description = locale.matchmakingTargetTargetDesc,
 					type = commandOptionType.channel,
 					required = true,
 					channel_types = {
@@ -81,13 +84,13 @@ return {
 			}
 		},
 		{
-			name = "mode",
-			description = "Select the matchmaking mode",
+			name = locale.matchmakingMode,
+			description = locale.matchmakingModeDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				{
-					name = "lobby",
-					description = "A lobby to be configured",
+					name = locale.lobby,
+					description = locale.lobbyConfigured,
 					type = commandOptionType.channel,
 					required = true,
 					channel_types = {
@@ -95,29 +98,29 @@ return {
 					}
 				},
 				{
-					name = "mode",
-					description = "A matchmaking mode",
+					name = locale.matchmakingMode,
+					description = locale.matchmakingModeModeDesc,
 					type = commandOptionType.string,
 					required = true,
 					choices = {
 						{
-							name = "random",
+							name = locale.matchmakingModeModeRandom,
 							value = "random"
 						},
 						{
-							name = "max",
+							name = locale.matchmakingModeModeMax,
 							value = "max"
 						},
 						{
-							name = "min",
+							name = locale.matchmakingModeModeMin,
 							value = "min"
 						},
 						{
-							name = "first",
+							name = locale.matchmakingModeModeFirst,
 							value = "first"
 						},
 						{
-							name = "last",
+							name = locale.matchmakingModeModeLast,
 							value = "last"
 						}
 					}

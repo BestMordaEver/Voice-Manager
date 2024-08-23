@@ -158,61 +158,7 @@ local CommandManager = {
 	end
 }
 
-local enums = require "discordia".enums
-local commandType = enums.applicationCommandType
-local commandOptionType = enums.applicationCommandOptionType
-
-local commandsStructure = {
-	require "slash/help",
-	require "slash/lobby",
-	require "slash/matchmaking",
-	require "slash/companion",
-	require "slash/room",
-	require "slash/server",
-	require "slash/reset",
-	require "slash/clone",
-	require "slash/delete",
-	require "slash/users",
-	{
-		name = "support",
-		description = "Send invite to the support server",
-	},
-	{
-		name = "ping",
-		description = "Check up on bot's status!"
-	},
-	{
-		name = "Invite",
-		type = commandType.user
-	},
-	--[[{
-		name = "Clear messages above",
-		type = commandType.message
-	},
-	{
-		name = "Clear messages below",
-		type = commandType.message
-	}]]
-}
-
-local debugCommands = {
-	{
-		name = "exec",
-		description = "This is gonna be our little secret",
-		options = {
-			{
-				name = "code",
-				description = "What do you want me to do?",
-				type = commandOptionType.string,
-				required = true
-			}
-		}
-	},
-	{
-		name = "shutdown",
-		description = "Guess I'll die",
-	}
-}
+local commandsStructure, debugCommands = require "slash"
 
 coroutine.wrap(function ()
 	print(CommandManager.overwriteGlobalCommands(commandsStructure))

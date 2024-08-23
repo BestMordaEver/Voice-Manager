@@ -1,54 +1,57 @@
 local commandOptionType = require "discordia".enums.applicationCommandOptionType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
 	{
-		name = "moderate",
-		description = "Access to all moderation tools",
+		name = locale.moderate,
+		description = locale.moderateDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "manage",
-		description = "Access to all room settings",
+		name = locale.manage,
+		description = locale.manageDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "rename",
-		description = "Access to /room rename",
+		name = locale.rename,
+		description = locale.renameDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "resize",
-		description = "Access to /room resize",
+		name = locale.resize,
+		description = locale.resizeDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "bitrate",
-		description = "Access to /room bitrate",
+		name = locale.bitrate,
+		description = locale.bitrateDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "kick",
-		description = 'Access to /room kick and "Move Members" permission',
+		name = locale.kick,
+		description = locale.kickDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "mute",
-		description = "Access to /room mute|unmute",
+		name = locale.mute,
+		description = locale.muteDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "hide",
-		description = "Access to /room hide|show",
+		name = locale.hide,
+		description = locale.hideDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "lock",
-		description = "Access to /room lock|unlock and /room block|allow",
+		name = locale.lock,
+		description = locale.lockDesc,
 		type = commandOptionType.boolean
 	},
 	{
-		name = "password",
-		description = "Access to /room password",
+		name = locale.password,
+		description = locale.passwordDesc,
 		type = commandOptionType.boolean
 	}
 }

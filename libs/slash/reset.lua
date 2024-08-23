@@ -3,24 +3,27 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-	name = "reset",
-	description = "Reset bot settings",
+	name = locale.reset,
+	description = locale.resetDesc,
 	contexts = {contextType.guild},
 	options = {
 		{
-			name = "lobby",
-			description = "Lobby settings",
+			name = locale.lobby,
+			description = locale.resetLobbyDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "name",
-					description = "Set new room name to default \"%nickname's room\"",
+					name = locale.name,
+					description = locale.resetLobbyNameDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -30,13 +33,13 @@ return {
 					}
 				},
 				{
-					name = "category",
-					description = "Set new room category to lobby's category",
+					name = locale.category,
+					description = locale.resetLobbyCategoryDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -46,13 +49,13 @@ return {
 					}
 				},
 				{
-					name = "bitrate",
-					description = "Set new room bitrate to 64",
+					name = locale.bitrate,
+					description = locale.resetLobbyBitrateDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -62,13 +65,13 @@ return {
 					}
 				},
 				{
-					name = "capacity",
-					description = "Set new room capacity to copy from lobby",
+					name = locale.lobbyCapacity,
+					description = locale.resetLobbyCapacityDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -78,13 +81,13 @@ return {
 					}
 				},
 				{
-					name = "permissions",
-					description = "Disable all room permissions",
+					name = locale.lobbyPermissions,
+					description = locale.resetLobbyPermissionsDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -94,13 +97,13 @@ return {
 					}
 				},
 				{
-					name = "role",
-					description = "Reset default managed role to @everyone",
+					name = locale.role,
+					description = locale.resetLobbyRoleDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -110,13 +113,13 @@ return {
 					}
 				},
 				{
-					name = "limit",
-					description = "Reset the limit to 500",
+					name = locale.limit,
+					description = locale.resetLobbyLimitDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -128,18 +131,18 @@ return {
 			}
 		},
 		{
-			name = "matchmaking",
-			description = "Matchmaking lobby settings",
+			name = locale.matchmaking,
+			description = locale.resetMatchmakingDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "target",
-					description = "Reset matchmaking target to current category",
+					name = locale.matchmakingTarget,
+					description = locale.resetMatchmakingTargetDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -149,13 +152,13 @@ return {
 					}
 				},
 				{
-					name = "mode",
-					description = "Reset matchmaking mode to random",
+					name = locale.matchmakingMode,
+					description = locale.resetMatchmakingModeDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -167,18 +170,18 @@ return {
 			}
 		},
 		{
-			name = "companion",
-			description = "Lobby companion settings",
+			name = locale.companion,
+			description = locale.resetCompanionDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "category",
-					description = "Reset companion category to use lobby settings",
+					name = locale.category,
+					description = locale.resetCompanionCategoryDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -188,13 +191,13 @@ return {
 					}
 				},
 				{
-					name = "name",
-					description = "Reset companion name to \"private-chat\"",
+					name = locale.name,
+					description = locale.resetCompanionNameDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -204,13 +207,13 @@ return {
 					}
 				},
 				{
-					name = "greeting",
-					description = "Disable companion greeting",
+					name = locale.companionGreeting,
+					description = locale.resetCompanionGreetingDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -220,13 +223,13 @@ return {
 					}
 				},
 				{
-					name = "log",
-					description = "Disable companion logging",
+					name = locale.companionLog,
+					description = locale.resetCompanionLogDesc,
 					type = commandOptionType.subcommand,
 					options = {
 						{
-							name = "lobby",
-							description = "A lobby to be configured",
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
 							type = commandOptionType.channel,
 							required = true,
 							channel_types = {
@@ -238,23 +241,23 @@ return {
 			}
 		},
 		{
-			name = "server",
-			description = "Server settings",
+			name = locale.server,
+			description = locale.resetServerDesc,
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = "limit",
-					description = "Reset limit to 500",
+					name = locale.limit,
+					description = locale.resetServerLimitDesc,
 					type = commandOptionType.subcommand
 				},
 				{
-					name = "permissions",
-					description = "Disable all permissions",
+					name = locale.lobbyPermissions,
+					description = locale.resetServerPermissionsDesc,
 					type = commandOptionType.subcommand
 				},
 				{
-					name = "role",
-					description = "Reset default managed role to @everyone",
+					name = locale.role,
+					description = locale.resetLobbyRoleDesc,
 					type = commandOptionType.subcommand
 				}
 			}

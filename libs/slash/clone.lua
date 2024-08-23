@@ -3,14 +3,17 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+---@module "locale/slash/en-US"
+local locale = require "locale/slash/localeHandler"
+
 return {
-	name = "clone",
-	description = "Spawn multiple clones of a channel",
+	name = locale.clone,
+	description = locale.cloneDesc,
 	contexts = {contextType.guild},
 	options = {
 		{
-			name = "source",
-			description = "Which channel to copy",
+			name = locale.cloneSource,
+			description = locale.cloneSourceDesc,
 			type = commandOptionType.channel,
 			required = true,
 			channel_types = {
@@ -19,16 +22,16 @@ return {
 			}
 		},
 		{
-			name = "amount",
-			description = "How many channels to create",
+			name = locale.cloneAmount,
+			description = locale.cloneAmountDesc,
 			type = commandOptionType.integer,
 			required = true,
 			min_value = 1,
 			max_value = 50
 		},
 		{
-			name = "name",
-			description = "Channel names",
+			name = locale.name,
+			description = locale.cloneNameDesc,
 			type = commandOptionType.string
 		}
 	}
