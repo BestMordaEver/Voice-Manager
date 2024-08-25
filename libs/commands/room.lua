@@ -139,8 +139,15 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
-		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
+		local guild, member, roles = voiceChannel.guild
+		if user then
+			if user == client.user then
+				return "Attempt to mute the bot", warningEmbed(interaction, "shame")
+			end
+			member = guild:getMember(user)
+		else
+			roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+		end
 
 		if scope == "voice" or scope == "both" then
 			if user then
@@ -231,8 +238,12 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
-		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
+		local guild, member, roles = voiceChannel.guild
+		if user then
+			member = guild:getMember(user)
+		else
+			roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+		end
 
 		if scope == "voice" or scope == "both" then
 			if user then
@@ -282,8 +293,15 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
-		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
+		local guild, member, roles = voiceChannel.guild
+		if user then
+			if user == client.user then
+				return "Attempt to hide from bot", warningEmbed(interaction, "shame")
+			end
+			member = guild:getMember(user)
+		else
+			roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+		end
 
 		if scope == "voice" or scope == "both" then
 			if user then
@@ -342,8 +360,12 @@ subcommands = {
 			user = interaction.option.option.option and interaction.option.option.option.value
 		end
 
-		local guild, member, roles = voiceChannel.guild, voiceChannel.guild:getMember(user)
-		if user then roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {} end
+		local guild, member, roles = voiceChannel.guild
+		if user then
+			member = guild:getMember(user)
+		else
+			roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+		end
 
 		if scope == "voice" or scope == "both" then
 			if user then
