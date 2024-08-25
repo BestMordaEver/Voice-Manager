@@ -308,6 +308,7 @@ If category is selected, all it's channels are used]],
 
 	limitConfirm = "Limit is set to %d",
 	roleConfirm = "Updated role list: %s",
+	roleConfirmNoRoles = "The default @everyone is in use",
 
 	-- lobbies
 	lobbiesInfoTitle = "Lobbies info | %s",

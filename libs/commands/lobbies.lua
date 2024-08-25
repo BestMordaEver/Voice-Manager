@@ -127,8 +127,11 @@ local subcommands = {
 				lobbyData:removeRole(roleID)
 			end
 		end
-		if #roles == 0 then roles[1] = lobby.guild.defaultRole.mentionString end
-		return "Changed managed lobby roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
+		if #roles == 0 then
+			return "Changed managed lobby roles", okEmbed(interaction, "roleConfirmNoRoles")
+		else
+			return "Changed managed lobby roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
+		end
 	end,
 
 	limit = function (interaction, lobby, limit)

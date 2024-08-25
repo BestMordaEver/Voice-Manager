@@ -35,7 +35,12 @@ local subcommands = {
 				guildData:removeRole(roleID)
 			end
 		end
-		return "Changed managed server roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
+
+		if #roles == 0 then
+			return "Changed managed server roles", okEmbed(interaction, "roleConfirmNoRoles")
+		else
+			return "Changed managed server roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
+		end
 	end,
 
 	limit = function (interaction, limit)

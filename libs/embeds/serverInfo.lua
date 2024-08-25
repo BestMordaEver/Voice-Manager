@@ -18,7 +18,7 @@ return embedHandler("serverInfo", function (interaction, ephemeral)
 			guildData:removeRole(roleID)
 		end
 	end
-	if #roles == 0 then roles[1] = guild.defaultRole.mentionString end
+	if #roles == 0 then roles[1] = locale(interaction.locale, "none") end
 
 	return {embeds = {{
 		title = locale(interaction.locale, "serverInfoTitle", guild.name),

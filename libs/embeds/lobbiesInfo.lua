@@ -41,7 +41,7 @@ return embedHandler("lobbiesInfo", function (interaction, channel, ephemeral)
 				lobbyData:removeRole(roleID)
 			end
 		end
-		if #roles == 0 then roles[1] = interaction.guild.defaultRole.mentionString end
+		if #roles == 0 then roles[1] = locale(interaction.locale, "none") end
 
 		insert(embed.fields, {
 			name = client:getChannel(lobbyData.id).name,
