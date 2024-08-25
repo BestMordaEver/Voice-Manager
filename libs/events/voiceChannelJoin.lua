@@ -122,7 +122,7 @@ local function lobbyJoin (member, lobby)
 		end
 
 		if lobbyData.companionLog then Overseer.track(companion or newChannel) end
-		if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(member.user, newChannel)) end
+		if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(newChannel)) end
 
 		processing[newChannel.id]:unlock()
 		processing[newChannel.id] = nil
