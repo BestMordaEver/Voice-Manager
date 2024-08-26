@@ -21,7 +21,7 @@ return function (interaction)
         interaction:updateReply(reply or errorEmbed(interaction))	-- reply mustn't be empty
 	else
 		interaction:updateReply(errorEmbed(interaction))
-		error(logMsg)
+		error(string.format('failed to process the modal "%s"\n%s', interaction.customId, logMsg))
 	end
 
 	logger:log(4, "USER %s: %s modal processed", interaction.user.id, interaction.customId)

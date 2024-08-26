@@ -44,10 +44,11 @@ return function (interaction)
         	local ok, msg
 			if interaction.isReplied then
 				ok, msg = interaction:updateReply(reply)
+				if not ok then error(string.format("failed to update reply - %s\n", msg)) end
 			else
 				ok, msg = interaction:reply(reply)
+				if not ok then error(string.format("failed to reply - %s\n", msg)) end
 			end
-			if not ok then error(msg) end
 		end
 	else
 		if interaction.isReplied then
@@ -55,7 +56,7 @@ return function (interaction)
 		else
 			interaction:reply(errorEmbed(interaction, true))
 		end
-		error(logMsg)
+		error(string.format('failed to execute the command "%s"\n%s', commandString, logMsg))
 	end
 
 	if interaction.guild then

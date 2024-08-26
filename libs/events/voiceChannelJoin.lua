@@ -262,7 +262,7 @@ return function (member, channel)
 				lobbyData.mutex:lock()
 				local ok, err = xpcall(lobbyJoin, debug.traceback, member, channel)
 				lobbyData.mutex:unlock()
-				if not ok then error(err) end
+				if not ok then error(string.format('failed to process a user %s joining lobby "%s"\n%s', member.user.id, channel.id, err)) end
 			end
 		elseif channels[channel.id] then
 			if channels[channel.id].host ~= member.user.id then roomJoin(member, channel) end

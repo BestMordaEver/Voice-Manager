@@ -35,7 +35,7 @@ return function (interaction)
 		else
 			interaction:reply(errorEmbed(interaction))
 		end
-		error(logMsg)
+		error(string.format('failed to process the component "%s"\n%s', interaction.customId, logMsg))
 	end
 
 	if interaction.guild then

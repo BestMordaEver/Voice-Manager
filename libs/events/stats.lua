@@ -24,9 +24,9 @@ end
 emitter:on("send", function (name, server)
 	local success, err = xpcall(send, debug.traceback, name, server)
 	if not success then
-		logger:log(1, "Error on %s: %s", name, err)
+		logger:log(1, "Error on %s\n%s", name, err)
 		if config.stderr then
-			client:getChannel(config.stderr):sendf("Error on %s: %s", name, err)
+			client:getChannel(config.stderr):sendf("Error on %s\n%s", name, err)
 		end
 	end
 end)
