@@ -256,6 +256,7 @@ return function (member, channel)
 				if limit == -1 then
 					member:setVoiceChannel()
 					member.user:send(warningEmbed(member.user, "wait", retryIn))
+					processMutex:unlock()
 					return
 				end
 
