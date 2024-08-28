@@ -62,7 +62,7 @@ setmetatable(channels, {
 			if parent then
 				self[channelID] = setmetatable({
 					id = channelID,
-					guildID = parent.guild and parent.guild.id or parent.id,
+					guildID = parent.guild and parent.guild.id or parent.guildID or parent.id,
 					parentType = tonumber(parentType),
 					host = host,
 					parent = parent,

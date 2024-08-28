@@ -5,18 +5,20 @@ https://leovoel.github.io/embed-visualizer/
 https://discord.com/developers/docs/resources/channel#embed-object
 ]]
 
-local locale = "locale/runtime/localeHandler"
+local locale = require "locale/runtime/localeHandler"
 
 local wrapper = {
 	__call = function (self, ...)
 		return self.factory(...)
 	end
 }
+
 -- this is so ugly :/
 local composeMeta = {
 	__call = function (self, msg, ...)
 		if msg then
-			table.insert(locale(self.locale, msg, ...))
+			table.insert(self.description, locale(self.locale, msg, ...))
+			return self
 		else
 			local embed = self.parentEmbed(self.locale, "none")
 			embed.embeds[1].description = table.concat(self.description)

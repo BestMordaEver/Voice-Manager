@@ -47,11 +47,11 @@ return function (interaction)
     end
 
     local fn, syntaxError = load(interaction.option.value, "Bot", "t", sandbox)
-    if not fn then return "Syntax error", warningEmbed:compose(interaction)(code(syntaxError))() end
+    if not fn then return "Syntax error", warningEmbed:compose(interaction)("asIs", code(syntaxError))() end
 
     local success, runtimeError = pcall(fn)
-    if not success then return "Runtime error", warningEmbed:compose(interaction)(code(runtimeError))() end
+    if not success then return "Runtime error", warningEmbed:compose(interaction)("asIs", code(runtimeError))() end
 
     lines = table.concat(lines, '\n') -- bring all the lines together
-    return "Code executed", okEmbed(interaction)(code(lines))()
+    return "Code executed", okEmbed:compose(interaction)("asIs", code(lines))()
 end

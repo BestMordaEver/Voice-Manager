@@ -1,4 +1,4 @@
-## Voice Manager v4.10.7
+## Voice Manager v4.10.8
 
 <a href="https://top.gg/bot/601347755046076427">
     <img src="https://top.gg/api/widget/status/601347755046076427.svg" alt="Voice Manager" />

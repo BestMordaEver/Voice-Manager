@@ -205,8 +205,8 @@ local function roomJoin (member, channel)
 			}
 		}
 
-		member:setVoiceChannel(newChannel)
 		channels:store(newChannel.id, 3, member.user.id, channel.id, 0)
+		member:setVoiceChannel(newChannel)
 
 		return member.user:send(passwordEmbed(member.user, channel))
 	end
@@ -256,7 +256,6 @@ return function (member, channel)
 				if limit == -1 then
 					member:setVoiceChannel()
 					member.user:send(warningEmbed(member.user, "wait", retryIn))
-					processMutex:unlock()
 					return
 				end
 
@@ -266,6 +265,7 @@ return function (member, channel)
 				if not ok then error(string.format('failed to process a user %s joining lobby "%s"\n%s', member.user.id, channel.id, err)) end
 			end
 		elseif channels[channel.id] then
+			if channels[channel.id].parentType == 3 then return end
 			if channels[channel.id].host ~= member.user.id then roomJoin(member, channel) end
 		elseif guilds[channel.guild.id].permissions.bitfield.value ~= 0 then
 			channelJoin(member, channel)

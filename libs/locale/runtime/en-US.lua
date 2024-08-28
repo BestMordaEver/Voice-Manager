@@ -472,6 +472,7 @@ https://discord.gg/%s]],
 	embedWarning = "⚠ Warning",
 	embedError = "❗ Error",
 	newline = "\n",
+	asIs = "%s",
 
 	inCategory = "in %s category",
 
