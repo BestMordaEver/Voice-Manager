@@ -11,7 +11,7 @@ return setmetatable({
 	help = require "commands/help",
 	reset = require "commands/reset",
 	server = require "commands/server",
-	lobby = require "commands/lobbies",
+	lobby = require "commands/lobby",
 	companion = require "commands/companions",
 	matchmaking = require "commands/matchmaking",
 	room = require "commands/room",

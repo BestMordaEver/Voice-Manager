@@ -7,7 +7,7 @@ local warningEmbed = require "embeds/warning"
 local checkPermissions = require "handlers/channelHandler".checkPermissions
 
 local commands = {
-	lobby = require "commands/lobbies",
+	lobby = require "commands/lobby",
 	matchmaking = require "commands/matchmaking",
 	companion = require "commands/companions",
 	server = require "commands/server",
