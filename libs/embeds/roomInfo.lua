@@ -93,8 +93,8 @@ return embedHandler("roomInfo", function (interaction, room, ephemeral)
 		liner(loc, room, roomPO, "voice", permission.connect),
 		liner(loc, room, roomPO, "voice", permission.speak),
 		liner(loc, room, roomPO, "voice", permission.sendMessages),
-		companion and liner(companion, chatPO, "text", permission.readMessages),
-		companion and liner(companion, chatPO, "text", permission.sendMessages)
+		companion and liner(loc, companion, chatPO, "text", permission.readMessages),
+		companion and liner(loc, companion, chatPO, "text", permission.sendMessages)
 	}
 
 	table.insert(fields, {name = locale(loc, "roomInfoCommands"), value = availableCommands(room)})
