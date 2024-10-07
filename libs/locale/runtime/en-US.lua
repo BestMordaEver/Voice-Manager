@@ -1,4 +1,5 @@
-return {
+---@type {textLine : string|table}
+local locale = {
 	-- help
 	help = {
 		help = {
@@ -255,7 +256,7 @@ Bot will start deleting user permission overwrites in all channels once this is 
 			title = "Other commands",
 			fields = {
 				{
-					name = "/help [lobbies|matchmaking|companions|room|chat|other]",
+					name = "/help [lobbies|matchmaking|companion|room|chat|other]",
 					value = [[Show table of contents for help
 You can specify the page to show instead of table of contents]]
 				},
@@ -266,7 +267,7 @@ You can specify the page to show instead of table of contents]]
 				{
 					name = "/reset <command> <subcommand>",
 					value = [[Reset any setting to its default value
-Example: **/reset companions greeting**]]
+Example: **/reset companion greeting**]]
 				},
 				{
 					name = "/clone <channel> <amount> [name]",
@@ -522,3 +523,5 @@ https://discord.gg/%s]],
 		"Add this one to the list"
 	}
 }
+
+return locale

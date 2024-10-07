@@ -2,6 +2,10 @@ local handler = {
 	["en-US"] = require "locale/runtime/en-US",
 }
 
+---@param locale table
+---@param line textLine
+---@param ... string
+---@return string | table
 return function (locale, line, ...)
 	locale = handler[locale]
 	if not locale or not locale[line] then locale = handler["en-US"] end

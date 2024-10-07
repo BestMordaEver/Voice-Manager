@@ -9,7 +9,7 @@ local checkPermissions = require "handlers/channelHandler".checkPermissions
 local commands = {
 	lobby = require "commands/lobby",
 	matchmaking = require "commands/matchmaking",
-	companion = require "commands/companions",
+	companion = require "commands/companion",
 	server = require "commands/server",
 }
 

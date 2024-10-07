@@ -1,4 +1,5 @@
 local commandType = require "discordia".enums.applicationCommandType
+local commandsNamespace = require "namespaces/commands"
 
 local function invite ()
 	return "Sent support invite", {content = "https://discord.gg/tqj6jvT"}
@@ -8,21 +9,21 @@ local undeferrable = {greeting = true}
 
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return setmetatable({
-	help = require "commands/help",
-	reset = require "commands/reset",
-	server = require "commands/server",
-	lobby = require "commands/lobby",
-	companion = require "commands/companions",
-	matchmaking = require "commands/matchmaking",
-	room = require "commands/room",
-	clone = require "commands/clone",
-	delete = require "commands/delete",
-	users = require "commands/users",
-	ping = require "commands/ping",
-	shutdown = require "commands/shutdown",
-	support = invite,
-	invite = invite,
-	exec = require "commands/exec"
+	[commandsNamespace.help] = require "commands/help",
+	[commandsNamespace.reset] = require "commands/reset",
+	[commandsNamespace.server] = require "commands/server",
+	[commandsNamespace.lobby] = require "commands/lobby",
+	[commandsNamespace.companion] = require "commands/companion",
+	[commandsNamespace.matchmaking] = require "commands/matchmaking",
+	[commandsNamespace.room] = require "commands/room",
+	[commandsNamespace.clone] = require "commands/clone",
+	[commandsNamespace.delete] = require "commands/delete",
+	[commandsNamespace.users] = require "commands/users",
+	[commandsNamespace.ping] = require "commands/ping",
+	[commandsNamespace.shutdown] = require "commands/shutdown",
+	[commandsNamespace.support] = invite,
+	[commandsNamespace.invite] = invite,
+	[commandsNamespace.exec] = require "commands/exec"
 },{__call = function (self, interaction)
 	if interaction.commandType == commandType.chatInput then
 		-- /lobby add channelname or /room lock or any other command
@@ -47,8 +48,8 @@ return setmetatable({
 		-- most commands will treat argument nil as a call for reset
 		return self[command](interaction, subcommand, argument and (argument.value or argument))
 	elseif interaction.type == commandType.user then
-		if interaction.commandName == "Invite" then
-			return self.room(interaction, "invite", interaction.target)
+		if interaction.commandName == commandsNamespace.Invite then
+			return self[commandsNamespace.room](interaction, "invite", interaction.target)
 		end
 	elseif interaction.type == commandType.message then
 
