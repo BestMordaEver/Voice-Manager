@@ -144,8 +144,6 @@ Overseer.finalize = function (channelID)
 	if writer then return concat(writer, "\n") end
 end
 
-Overseer.finalize("nothing")
-
 Overseer.events = {
 	messageCreate = function (message)
 		if writers[message.channel.id] then
