@@ -13,7 +13,7 @@ return embedHandler("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
 	if not channelData then return end
 
-	if not channelData.parent.greeting then return end
+	if not (channelData.parent.greeting or channelData.parent.companionLog) then return end
 
 	local companion = client:getChannel(channelData.companion) or room
 
@@ -37,8 +37,11 @@ return embedHandler("greeting", function (room, ephemeral)
 	embeds = {{
 		title = companion.name,
 		color = fuchsia,
-		description = channelData.parent.greeting:gsub("%%(.-)%%", rt) .. (channelData.parent.companionLog and locale(member.user.locale, "loggerWarning") or "")
+		description =
+		(channelData.parent.greeting and channelData.parent.greeting:gsub("%%(.-)%%", rt) or "")
+			..
+		(channelData.parent.companionLog and locale(member.user.locale, "loggerWarning") or "")
 	}},
-	components = channelData.parent.greeting:match("%%buttons%%") and roomButtons or nil,
+	components = channelData.parent.greeting and channelData.parent.greeting:match("%%buttons%%") and roomButtons or nil,
 	ephemeral = ephemeral}
 end)
