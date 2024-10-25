@@ -155,7 +155,7 @@ return function (member, lobby)
 	lobbyData.mutex:lock()
 	local timer = lobbyData.mutex:unlockAfter(10000)
 	local ok, err = xpcall(lobbyJoin, debug.traceback, member, lobby)
-	Timer.clearTimeout(timer)
 	lobbyData.mutex:unlock()
+	Timer.clearTimeout(timer)
 	if not ok then error(string.format('failed to process a user %s joining lobby "%s"\n%s', member.user.id, lobby.id, err)) end
 end
