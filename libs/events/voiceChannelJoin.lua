@@ -1,3 +1,5 @@
+local Timer = require "timer"
+
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
@@ -7,13 +9,16 @@ local matchmakingJoin = require "channelHandlers/matchmakingJoin"
 local roomJoin = require "channelHandlers/roomJoin"
 local channelJoin = require "channelHandlers/channelJoin"
 
-local processing = {}
+local queue = {}
+package.loaded.channelQueue = queue
 
 return function (member, channel)
 	if channel then
-		local processMutex = processing[channel.id]
-		if processMutex then
-			processMutex:lock()
+		local mutex = queue[channel.id]
+		local timer
+		if mutex then
+			mutex:lock()
+			timer = mutex:unlockAfter(10000)
 		end
 
 		local lobbyData = lobbies[channel.id]
@@ -30,8 +35,9 @@ return function (member, channel)
 			channelJoin(member, channel)
 		end
 
-		if processMutex then
-			processMutex:unlock()
+		if mutex then
+			mutex:unlock()
+			Timer.clearTimeout(timer)
 		end
 	end
 end

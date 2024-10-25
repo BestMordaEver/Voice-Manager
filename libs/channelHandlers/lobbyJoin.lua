@@ -1,4 +1,4 @@
-local timer = require "timer"
+local Timer = require "timer"
 
 local discordia = require "discordia"
 local client = require "client"
@@ -20,8 +20,8 @@ local ratelimiter = require "utils/ratelimiter"
 local Mutex = discordia.Mutex
 local permission = discordia.enums.permission
 local channelType = discordia.enums.channelType
+local queue = require "channelQueue"
 
-local processing = {}
 ratelimiter("channelCreate", 2, 20)
 
 local function lobbyJoin (member, lobby)
@@ -89,8 +89,10 @@ local function lobbyJoin (member, lobby)
 		return
 	end
 
-	processing[newChannel.id] = Mutex()
-	processing[newChannel.id]:lock()
+	local mutex = Mutex()
+	queue[newChannel.id] = mutex
+	mutex:lock()
+	local timer = mutex:unlockAfter(10000)
 
 	member:setVoiceChannel(newChannel.id)
 
@@ -136,13 +138,9 @@ local function lobbyJoin (member, lobby)
 	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
 	if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(newChannel)) end
 
-	processing[newChannel.id]:unlock()
-	processing[newChannel.id] = nil
-end
-
-local function reset (channel, member, mutex)
-	logger:log(4, "GUILD %s LOBBY %s USER %s: processing timeout", channel.guild.id, channel.id, member.user.id)
 	mutex:unlock()
+	Timer.clearTimeout(timer)
+	queue[newChannel.id] = nil
 end
 
 return function (member, lobby)
@@ -155,9 +153,9 @@ return function (member, lobby)
 	end
 
 	lobbyData.mutex:lock()
-	local timeout = timer.setTimeout(10000, reset, lobby, member, lobbyData.mutex)
+	local timer = lobbyData.mutex:unlockAfter(10000)
 	local ok, err = xpcall(lobbyJoin, debug.traceback, member, lobby)
-	timer.clearTimeout(timeout)
+	Timer.clearTimeout(timer)
 	lobbyData.mutex:unlock()
 	if not ok then error(string.format('failed to process a user %s joining lobby "%s"\n%s', member.user.id, lobby.id, err)) end
 end
