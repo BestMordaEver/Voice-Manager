@@ -4,8 +4,7 @@ local embed = require "embeds/embed"
 
 local lobbies = require "storage/lobbies"
 
-local tps = require "channelHandlers/truePositionSort"
-
+local tps = require "utils/truePositionSort"
 local channelType = require "discordia".enums.channelType
 local blurple = embed.colors.blurple
 local insert = table.insert

@@ -8,7 +8,10 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
-local channelHandler = require "handlers/channelHandler"
+local handleTemplate = require "channelHandlers/handleTemplate"
+local adjustPermissions = require "channelHandlers/adjustPermissions"
+local checkHostPermissions = require "channelHandlers/checkHostPermissions"
+
 local passwordModal = require "utils/components".passwordModal
 local ratelimiter = require "utils/ratelimiter"
 
@@ -47,7 +50,7 @@ subcommands = {
 		local success, err
 
 		if template and template:match("%%rename.-%%") then
-			success, err = channel:setName(channelHandler.handleTemplate(template, interaction.member or channel.guild:getMember(interaction.user), channelData.position, name))
+			success, err = channel:setName(handleTemplate(template, interaction.member or channel.guild:getMember(interaction.user), channelData.position, name))
 		else
 			success, err = channel:setName(name)
 		end
@@ -109,7 +112,7 @@ subcommands = {
 			channelData:setHost(newHost.user.id)
 
 			if channelData.parent then
-				channelHandler.adjustPermissions(voiceChannel, newHost, interaction.member)
+				adjustPermissions(voiceChannel, newHost, interaction.member)
 			end
 
 			return "Promoted a new host", okEmbed(interaction, "hostConfirm", newHost.user.mentionString)
@@ -454,7 +457,7 @@ subcommands = {
 
 	invite = function (interaction, voiceChannel, user)
 		local tryReservation = channels[voiceChannel.id].host == interaction.user.id and
-			channelHandler.checkHostPermissions(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
+			checkHostPermissions(interaction.member or voiceChannel.guild:getMember(interaction.user), voiceChannel, "moderate")
 		local invite = voiceChannel:createInvite()
 
 		if not invite then
@@ -549,7 +552,7 @@ return function (interaction, subcommand, argument)
 	if noAdmin[subcommand] or member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, voiceChannel, argument)
 	elseif channels[voiceChannel.id].host == interaction.user.id then
-		if channelHandler.checkHostPermissions(member, voiceChannel, subcommand) then
+		if checkHostPermissions(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end
 		return "Insufficient permissions", warningEmbed(interaction, "badHostPermission")
