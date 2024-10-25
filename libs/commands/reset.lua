@@ -4,7 +4,7 @@ local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
 
-local checkPermissions = require "handlers/channelHandler".checkPermissions
+local checkPermissions = require "channelHandlers/checkPermissions"
 
 local commands = {
 	lobby = require "commands/lobby",

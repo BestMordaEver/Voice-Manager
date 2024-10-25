@@ -1,7 +1,7 @@
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
-local checkPermissions = require "handlers/channelHandler".checkPermissions
+local checkPermissions = require "channelHandlers/checkPermissions"
 
 return function (interaction)
 	local options = interaction.options

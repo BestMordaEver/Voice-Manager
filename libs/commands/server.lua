@@ -7,7 +7,7 @@ local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
-local checkPermissions = require "handlers/channelHandler".checkPermissions
+local checkPermissions = require "channelHandlers/checkPermissions"
 
 local subcommands = {
 	role = function (interaction, action)

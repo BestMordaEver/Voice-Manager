@@ -4,7 +4,7 @@ local embed = require "embeds/embed"
 
 local lobbies = require "storage/lobbies"
 
-local tps = require "handlers/channelHandler".truePositionSort
+local tps = require "channelHandlers/truePositionSort"
 local blurple = embed.colors.blurple
 local insert = table.insert
 

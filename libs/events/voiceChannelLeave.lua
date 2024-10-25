@@ -1,81 +1,23 @@
-local timer = require "timer"
-
-local client = require "client"
-local logger = require "logger"
-
 local channels = require "storage/channels"
 
-local adjustPermissions = require "handlers/channelHandler".adjustPermissions
-
-local permission = require "discordia".enums.permission
-local overwriteType = require "discordia".enums.overwriteType
-
-local function reset (channel, mutex)
-	logger:log(4, "GUILD %s LOBBY %s: delete timeout", channel.guild.id, channel.id)
-	mutex:unlock()
-end
+local roomEmpty = require "channelHandlers/roomEmpty"
+local roomReset = require "channelHandlers/roomReset"
+local passwordCompleted = require "channelHandlers/passwordCompleted"
+local memberLeft = require "channelHandlers/memberLeft"
 
 return function (member, channel) -- now remove the unwanted corpses!
 	local channelData = channel and channels[channel.id]
 	if channelData then
-		local guild = channel.guild
 		if #channel.connectedMembers == 0 then
 			if channelData.parentType == 0 then
-				local parent = channelData.parent
-				if parent and parent.mutex then
-					parent.mutex:lock()
-					local timeout = timer.setTimeout(10000, reset, parent, parent.mutex)
-					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: deleted", guild.id, channel.id)
-					timer.clearTimeout(timeout)
-					parent.mutex:unlock()
-				else
-					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: deleted without sync, parent missing", guild.id, channel.id)
-				end
+				roomEmpty(channel)
 			elseif channelData.parentType == 3 then
-				if channelData.parent then
-					local parent = client:getChannel(channelData.parent.id)
-					if parent then
-						local overwrite = parent:getPermissionOverwriteFor(member)
-						if not (overwrite:getAllowedPermissions():has(permission.connect) or overwrite:getDeniedPermissions():has(permission.sendMessages)) then
-							overwrite:clearPermissions(permission.connect)
-						end
-					end
-					channel:delete()
-					logger:log(4, "GUILD %s ROOM %s: finished password flow", guild.id, channel.id)
-				end
+				passwordCompleted(channel, member)
 			else
-				channelData:delete()
-				if channelData.parent then
-					local perms = channelData.parent.permissions:toDiscordia()
-					if #perms ~= 0 and guild.me:getPermissions(channel):has(permission.manageRoles, table.unpack(perms)) then
-						for _, permissionOverwrite in pairs(channel.permissionOverwrites) do
-							if permissionOverwrite.type == overwriteType.member then permissionOverwrite:delete() end
-						end
-					end
-				end
-				logger:log(4, "GUILD %s CHANNEL %s: reset", guild.id, channel.id)
+				roomReset(channel)
 			end
 		else
-			if not channelData then return end
-			local companion = client:getChannel(channelData.companion)
-			if companion then
-				companion:getPermissionOverwriteFor(member):clearPermissions(permission.readMessages)
-			end
-
-			if channelData.host == member.user.id then
-				local newHost = channel.connectedMembers:random()
-
-				if newHost then
-					logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", guild.id, channel.id, member.user.id, newHost.user.id)
-					channelData:setHost(newHost.user.id)
-
-					if channelData.parent then
-						adjustPermissions(channel, newHost, member)
-					end
-				end
-			end
+			memberLeft(channel, member)
 		end
 	end
 end

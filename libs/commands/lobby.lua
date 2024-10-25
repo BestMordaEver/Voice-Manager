@@ -8,7 +8,7 @@ local warningEmbed = require "embeds/warning"
 local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
 
 local botPermissions = require "utils/botPermissions"
-local checkPermissions = require "handlers/channelHandler".checkPermissions
+local checkPermissions = require "channelHandlers/checkPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local tierRate = {[0] = 96,128,256,384}
