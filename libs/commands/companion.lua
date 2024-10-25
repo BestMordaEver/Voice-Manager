@@ -10,7 +10,7 @@ local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
 local checkPermissions = require "handlers/channelHandler".checkPermissions
-local greetingComponents = require "handlers/componentHandler".greetingComponents
+local greetingComponents = require "utils/components".greetingComponents
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local subcommands

@@ -5,7 +5,7 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
 local channelHandler = require "handlers/channelHandler"
-local buttons = require "handlers/componentHandler".deleteButtons
+local buttons = require "utils/components".deleteButtons
 
 local interactionType = require "discordia".enums.interactionType
 

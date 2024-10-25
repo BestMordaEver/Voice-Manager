@@ -1,6 +1,6 @@
 local client = require "client"
 local locale = require "locale/runtime/localeHandler"
-local embedHandler = require "handlers/embedHandler"
+local embed = require "embeds/embed"
 
 local channels = require "storage/channels"
 
@@ -9,7 +9,7 @@ local availableCommands = require "embeds/availableCommands"
 local enums = require "discordia".enums
 local permission = enums.permission
 local overwriteType = enums.overwriteType
-local blurple = embedHandler.colors.blurple
+local blurple = embed.colors.blurple
 
 local lines = {
 	voice = {
@@ -81,7 +81,7 @@ local function liner (loc, channel, rolePO, type, perm)
 	return field
 end
 
-return embedHandler("roomInfo", function (interaction, room, ephemeral)
+return embed("roomInfo", function (interaction, room, ephemeral)
 	local companion = client:getChannel(channels[room.id].companion)
 	local role = channels[room.id].parent and client:getRole(channels[room.id].parent.roles:random()) or room.guild.defaultRole
 	local roomPO = room:getPermissionOverwriteFor(role)

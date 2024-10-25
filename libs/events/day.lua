@@ -1,7 +1,7 @@
 local client = require "client"
 local config = require "config"
 
-local stats = require "handlers/storageHandler".stats
+local stats = require "storage/handler".stats
 
 return function ()
 

@@ -1,11 +1,11 @@
 local locale = require "locale/runtime/localeHandler"
-local embedHandler = require "handlers/embedHandler"
-local buttons = require "handlers/componentHandler".helpButtons
+local embed = require "embeds/embed"
+local buttons = require "utils/components".helpButtons
 
-local blurple = embedHandler.colors.blurple
+local blurple = embed.colors.blurple
 local insert, copy = table.insert, table.deepcopy
 
-return embedHandler("help", function (interaction, page, ephemeral)
+return embed("help", function (interaction, page, ephemeral)
 
 	local embed = copy(locale(interaction.locale, "help")[page])
 	embed.color = blurple

@@ -45,12 +45,12 @@ package.loaded.logger = discordia.Logger(6, '%F %T')
 
 local config = require "config"
 
-local storage = require "handlers/storageHandler"
+local storage = require "storage/handler"
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local status = require "handlers/statusHandler"
+local status = require "utils/status"
 local safeEvent = require "utils/safeEvent"
 
 -- pre-load db

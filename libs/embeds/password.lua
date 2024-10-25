@@ -1,10 +1,10 @@
 local locale = require "locale/runtime/localeHandler"
-local embedHandler = require "handlers/embedHandler"
+local embed = require "embeds/embed"
 
-local passwordButton = require "handlers/componentHandler".passwordInputButton
-local blurple = embedHandler.colors.blurple
+local passwordButton = require "utils/components".passwordInputButton
+local blurple = embed.colors.blurple
 
-return embedHandler("password", function (interaction, channel)
+return embed("password", function (interaction, channel)
 	return {
 		ephemeral = true,
 		embeds = {

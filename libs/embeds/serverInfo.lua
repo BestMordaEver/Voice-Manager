@@ -1,11 +1,11 @@
 local locale = require "locale/runtime/localeHandler"
-local embedHandler = require "handlers/embedHandler"
+local embed = require "embeds/embed"
 
 local guilds = require "storage/guilds"
 
-local blurple = embedHandler.colors.blurple
+local blurple = embed.colors.blurple
 
-return embedHandler("serverInfo", function (interaction, ephemeral)
+return embed("serverInfo", function (interaction, ephemeral)
 	local guild = interaction.guild
 	local guildData = guilds[guild.id]
 

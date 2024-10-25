@@ -9,7 +9,7 @@ local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
 local channelHandler = require "handlers/channelHandler"
-local passwordModal = require "handlers/componentHandler".passwordModal
+local passwordModal = require "utils/components".passwordModal
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission

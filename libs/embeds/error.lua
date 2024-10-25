@@ -1,9 +1,9 @@
 local locale = require "locale/runtime/localeHandler"
-local embedHandler = require "handlers/embedHandler"
+local embed = require "embeds/embed"
 
-local red = embedHandler.colors.red
+local red = embed.colors.red
 
-return embedHandler("error", function (interaction)
+return embed("error", function (interaction)
 	local errorReactions = locale(interaction.locale, "errorReaction")
 	return {embeds = {{
 		title = locale(interaction.locale, "embedError"),

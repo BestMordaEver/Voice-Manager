@@ -1,15 +1,15 @@
 local locale = require "locale/runtime/localeHandler"
 local client = require "client"
-local embedHandler = require "handlers/embedHandler"
+local embed = require "embeds/embed"
 
 local channels = require "storage/channels"
-local roomButtons = require "handlers/componentHandler".roomButtons
+local roomButtons = require "utils/components".roomButtons
 
 local availableCommands = require "embeds/availableCommands"
 
-local fuchsia = embedHandler.colors.fuchsia
+local fuchsia = embed.colors.fuchsia
 
-return embedHandler("greeting", function (room, ephemeral)
+return embed("greeting", function (room, ephemeral)
 	local channelData = channels[room.id]
 	if not channelData then return end
 
