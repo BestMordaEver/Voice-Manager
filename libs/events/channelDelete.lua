@@ -33,7 +33,7 @@ return function (channel) -- and make sure there are no traces!
 				end
 			end
 
-			companion:delete()
+			if channel ~= companion then companion:delete() end
 		end
 		channelData:delete()
 	end

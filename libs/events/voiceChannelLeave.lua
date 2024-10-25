@@ -1,3 +1,5 @@
+local timer = require "timer"
+
 local client = require "client"
 local logger = require "logger"
 
@@ -8,6 +10,11 @@ local adjustPermissions = require "handlers/channelHandler".adjustPermissions
 local permission = require "discordia".enums.permission
 local overwriteType = require "discordia".enums.overwriteType
 
+local function reset (channel, mutex)
+	logger:log(4, "GUILD %s LOBBY %s: delete timeout", channel.guild.id, channel.id)
+	mutex:unlock()
+end
+
 return function (member, channel) -- now remove the unwanted corpses!
 	local channelData = channel and channels[channel.id]
 	if channelData then
@@ -17,8 +24,10 @@ return function (member, channel) -- now remove the unwanted corpses!
 				local parent = channelData.parent
 				if parent and parent.mutex then
 					parent.mutex:lock()
+					local timeout = timer.setTimeout(10000, reset, parent, parent.mutex)
 					channel:delete()
 					logger:log(4, "GUILD %s ROOM %s: deleted", guild.id, channel.id)
+					timer.clearTimeout(timeout)
 					parent.mutex:unlock()
 				else
 					channel:delete()

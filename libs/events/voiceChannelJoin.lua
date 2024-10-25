@@ -1,3 +1,5 @@
+local timer = require "timer"
+
 local discordia = require "discordia"
 local client = require "client"
 local logger = require "logger"
@@ -240,6 +242,11 @@ local function channelJoin (member, channel)
 	end
 end
 
+local function reset (channel, mutex)
+	logger:log(4, "GUILD %s LOBBY %s: processing timeout", channel.guild.id, channel.id)
+	mutex:unlock()
+end
+
 return function (member, channel)
 	if channel then
 		local processMutex = processing[channel.id]
@@ -260,7 +267,9 @@ return function (member, channel)
 				end
 
 				lobbyData.mutex:lock()
+				local timeout = timer.setTimeout(10000, reset, channel, lobbyData.mutex)
 				local ok, err = xpcall(lobbyJoin, debug.traceback, member, channel)
+				timer.clearTimeout(timeout)
 				lobbyData.mutex:unlock()
 				if not ok then error(string.format('failed to process a user %s joining lobby "%s"\n%s', member.user.id, channel.id, err)) end
 			end
