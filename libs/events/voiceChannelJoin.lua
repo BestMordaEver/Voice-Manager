@@ -4,13 +4,13 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
+local queue = {}
+package.loaded.channelQueue = queue
+
 local lobbyJoin = require "channelHandlers/lobbyJoin"
 local matchmakingJoin = require "channelHandlers/matchmakingJoin"
 local roomJoin = require "channelHandlers/roomJoin"
 local channelJoin = require "channelHandlers/channelJoin"
-
-local queue = {}
-package.loaded.channelQueue = queue
 
 return function (member, channel)
 	if channel then
