@@ -11,7 +11,7 @@ local channels = require "storage/channels"
 local greetingEmbed = require "embeds/greeting"
 local warningEmbed = require "embeds/warning"
 
-local adjustPermissions = require "channelHandlers/adjustPermissions"
+local adjustHostPermissions = require "channelHandlers/adjustHostPermissions"
 local handleTemplate = require "channelHandlers/handleTemplate"
 
 local Overseer = require "utils/logWriter"
@@ -121,7 +121,7 @@ local function lobbyJoin (member, lobby)
 	lobbyData:attachChild(channels[newChannel.id], position)
 
 	newChannel:getPermissionOverwriteFor(guild.me):allowPermissions(permission.connect, permission.readMessages)
-	adjustPermissions(newChannel, member)
+	adjustHostPermissions(newChannel, member)
 
 	if companion then
 		-- companions are private by default

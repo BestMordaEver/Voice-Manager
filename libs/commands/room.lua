@@ -9,7 +9,7 @@ local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
 local handleTemplate = require "channelHandlers/handleTemplate"
-local adjustPermissions = require "channelHandlers/adjustPermissions"
+local adjustHostPermissions = require "channelHandlers/adjustHostPermissions"
 local checkHostPermissions = require "channelHandlers/checkHostPermissions"
 
 local passwordModal = require "utils/components".passwordModal
@@ -112,7 +112,7 @@ subcommands = {
 			channelData:setHost(newHost.user.id)
 
 			if channelData.parent then
-				adjustPermissions(voiceChannel, newHost, interaction.member)
+				adjustHostPermissions(voiceChannel, newHost, interaction.member)
 			end
 
 			return "Promoted a new host", okEmbed(interaction, "hostConfirm", newHost.user.mentionString)

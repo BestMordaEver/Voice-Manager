@@ -2,7 +2,7 @@ local client = require "client"
 local logger = require "logger"
 
 local channels = require "storage/channels"
-local adjustPermissions = require "channelHandlers/adjustPermissions"
+local adjustHostPermissions = require "channelHandlers/adjustHostPermissions"
 
 local permission = require "discordia".enums.permission
 
@@ -25,6 +25,6 @@ return function (channel, member)
 	logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", guild.id, channel.id, member.user.id, newHost.user.id)
 
 	if channelData.parent then
-		adjustPermissions(channel, newHost, member)
+		adjustHostPermissions(channel, newHost, member)
 	end
 end
