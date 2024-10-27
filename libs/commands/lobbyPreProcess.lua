@@ -1,7 +1,7 @@
 local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 
 local soloArged = {add = true, remove = true, enable = true, disable = true}
 
@@ -11,7 +11,7 @@ return function (interaction, embed)
 	local channel = (options.lobby or options.channel or interaction.option.option.options.lobby).value
 
 	if soloArged[subcommand] or #options > 1 then
-		local isPermitted, logMsg, userMsg = checkPermissions(interaction, channel)
+		local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, channel)
 		if not isPermitted then
 			return logMsg, warningEmbed(interaction, userMsg)
 		end

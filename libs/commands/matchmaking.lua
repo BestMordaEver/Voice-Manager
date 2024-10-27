@@ -5,7 +5,7 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local matchmakingInfoEmbed = require "embeds/matchmakingInfo"
 
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType
@@ -36,7 +36,7 @@ local subcommands = {
 				return "Selected target is not lobby or category", warningEmbed(interaction, "notLobby")
 			end
 
-			local isPermitted, logMsg, msg = checkPermissions(interaction, target)
+			local isPermitted, logMsg, msg = checkSetupPermissions(interaction, target)
 			if isPermitted then
 				lobbies[channel.id]:setTarget(target.id)
 				return "Lobby target set", okEmbed(interaction, "targetConfirm", target.name)

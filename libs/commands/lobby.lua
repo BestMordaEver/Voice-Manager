@@ -8,7 +8,7 @@ local warningEmbed = require "embeds/warning"
 local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
 
 local botPermissions = require "utils/botPermissions"
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local tierRate = {[0] = 96,128,256,384}
@@ -37,7 +37,7 @@ local subcommands = {
 
 	category = function (interaction, channel, category)
 		if category then
-			local isPermitted, logMsg, msg = checkPermissions(interaction, category)
+			local isPermitted, logMsg, msg = checkSetupPermissions(interaction, category)
 			if isPermitted then
 				lobbies[channel.id]:setTarget(category.id)
 				return "Lobby target category set", okEmbed(interaction, "categoryConfirm", category.name)

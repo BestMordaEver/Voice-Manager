@@ -1,14 +1,14 @@
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 
 return function (interaction)
 	local options = interaction.options
 	local source, amount = options.source.value, options.amount.value
 	local category, name = source.category, options.name and options.name.value or source.name
 
-	local isPermitted, logMsg, userMsg = checkPermissions(interaction, category)
+	local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, category)
 	if not isPermitted then
 		return logMsg, warningEmbed(interaction, userMsg)
 	end

@@ -4,7 +4,7 @@ local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
 
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 
 local commands = {
 	lobby = require "commands/lobby",
@@ -30,7 +30,7 @@ return function (interaction)
 		local lobby = interaction.option.option.option.value
 		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(interaction, "notLobby") end
 
-		local isPermitted, logMsg, userMsg = checkPermissions(interaction, lobby)
+		local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, lobby)
 		if not isPermitted then
 			return logMsg, warningEmbed(interaction, userMsg)
 		end

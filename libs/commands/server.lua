@@ -7,7 +7,7 @@ local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
-local checkPermissions = require "channelHandlers/checkPermissions"
+local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
 
 local subcommands = {
 	role = function (interaction, action)
@@ -76,7 +76,7 @@ return function (interaction, subcommand, argument)
 		return "Sent server info", serverInfoEmbed(interaction)
 	end
 
-	local isPermitted, logMsg, userMsg = checkPermissions(interaction)
+	local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction)
 	if not isPermitted then
 		return logMsg, warningEmbed(interaction, userMsg)
 	end
