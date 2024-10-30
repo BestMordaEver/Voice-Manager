@@ -13,7 +13,7 @@ local commands = {
 	server = "server",
 	shutdown = "shutdown",
 	invite = "invite",
-	support = "invite",
+	support = "support",
 	users = "users",
 	Invite = "Invite"
 }
