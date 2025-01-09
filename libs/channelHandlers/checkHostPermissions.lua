@@ -1,3 +1,5 @@
+local channels = require "storage/channels"
+
 local requiredPerms = {
 	bitrate = {manage = true},
 	rename = {manage = true},
@@ -16,7 +18,7 @@ local requiredPerms = {
 }
 
 return function (member, channel, permissionName)
-	local permissions = channels[channel.id].parent.permissions
+	local permissions = channels[channel.id].parent and channels[channel.id].parent.permissions
 	if not permissions then return false end
 	if channels[channel.id].host ~= member.user.id then return false end
 
