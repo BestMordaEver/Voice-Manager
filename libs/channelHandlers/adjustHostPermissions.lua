@@ -3,9 +3,13 @@ local channels = require "storage/channels"
 local permission = require "discordia".enums.permission
 
 return function (channel, newHost, oldHost)
-    if not channel or not channels[channel.id] then return end
+    if not channel then return end
 
-    local lobbyData = channels[channel.id].parent
+    local channelData = channels[channel.id]
+    if not channelData then return end
+
+    local lobbyData = channelData.parent
+    if not lobbyData then return end
 
     local perms, isAdmin, needsManage =
     lobbyData.permissions:toDiscordia(),
@@ -22,7 +26,7 @@ return function (channel, newHost, oldHost)
         if oldHost then channel:getPermissionOverwriteFor(oldHost):clearPermissions(permission.manageRoles) end
     end
 
-    local companion = client:getChannel(channels[channel.id].companion)
+    local companion = client:getChannel(channelData.companion)
     if not companion then return end
 
     companion:getPermissionOverwriteFor(newHost):allowPermissions(table.unpack(perms))

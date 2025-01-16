@@ -8,7 +8,7 @@ return function (interaction, channel)
 
 	if config.owners[interaction.user.id] then return true end
 
-	if channel.permissions and channel.permissions:has(permission.manageChannels)
+	if channel and channel.permissions and channel.permissions:has(permission.manageChannels)
 			or
 		(interaction.member or channel.guild:getMember(interaction.user)):hasPermission(channel, permission.manageChannels) then
 		return true
