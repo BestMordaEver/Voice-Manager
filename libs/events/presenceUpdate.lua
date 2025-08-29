@@ -3,7 +3,7 @@ local client = require "client"
 local channels = require "storage/channels"
 
 local ratelimiter = require "utils/ratelimiter"
-local handleTemplate = require "channelHandlers/handleTemplate"
+local handleTemplate = require "channelUtils/handleTemplate"
 
 local awaiting = {}
 

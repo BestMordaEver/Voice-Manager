@@ -5,7 +5,7 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local matchmakingInfoEmbed = require "embeds/matchmakingInfo"
 
-local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
+local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType

@@ -8,9 +8,9 @@ local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 local roomInfoEmbed = require "embeds/roomInfo"
 
-local handleTemplate = require "channelHandlers/handleTemplate"
-local adjustHostPermissions = require "channelHandlers/adjustHostPermissions"
-local checkHostPermissions = require "channelHandlers/checkHostPermissions"
+local handleTemplate = require "channelUtils/handleTemplate"
+local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
+local checkHostPermissions = require "channelUtils/checkHostPermissions"
 
 local passwordModal = require "utils/components".passwordModal
 local ratelimiter = require "utils/ratelimiter"

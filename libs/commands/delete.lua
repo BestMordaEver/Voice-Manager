@@ -4,7 +4,7 @@ local locale = require "locale/runtime/localeHandler"
 local okEmbed = require "embeds/ok"
 local warningEmbed = require "embeds/warning"
 
-local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
+local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local truePositionSort = require "utils/truePositionSort"
 local buttons = require "utils/components".deleteButtons
 

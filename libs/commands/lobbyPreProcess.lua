@@ -1,7 +1,7 @@
 local lobbies = require "storage/lobbies"
 
 local warningEmbed = require "embeds/warning"
-local checkSetupPermissions = require "channelHandlers/checkSetupPermissions"
+local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
 local soloArged = {add = true, remove = true, enable = true, disable = true}
 
