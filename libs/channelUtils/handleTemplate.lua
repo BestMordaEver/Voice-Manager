@@ -6,7 +6,7 @@ return function (template, member, position, replacement)
 		(member.streaming and member.streaming.name) or
 		(member.competing and member.competing.name) or
 		template:match("%%game%((.-)%)%%") or "no game"
-	local standin = template:match("%%rename%((.-)%)%%") or ""
+	local standin = replacement or template:match("%%rename%((.-)%)%%") or ""
 
 	template = template:gsub("%%game%(.-%)%%", game:demagic()):gsub("%%rename%(.-%)%%", standin:demagic())
 
