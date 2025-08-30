@@ -6,7 +6,6 @@ local interactionType = require "discordia".enums.interactionType
 local lobbies = require "storage/lobbies"
 
 local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
 local companionsInfoEmbed = require "embeds/companionsInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
@@ -31,13 +30,13 @@ subcommands = {
 			return "Companion target category reset", okEmbed(interaction, "categoryReset")
 		end
 
-		local isPermitted, logMsg, msg = checkSetupPermissions(interaction, category)
-		if isPermitted then
+		local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+		if ok then
 			lobbies[channel.id]:setCompanionTarget(category.id)
 			return "Companion target category set", okEmbed(interaction, "categoryConfirm", category.name)
 		end
 
-		return logMsg, warningEmbed(interaction, msg)
+		return logMsg, embed
 	end,
 
 	name = function (interaction, channel, name)
@@ -69,13 +68,13 @@ subcommands = {
 
 	log = function (interaction, channel, logChannel)
 		if logChannel then
-			local isPermitted, logMsg, msg = checkSetupPermissions(interaction, logChannel)
-			if isPermitted then
+			local ok, logMsg, embed = checkSetupPermissions(interaction, logChannel)
+			if ok then
 				lobbies[channel.id]:setCompanionLog(logChannel.id)
 				return "Companion log channel set", okEmbed(interaction, "logConfirm", logChannel.name)
 			end
 
-			return logMsg, warningEmbed(interaction, msg)
+			return logMsg, embed
 		end
 
 		lobbies[channel.id]:setCompanionLog()

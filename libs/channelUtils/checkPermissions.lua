@@ -6,7 +6,7 @@ local permission = require "discordia".enums.permission
 return function (member, channel, ...)
 	local permissions = member:getPermissions(channel)
 	if channel and channel.permissions then permissions = channel.permissions end
-	if permissions:has(permission.amdinistrator) then return true end
+	if permissions:has(permission.administrator) then return true end
 
 	local missingPermissions = {}
 

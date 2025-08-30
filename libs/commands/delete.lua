@@ -27,9 +27,9 @@ return function (interaction, action, argument)
 		local name = options.name and options.name.value
 		local only_empty = options.only_empty and options.only_empty.value
 
-		local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, category)
-		if not isPermitted then
-			return logMsg, warningEmbed(interaction, userMsg)
+		local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+		if not ok then
+			return logMsg, embed
 		end
 
 		---@diagnostic disable-next-line: undefined-field

@@ -8,9 +8,9 @@ return function (interaction)
 	local source, amount = options.source.value, options.amount.value
 	local category, name = source.category, options.name and options.name.value or source.name
 
-	local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, category)
-	if not isPermitted then
-		return logMsg, warningEmbed(interaction, userMsg)
+	local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+	if not ok then
+		return logMsg, embed -- TODO: server-wide ignore warnings?
 	end
 
 	if category and #category.textChannels + #category.voiceChannels + amount > 50 then

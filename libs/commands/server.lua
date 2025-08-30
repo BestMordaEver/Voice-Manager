@@ -3,7 +3,6 @@ local client = require "client"
 local guilds = require "storage/guilds"
 
 local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
 local serverInfoEmbed = require "embeds/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
@@ -76,9 +75,9 @@ return function (interaction, subcommand, argument)
 		return "Sent server info", serverInfoEmbed(interaction)
 	end
 
-	local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction)
+	local isPermitted, logMsg, embed = checkSetupPermissions(interaction)
 	if not isPermitted then
-		return logMsg, warningEmbed(interaction, userMsg)
+		return logMsg, embed
 	end
 
 	return subcommands[subcommand](interaction, argument)

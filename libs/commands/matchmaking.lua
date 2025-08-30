@@ -36,13 +36,13 @@ local subcommands = {
 				return "Selected target is not lobby or category", warningEmbed(interaction, "notLobby")
 			end
 
-			local isPermitted, logMsg, msg = checkSetupPermissions(interaction, target)
-			if isPermitted then
+			local ok, logMsg, embed = checkSetupPermissions(interaction, target)
+			if ok then
 				lobbies[channel.id]:setTarget(target.id)
 				return "Lobby target set", okEmbed(interaction, "targetConfirm", target.name)
 			end
 
-			return logMsg, warningEmbed(interaction, msg)
+			return logMsg, embed
 		end
 
 		lobbies[channel.id]:setTarget()

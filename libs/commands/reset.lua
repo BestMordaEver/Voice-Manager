@@ -30,9 +30,9 @@ return function (interaction)
 		local lobby = interaction.option.option.option.value
 		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(interaction, "notLobby") end
 
-		local isPermitted, logMsg, userMsg = checkSetupPermissions(interaction, lobby)
-		if not isPermitted then
-			return logMsg, warningEmbed(interaction, userMsg)
+		local ok, logMsg, embed = checkSetupPermissions(interaction, lobby)
+		if not ok then
+			return logMsg, embed
 		end
 
 		return commands[command](interaction, subcommand)

@@ -37,13 +37,13 @@ local subcommands = {
 
 	category = function (interaction, channel, category)
 		if category then
-			local isPermitted, logMsg, msg = checkSetupPermissions(interaction, category)
-			if isPermitted then
+			local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+			if ok then
 				lobbies[channel.id]:setTarget(category.id)
 				return "Lobby target category set", okEmbed(interaction, "categoryConfirm", category.name)
 			end
 
-			return logMsg, warningEmbed(interaction, msg)
+			return logMsg, embed
 		end
 
 		lobbies[channel.id]:setTarget()
