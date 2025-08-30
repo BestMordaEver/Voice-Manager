@@ -1,4 +1,4 @@
-local helpEmbed = require "embeds/help"
+local helpEmbed = require "response/help"
 
 return function (interaction, page)
 	if page then

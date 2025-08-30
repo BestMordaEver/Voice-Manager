@@ -3,8 +3,8 @@ local locale = require "locale/runtime/localeHandler"
 
 local lobbies = require "storage/lobbies"
 
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
 
 local channelType = require "discordia".enums.channelType
 local insert = table.insert

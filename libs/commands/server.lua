@@ -2,8 +2,8 @@ local client = require "client"
 
 local guilds = require "storage/guilds"
 
-local okEmbed = require "embeds/ok"
-local serverInfoEmbed = require "embeds/serverInfo"
+local okEmbed = require "response/ok"
+local serverInfoEmbed = require "response/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"

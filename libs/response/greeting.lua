@@ -1,11 +1,11 @@
 local locale = require "locale/runtime/localeHandler"
 local client = require "client"
-local embed = require "embeds/embed"
+local embed = require "response/embed"
 
 local channels = require "storage/channels"
 local roomButtons = require "utils/components".roomButtons
 
-local availableCommands = require "embeds/availableCommands"
+local availableCommands = require "response/availableCommands"
 
 local fuchsia = embed.colors.fuchsia
 

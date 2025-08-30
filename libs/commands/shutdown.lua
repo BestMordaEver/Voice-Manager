@@ -2,7 +2,7 @@ local client = require "client"
 local clock = require "clock"
 local logger = require "logger"
 local config = require "config"
-local warningEmbed = require "embeds/warning"
+local warningEmbed = require "response/warning"
 
 return function (interaction)
 	if interaction then

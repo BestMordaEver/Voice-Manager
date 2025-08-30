@@ -4,9 +4,9 @@ local config = require "config"
 
 local channels = require "storage/channels"
 
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
-local roomInfoEmbed = require "embeds/roomInfo"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
+local roomInfoEmbed = require "response/roomInfo"
 
 local handleTemplate = require "channelUtils/handleTemplate"
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"

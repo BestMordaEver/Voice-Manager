@@ -2,7 +2,7 @@ local logger = require "logger"
 
 local commands = require "commands/init"
 
-local errorEmbed = require "embeds/error"
+local errorEmbed = require "response/error"
 
 local insert, concat = table.insert, table.concat
 

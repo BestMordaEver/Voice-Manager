@@ -1,6 +1,6 @@
 local lobbies = require "storage/lobbies"
 
-local warningEmbed = require "embeds/warning"
+local warningEmbed = require "response/warning"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
 return function (interaction, embed)

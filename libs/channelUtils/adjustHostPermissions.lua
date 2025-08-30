@@ -2,7 +2,7 @@ local client = require "client"
 local channels = require "storage/channels"
 local adjustPermissions = require "channelUtils/adjustPermissions"
 
-local warningEmbed = require "embeds/warning"
+local warningEmbed = require "response/warning"
 
 return function (channel, newHost, oldHost)
     if not channel then return end

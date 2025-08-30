@@ -1,5 +1,5 @@
 local locale = require "locale/runtime/localeHandler"
-local embed = require "embeds/embed"
+local embed = require "response/embed"
 
 local passwordButton = require "utils/components".passwordInputButton
 local blurple = embed.colors.blurple

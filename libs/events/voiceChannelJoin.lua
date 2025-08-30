@@ -8,9 +8,9 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local greetingEmbed = require "embeds/greeting"
-local warningEmbed = require "embeds/warning"
-local passwordEmbed = require "embeds/password"
+local greetingEmbed = require "response/greeting"
+local warningEmbed = require "response/warning"
+local passwordEmbed = require "response/password"
 
 local matchmakers = require "utils/matchmakers"
 

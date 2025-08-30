@@ -1,5 +1,5 @@
 local locale = require "locale/runtime/localeHandler"
-local embed = require "embeds/embed"
+local embed = require "response/embed"
 
 local red = embed.colors.red
 

@@ -1,4 +1,4 @@
-local pingEmbed = require "embeds/ping"
+local pingEmbed = require "response/ping"
 local Date = require "discordia".Date
 
 return function (interaction)

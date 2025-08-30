@@ -1,7 +1,7 @@
 local permission = require "discordia".enums.permission
 local config = require "config"
 
-local warningEmbed = require "embeds/warning"
+local warningEmbed = require "response/warning"
 
 local checkBotPermissions = require "channelUtils/checkBotPermissions"
 local checkPermissions = require "channelUtils/checkPermissions"

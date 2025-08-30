@@ -3,9 +3,9 @@ local client = require "client"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
-local lobbiesInfoEmbed = require "embeds/lobbiesInfo"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
+local lobbiesInfoEmbed = require "response/lobbiesInfo"
 
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"

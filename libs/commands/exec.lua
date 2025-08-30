@@ -1,8 +1,8 @@
 local pp = require "pretty-print"
 local config = require "config"
 
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
 
 local sandbox = setmetatable({
 	client = require "client",

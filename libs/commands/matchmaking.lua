@@ -1,9 +1,9 @@
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
-local matchmakingInfoEmbed = require "embeds/matchmakingInfo"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
+local matchmakingInfoEmbed = require "response/matchmakingInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"

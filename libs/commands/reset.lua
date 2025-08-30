@@ -2,7 +2,7 @@ local config = require "config"
 
 local lobbies = require "storage/lobbies"
 
-local warningEmbed = require "embeds/warning"
+local warningEmbed = require "response/warning"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 

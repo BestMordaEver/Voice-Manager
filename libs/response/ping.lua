@@ -1,6 +1,6 @@
 local locale = require "locale/runtime/localeHandler"
 local client = require "client"
-local embed = require "embeds/embed"
+local embed = require "response/embed"
 
 local guilds = require "storage/guilds"
 local stats = require "storage/handler".stats

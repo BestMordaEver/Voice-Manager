@@ -5,8 +5,8 @@ local interactionType = require "discordia".enums.interactionType
 
 local lobbies = require "storage/lobbies"
 
-local okEmbed = require "embeds/ok"
-local companionsInfoEmbed = require "embeds/companionsInfo"
+local okEmbed = require "response/ok"
+local companionsInfoEmbed = require "response/companionsInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local greetingComponents = require "utils/components".greetingComponents

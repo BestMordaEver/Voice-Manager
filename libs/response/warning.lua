@@ -1,15 +1,15 @@
 local locale = require "locale/runtime/localeHandler"
-local embed = require "embeds/embed"
+local embed = require "response/embed"
 
-local green = embed.colors.green
+local yellow = embed.colors.yellow
 
 ---@overload fun(localeCarrier : table, line : textLine, ...? : string) : table
-local ok = embed("ok", function (localeCarrier, msg, ...)
+local warning = embed("warning", function (localeCarrier, msg, ...)
 	return {embeds = {{
-		title = locale(localeCarrier.locale, "embedOK"),
-		color = green,
+		title = locale(localeCarrier.locale, "embedWarning"),
+		color = yellow,
 		description = locale(localeCarrier.locale, msg, ...)
 	}}, ephemeral = true}
 end)
 
-return ok
+return warning

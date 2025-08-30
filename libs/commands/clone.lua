@@ -1,5 +1,5 @@
-local okEmbed = require "embeds/ok"
-local warningEmbed = require "embeds/warning"
+local okEmbed = require "response/ok"
+local warningEmbed = require "response/warning"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
