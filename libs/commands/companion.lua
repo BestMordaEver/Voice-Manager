@@ -6,6 +6,7 @@ local interactionType = require "discordia".enums.interactionType
 local lobbies = require "storage/lobbies"
 
 local okResponse = require "response/ok"
+local greetingSetupResponse = require "response/greetingSetup"
 local companionsInfoResponse = require "response/companionsInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
@@ -58,7 +59,7 @@ subcommands = {
 			return "Companion greeting set", okResponse(true, interaction.locale, "greetingConfirm")
 		end
 
-		interaction:createModal("companion_greetingwidget_"..channel.id, localeHandler(interaction.locale, "greetingModalTitle"), greetingComponents(interaction))
+		interaction:createModal(greetingSetupResponse(interaction.locale))
 		return "Sent greeting setup modal"
 	end,
 
