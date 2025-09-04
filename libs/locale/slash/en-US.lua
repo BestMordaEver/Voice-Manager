@@ -1,4 +1,4 @@
----@class (exact) locale
+---@class (exact) slashLocale
 return {
 	-- generic
 	add = "add",

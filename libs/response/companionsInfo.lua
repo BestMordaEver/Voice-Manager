@@ -1,21 +1,23 @@
-local locale = require "locale/runtime/localeHandler"
 local client = require "client"
-local embed = require "response/embed"
 
 local lobbies = require "storage/lobbies"
 
 local tps = require "utils/truePositionSort"
-
-local blurple = embed.colors.blurple
 local insert = table.insert
 
-return embed("companionsInfo", function (interaction, channel, ephemeral)
+local componentType = require "discordia".enums.componentType
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
+
+---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table
+local companionsInfo = response("companionsInfo", response.colors.blurple, function (locale, target)
 	local sortedLobbies
-	if channel then
-		sortedLobbies = {lobbies[channel.id]}
+	if target.guild then
+		sortedLobbies = {lobbies[target.id]}
+		target = target.guild
 	else
 		---@diagnostic disable-next-line: undefined-field
-		sortedLobbies = table.sorted(interaction.guild.voiceChannels:toArray(function(voiceChannel)
+		sortedLobbies = table.sorted(target.voiceChannels:toArray(function(voiceChannel)
 			return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget and not lobbies[voiceChannel.id].isMatchmaking
 		end), tps)
 		for i,lobby in ipairs(sortedLobbies) do
@@ -23,27 +25,39 @@ return embed("companionsInfo", function (interaction, channel, ephemeral)
 		end
 	end
 
-	local embed = {
-		title = locale(interaction.locale, "companionsInfoTitle", interaction.guild.name),
-		color = blurple,
-		description = #sortedLobbies == 0 and locale(interaction.locale, "companionsNoInfo") or nil,
-		fields = {}
+	local components = {
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "companionsInfoTitle", target.name)
+		}
 	}
 
-	for _, lobbyData in pairs(sortedLobbies) do
+	if #sortedLobbies == 0 then insert(components, {
+		type = componentType.textDisplay,
+		localeHandler(locale, "companionsNoInfo")
+	}) end
+
+	for _, lobbyData in ipairs(sortedLobbies) do
 		local target = client:getChannel(lobbyData.companionTarget)
 		local logChannel = client:getChannel(lobbyData.companionLog)
-		insert(embed.fields, {
-			name = client:getChannel(lobbyData.id).name,
-			value = locale(interaction.locale, "companionsField",
+
+		insert(components, {
+			type = componentType.textDisplay,
+			name = string.format("**%s**", client:getChannel(lobbyData.id).name)
+		})
+
+		insert(components, {
+			type = componentType.textDisplay,
+			name = localeHandler(locale, "companionsField",
 				target and target.name or "default",
 				lobbyData.companionTemplate or "private-chat",
-				logChannel and logChannel.name or locale(interaction.locale, "none"),
-				lobbyData.greeting or locale(interaction.locale, "none")
-			),
-			inline = true
+				logChannel and logChannel.name or localeHandler(locale, "none"),
+				lobbyData.greeting or localeHandler(locale, "none")
+			)
 		})
 	end
 
-	return {embeds = {embed}, ephemeral = ephemeral}
+	return components
 end)
+
+return companionsInfo

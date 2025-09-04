@@ -1,12 +1,11 @@
-local locale = require "locale/runtime/localeHandler"
-local embed = require "response/embed"
-
 local guilds = require "storage/guilds"
 
-local blurple = embed.colors.blurple
+local componentType = require "discordia".enums.componentType
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
 
-return embed("serverInfo", function (interaction, ephemeral)
-	local guild = interaction.guild
+---@overload fun(ephemeral : boolean, locale : localeName, guild : Guild) : table
+local serverInfo = response("serverInfo", response.colors.blurple, function (locale, guild)
 	local guildData = guilds[guild.id]
 
 	local roles = {}
@@ -18,18 +17,23 @@ return embed("serverInfo", function (interaction, ephemeral)
 			guildData:removeRole(roleID)
 		end
 	end
-	if #roles == 0 then roles[1] = locale(interaction.locale, "none") end
+	if #roles == 0 then roles[1] = localeHandler(locale, "none") end
 
-	return {embeds = {{
-		title = locale(interaction.locale, "serverInfoTitle", guild.name),
-		color = blurple,
-		description = locale(interaction.locale, "serverInfo",
-			guildData.permissions,
-			table.concat(roles, " "),
-			#guildData.lobbies,
-			guildData:users(),
-			guildData:channels(),
-			guildData.limit
-		)
-	}}, ephemeral = ephemeral}
+	return {
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "serverInfoTitle", guild.name)
+		},{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "serverInfo",
+				guildData.permissions,
+				table.concat(roles, " "),
+				#guildData.lobbies,
+				guildData:users(),
+				guildData:channels(),
+				guildData.limit)
+		}
+	}
 end)
+
+return serverInfo

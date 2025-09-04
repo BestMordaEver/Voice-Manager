@@ -2,7 +2,7 @@ local config = require "config"
 
 local lobbies = require "storage/lobbies"
 
-local warningEmbed = require "response/warning"
+local warningResponse = require "response/warning"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
@@ -18,21 +18,21 @@ return function (interaction)
 
 	if command == "server" then
 		if not interaction.guild then
-			return "Command must be issued in guild", warningEmbed(interaction, "notInGuild")
+			return "Command must be issued in guild", warningResponse(true, interaction.locale, "notInGuild")
 		end
 
 		if not (interaction.member:hasPermission("manageChannels") or config.owners[interaction.user.id]) then
-			return "Bad user permissions", warningEmbed(interaction, "badUserPermissions")
+			return "Bad user permissions", warningResponse(true, interaction.locale, "badUserPermissions")
 		end
 
 		return commands.server(interaction, subcommand)
 	else
 		local lobby = interaction.option.option.option.value
-		if not lobbies[lobby.id] then return "Not a lobby", warningEmbed(interaction, "notLobby") end
+		if not lobbies[lobby.id] then return "Not a lobby", warningResponse(true, interaction.locale, "notLobby") end
 
-		local ok, logMsg, embed = checkSetupPermissions(interaction, lobby)
+		local ok, logMsg, response = checkSetupPermissions(interaction, lobby)
 		if not ok then
-			return logMsg, embed
+			return logMsg, response
 		end
 
 		return commands[command](interaction, subcommand)

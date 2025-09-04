@@ -1,6 +1,4 @@
 local client = require "client"
-local locale = require "locale/runtime/localeHandler"
-local embed = require "response/embed"
 
 local channels = require "storage/channels"
 
@@ -9,7 +7,13 @@ local availableCommands = require "response/availableCommands"
 local enums = require "discordia".enums
 local permission = enums.permission
 local overwriteType = enums.overwriteType
-local blurple = embed.colors.blurple
+
+local componentType = require "discordia".enums.componentType
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
+
+local insert = table.insert
+local format = string.format
 
 local lines = {
 	voice = {
@@ -54,55 +58,80 @@ local lines = {
 	}
 }
 
-local function liner (loc, channel, rolePO, type, perm)
-	local field = {value = ""}
+local header = "**%s**"
+local headerAndNL = "**%s**\n%s"
+local function liner (locale, channel, rolePO, type, perm)
+	local row = {
+		type = componentType.textDisplay
+	}
+
 	if rolePO:getDeniedPermissions():has(perm) then
-		field.name = locale(loc, lines[type][perm].denied)
+		local line
 		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getAllowedPermissions():has(perm) end)
 		if #POs ~= 0 then
-			local line = {}
-			table.insert(line, locale(loc, lines[type][perm].deniedExceptions))
+			local mentions = {}
+			table.insert(mentions, localeHandler(locale, lines[type][perm].deniedExceptions))
 			for _, po in pairs(POs) do
-				table.insert(line, po:getObject().user.mentionString)
+				table.insert(mentions, po:getObject().user.mentionString)
 			end
-			field.value = table.concat(line, " ")
+			line = table.concat(line, " ")
 		end
+
+		row.content = #POs == 0 and
+			format(header, localeHandler(locale, lines[type][perm].denied))
+		or
+			format(headerAndNL, localeHandler(locale, lines[type][perm].denied), line)
 	else
-		field.name = locale(loc, lines[type][perm].allowed)
+		local line
 		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getDeniedPermissions():has(perm) end)
 		if #POs ~= 0 then
-			local line = {}
-			table.insert(line, locale(loc, lines[type][perm].allowedExceptions))
+			local mentions = {}
+			table.insert(mentions, locale(mentions, lines[type][perm].allowedExceptions))
 			for _, po in pairs(POs) do
-				table.insert(line, po:getObject().user.mentionString)
+				table.insert(mentions, po:getObject().user.mentionString)
 			end
+			line = table.concat(line, " ")
 		end
+
+		row.content = #POs == 0 and
+			format(header, localeHandler(locale, lines[type][perm].allowed))
+		or
+			format(headerAndNL, localeHandler(locale, lines[type][perm].allowed), line)
 	end
-	return field
+	return row
 end
 
-return embed("roomInfo", function (interaction, room, ephemeral)
+---@overload fun(ephemeral : boolean, locale : localeName, room : GuildVoiceChannel) : table
+local roomInfo = response("roomInfo", response.colors.blurple, function (locale, room)
 	local companion = client:getChannel(channels[room.id].companion)
 	local role = channels[room.id].parent and client:getRole(channels[room.id].parent.roles:random()) or room.guild.defaultRole
 	local roomPO = room:getPermissionOverwriteFor(role)
 	local chatPO = companion and companion:getPermissionOverwriteFor(role)
-	local loc = interaction.locale
 
-	local fields = {
-		liner(loc, room, roomPO, "voice", permission.readMessages),
-		liner(loc, room, roomPO, "voice", permission.connect),
-		liner(loc, room, roomPO, "voice", permission.speak),
-		liner(loc, room, roomPO, "voice", permission.sendMessages),
-		companion and liner(loc, companion, chatPO, "text", permission.readMessages),
-		companion and liner(loc, companion, chatPO, "text", permission.sendMessages)
+	local components = {
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "roomInfoTitle")
+		},
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "roomInfoHost", client:getUser(channels[room.id].host).mentionString)
+		},
+		{
+			type = componentType.textDisplay,
+			content = table.concat({
+				liner(locale, room, roomPO, "voice", permission.readMessages),
+				liner(locale, room, roomPO, "voice", permission.connect),
+				liner(locale, room, roomPO, "voice", permission.speak),
+				liner(locale, room, roomPO, "voice", permission.sendMessages),
+				companion and liner(locale, companion, chatPO, "text", permission.readMessages),
+				companion and liner(locale, companion, chatPO, "text", permission.sendMessages),
+				localeHandler(locale, "roomInfoCommands", availableCommands(room))
+			}, "\n")
+		}
 	}
 
-	table.insert(fields, {name = locale(loc, "roomInfoCommands"), value = availableCommands(room)})
-
-	return {embeds = {{
-		title = locale(loc, "roomInfoTitle", room.name),
-		color = blurple,
-		description = locale(loc, "roomInfoHost") .. client:getUser(channels[room.id].host).mentionString .. "\n",
-		fields = fields,
-	}}, ephemeral = ephemeral}
+	return components
 end)
+
+return roomInfo

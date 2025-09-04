@@ -1,8 +1,8 @@
 local pp = require "pretty-print"
 local config = require "config"
 
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
 
 local sandbox = setmetatable({
 	client = require "client",
@@ -34,7 +34,7 @@ local function prettyLine(...)
 end
 
 return function (interaction)
-    if not config.owners[interaction.user.id] then return "Not owner", warningEmbed(interaction, "veryNotPermitted") end
+    if not config.owners[interaction.user.id] then return "Not owner", warningResponse(true, interaction.locale, "veryNotPermitted") end
 
     local lines = {}
 
@@ -47,11 +47,11 @@ return function (interaction)
     end
 
     local fn, syntaxError = load(interaction.option.value, "Bot", "t", sandbox)
-    if not fn then return "Syntax error", warningEmbed:compose(interaction)("asIs", code(syntaxError))() end
+    if not fn then return "Syntax error", warningResponse(true, interaction.locale, "asIs", code(syntaxError)) end
 
     local success, runtimeError = pcall(fn)
-    if not success then return "Runtime error", warningEmbed:compose(interaction)("asIs", code(runtimeError))() end
+    if not success then return "Runtime error", warningResponse(true, interaction.locale, "asIs", code(runtimeError)) end
 
     lines = table.concat(lines, '\n') -- bring all the lines together
-    return "Code executed", okEmbed:compose(interaction)("asIs", code(lines))()
+    return "Code executed", okResponse(true, interaction.locale, "asIs", code(lines))
 end

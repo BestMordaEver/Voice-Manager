@@ -8,9 +8,9 @@ local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local greetingEmbed = require "response/greeting"
-local warningEmbed = require "response/warning"
-local passwordEmbed = require "response/password"
+local greetingResponse = require "response/greeting"
+local warningResponse = require "response/warning"
+local passwordResponse = require "response/password"
 
 local matchmakers = require "utils/matchmakers"
 
@@ -142,7 +142,7 @@ local function lobbyJoinCall (member, lobby)
 	adjustHostPermissions(newChannel, member)
 
 	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
-	if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingEmbed(newChannel)) end
+	if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel)) end
 
 	mutex:unlock()
 	Timer.clearTimeout(timer)
@@ -156,7 +156,7 @@ local function lobbyJoin (member, lobby)
 	local limit, retryIn = ratelimiter:limit("channelCreate", member.user.id)
 	if limit == -1 then
 		member:setVoiceChannel()
-		member.user:send(warningEmbed(member.user, "wait", retryIn))
+		member.user:send(warningResponse(false, member.user.locale, "wait", retryIn))
 		return
 	end
 
@@ -245,7 +245,7 @@ local function roomJoin (member, channel)
 		channels:store(newChannel.id, 3, member.user.id, channel.id, 0)
 		member:setVoiceChannel(newChannel)
 
-		return member.user:send(passwordEmbed(member.user, channel))
+		return member.user:send(passwordResponse(false, member.user.locale, channel))
 	end
 
 	logger:log(4, "GUILD %s ROOM %s USER %s: joined", channel.guild.id, channel.id, member.user.id)

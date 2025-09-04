@@ -2,7 +2,7 @@ local logger = require "logger"
 
 local commands = require "commands/init"
 
-local errorEmbed = require "response/error"
+local errorResponse = require "response/error"
 
 return function (interaction)
 
@@ -31,9 +31,9 @@ return function (interaction)
 		if reply then interaction:reply(reply) end
 	else
 		if interaction.isReplied then
-			interaction:followup(errorEmbed(interaction))
+			interaction:followup(errorResponse(true, interaction.locale))
 		else
-			interaction:reply(errorEmbed(interaction))
+			interaction:reply(errorResponse(true, interaction.locale))
 		end
 		error(string.format('failed to process the component "%s"\n%s', interaction.customId, logMsg))
 	end

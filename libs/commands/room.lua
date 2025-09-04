@@ -1,12 +1,12 @@
 local client = require "client"
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 local config = require "config"
 
 local channels = require "storage/channels"
 
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
-local roomInfoEmbed = require "response/roomInfo"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
+local roomInfoResponse = require "response/roomInfo"
 
 local handleTemplate = require "channelUtils/handleTemplate"
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
@@ -35,7 +35,7 @@ subcommands = {
 		if type == "text" then
 			local companion = client:getChannel(channelData.companion)
 			if not companion or companion == channel then
-				return "No text channel to rename", warningEmbed(interaction, "noCompanion")
+				return "No text channel to rename", warningResponse(true, interaction.locale, "noCompanion")
 			end
 			channel = companion
 			template = channelData.parent and channelData.parent.companionTemplate
@@ -44,7 +44,7 @@ subcommands = {
 
 		local limit, retryIn = ratelimiter:limit(ratelimit, channel.id)
 		if limit == -1 then
-			return "Ratelimit reached", warningEmbed(interaction, "nameRatelimitReached", retryIn)
+			return "Ratelimit reached", warningResponse(true, interaction.locale, "nameRatelimitReached", retryIn)
 		end
 
 		local success, err
@@ -56,22 +56,19 @@ subcommands = {
 		end
 
 		if success then
-			return "Successfully changed channel name", okEmbed:compose(interaction)
-				("nameConfirm", channel.name)
-				("newline")
-				(limit == 0 and "nameRatelimitReached" or "nameRatelimitRemaining", retryIn)
-				()
+			return "Successfully changed channel name", okResponse(true, interaction.locale, "renameConfirm", channel.name,
+				localeHandler(interaction.locale, limit == 0 and "nameRatelimitReached" or "nameRatelimitRemaining", retryIn))
 		end
 
-		return "Couldn't change channel name: "..err, warningEmbed(interaction, "renameError")
+		return "Couldn't change channel name: "..err, warningResponse(true, interaction.locale, "renameError")
 	end,
 
 	resize = function (interaction, voiceChannel, size)
 		local success, err = voiceChannel:setUserLimit(size)
 		if success then
-			return "Successfully changed room capacity", okEmbed(interaction, "capacityConfirm", size)
+			return "Successfully changed room capacity", okResponse(true, interaction.locale, "capacityConfirm", size)
 		else
-			return "Couldn't change room capacity: "..err, warningEmbed(interaction, "resizeError")
+			return "Couldn't change room capacity: "..err, warningResponse(true, interaction.locale, "resizeError")
 		end
 	end,
 
@@ -83,14 +80,14 @@ subcommands = {
 		end
 
 		if bitrate > tierRate[tier] then
-			return "Bitrate OOB", warningEmbed(interaction.locale, tierLocale[tier])
+			return "Bitrate OOB", warningResponse(true, interaction.locale, tierLocale[tier])
 		end
 
 		local success, err = voiceChannel:setBitrate(bitrate * 1000)
 		if success then
-			return "Successfully changed room bitrate", okEmbed(interaction, "bitrateConfirm", bitrate)
+			return "Successfully changed room bitrate", okResponse(true, interaction.locale, "bitrateConfirm", bitrate)
 		else
-			return "Couldn't change room bitrate: "..err, warningEmbed(interaction, "bitrateError")
+			return "Couldn't change room bitrate: "..err, warningResponse(true, interaction.locale, "bitrateError")
 		end
 	end,
 
@@ -100,13 +97,13 @@ subcommands = {
 
 		if newHost then
 			if interaction.user ~= host then
-				return "Not a host", warningEmbed(interaction, "notHost")
+				return "Not a host", warningResponse(true, interaction.locale, "notHost")
 			end
 
 			local guild = voiceChannel.guild
 			newHost = guild:getMember(newHost)
 			if newHost.voiceChannel ~= voiceChannel then
-				return "Can't promote person not in a room", warningEmbed(interaction, "badNewHost")
+				return "Can't promote person not in a room", warningResponse(true, interaction.locale, "badNewHost")
 			end
 
 			channelData:setHost(newHost.user.id)
@@ -115,12 +112,12 @@ subcommands = {
 				adjustHostPermissions(voiceChannel, newHost, interaction.member)
 			end
 
-			return "Promoted a new host", okEmbed(interaction, "hostConfirm", newHost.user.mentionString)
+			return "Promoted a new host", okResponse(true, interaction.locale, "hostConfirm", newHost.user.mentionString)
 		else
 			if host then
-				return "Pinged the host", okEmbed(interaction, "hostIdentify", host.mentionString)
+				return "Pinged the host", okResponse(true, interaction.locale, "hostIdentify", host.mentionString)
 			else
-				return "Didn't find host", warningEmbed(interaction, "badHost")
+				return "Didn't find host", warningResponse(true, interaction.locale, "badHost")
 			end
 		end
 	end,
@@ -129,9 +126,9 @@ subcommands = {
 		local member = voiceChannel.guild:getMember(user)
 		if member.voiceChannel == voiceChannel then
 			member:setVoiceChannel()
-			return "Kicked member", okEmbed(interaction, "kickConfirm", user.mentionString)
+			return "Kicked member", okResponse(true, interaction.locale, "kickConfirm", user.mentionString)
 		else
-			return "Can't kick the user from a different room", warningEmbed(interaction, "kickNotInRoom")
+			return "Can't kick the user from a different room", warningResponse(true, interaction.locale, "kickNotInRoom")
 		end
 	end,
 
@@ -145,7 +142,7 @@ subcommands = {
 		local guild, member, roles = voiceChannel.guild
 		if user then
 			if user == client.user then
-				return "Attempt to mute the bot", warningEmbed(interaction, "shame")
+				return "Attempt to mute the bot", warningResponse(true, interaction.locale, "shame")
 			end
 			member = guild:getMember(user)
 		else
@@ -228,9 +225,9 @@ subcommands = {
 		end
 
 		if user then
-			return "Muted mentioned user", okEmbed(interaction, "muteConfirm", user.mentionString)
+			return "Muted mentioned user", okResponse(true, interaction.locale, "muteConfirm", user.mentionString)
 		else
-			return "Muted all users outside the room", okEmbed(interaction, "muteAllConfirm")
+			return "Muted all users outside the room", okResponse(true, interaction.locale, "muteAllConfirm")
 		end
 	end,
 
@@ -283,9 +280,9 @@ subcommands = {
 		end
 
 		if user then
-			return "Unmuted mentioned user", okEmbed(interaction, "unmuteConfirm", user.mentionString)
+			return "Unmuted mentioned user", okResponse(true, interaction.locale, "unmuteConfirm", user.mentionString)
 		else
-			return "Unmuted all users outside the room", okEmbed(interaction, "unmuteAllConfirm")
+			return "Unmuted all users outside the room", okResponse(true, interaction.locale, "unmuteAllConfirm")
 		end
 	end,
 
@@ -299,7 +296,7 @@ subcommands = {
 		local guild, member, roles = voiceChannel.guild
 		if user then
 			if user == client.user then
-				return "Attempt to hide from bot", warningEmbed(interaction, "shame")
+				return "Attempt to hide from bot", warningResponse(true, interaction.locale, "shame")
 			end
 			member = guild:getMember(user)
 		else
@@ -345,14 +342,14 @@ subcommands = {
 					end end
 				end
 			elseif scope == "text" then
-				return "No companion to hide", warningEmbed(interaction, "hideNoCompanion")
+				return "No companion to hide", warningResponse(true, interaction.locale, "hideNoCompanion")
 			end
 		end
 
 		if user then
-			return "Hid the channel from the mentioned user", okEmbed(interaction, "hideConfirm", user.mentionString)
+			return "Hid the channel from the mentioned user", okResponse(true, interaction.locale, "hideConfirm", user.mentionString)
 		else
-			return "Hid the channel from all users outside the room", okEmbed(interaction, "hideAllConfirm")
+			return "Hid the channel from all users outside the room", okResponse(true, interaction.locale, "hideAllConfirm")
 		end
 	end,
 
@@ -391,20 +388,20 @@ subcommands = {
 					companion:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.readMessages)
 				end end
 			elseif scope == "text" then
-				return "No companion to show", warningEmbed(interaction, "showNoCompanion")
+				return "No companion to show", warningResponse(true, interaction.locale, "showNoCompanion")
 			end
 		end
 
 		if user then
-			return "Channel is made visible to the mentioned user", okEmbed(interaction, "showConfirm", user.mentionString)
+			return "Channel is made visible to the mentioned user", okResponse(true, interaction.locale, "showConfirm", user.mentionString)
 		else
-			return "Channel is made visible to everyone", okEmbed(interaction, "showAllConfirm")
+			return "Channel is made visible to everyone", okResponse(true, interaction.locale, "showAllConfirm")
 		end
 	end,
 
 	block = function (interaction, voiceChannel, user)
 		if user == client.user then
-			return "Attempt to block the bot", warningEmbed(interaction, "shame")
+			return "Attempt to block the bot", warningResponse(true, interaction.locale, "shame")
 		end
 
 		local member = voiceChannel.guild:getMember(user)
@@ -412,14 +409,14 @@ subcommands = {
 		if member.voiceChannel == voiceChannel then
 			member:setVoiceChannel()
 		end
-		return "Blocked the user", okEmbed(interaction, "blockConfirm", user.mentionString)
+		return "Blocked the user", okResponse(true, interaction.locale, "blockConfirm", user.mentionString)
 	end,
 
 	allow = function (interaction, voiceChannel, user)
 		local member = voiceChannel.guild:getMember(user)
 		voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
 
-		return "Allowed the user", okEmbed(interaction, "allowConfirm", user.mentionString)
+		return "Allowed the user", okResponse(true, interaction.locale, "allowConfirm", user.mentionString)
 	end,
 
 	lock = function (interaction, voiceChannel)
@@ -439,7 +436,7 @@ subcommands = {
 			voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):denyPermissions(permission.connect)
 		end end
 
-		return "Locked the room", okEmbed(interaction, "lockConfirm")
+		return "Locked the room", okResponse(true, interaction.locale, "lockConfirm")
 	end,
 
 	unlock = function (interaction, voiceChannel)
@@ -452,7 +449,7 @@ subcommands = {
 			voiceChannel:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.connect)
 		end end
 
-		return "Unlocked the room", okEmbed(interaction, "unlockConfirm")
+		return "Unlocked the room", okResponse(true, interaction.locale, "unlockConfirm")
 	end,
 
 	invite = function (interaction, voiceChannel, user)
@@ -461,37 +458,37 @@ subcommands = {
 		local invite = voiceChannel:createInvite()
 
 		if not invite then
-			return "Bot isn't permitted to create invites", warningEmbed(interaction, "inviteError")
+			return "Bot isn't permitted to create invites", warningResponse(true, interaction.locale, "inviteError")
 		end
 
 		if not user then
-			return "Created invite in room", okEmbed(interaction, "inviteCreated", invite.code)
+			return "Created invite in room", okResponse(true, interaction.locale, "inviteCreated", invite.code)
 		end
 
 		if not user:getPrivateChannel() then
-			return "Can't contact user", warningEmbed(interaction, "noDMs", invite.code)
+			return "Can't contact user", warningResponse(true, interaction.locale, "noDMs", invite.code)
 		end
 
-		user:getPrivateChannel():sendf(locale(interaction.locale, "inviteText"), interaction.user.name, voiceChannel.name, invite.code)
+		user:getPrivateChannel():sendf(localeHandler(interaction.locale, "inviteText"), interaction.user.name, voiceChannel.name, invite.code)
 
 		if tryReservation then
 			voiceChannel:getPermissionOverwriteFor(voiceChannel.guild:getMember(user)):allowPermissions(permission.readMessages, permission.connect, permission.speak)
 		end
-		return "Sent invite to mentioned user", okEmbed(interaction, "inviteConfirm", user.mentionString)
+		return "Sent invite to mentioned user", okResponse(true, interaction.locale, "inviteConfirm", user.mentionString)
 	end,
 
 	password = function (interaction, voiceChannel, password)
 		channels[voiceChannel.id]:setPassword(password)
 
 		if password then
-			return "New password set", okEmbed(interaction, "passwordConfirm", password)
+			return "New password set", okResponse(true, interaction.locale, "passwordConfirm", password)
 		else
-			return "Password reset", okEmbed(interaction, "passwordReset")
+			return "Password reset", okResponse(true, interaction.locale, "passwordReset")
 		end
 	end,
 
 	passwordinit = function (interaction)	-- not exposed, access via componentInteraction
-		interaction:createModal("room_passwordcheck", locale(interaction.locale, "passwordEnter"), passwordModal(interaction))
+		interaction:createModal("room_passwordcheck", localeHandler(interaction.locale, "passwordEnter"), passwordModal(interaction))
 		return "Created password modal"
 	end,
 
@@ -501,21 +498,21 @@ subcommands = {
 
 		if not channel then
 			if channelData and channelData.parentType == 3 then voiceChannel:delete() end
-			return "No parent channel", warningEmbed(interaction, "passwordNoChannel")
+			return "No parent channel", warningResponse(true, interaction.locale, "passwordNoChannel")
 		elseif interaction.components[1].components[1].value == channelData.parent.password then
 			local member = voiceChannel.guild:getMember(interaction.user)
 
 			-- sendMessages is used as an indication of blocklist, to not conflict with password flow
 			if channel:getPermissionOverwriteFor(member):getDeniedPermissions():has(permission.sendMessages) then
 				if channelData and channelData.parentType == 3 then voiceChannel:delete() end
-				return "User is banned", warningEmbed(interaction, "passwordBanned")
+				return "User is banned", warningResponse(true, interaction.locale, "passwordBanned")
 			end
 
 			channel:getPermissionOverwriteFor(member):allowPermissions(permission.connect)
 			member:setVoiceChannel(channel.id)
-			return "Successfull password check", okEmbed(interaction, "passwordSuccess")
+			return "Successfull password check", okResponse(true, interaction.locale, "passwordSuccess")
 		else
-			return "Failed password check", warningEmbed(interaction, "passwordFailure")
+			return "Failed password check", warningResponse(true, interaction.locale, "passwordFailure")
 		end
 	end,
 
@@ -524,8 +521,8 @@ subcommands = {
 		if not action then action = argument end
 		interaction:deferReply(true)
 
-		local log, embed = subcommands[action](interaction, voiceChannel, scope)
-		interaction:updateReply(embed)
+		local log, response = subcommands[action](interaction, voiceChannel, scope)
+		interaction:updateReply(response)
 
 		return log
 	end
@@ -541,12 +538,12 @@ return function (interaction, subcommand, argument)
 	end
 
 	if not (member and member.voiceChannel and channels[member.voiceChannel.id]) then
-		return "User not in room", warningEmbed(interaction, "notInRoom")
+		return "User not in room", warningResponse(true, interaction.locale, "notInRoom")
 	end
 
 	local voiceChannel = member.voiceChannel
 	if subcommand == "view" then
-		return "Sent room info", roomInfoEmbed(interaction, voiceChannel)
+		return "Sent room info", roomInfoResponse(true, interaction.locale, voiceChannel)
 	end
 
 	if noAdmin[subcommand] or member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
@@ -555,7 +552,7 @@ return function (interaction, subcommand, argument)
 		if checkHostPermissions(member, voiceChannel, subcommand) then
 			return subcommands[subcommand](interaction, voiceChannel, argument)
 		end
-		return "Insufficient permissions", warningEmbed(interaction, "badHostPermission")
+		return "Insufficient permissions", warningResponse(true, interaction.locale, "badHostPermission")
 	end
-	return "Not a host", warningEmbed(interaction, "notHost")
+	return "Not a host", warningResponse(true, interaction.locale, "notHost")
 end

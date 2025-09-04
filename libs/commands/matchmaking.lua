@@ -1,9 +1,9 @@
 local lobbies = require "storage/lobbies"
 local channels = require "storage/channels"
 
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
-local matchmakingInfoEmbed = require "response/matchmakingInfo"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
+local matchmakingInfoResponse = require "response/matchmakingInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "commands/lobbyPreProcess"
@@ -13,13 +13,13 @@ local channelType = require "discordia".enums.channelType
 local subcommands = {
 	add = function (interaction, channel)
 		if lobbies[channel.id] then
-			return "Already registered", warningEmbed(interaction, "lobbyDupe")
+			return "Already registered", warningResponse(true, interaction.locale, "lobbyDupe")
 		elseif channels[channel.id] and not channels[channel.id].isPersistent then
-			return "Rooms can't be lobbies", warningEmbed(interaction, "channelDupe")
+			return "Rooms can't be lobbies", warningResponse(true, interaction.locale, "channelDupe")
 		end
 
 		lobbies:store(channel):setMatchmaking(true)
-		return "New matchmaking lobby added", okEmbed(interaction, "matchmakingAddConfirm", channel.name)
+		return "New matchmaking lobby added", okResponse(true, interaction.locale, "matchmakingAddConfirm", channel.name)
 	end,
 
 	remove = function (interaction, channel)
@@ -27,38 +27,38 @@ local subcommands = {
 			lobbies[channel.id]:delete()
 		end
 
-		return "Matchmaking lobby removed", okEmbed(interaction, "matchmakingRemoveConfirm", channel.name)
+		return "Matchmaking lobby removed", okResponse(true, interaction.locale, "matchmakingRemoveConfirm", channel.name)
 	end,
 
 	target = function (interaction, channel, target)
 		if target and target ~= channel then
 			if target.type == channelType.voice and not lobbies[target.id] then
-				return "Selected target is not lobby or category", warningEmbed(interaction, "notLobby")
+				return "Selected target is not lobby or category", warningResponse(true, interaction.locale, "notLobby")
 			end
 
-			local ok, logMsg, embed = checkSetupPermissions(interaction, target)
+			local ok, logMsg, response = checkSetupPermissions(interaction, target)
 			if ok then
 				lobbies[channel.id]:setTarget(target.id)
-				return "Lobby target set", okEmbed(interaction, "targetConfirm", target.name)
+				return "Lobby target set", okResponse(true, interaction.locale, "targetConfirm", target.name)
 			end
 
-			return logMsg, embed
+			return logMsg, response
 		end
 
 		lobbies[channel.id]:setTarget()
-		return "Lobby target reset", okEmbed(interaction, "targetReset")
+		return "Lobby target reset", okResponse(true, interaction.locale, "targetReset")
 	end,
 
 	mode = function (interaction, channel, mode)
 		if not mode then mode = "random" end
 
 		lobbies[channel.id]:setTemplate(mode)
-		return "Matchmaking mode set", okEmbed(interaction, "modeConfirm", mode)
+		return "Matchmaking mode set", okResponse(true, interaction.locale, "modeConfirm", mode)
 	end
 }
 
 return function (interaction, subcommand, argument)
-	local channel, embed = lobbyPreProcess(interaction, matchmakingInfoEmbed)
-	if embed then return channel, embed end
+	local channel, response = lobbyPreProcess(interaction, matchmakingInfoResponse)
+	if response then return channel, response end
 	return subcommands[subcommand](interaction, channel, argument)
 end

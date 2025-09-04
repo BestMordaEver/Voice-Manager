@@ -2,7 +2,7 @@ local client = require "client"
 local channels = require "storage/channels"
 local adjustPermissions = require "channelUtils/adjustPermissions"
 
-local warningEmbed = require "response/warning"
+local warningResponse = require "response/warning"
 
 return function (channel, newHost, oldHost)
     if not channel then return end
@@ -27,6 +27,6 @@ return function (channel, newHost, oldHost)
     end
 
     if not (channelOK and companionOK) then
-        newHost:send(warningEmbed(channel.guild, "hostMigrationFail", table.concat(channelMissingPermissions), table.concat(companionMissingPermissions)))
+        newHost:send(warningResponse(false, newHost.user.locale, "hostMigrationFail", table.concat(channelMissingPermissions), table.concat(companionMissingPermissions)))
     end
 end

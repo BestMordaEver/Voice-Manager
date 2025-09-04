@@ -1,7 +1,6 @@
 ---@enum (key) textLine
 local text = {
 	deleteNone = true,
-	helpLinksTitle = true,
 	passwordEnter = true,
 	greetingModalTitle = true,
 	asIs = true,
@@ -43,7 +42,7 @@ local text = {
 	botPermissionsMandatory = true,
 	botPermissionsOptional = true,
 	botPermissionsOk = true,
-	hostMigrationFail = true;
+	hostMigrationFail = true,
 	deleteConfirm = true,
 	inviteCreated = true,
 	permissionsReset = true,
@@ -115,7 +114,6 @@ local text = {
 	embedWarning = true,
 	limitConfirm = true,
 	companionsField = true,
-	newline = true,
 	nameRatelimitReached = true,
 	matchmakingNoInfo = true,
 	allowConfirm = true,
@@ -153,7 +151,15 @@ local text = {
 	hostIdentify = true,
 	modeConfirm = true,
 	renameError = true,
-	deleteNotArmed = true
+	deleteNotArmed = true,
+	helpContents = true,
+	helpLobby = true,
+	helpMatchmaking = true,
+	helpComapnion = true,
+	helpRoom = true,
+	helpServer = true,
+	helpOther = true,
+	renameConfirm = true,
 }
 
 return text

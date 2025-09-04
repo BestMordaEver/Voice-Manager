@@ -1,5 +1,5 @@
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
@@ -8,13 +8,13 @@ return function (interaction)
 	local source, amount = options.source.value, options.amount.value
 	local category, name = source.category, options.name and options.name.value or source.name
 
-	local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+	local ok, logMsg, response = checkSetupPermissions(interaction, category)
 	if not ok then
-		return logMsg, embed -- TODO: server-wide ignore warnings?
+		return logMsg, response -- TODO: server-wide ignore warnings?
 	end
 
 	if category and #category.textChannels + #category.voiceChannels + amount > 50 then
-		return "Create aborted, category overflow", warningEmbed(interaction, "createCategoryOverflow")
+		return "Create aborted, category overflow", warningResponse(true, interaction.locale, "createCategoryOverflow")
 	end
 
 	local success, start = 0, tonumber(name:match("%%counter%((%d+)%)%%")) or 1
@@ -28,5 +28,5 @@ return function (interaction)
 		end
 	end
 
-	return "Created channels", okEmbed(interaction, "createConfirm", success)
+	return "Created channels", okResponse(true, interaction.locale, "createConfirm", success)
 end

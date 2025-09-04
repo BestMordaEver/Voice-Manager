@@ -1,22 +1,32 @@
-local locale = require "locale/runtime/localeHandler"
-local embed = require "response/embed"
+local enums = require "discordia".enums
+local componentType = enums.componentType
+local buttonStyle = enums.buttonStyle
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
 
-local passwordButton = require "utils/components".passwordInputButton
-local blurple = embed.colors.blurple
-
-return embed("password", function (interaction, channel)
+---@overload fun(ephemeral : boolean, locale : localeName, channel : GuildVoiceChannel) : table
+local password = response("password", response.colors.blurple, function (locale, channel)
 	return {
-		ephemeral = true,
-		embeds = {
-			{
-				description = locale(interaction.locale, "passwordCheckText"),
-				color = blurple,
-				author = {
-					name = channel.name,
-					proxy_icon_url = channel.guild.iconURL
+		{
+			type = componentType.textDisplay,
+			content = channel.name
+		},
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "passwordCheckText")
+		},
+		{
+			type = componentType.row,
+			components = {
+				{
+					type = componentType.button,
+					style = buttonStyle.primary,
+					label = localeHandler(locale, "passwordEnter"),
+					custom_id = "room_passwordinit",
 				}
 			}
-		},
-		components = passwordButton(interaction)
+		}
 	}
 end)
+
+return password

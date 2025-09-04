@@ -1,15 +1,19 @@
-local locale = require "locale/runtime/localeHandler"
-local embed = require "response/embed"
+local componentType = require "discordia".enums.componentType
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
 
-local green = embed.colors.green
-
----@overload fun(localeCarrier : table, line : textLine, ...? : string) : table
-local ok = embed("ok", function (localeCarrier, msg, ...)
-	return {embeds = {{
-		title = locale(localeCarrier.locale, "embedOK"),
-		color = green,
-		description = locale(localeCarrier.locale, msg, ...)
-	}}, ephemeral = true}
+---@overload fun(ephemeral : boolean, locale : localeName, text : textLine, ... : string) : table
+local ok = response("ok", response.colors.green, function (locale, msg, ...)
+	return {
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "embedOK")
+		},
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, msg, ...)
+		}
+	}
 end)
 
 return ok

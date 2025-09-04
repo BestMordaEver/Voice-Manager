@@ -2,7 +2,7 @@ local logger = require "logger"
 
 local commands = require "commands/init"
 
-local errorEmbed = require "response/error"
+local errorResponse = require "response/error"
 
 local insert, concat = table.insert, table.concat
 
@@ -52,9 +52,9 @@ return function (interaction)
 		end
 	else
 		if interaction.isReplied then
-			interaction:updateReply(errorEmbed(interaction, true))
+			interaction:updateReply(errorResponse(true, interaction.locale))
 		else
-			interaction:reply(errorEmbed(interaction, true))
+			interaction:reply(errorResponse(true, interaction.locale))
 		end
 		error(string.format('failed to execute the command "%s"\n%s', commandString, logMsg))
 	end

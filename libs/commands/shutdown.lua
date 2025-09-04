@@ -2,11 +2,11 @@ local client = require "client"
 local clock = require "clock"
 local logger = require "logger"
 local config = require "config"
-local warningEmbed = require "response/warning"
+local warningResponse = require "response/warning"
 
 return function (interaction)
 	if interaction then
-		if not config.owners[interaction.user.id] then return "Not owner", warningEmbed(interaction, "veryNotPermitted") end
+		if not config.owners[interaction.user.id] then return "Not owner", warningResponse(true, interaction.locale, "veryNotPermitted") end
 		interaction:updateReply("Shutting down gracefully")
 	end
 

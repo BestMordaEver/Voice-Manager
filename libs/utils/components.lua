@@ -55,38 +55,6 @@ local handler = {
 		}
 	}, meta),
 
-	passwordModal = function (interaction)
-		return {
-			{
-				type = componentType.row,
-				components = {
-					{
-						type = componentType.textInput,
-						custom_id = "password",
-						label = locale(interaction.locale, "password"),
-						style = inputStyle.short
-					}
-				}
-			}
-		}
-	end,
-
-	passwordInputButton = function (interaction)
-		return {
-			{
-				type = componentType.row,
-				components = {
-					{
-						type = componentType.button,
-						style = buttonStyle.primary,
-						label = locale(interaction.locale, "passwordEnter"),
-						custom_id = "room_passwordinit",
-					}
-				}
-			}
-		}
-	end,
-
 	roomButtons = setmetatable({
 		{
 			type = componentType.row,
@@ -144,50 +112,6 @@ local handler = {
 					label = "Mute text",
 					custom_id = "room_widget_mute_text",
 					emoji = {name = "📵"}
-				}
-			}
-		}
-	}, meta),
-
-	helpButtons = setmetatable({
-		{
-			type = componentType.row,
-			components = {
-				{
-					type = componentType.button,
-					label = "Lobbies",
-					custom_id = "help_lobby",
-					style = buttonStyle.primary
-				},{
-					type = componentType.button,
-					label = "Matchmaking",
-					custom_id = "help_matchmaking",
-					style = buttonStyle.primary
-				},{
-					type = componentType.button,
-					label = "Companion",
-					custom_id = "help_companion",
-					style = buttonStyle.primary
-				}
-			}
-		},{
-			type = componentType.row,
-			components = {
-				{
-					type = componentType.button,
-					label = "Room",
-					custom_id = "help_room",
-					style = buttonStyle.primary
-				},{
-					type = componentType.button,
-					label = "Server",
-					custom_id = "help_server",
-					style = buttonStyle.primary
-				},{
-					type = componentType.button,
-					label = "Other",
-					custom_id = "help_other",
-					style = buttonStyle.primary
 				}
 			}
 		}

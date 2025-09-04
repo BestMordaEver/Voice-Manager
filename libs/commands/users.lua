@@ -3,8 +3,8 @@ local locale = require "locale/runtime/localeHandler"
 
 local lobbies = require "storage/lobbies"
 
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
 
 local channelType = require "discordia".enums.channelType
 local insert = table.insert
@@ -43,7 +43,7 @@ local commands = {
                     embeds = {}
                 end
             until index >= len
-            return "Sent names list", okEmbed(interaction, "usersSent")
+            return "Sent names list", okResponse(true, interaction.locale, "usersSent")
         end
 
         repeat
@@ -63,7 +63,7 @@ local commands = {
                 end
             end
         end
-        return "Added roles to users", okEmbed(interaction, "usersRolesAdded", count)
+        return "Added roles to users", okResponse(true, interaction.locale, "usersRolesAdded", count)
 
     end,
 
@@ -76,7 +76,7 @@ local commands = {
                 end
             end
         end
-        return "Removed roles from users", okEmbed(interaction, "usersRolesRemoved", count)
+        return "Removed roles from users", okResponse(true, interaction.locale, "usersRolesRemoved", count)
     end
 }
 
@@ -110,7 +110,7 @@ return function (interaction, subcommand)
     end
 
     if #channels == 0 then
-        return "No channels to query", warningEmbed(interaction, "noChildChannels")
+        return "No channels to query", warningResponse(true, interaction.locale, "noChildChannels")
     end
 
     return commands[subcommand](interaction, channels, options)

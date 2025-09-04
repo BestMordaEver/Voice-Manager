@@ -2,8 +2,8 @@ local client = require "client"
 
 local guilds = require "storage/guilds"
 
-local okEmbed = require "response/ok"
-local serverInfoEmbed = require "response/serverInfo"
+local okResponse = require "response/ok"
+local serverInfoResponse = require "response/serverInfo"
 
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
@@ -36,9 +36,9 @@ local subcommands = {
 		end
 
 		if #roles == 0 then
-			return "Changed managed server roles", okEmbed(interaction, "roleConfirmNoRoles")
+			return "Changed managed server roles", okResponse(true, interaction.locale, "roleConfirmNoRoles")
 		else
-			return "Changed managed server roles", okEmbed(interaction, "roleConfirm", table.concat(roles," "))
+			return "Changed managed server roles", okResponse(true, interaction.locale, "roleConfirm", table.concat(roles," "))
 		end
 	end,
 
@@ -46,7 +46,7 @@ local subcommands = {
 		if not limit then limit = 500 end
 
 		guilds[interaction.guild.id]:setLimit(limit)
-		return "Server limit set", okEmbed(interaction, "limitConfirm", limit)
+		return "Server limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
 	end,
 
 	permissions = function (interaction, perm)
@@ -62,22 +62,22 @@ local subcommands = {
 			end
 
 			guildData:setPermissions(permissionBits)
-			return "Server permissions set", okEmbed(interaction, "permissionsConfirm")
+			return "Server permissions set", okResponse(true, interaction.locale, "permissionsConfirm")
 		end
 
 		guildData:setPermissions(botPermissions())
-		return "Server permissions reset", okEmbed(interaction, "permissionsReset")
+		return "Server permissions reset", okResponse(true, interaction.locale, "permissionsReset")
 	end
 }
 
 return function (interaction, subcommand, argument)
 	if subcommand == "view" then
-		return "Sent server info", serverInfoEmbed(interaction)
+		return "Sent server info", serverInfoResponse(true, interaction.locale, interaction.guild)
 	end
 
-	local isPermitted, logMsg, embed = checkSetupPermissions(interaction)
+	local isPermitted, logMsg, response = checkSetupPermissions(interaction)
 	if not isPermitted then
-		return logMsg, embed
+		return logMsg, response
 	end
 
 	return subcommands[subcommand](interaction, argument)

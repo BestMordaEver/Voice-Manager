@@ -1,8 +1,8 @@
 local client = require "client"
 local locale = require "locale/runtime/localeHandler"
 
-local okEmbed = require "response/ok"
-local warningEmbed = require "response/warning"
+local okResponse = require "response/ok"
+local warningResponse = require "response/warning"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local truePositionSort = require "utils/truePositionSort"
@@ -27,9 +27,9 @@ return function (interaction, action, argument)
 		local name = options.name and options.name.value
 		local only_empty = options.only_empty and options.only_empty.value
 
-		local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+		local ok, logMsg, response = checkSetupPermissions(interaction, category)
 		if not ok then
-			return logMsg, embed
+			return logMsg, response
 		end
 
 		---@diagnostic disable-next-line: undefined-field
@@ -47,7 +47,7 @@ return function (interaction, action, argument)
 			return true
 		end), truePositionSort)
 
-		if #channels == 0 then return "No channels to delete", warningEmbed(interaction, "deleteNone") end
+		if #channels == 0 then return "No channels to delete", warningResponse(true, interaction.locale, "deleteNone") end
 
 		local channels = table.move(channels, 1, amount, 1, {})
 
@@ -104,10 +104,10 @@ return function (interaction, action, argument)
 					end
 				end
 
-				interaction:followup(okEmbed(interaction, "deleteConfirm", count), true)
+				interaction:followup(okResponse(true, interaction.locale, "deleteConfirm", count))
 				return "Deleted the channels"
 			else
-				interaction:reply(warningEmbed(interaction, "deleteNotArmed"), true)
+				interaction:reply(warningResponse(true, interaction.locale, "deleteNotArmed"))
 				return "Not all keys are armed"
 			end
 

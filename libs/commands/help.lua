@@ -1,11 +1,11 @@
-local helpEmbed = require "response/help"
+local helpResponse = require "response/help"
 
 return function (interaction, page)
 	if page then
-		interaction:update(helpEmbed(interaction, page))
+		interaction:update(helpResponse(true, interaction.locale, page))
 		return "Help page switched"
 	else
 		local command = interaction.option and interaction.option.value or "help"
-		return command.." help message", helpEmbed(interaction, command)
+		return command.." help message", helpResponse(true, interaction.locale, command)
 	end
 end

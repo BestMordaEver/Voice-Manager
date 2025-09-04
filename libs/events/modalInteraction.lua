@@ -2,7 +2,7 @@ local logger = require "logger"
 
 local commands = require "commands/init"
 
-local errorEmbed = require "response/error"
+local errorResponse = require "response/error"
 
 return function (interaction)
     interaction:deferReply(true)
@@ -18,9 +18,9 @@ return function (interaction)
 
 	if res then
 		logger:log(4, "USER %s: %s", interaction.user.id, logMsg)
-        interaction:updateReply(reply or errorEmbed(interaction))	-- reply mustn't be empty
+        interaction:updateReply(reply or errorResponse(true, interaction.locale))	-- reply mustn't be empty
 	else
-		interaction:updateReply(errorEmbed(interaction))
+		interaction:updateReply(errorResponse(true, interaction.locale))
 		error(string.format('failed to process the modal "%s"\n%s', interaction.customId, logMsg))
 	end
 

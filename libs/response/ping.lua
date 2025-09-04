@@ -1,20 +1,26 @@
-local locale = require "locale/runtime/localeHandler"
 local client = require "client"
-local embed = require "response/embed"
 
 local guilds = require "storage/guilds"
 local stats = require "storage/handler".stats
 
-local black = embed.colors.black
+local componentType = require "discordia".enums.componentType
+local localeHandler = require "locale/runtime/localeHandler"
+local response = require "response/response"
 
-return embed("ping", function (interaction, dt, guild, ephemeral)
+---@overload fun(ephemeral : boolean, locale : localeName, dt : Date, guild : Guild) : table
+local ping = response("ping", response.colors.black, function (locale, dt, guild)
 	local guildData = guilds[guild.id]
-	return {embeds = {{
-		color = black,
-		description = locale(interaction.locale, "ping", dt:toMilliseconds(),
+
+	return {
+		{
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "ping", dt:toMilliseconds(),
 			#client.guilds,
 			stats.lobbies, #guildData.lobbies,
 			stats.channels, guildData:channels(),
 			stats.users, guildData:users())
-	}}, ephemeral = ephemeral}
+		}
+	}
 end)
+
+return ping

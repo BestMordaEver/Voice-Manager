@@ -5,8 +5,8 @@ local interactionType = require "discordia".enums.interactionType
 
 local lobbies = require "storage/lobbies"
 
-local okEmbed = require "response/ok"
-local companionsInfoEmbed = require "response/companionsInfo"
+local okResponse = require "response/ok"
+local companionsInfoResponse = require "response/companionsInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local greetingComponents = require "utils/components".greetingComponents
@@ -16,34 +16,34 @@ local subcommands
 subcommands = {
 	enable = function (interaction, channel)
 		lobbies[channel.id]:setCompanionTarget(true)
-		return "Lobby companion enabled", okEmbed(interaction, "companionEnable")
+		return "Lobby companion enabled", okResponse(true, interaction.locale, "companionEnable")
 	end,
 
 	disable = function (interaction, channel)
 		lobbies[channel.id]:setCompanionTarget(nil)
-		return "Lobby companion disabled", okEmbed(interaction, "companionDisable")
+		return "Lobby companion disabled", okResponse(true, interaction.locale, "companionDisable")
 	end,
 
 	category = function (interaction, channel, category)
 		if not category then
 			lobbies[channel.id]:setCompanionTarget(true)
-			return "Companion target category reset", okEmbed(interaction, "categoryReset")
+			return "Companion target category reset", okResponse(true, interaction.locale, "categoryReset")
 		end
 
-		local ok, logMsg, embed = checkSetupPermissions(interaction, category)
+		local ok, logMsg, response = checkSetupPermissions(interaction, category)
 		if ok then
 			lobbies[channel.id]:setCompanionTarget(category.id)
-			return "Companion target category set", okEmbed(interaction, "categoryConfirm", category.name)
+			return "Companion target category set", okResponse(true, interaction.locale, "categoryConfirm", category.name)
 		end
 
-		return logMsg, embed
+		return logMsg, response
 	end,
 
 	name = function (interaction, channel, name)
 		if not name then name = "private-chat" end
 
 		lobbies[channel.id]:setCompanionTemplate(name)
-		return "Companion name template set", okEmbed(interaction, "nameConfirm", name)
+		return "Companion name template set", okResponse(true, interaction.locale, "nameConfirm", name)
 	end,
 
 	greeting = function (interaction, channel, greeting)
@@ -55,7 +55,7 @@ subcommands = {
 			else
 				lobbies[channel.id]:setGreeting(greeting)
 			end
-			return "Companion greeting set", okEmbed(interaction, "greetingConfirm")
+			return "Companion greeting set", okResponse(true, interaction.locale, "greetingConfirm")
 		end
 
 		interaction:createModal("companion_greetingwidget_"..channel.id, locale(interaction.locale, "greetingModalTitle"), greetingComponents(interaction))
@@ -68,27 +68,27 @@ subcommands = {
 
 	log = function (interaction, channel, logChannel)
 		if logChannel then
-			local ok, logMsg, embed = checkSetupPermissions(interaction, logChannel)
+			local ok, logMsg, response = checkSetupPermissions(interaction, logChannel)
 			if ok then
 				lobbies[channel.id]:setCompanionLog(logChannel.id)
-				return "Companion log channel set", okEmbed(interaction, "logConfirm", logChannel.name)
+				return "Companion log channel set", okResponse(true, interaction.locale, "logConfirm", logChannel.name)
 			end
 
-			return logMsg, embed
+			return logMsg, response
 		end
 
 		lobbies[channel.id]:setCompanionLog()
-		return "Companion log channel reset", okEmbed(interaction, "logReset")
+		return "Companion log channel reset", okResponse(true, interaction.locale, "logReset")
 	end
 }
 
 return function (interaction, subcommand, argument)
-	local channel, embed
+	local channel, response
 	if interaction.type == interactionType.modalSubmit then
 		channel = client:getChannel(argument)
 	else
-		channel, embed = lobbyPreProcess(interaction, companionsInfoEmbed)
+		channel, response = lobbyPreProcess(interaction, companionsInfoResponse)
 	end
-	if embed then return channel, embed end
+	if response then return channel, response end
 	return subcommands[subcommand](interaction, channel, argument)
 end
