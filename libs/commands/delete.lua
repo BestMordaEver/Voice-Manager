@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 
 local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
@@ -63,7 +63,7 @@ return function (interaction, action, argument)
 			insert(components[row].components[1].options, {
 				label = channel.name,
 				value = channel.id,
-				description = channel.category and locale(interaction.locale, "inCategory", channel.category.name),
+				description = channel.category and localeHandler(interaction.locale, "inCategory", channel.category.name),
 				default = true
 			})
 			storage[row][channel.id] = true
@@ -75,7 +75,7 @@ return function (interaction, action, argument)
 
 		insert(components, buttons)
 
-		return "Deletion list is formed", {content = locale(interaction.locale, "deleteForm", #channels), components = components}
+		return "Deletion list is formed", {content = localeHandler(interaction.locale, "deleteForm", #channels), components = components}
 
 	else	-- sent from component, absolute anarchy
 		-- no perm check, since component is on ephemeral message, that was sent to permed user
@@ -92,7 +92,7 @@ return function (interaction, action, argument)
 			for i=1,4 do if buttons[i].style ~= 3 then ready = false end end
 
 			if ready then
-				interaction:update {content = locale(interaction.locale, "deleteProcessing"), components = {}}
+				interaction:update {content = localeHandler(interaction.locale, "deleteProcessing"), components = {}}
 
 				local count = 0
 				for i=1,#components-1 do

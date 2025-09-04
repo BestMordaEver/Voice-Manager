@@ -1,4 +1,4 @@
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 local enums = require "discordia".enums
 local buttonStyle = enums.buttonStyle
 local componentType = enums.componentType
@@ -16,7 +16,7 @@ local handler = {
 						type = componentType.textInput,
 						custom_id = "greeting",
 						style = inputStyle.paragraph,
-						label = locale(interaction.locale, "greetingModalTitle")
+						label = localeHandler(interaction.locale, "greetingModalTitle")
 					}
 				}
 			}

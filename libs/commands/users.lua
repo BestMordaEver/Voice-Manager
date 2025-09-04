@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 
 local lobbies = require "storage/lobbies"
 
@@ -30,7 +30,7 @@ local commands = {
             end
 
             names = table.concat(names, separator)
-            if #names == 0 then names = locale(interaction.locale, "none") end
+            if #names == 0 then names = localeHandler(interaction.locale, "none") end
         end
 
         local embeds, index, len = {}, 1, #names

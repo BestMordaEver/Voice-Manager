@@ -1,4 +1,4 @@
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 local client = require "client"
 
 local interactionType = require "discordia".enums.interactionType
@@ -58,7 +58,7 @@ subcommands = {
 			return "Companion greeting set", okResponse(true, interaction.locale, "greetingConfirm")
 		end
 
-		interaction:createModal("companion_greetingwidget_"..channel.id, locale(interaction.locale, "greetingModalTitle"), greetingComponents(interaction))
+		interaction:createModal("companion_greetingwidget_"..channel.id, localeHandler(interaction.locale, "greetingModalTitle"), greetingComponents(interaction))
 		return "Sent greeting setup modal"
 	end,
 

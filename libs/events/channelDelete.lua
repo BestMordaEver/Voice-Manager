@@ -1,5 +1,5 @@
 local client = require "client"
-local locale = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/runtime/localeHandler"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
@@ -24,10 +24,10 @@ return function (channel) -- and make sure there are no traces!
 				if logChannel then
 					local log = Overseer.finalize(companionID)
 					logChannel:send{
-						content = locale(channel.guild.preferred_locale,
+						content = localeHandler(channel.guild.preferred_locale,
 							"logName",
 							channel.name,
-							channelData.parent and client:getChannel(channelData.parent.id).name or locale(channel.guild.preferred_locale, "noParent")),
+							channelData.parent and client:getChannel(channelData.parent.id).name or localeHandler(channel.guild.preferred_locale, "noParent")),
 						file = {string.format("%s.txt", companionID), log}
 					}
 				end
