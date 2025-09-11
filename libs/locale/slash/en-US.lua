@@ -24,6 +24,9 @@ return {
 	help = "help",
 	helpArticle = "article",
 	helpArticleOther = "other",
+	helpChoiceLobby = "lobby names and permissions",
+	helpChoiceRoom1 = "room management",
+	helpChoiceRoom2 = "room moderation",
 	helpDesc = "A help command!",
 	helpArticleDesc = "Which help article do you need?",
 

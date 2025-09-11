@@ -15,6 +15,9 @@ return {
 				{
 					name = locale.lobby,
 					value = "lobby"
+				},{
+					name = locale.helpChoiceLobby,
+					value = "lobbymore"
 				},
 				{
 					name = locale.matchmaking,
@@ -25,8 +28,11 @@ return {
 					value = "companion"
 				},
 				{
-					name = locale.room,
+					name = locale.helpChoiceRoom1,
 					value = "room"
+				},{
+					name = locale.helpChoiceRoom2,
+					value = "roommore"
 				},
 				{
 					name = locale.server,

@@ -1,42 +1,55 @@
 ---@type {textLine : string|table}
 local locale = {
 	-- help
-	helpContents = [[# Table of contents
-**Lobby commands**
-Setup and configure lobbies - **/lobby**
+	helpSelectorPlaceholder = "Select help article",
+	helpSelectorLobby = "Lobby",
+	helpSelectorLobbyMore = "Lobby names and permissions",
+	helpSelectorMatchmaking = "Matchmaking",
+	helpSelectorCompanion = "Companion",
+	helpSelectorRoom = "Room management",
+	helpSelectorRoomMore = "Room moderation",
+	helpSelectorServer = "Server",
+	helpSelectorOther = "Other",
 
-**Matchmaking commands**
-Setup and configure matchmaking in lobbies or normal channels - **/matchmaking**
-
-**Companion commands**
-Configure companion chats (see **Lobby commands** first) - **/companion**
-
-**Room commands**
-User commands for room configuration and moderation - **/room**
-
-**Server commands**
-Setup bot functionality in normal channels - **/server**
-
-**Other commands**
+	helpContentsLobby = [[**Lobby commands**
+Setup and configure lobbies]],
+	helpContentsSLobby = "/lobby",
+	helpContentsMatchmaking = [[**Matchmaking commands**
+Setup and configure matchmaking in lobbies or normal channels]],
+	helpContentsSMatchmaking = "/matchmaking",
+	helpContentsCompanion = [[**Companion commands**
+Configure companion chats (see **Lobby commands** first)]],
+	helpContentsSCompanion = "/companion",
+	helpContentsRoom = [[**Room commands**
+User commands for room configuration and moderation]],
+	helpContentsSRoom = "/room",
+	helpContentsServer = [[**Server commands**
+Setup bot functionality in normal channels]],
+	helpContentsSServer = "/server",
+	helpContentsOther = [[**Other commands**
 Different helpful commands for users and administrators]],
+	helpContentsSOther = "/help",
 
-	helpLobby = [[# Lobby commands
-Enter a lobby to create a room. Room is deleted once it's empty
+	helpLobbyHeader = [[# Lobby commands
+Enter a lobby to create a room. Room is deleted once it's empty]],
+	helpLobbySetup = "Quickly configure several lobbies",
+	helpLobbySSetup = "/lobby setup",
+	helpLobbyView = "Show your lobbies",
+	helpLobbySView = "/lobby view",
+	helpLobbyAdd = "Add a new lobby",
+	helpLobbySAdd = "/lobby add",
+	helpLobbyRemove = "Remove an existing lobby",
+	helpLobbySRemove = "/lobby remove",
+	helpLobbyCategory = "Select a category in which rooms will be created. By default, rooms are created in the same category as the lobby.",
+	helpLobbySCategory = "/lobby category",
+	helpLobbyCapacity = "Choose the capacity for the new rooms. By default, capacity will be copied from the lobby.",
+	helpLobbySCapacity = "/lobby capacity",
+	helpLobbyLimit = "Set the maximum amount of channels bot will create for the lobby",
+	helpLobbySLimit = "/lobby limit",
+	helpLobbyBitrate = "Choose the bitrate for the new rooms. By default, bitrate will be copied from the lobby. This setting respects server boost status.",
+	helpLobbySBitrate = "/lobby bitrate",
 
-**/lobby view**
-Show your lobbies
-
-**/lobby add**
-Add a new lobby
-
-**/lobby remove**
-Remove an existing lobby
-
-**/lobby category**
-Select a category in which rooms will be created. By default, rooms are created in the same category as the lobby.
-
-**/lobby name**
-Configure what name a room will have when it's created. Default name is **%nickname's% room**.
+	helpLobbyName = [[Configure what name a room will have when it's created. Default name is **%nickname's% room**.
 You can put different **%patterns%** in the name to customize it
 **%name%** - user's name
 **%nickname%** - user's nickname (name is used if nickname is not set)
@@ -46,19 +59,9 @@ You can put different **%patterns%** in the name to customize it
 **%game(text)%** - same as %game%, but shows **text** instead of **no game**
 **%counter%** - room position, keeps rooms ordered
 **%rename%** - blank when room is created, gets replaced by host's input when **/room rename** is used
-**%rename(text)%** - same as %rename%, but shows **text** instead of being blank
-
-**/lobby capacity**
-Select new rooms' capacity. By default, capacity will be copied over from the lobby.
-
-**/lobby limit**
-Set the maximum amount of channels bot will create for the lobby
-
-**/lobby bitrate**
-Select new rooms' bitrate. By default, bitrate will be copied over from the lobby. This setting respects server boost status, so you may want to try bigger numbers.
-
-**/lobby permissions**
-Give room hosts' access to different commands
+**%rename(text)%** - same as %rename%, but shows **text** instead of being blank]],
+	helpLobbySName = "/lobby name",
+	helpLobbyPermissions = [[Give room hosts' access to different commands
 Room settings permissions:
 **rename** - allows use of **/room rename**
 **resize** - allows use of **/room resize**
@@ -70,147 +73,126 @@ Moderation permissions:
 **hide** - allows use of **/room hide|show**
 **lock** - allows use of **/room lock|unlock** and **/room block|unblock**
 **password** - allows use of **/room password**
-**moderate** - all of the above. If bot is given administrator privileges, gives host **Manage Roles** permission in their room
+**moderate** - all of the above. If bot is given administrator privileges, gives host **Manage Roles** permission in their room.]],
+	helpLobbySPermissions = "/lobby permissions",
+	helpLobbyRole = "Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone.",
+	helpLobbySRole = "/lobby role",
 
-**/lobby role**
-Change the default role that's used to inflict restrictions in room and chat commands. Default is @everyone.]],
-
-	helpMatchmaking = [[# Matchmaking commands
-Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool
-
-**/matchmaking view**
-Show your matchmaking lobbies
-
-**/matchmaking add**
-Add a new matchmaking lobby
-
-**/matchmaking remove**
-Remove an existing matchmaking lobby
-
-**/matchmaking target**
-Select a target for the matchmaking pool
+	helpMatchmakingHeader = [[# Matchmaking commands
+Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool]],
+	helpMatchmakingSetup = "Quickly configure several matchmaking lobbies",
+	helpMatchmakingSSetup = "/matchmaking setup",
+	helpMatchmakingView = "Show your matchmaking lobbies",
+	helpMatchmakingSView = "/matchmaking view",
+	helpMatchmakingAdd = "Add a new matchmaking lobby",
+	helpMatchmakingSAdd = "/matchmaking add",
+	helpMatchmakingRemove = "Remove an existing matchmaking lobby",
+	helpMatchmakingSRemove = "/matchmaking remove",
+	helpMatchmakingTarget = [[Select a target for the matchmaking pool
 **If target is a lobby**, then the matchmaking pool is rooms that are created by that lobby. If no room is available, a new one is created using that lobby's settings.
-**If target is a category**, then the matchmaking pool is its voice channels. If no channel is available, user is kicked from the matchmaking lobby.
-
-**/matchmaking mode**
-Select the matchmaking mode. All modes respect channel capacity and blocklists/reservations.
+**If target is a category**, then the matchmaking pool is its voice channels. If no channel is available, user is kicked from the matchmaking lobby.]],
+	helpMatchmakingSTarget = "/matchmaking target",
+	helpMatchmakingMode = [[Select the matchmaking mode. All modes respect channel capacity and blocklists/reservations.
 **random** - selects a random available channel. This is the default option
 **max** - selects the most filled available channel
 **min** - selects the least filled available channel
 **first** - selects the first available channel
 **last** - selects the last available channel]],
+	helpMatchmakingSMode = "/matchmaking mode",
 
-	helpCompanion = [[# Companion commands
+	helpCompanionHeader = [[# Companion commands
 Companion chats are created and deleted along the rooms. By default, chat is visible only when you're in the chat's room.
-Some commands in this category can be used with text-in-voice and don't require companion chat to be enabled.
-
-**/companion view**
-Show all lobies that have companion chats enabled
-
-**/companion enable|disable**
-Enable or disable companion chat for a lobby
-
-**/companion category**
-Select a category in which chats will be created
-
-**/companion name**
-Configure what name a chat will have when it's created and customize it with %patterns% similarly to **/lobby name**. Default is **private-chat**.
-Text chat names have default formatting enforced by Discord, name template will be automatically converted to this formatting.
-
-**/companion greeting**
-Configure a message that will be automatically sent to the chat when it's created. This command also works in chat-in-voice channels.
+Some commands in this category can be used with text-in-voice and don't require companion chat to be enabled.]],
+	helpCompanionSetup = "Quickly configure companion settings for several lobbies",
+	helpCompanionSSetup = "/companion setup",
+	helpCompanionView = "Show all lobies that have companion chats enabled",
+	helpCompanionSView = "/companion view",
+	helpCompanionEnable = "Enable companion chat for a lobby",
+	helpCompanionSEnable = "/companion enable",
+	helpCompanionDisable = "Disable companion chat for a lobby",
+	helpCompanionSDisable = "/companion disable",
+	helpCompanionCategory = "Select a category in which chats will be created",
+	helpCompanionSCategory = "/companion category",
+	helpCompanionName = [[Configure what name a chat will have when it's created and customize it with %patterns% similarly to **/lobby name**. Default is **private-chat**.
+Text chat names have default formatting enforced by Discord, name template will be automatically converted to this formatting.]],
+	helpCompanionSName = "/companion name",
+	helpCompanionGreeting = [[Configure a message that will be automatically sent to the chat when it's created. This command also works in chat-in-voice channels.
 You can put different **%patterns%** in the greeting to customize it.
 **%roomname%** - name of the room chat belongs to
 **%chatname%** - name of the chat
 **%commands%** - list of available **/room** commands
 **%nickname%**, **%name%**, **%tag%**, **%nickname's%**, **%name's%** - similar to **/lobby name**
-**%buttons%** - blank, attaches privacy controls to the greeting message
+**%buttons%** - blank, attaches privacy controls to the greeting message]],
+	helpCompanionSGreeting = "/companion greeting",
+	helpCompanionLog = "Enable chat logging. Logs will be sent as files to a channel of your choosing. Users will be notified about chat logging with a generic greeting message in chat.",
+	helpCompanionSLog = "/companion log",
 
-**/companion log**
-Enable chat logging. Logs will be sent as files to a channel of your choosing. Users will be notified about chat logging with a generic greeting message in chat.]],
+	helpRoomHeader = [[# Room commands
+Most room commands are used by a room host - the user who created the room. Those commands can be enabled by administrator.]],
+	helpRoomView = "Show room info and available commands",
+	helpRoomSView = "/room view",
+	helpRoomHost = "Ping current room host or transfer host privileges to another user",
+	helpRoomSHost = "/room host",
+	helpRoomInvite = "Send invite to immediately connect to the room. If specific user is mentioned - sends them a DM. If sent by a room host - whitelists them.",
+	helpRoomSInvite = "/room invite",
+	helpRoomRename = [[Change room or companion name
+❗Bot can't change the channel name more than twice per 10 minutes❗]],
+	helpRoomSRename = "/room rename",
+	helpRoomResize = "Change room capacity",
+	helpRoomSResize = "/room resize",
+	helpRoomBitrate = "Change room bitrate. This command respects server boost status.",
+	helpRoomSBitrate = "/room bitrate",
+	helpRoomKick = "Kick a user from the room. This will not prevent the user from joining in the future, use **/room block** for that.",
+	helpRoomSKick = "/room kick",
+	helpRoomBlock = "Restrict or allow entry to the room for a specific user",
+	helpRoomSBlock = "/room block|allow",
+	helpRoomLock = "Lock or unlock entry to the room",
+	helpRoomSLock = "/room lock|unlock",
+	helpRoomMuteVoice = "Mute or unmute a user in your voice channel and change if new users are able to speak",
+	helpRoomSMuteVoice = "/room mute|unmute voice",
+	helpRoomMuteText = "Mute or unmute a user in your text channels and change if new users are able to write",
+	helpRoomSMuteText = "/room mute|unmute text",
+	helpRoomHideVoice = "Hide or show the room",
+	helpRoomSHideVoice = "/room hide|show voice",
+	helpRoomHideText = "Hide or show the companion text channel",
+	helpRoomSHideText = "/room hide|show text",
+	helpRoomPassword = "Users will have to enter the password before connecting to the channel, unless they were invited or allowed in with **/room allow**",
+	helpRoomSPassword = "/room password",
 
-	helpRoom = [[# Room commands
-Most room commands are used by a room host - the user who created the room. Those commands can be enabled by administrator.
+	helpServerHeader = [[# Server commands
+Global server settings. Room commands in normal channels can be enabled using these commands.]],
+	helpServerSetup = "Quickly configure server settings all in one place",
+	helpServerSSetup = "/server setup",
+	helpServerView = "Show server settings",
+	helpServerSView = "/server view",
+	helpServerLimit = "Set the maximum amount of channels bot will create on the server",
+	helpServerSLimit = "/server limit",
+	helpServerPermissions = [[Enable room commands in normal voice channels, similar to **/lobby permissions**
+Bot will start deleting user permission overwrites in all voice channels once this is enabled, use at your own risk!]],
+	helpServerSPermissions = "/server permissions",
+	helpServerRole = "Change the default role that's used to inflict restrictions in channels",
+	helpServerSRole = "/server role",
 
-**/room view**
-Show room info and available commands
-
-**/room rename**
-Change room or companion name
-❗Bot can't change the channel name more than twice per 10 minutes❗
-
-**/room resize**
-Change room capacity
-
-**/room bitrate**
-Change room bitrate. This command respects server boost status, check if you can use higher bitrates.
-
-**/room kick**
-Kick a user from the room
-
-**/room mute|unmute**
-Mute or unmute a user and change whether you want new users to be able to speak or write
-
-**/room block|allow**
-Restrict or allow entry to the room for a specific user
-
-**/room hide|show**
-Hide or show the room
-
-**/room lock|unlock**
-Lock or unlock entry to the room
-
-**/room password**
-Users will have to enter the password before connecting to the channel, unless they were invited or whitelisted with **/room allow**
-
-**/room host**
-Ping current room host or transfer host privileges to another user
-
-**/room invite**
-Send invite to immediately connect to the room. If specific user is mentioned - sends them a DM. If sent by a room host - whitelists them.]],
-
-	helpServer = [[# Server commands
-Global server settings. Room commands in normal channels can be enabled using these commands.
-
-**/server view**
-Show server settings
-
-**/server limit**
-Set the maximum amount of channels bot will create on the server
-
-**/server permissions**
-Enable room commands in normal voice channels, similar to **/lobby permissions**
-Bot will start deleting user permission overwrites in all voice channels once this is enabled, use at your own risk!
-
-**/server role**
-Change the default role that's used to inflict restrictions in channels]],
-
-	helpOther = [[# Other commands
-**/help [lobbies|matchmaking|companion|room|chat|other]**
-Show table of contents for help. You can specify the page to show instead of table of contents.
-
-**/support**
-Send invite to the support server
-
-**/reset <command> <subcommand>**
-Reset any setting to its default value
-Example: **/reset companion greeting**
-
-**/clone <channel> <amount> [name]**
-Clone a channel. You can add **%counter%** to channel name to make the cloned channels numbered, and **%counter(number)%** to start counting from a specific number.
-This command will not carry over any permission overrides from the cloned channel - all clones will spawn synced with the parent category.
-
-**/delete <channel_type> [category] [amount] [name] [only_empty]**
-Delete several channels. Optionally select several filters - category, name, whether to consider channels with messages (for text) or connected members (for voice).
-This command will not immediately delete the selected channels, instead a helper tool will appear. Handle with care, since channels are deleted irreversibly!
-
-**/users print <channel|lobby|category> [mode] [separator]**
-Create a handy list of users in a selected channel
+	helpHelp = "Show table of contents for help. You can also specify a specific article you might want to see",
+	helpSHelp = "/help",
+	helpSupport = "Sends an invite to the support server",
+	helpSSupport = "/support",
+	helpReset = "Reset any setting to its default value",
+	helpSReset = "/reset",
+	helpClone = [[Clone a channel. You can add **%counter%** to channel name to make the cloned channels numbered, and **%counter(number)%** to start counting from a specific number.
+This command will not carry over any permission overrides from the cloned channel - all clones will spawn synced with the parent category.]],
+	helpSClone = "/clone",
+	helpDelete = [[Delete several channels. Optionally select several filters - category, name, whether to consider channels with messages (for text) or connected members (for voice).
+This command will not immediately delete the selected channels, instead a helper tool will appear. Handle with care, since channels are deleted irreversibly!]],
+	helpSDelete = "/delete",
+	helpUsersPrint = [[Create a handy list of users in a selected channel
 If selected channel is a lobby, prints users in lobby's rooms or matchmaking pool channels
-If category is selected, all it's channels are used
-
-**/users give|remove <channel|lobby|category> <role>**
-Give or remove a role to/from users in a selected channel. Selection rules are similar to **/users print**]],
+If category is selected, prints users in the channels in the category]],
+	helpUsersSPrint = "/users print",
+	helpUsersGive = "Give a role to users in a selected channel. Selection rules are similar to **/users print**",
+	helpUsersSGive = "/users remove",
+	helpUsersRemove = "Remove a role from users in a selected channel. Selection rules are similar to **/users print**",
+	helpUsersSRemove = "/users remove",
 
 	helpLinks = [[[Setup Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/Setup-Guide) | [User Guide](https://github.com/BestMordaEver/Voice-Manager/wiki/User-Guide) | [Glossary](https://github.com/BestMordaEver/Voice-Manager/wiki/Glossary)
 [Privacy](https://github.com/BestMordaEver/Voice-Manager/blob/dev/privacy.md) | [ToS](https://github.com/BestMordaEver/Voice-Manager/blob/dev/tos.md)
@@ -389,9 +371,9 @@ https://discord.gg/%s]],
 	usersRolesRemoved = "Removed the role from %d users",
 
 	-- utility
-	embedOK = "#✅ OK",
-	embedWarning = "#⚠ Warning",
-	embedError = "#❗ Error",
+	embedOK = "# ✅ OK",
+	embedWarning = "# ⚠ Warning",
+	embedError = "# ❗ Error",
 	asIs = "%s",
 
 	inCategory = "in %s category",
