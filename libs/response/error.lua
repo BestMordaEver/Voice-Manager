@@ -4,7 +4,7 @@ local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName) : table
 local error = response("error", response.colors.red, function (locale)
-	local errorReactions = locale(locale, "errorReaction")
+	local errorReactions = localeHandler(locale, "errorReaction")
 
 	return {
 		{
