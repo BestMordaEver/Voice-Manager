@@ -58,7 +58,12 @@ local subcommands = {
 }
 
 return function (interaction, subcommand, argument)
-	local channel, response = lobbyPreProcess(interaction, matchmakingInfoResponse)
+	if subcommand == "view" then
+		return "Sent lobby info", matchmakingInfoResponse(true, interaction.locale, argument or interaction.guild)
+	end
+
+	local channel, response = lobbyPreProcess(interaction)
 	if response then return channel, response end
+
 	return subcommands[subcommand](interaction, channel, argument)
 end

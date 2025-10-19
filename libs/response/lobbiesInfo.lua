@@ -11,33 +11,31 @@ local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table
 local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (locale, target)
-	local sortedLobbies
-	if target.guild then
-		sortedLobbies = {lobbies[target.id]}
-		target = target.guild
-	else
-		---@diagnostic disable-next-line: undefined-field
-		sortedLobbies = table.sorted(target.voiceChannels:toArray(function(voiceChannel)
-			return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
-		end), tps)
-		for i,lobby in ipairs(sortedLobbies) do
-			sortedLobbies[i] = lobbies[lobby.id]
-		end
-	end
-
 	local components = {
 		{
 			type = componentType.textDisplay,
-			content = localeHandler(locale, "lobbiesInfoTitle", target.name)
+			content = string.format("## %s", target.name)
 		}
 	}
 
-	if #sortedLobbies == 0 then insert(components, {
-		type = componentType.textDisplay,
-		localeHandler(locale, "lobbiesNoInfo")
-	}) end
+	local guild = target.guild or target
+	local isChannel = not not target.guild
 
-	for _, lobbyData in ipairs(sortedLobbies) do
+	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
+		return lobbies[voiceChannel.id] and not lobbies[voiceChannel.id].isMatchmaking
+	end), tps)
+
+	if not sortedLobbies or #sortedLobbies == 0 then
+		insert(components, {
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "lobbiesNoInfo")
+		})
+
+		return components
+	end
+
+	if isChannel then
+		local lobbyData = lobbies[target.id]
 		local target = client:getChannel(lobbyData.target)
 		local roles = {}
 		for roleID in pairs(lobbyData.roles) do
@@ -52,12 +50,8 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 
 		insert(components, {
 			type = componentType.textDisplay,
-			name = string.format("**%s**", client:getChannel(lobbyData.id).name)
-		})
-
-		insert(components, {
-			type = componentType.textDisplay,
-			name = localeHandler(locale, "lobbiesField",
+			content = localeHandler(locale, "lobbiesField",
+				client:getChannel(lobbyData.id).name,
 				target and target.name or "default",
 				lobbyData.template or "%nickname's% room",
 				lobbyData.permissions,
@@ -67,6 +61,29 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 				lobbyData.companionTarget and "enabled" or "disabled",
 				#lobbyData.children
 			)
+		})
+	end
+
+	if not isChannel or #sortedLobbies > 1 then
+		local options = {}
+
+		for _, lobby in ipairs(sortedLobbies) do
+			if lobby ~= target then
+				insert(options, {
+					label = lobby.name,
+					value = lobby.id
+				})
+			end
+		end
+
+		insert(components, {
+			type = componentType.row,
+			components = {{
+				type = componentType.stringSelect,
+				custom_id = "lobby_view",
+				options = options,
+				placeholder = localeHandler(locale, "lobbyViewSelect")
+			}}
 		})
 	end
 

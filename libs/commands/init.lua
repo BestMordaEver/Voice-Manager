@@ -37,9 +37,14 @@ return setmetatable({
 		-- undeferrable commands that might need to send a modal
 
 		-- resolving the argument here
-		if interaction.option and interaction.option.options then
-			for optionName, option in pairs(interaction.option.options) do
-				if optionName ~= "lobby" then argument = option end
+		if interaction.option then
+			if interaction.option.option then
+				argument = interaction.option.option
+			elseif interaction.option.options then
+				for optionName, option in pairs(interaction.option.options) do
+					if optionName ~= "lobby" then argument = option end
+					break
+				end
 			end
 		end
 		-- the argument can be used as indication of work to be done, and actual arguments will be resolved by the command function itself

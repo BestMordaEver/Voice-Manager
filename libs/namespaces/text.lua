@@ -70,8 +70,6 @@ local text = {
 	helpCompanionSView = true,
 	helpCompanionEnable = true,
 	helpCompanionSEnable = true,
-	helpCompanionDisable = true,
-	helpCompanionSDisable = true,
 	helpCompanionCategory = true,
 	helpCompanionSCategory = true,
 	helpCompanionName = true,
@@ -146,8 +144,8 @@ local text = {
 	-- lobbies
 	lobbiesInfoTitle = true,
 	lobbiesNoInfo = true,
-	lobbiesInfo = true,
 	lobbiesField = true,
+	lobbyViewSelect = true,
 
 	addConfirm = true,
 	removeConfirm = true,

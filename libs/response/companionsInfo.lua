@@ -11,49 +11,65 @@ local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table
 local companionsInfo = response("companionsInfo", response.colors.blurple, function (locale, target)
-	local sortedLobbies
-	if target.guild then
-		sortedLobbies = {lobbies[target.id]}
-		target = target.guild
-	else
-		---@diagnostic disable-next-line: undefined-field
-		sortedLobbies = table.sorted(target.voiceChannels:toArray(function(voiceChannel)
-			return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget and not lobbies[voiceChannel.id].isMatchmaking
-		end), tps)
-		for i,lobby in ipairs(sortedLobbies) do
-			sortedLobbies[i] = lobbies[lobby.id]
-		end
-	end
-
 	local components = {
 		{
 			type = componentType.textDisplay,
-			content = localeHandler(locale, "companionsInfoTitle", target.name)
+			content = string.format("## %s", target.name)
 		}
 	}
 
-	if #sortedLobbies == 0 then insert(components, {
-		type = componentType.textDisplay,
-		localeHandler(locale, "companionsNoInfo")
-	}) end
+	local guild = target.guild or target
+	local isChannel = not not target.guild
 
-	for _, lobbyData in ipairs(sortedLobbies) do
+	local sortedLobbies = table.sorted(guild.voiceChannels:toArray(function(voiceChannel)
+		return lobbies[voiceChannel.id] and lobbies[voiceChannel.id].companionTarget and not lobbies[voiceChannel.id].isMatchmaking
+	end), tps)
+
+	if not sortedLobbies or #sortedLobbies == 0 then
+		insert(components, {
+			type = componentType.textDisplay,
+			content = localeHandler(locale, "companionsNoInfo")
+		})
+
+		return components
+	end
+
+	if isChannel then
+		local lobbyData = lobbies[target.id]
 		local target = client:getChannel(lobbyData.companionTarget)
 		local logChannel = client:getChannel(lobbyData.companionLog)
 
 		insert(components, {
 			type = componentType.textDisplay,
-			name = string.format("**%s**", client:getChannel(lobbyData.id).name)
-		})
-
-		insert(components, {
-			type = componentType.textDisplay,
-			name = localeHandler(locale, "companionsField",
+			content = localeHandler(locale, "companionsField",
 				target and target.name or "default",
 				lobbyData.companionTemplate or "private-chat",
 				logChannel and logChannel.name or localeHandler(locale, "none"),
 				lobbyData.greeting or localeHandler(locale, "none")
 			)
+		})
+	end
+
+	if not isChannel or #sortedLobbies > 1 then
+		local options = {}
+
+		for _, lobby in ipairs(sortedLobbies) do
+			if lobby ~= target then
+				insert(options, {
+					label = lobby.name,
+					value = lobby.id
+				})
+			end
+		end
+
+		insert(components, {
+			type = componentType.row,
+			components = {{
+				type = componentType.stringSelect,
+				custom_id = "lobby_view",
+				options = options,
+				placeholder = localeHandler(locale, "lobbyViewSelect")
+			}}
 		})
 	end
 

@@ -1,4 +1,5 @@
 local logger = require "logger"
+local client = require "client"
 
 local commands = require "commands/init"
 
@@ -20,6 +21,10 @@ return function (interaction)
 		primary = tonumber(primary) or primary -- help_1 or delete_nuke
 	end
 
+	if interaction.values then
+		secondary = client:getChannel(interaction.values[1])
+	end
+
 	local res, logMsg, reply = xpcall(commands[command], debug.traceback, interaction, primary, secondary)
 
 	if res then
@@ -28,7 +33,14 @@ return function (interaction)
 		else
 			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
 		end
-		if reply then interaction:reply(reply) end
+
+		if interaction.isReplied and reply then
+			interaction:followup(reply)
+		elseif reply then
+			interaction:update(reply)
+		else
+			interaction:deferUpdate()
+		end
 	else
 		if interaction.isReplied then
 			interaction:followup(errorResponse(true, interaction.locale))

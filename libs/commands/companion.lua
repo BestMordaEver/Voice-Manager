@@ -84,11 +84,15 @@ subcommands = {
 }
 
 return function (interaction, subcommand, argument)
+	if subcommand == "view" then
+		return "Sent lobby info", companionsInfoResponse(true, interaction.locale, argument or interaction.guild)
+	end
+
 	local channel, response
 	if interaction.type == interactionType.modalSubmit then
 		channel = client:getChannel(argument)
 	else
-		channel, response = lobbyPreProcess(interaction, companionsInfoResponse)
+		channel, response = lobbyPreProcess(interaction)
 	end
 	if response then return channel, response end
 	return subcommands[subcommand](interaction, channel, argument)

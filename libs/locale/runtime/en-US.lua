@@ -107,10 +107,8 @@ Some commands in this category can be used with text-in-voice and don't require 
 	helpCompanionSSetup = "/companion setup",
 	helpCompanionView = "Show all lobies that have companion chats enabled",
 	helpCompanionSView = "/companion view",
-	helpCompanionEnable = "Enable companion chat for a lobby",
-	helpCompanionSEnable = "/companion enable",
-	helpCompanionDisable = "Disable companion chat for a lobby",
-	helpCompanionSDisable = "/companion disable",
+	helpCompanionEnable = "Enable or disable companion chat for a lobby",
+	helpCompanionSEnable = "/companion enable|disable",
 	helpCompanionCategory = "Select a category in which chats will be created",
 	helpCompanionSCategory = "/companion category",
 	helpCompanionName = [[Configure what name a chat will have when it's created and customize it with %patterns% similarly to **/lobby name**. Default is **private-chat**.
@@ -212,11 +210,11 @@ If category is selected, prints users in the channels in the category]],
 	roleConfirmNoRoles = "The default @everyone is in use",
 
 	-- lobbies
-	lobbiesInfoTitle = "Lobbies info | %s",
+	lobbiesInfoTitle = "# Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
 You can add a lobby with **/lobby add**]],
-	lobbiesInfo = "Select lobbies to change their settings",
-	lobbiesField = [[**Target category:** %s
+	lobbiesField = [[## %s
+**Target category:** %s
 **Name template:** %s
 **Permissions:** %s
 **Managed roles:** %s
@@ -224,6 +222,7 @@ You can add a lobby with **/lobby add**]],
 **Bitrate:** %s
 **Companion:** %s
 **Channels:** %d]],
+	lobbyViewSelect = "Select a lobby",
 
 	addConfirm = "Added new lobby %s",
 	removeConfirm = "Removed lobby %s",

@@ -3,9 +3,8 @@ local lobbies = require "storage/lobbies"
 local warningResponse = require "response/warning"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
-return function (interaction, response)
+return function (interaction)
 	local subcommand, options = interaction.option.name, interaction.option.options
-	if subcommand == "view" then return "Sent lobby info", response(interaction.locale, options and options.lobby.value) end
 	local channel = (options.lobby or options.channel or interaction.option.option.options.lobby).value
 
 	local ok, logMsg, response = checkSetupPermissions(interaction, channel)
