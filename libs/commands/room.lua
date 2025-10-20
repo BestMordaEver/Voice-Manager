@@ -382,11 +382,17 @@ subcommands = {
 		if scope == "text" or scope == "both" then
 			local companion = client:getChannel(channels[voiceChannel.id].companion)
 			if companion then
-				if #roles == 0 then
-					companion:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.readMessages)
-				else for role in pairs(roles) do
-					companion:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.readMessages)
-				end end
+				if user then
+					voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+				else
+					if #roles == 0 then
+						companion:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.readMessages)
+					else
+						for role in pairs(roles) do
+							companion:getPermissionOverwriteFor(guild:getRole(role)):allowPermissions(permission.readMessages)
+						end
+					end
+				end
 			elseif scope == "text" then
 				return "No companion to show", warningResponse(true, interaction.locale, "showNoCompanion")
 			end
