@@ -6,21 +6,15 @@ local errorResponse = require "response/error"
 
 local insert, concat = table.insert, table.concat
 
-local function stringer (strings, options)
-	for name, option in pairs(options) do
-		insert(strings, name)
-		if option.value then
-			insert(strings, tostring(option.value))
-		end
-		if option.options then
-			stringer(strings, option.options)
+return function (interaction)
+	local strings = {interaction.commandName, interaction.subcommandGroup or interaction.subcommand, interaction.subcommandGroup and interaction.subcommand}
+	if interaction.options then
+		for name, option in pairs(interaction.options) do
+			insert(strings, name)
+			insert(strings, option.value)
 		end
 	end
-	return strings
-end
-
-return function (interaction)
-	local commandString = interaction.options and concat(stringer({interaction.commandName}, interaction.options), " ") or interaction.commandName
+	local commandString = concat(strings, " ")
 
 	if interaction.guild then
 		logger:log(4, "GUILD %s USER %s invoked a command: %s", interaction.guild.id, interaction.user.id, commandString)
