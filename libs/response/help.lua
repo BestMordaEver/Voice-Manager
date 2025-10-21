@@ -19,7 +19,7 @@ local function helpLiner (components, locale, line)
 		accessory = {
 			type = componentType.button,
 			style = buttonStyle.secondary,
-			label = localeHandler(locale, line:gsub("^(%l-%u%l-)(%u)", "%1S%2"), nil),
+			label = localeHandler(locale, line:gsub("^(%l+)(%u)", "%1S%2"), nil),
 			disabled = true,
 			custom_id = #components
 		}
