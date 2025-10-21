@@ -34,6 +34,17 @@ local companionsInfo = response("companionsInfo", response.colors.blurple, funct
 		return components
 	end
 
+	if #sortedLobbies == 1 then
+		isChannel = true
+		target = sortedLobbies[1]
+		components = {
+			{
+				type = componentType.textDisplay,
+				content = string.format("## %s", target.name)
+			}
+		}
+	end
+
 	if isChannel then
 		local lobbyData = lobbies[target.id]
 		local target = client:getChannel(lobbyData.companionTarget)

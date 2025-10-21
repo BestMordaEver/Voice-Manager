@@ -34,12 +34,23 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 		return components
 	end
 
+	if #sortedLobbies == 1 then
+		isChannel = true
+		target = sortedLobbies[1]
+		components = {
+			{
+				type = componentType.textDisplay,
+				content = string.format("## %s", target.name)
+			}
+		}
+	end
+
 	if isChannel then
 		local lobbyData = lobbies[target.id]
 		local target = client:getChannel(lobbyData.target)
 		local roles = {}
 		for roleID in pairs(lobbyData.roles) do
-			local role = target:getRole(roleID)
+			local role = guild:getRole(roleID)
 			if role then
 				table.insert(roles, role.mentionString)
 			else
