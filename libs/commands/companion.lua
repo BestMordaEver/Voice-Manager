@@ -37,7 +37,7 @@ return setmetatable({
 	end,
 
 	name = function (interaction, lobby)
-		local name = interaction.commandName == "reset" and "private-chat" or interaction.options.name.value
+		local name = interaction.commandName == "reset" and "private-chat" or string.discordify(interaction.options.name.value)
 
 		lobbies[lobby.id]:setCompanionTemplate(name)
 		return "Companion name template set", okResponse(true, interaction.locale, "nameConfirm", name)
