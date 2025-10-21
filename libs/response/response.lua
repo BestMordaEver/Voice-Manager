@@ -37,10 +37,11 @@ return setmetatable({}, {
 		},
 		newCustomType = function (self, name, responseFactory, factoryCaller, customFields)
 			assert(not self.types[name], name .. " response type already exists!")
+			assert(responseFactory, "#3 parameter is nil, expected callable")
 
 			local response = type(customFields) == "table" and table.copy(customFields) or {}
 			response.factory = responseFactory
-			self.types[name] = setmetatable(response, {_call = factoryCaller or defaultWrapper})
+			self.types[name] = setmetatable(response, {__call = factoryCaller or defaultWrapper})
 
 			return response
 		end
