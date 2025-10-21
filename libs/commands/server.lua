@@ -9,20 +9,18 @@ local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
 local subcommands = {
-	role = function (interaction, action)
+	role = function (interaction)
 		local guildData = guilds[interaction.guild.id]
 
-		if action then
-			action = action.name
-			local role = interaction.option.option.option.value
-
-			if action == "add" and not guildData.roles[role.id] then
+		if interaction.commandName == "reset" then
+			guildData:removeRoles()
+		else
+			local role = interaction.option.value
+			if interaction.subcommandOption == "add" and not guildData.roles[role.id] then
 				guildData:addRole(role.id)
-			elseif action == "remove" and guildData.roles[role.id] then
+			elseif interaction.subcommandOption == "remove" and guildData.roles[role.id] then
 				guildData:removeRole(role.id)
 			end
-		else
-			guildData:removeRoles()
 		end
 
 		local roles = {}
@@ -42,35 +40,35 @@ local subcommands = {
 		end
 	end,
 
-	limit = function (interaction, limit)
-		if not limit then limit = 500 end
+	limit = function (interaction)
+		local limit = interaction.commandName == "reset" and 500 or interaction.option.value
 
 		guilds[interaction.guild.id]:setLimit(limit)
 		return "Server limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
 	end,
 
-	permissions = function (interaction, perm)
+	permissions = function (interaction)
 		local guildData = guilds[interaction.guild.id]
 
-		if perm then
-			local permissionBits = guildData.permissions
-
-			for permissionName, permission in pairs(interaction.option.options) do
-				if permissionBits.bits[permissionName] then
-					permissionBits.bitfield = permission.value and (permissionBits.bitfield + permissionBits.bits[permissionName]) or (permissionBits.bitfield - permissionBits.bits[permissionName])
-				end
-			end
-
-			guildData:setPermissions(permissionBits)
-			return "Server permissions set", okResponse(true, interaction.locale, "permissionsConfirm")
+		if interaction.commandName == "reset" then
+			guildData:setPermissions(botPermissions())
+			return "Server permissions reset", okResponse(true, interaction.locale, "permissionsReset")
 		end
 
-		guildData:setPermissions(botPermissions())
-		return "Server permissions reset", okResponse(true, interaction.locale, "permissionsReset")
+		local permissionBits = guildData.permissions
+
+		for permissionName, permission in pairs(interaction.options) do
+			if permissionBits.bits[permissionName] then
+				permissionBits.bitfield = permission.value and (permissionBits.bitfield + permissionBits.bits[permissionName]) or (permissionBits.bitfield - permissionBits.bits[permissionName])
+			end
+		end
+
+		guildData:setPermissions(permissionBits)
+		return "Server permissions set", okResponse(true, interaction.locale, "permissionsConfirm")
 	end
 }
 
-return function (interaction, subcommand, argument)
+return function (interaction, subcommand)
 	if subcommand == "view" then
 		return "Sent server info", serverInfoResponse(true, interaction.locale, interaction.guild)
 	end
@@ -80,5 +78,5 @@ return function (interaction, subcommand, argument)
 		return logMsg, response
 	end
 
-	return subcommands[subcommand](interaction, argument)
+	return subcommands[subcommand](interaction)
 end

@@ -14,7 +14,7 @@ local commands = {
 }
 
 return function (interaction)
-	local command, subcommand = interaction.option.name, interaction.option.option.name
+	local command, subcommand = interaction.subcommand, interaction.subcommandOption
 
 	if command == "server" then
 		if not interaction.guild then
@@ -27,7 +27,7 @@ return function (interaction)
 
 		return commands.server(interaction, subcommand)
 	else
-		local lobby = interaction.option.option.option.value
+		local lobby = interaction.options.lobby.value
 		if not lobbies[lobby.id] then return "Not a lobby", warningResponse(true, interaction.locale, "notLobby") end
 
 		local ok, logMsg, response = checkSetupPermissions(interaction, lobby)
@@ -35,6 +35,6 @@ return function (interaction)
 			return logMsg, response
 		end
 
-		return commands[command](interaction, subcommand)
+		return commands[command][subcommand](interaction, lobby)
 	end
 end

@@ -142,11 +142,15 @@ local function lobbyJoinCall (member, lobby)
 	adjustHostPermissions(newChannel, member)
 
 	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
-	if lobbyData.greeting or lobbyData.companionLog then (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel)) end
+	if lobbyData.greeting or lobbyData.companionLog then 
+		distance, err = (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel))
+	end
 
 	mutex:unlock()
 	Timer.clearTimeout(timer)
 	queue[newChannel.id] = nil
+
+	if not distance then logger:log(4, "GUILD %s LOBBY %s USER %s: couldn't send greeting - %s", guild.id, lobby.id, member.user.id, err) end
 end
 
 

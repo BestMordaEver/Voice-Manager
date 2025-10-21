@@ -9,11 +9,10 @@ local lobbiesInfoResponse = require "response/lobbiesInfo"
 
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
-local lobbyPreProcess = require "commands/lobbyPreProcess"
+local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
-
 
 local subcommands = {
 	add = function (interaction, channel)
@@ -27,48 +26,46 @@ local subcommands = {
 		return "New lobby added", okResponse(true, interaction.locale, "addConfirm", channel.name)
 	end,
 
-	remove = function (interaction, channel)
-		if lobbies[channel.id] then
-			lobbies[channel.id]:delete()
-		end
-
-		return "Lobby removed", okResponse(true, interaction.locale, "removeConfirm", channel.name)
+	remove = function (interaction, lobby)
+		lobbies[lobby.id]:delete()
+		return "Lobby removed", okResponse(true, interaction.locale, "removeConfirm", lobby.name)
 	end,
 
-	category = function (interaction, channel, category)
-		if category then
-			local ok, logMsg, response = checkSetupPermissions(interaction, category)
-			if ok then
-				lobbies[channel.id]:setTarget(category.id)
-				return "Lobby target category set", okResponse(true, interaction.locale, "categoryConfirm", category.name)
-			end
-
-			return logMsg, response
+	category = function (interaction, lobby)
+		if interaction.commandName == "reset" then
+			lobbies[lobby.id]:setTarget()
+			return "Lobby target category reset", okResponse(true, interaction.locale, "categoryReset")
 		end
 
-		lobbies[channel.id]:setTarget()
-		return "Lobby target category reset", okResponse(true, interaction.locale, "categoryReset")
+		local category = interaction.options.category.value
+		local ok, logMsg, response = checkSetupPermissions(interaction, category)
+		if ok then
+			lobbies[lobby.id]:setTarget(category.id)
+			return "Lobby target category set", okResponse(true, interaction.locale, "categoryConfirm", category.name)
+		end
+		return logMsg, response
 	end,
 
-	name = function (interaction, channel, name)
-		if not name then name = "%nickname's% room" end
-		lobbies[channel.id]:setTemplate(name)
+	name = function (interaction, lobby)
+		local name = interaction.commandName == "reset" and "%nickname's% room" or interaction.options.name.value
+		lobbies[lobby.id]:setTemplate(name)
 		return "Lobby name template set", okResponse(true, interaction.locale, "nameConfirm", name)
 	end,
 
-	capacity = function (interaction, channel, capacity)
-		if capacity then
-			lobbies[channel.id]:setCapacity(capacity)
-			return "Lobby capacity set", okResponse(true, interaction.locale, "capacityConfirm", capacity)
+	capacity = function (interaction, lobby)
+		if interaction.commandName == "reset" then
+			lobbies[lobby.id]:setCapacity()
+			return "Lobby capacity reset", okResponse(true, interaction.locale, "capacityReset")
 		end
 
-		lobbies[channel.id]:setCapacity()
-		return "Lobby capacity reset", okResponse(true, interaction.locale, "capacityReset")
+		local capacity = interaction.options.capacity.value
+		lobbies[lobby.id]:setCapacity(capacity)
+		return "Lobby capacity set", okResponse(true, interaction.locale, "capacityConfirm", capacity)
 	end,
 
-	bitrate = function (interaction, channel, bitrate)
-		if not bitrate then bitrate = 64 end
-		local tier = channel.guild.premiumTier
+	bitrate = function (interaction, lobby)
+		local bitrate = interaction.commandName == "reset" and 64 or interaction.options.bitrate.value
+		local tier = lobby.guild.premiumTier
 
 		for _,feature in ipairs(interaction.guild.features) do
 			if feature == "VIP_REGIONS" then tier = 3 end
@@ -78,44 +75,42 @@ local subcommands = {
 			return "Bitrate OOB", warningResponse(true, interaction.locale, tierLocale[tier])
 		end
 
-		lobbies[channel.id]:setBitrate(bitrate*1000)
+		lobbies[lobby.id]:setBitrate(bitrate*1000)
 		return "Lobby bitrate set", okResponse(true, interaction.locale, "bitrateConfirm", bitrate)
 	end,
 
-	permissions = function (interaction, channel, perm)
-		local lobbyData = lobbies[channel.id]
-
-		if perm then
-			local permissionBits = lobbyData.permissions
-			for permissionName, permission in pairs(interaction.option.options) do
-				if permissionBits.bits[permissionName] then
-					-- metamethods resolve this as bit operations
-					permissionBits.bitfield = permission.value and (permissionBits.bitfield + permissionBits.bits[permissionName]) or (permissionBits.bitfield - permissionBits.bits[permissionName])
-				end
-			end
-
-			lobbyData:setPermissions(permissionBits)
-			return "Lobby permissions set", okResponse(true, interaction.locale, "permissionsConfirm")
-		end
-
-		lobbyData:setPermissions(botPermissions())
-		return "Lobby permissions reset", okResponse(true, interaction.locale, "permissionsReset")
-	end,
-
-	role = function (interaction, lobby, action)
+	permissions = function (interaction, lobby)
 		local lobbyData = lobbies[lobby.id]
 
-		if action then
-			action = action.name
-			local role = interaction.option.option.options.role.value
+		if interaction.commandName == "reset" then
+			lobbyData:setPermissions(botPermissions())
+			return "Lobby permissions reset", okResponse(true, interaction.locale, "permissionsReset")
+		end
 
-			if action == "add" and not lobbyData.roles[role.id] then
+		local permissionBits = lobbyData.permissions
+		for permissionName, permission in pairs(interaction.options) do
+			if permissionBits.bits[permissionName] then
+				-- metamethods resolve this as bit operations
+				permissionBits.bitfield = permission.value and (permissionBits.bitfield + permissionBits.bits[permissionName]) or (permissionBits.bitfield - permissionBits.bits[permissionName])
+			end
+		end
+
+		lobbyData:setPermissions(permissionBits)
+		return "Lobby permissions set", okResponse(true, interaction.locale, "permissionsConfirm")
+	end,
+
+	role = function (interaction, lobby)
+		local lobbyData = lobbies[lobby.id]
+
+		if interaction.commandName == "reset" then
+			lobbyData:removeRoles()
+		else
+			local role = interaction.options.role.value
+			if interaction.subcommandOption == "add" and not lobbyData.roles[role.id] then
 				lobbyData:addRole(role.id)
-			elseif action == "remove" and lobbyData.roles[role.id] then
+			elseif interaction.subcommandOption == "remove" and lobbyData.roles[role.id] then
 				lobbyData:removeRole(role.id)
 			end
-		else
-			lobbyData:removeRoles()
 		end
 
 		local roles = {}
@@ -134,13 +129,14 @@ local subcommands = {
 		end
 	end,
 
-	limit = function (interaction, lobby, limit)
-		if not limit then limit = 500 end
+	limit = function (interaction, lobby)
+		local limit = interaction.command == "reset" and 500 or interaction.options.limit.value
 
 		lobbies[lobby.id]:setLimit(limit)
 		return "Lobby limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
 	end,
 
+	--[[ TODO
 	position = function (interaction, lobby)
 		local order, type
 		if interaction.name == "lobby" then
@@ -153,16 +149,12 @@ local subcommands = {
 
 		lobbies[lobby.id]:setPosition(order, type)
 		return "Lobby target position set", okResponse(true, interaction.locale, "positionConfirm")
-	end,
+	end, --]]
 }
 
-return function (interaction, subcommand, argument)
-	if subcommand == "view" then
-		return "Sent lobby info", lobbiesInfoResponse(true, interaction.locale, argument or interaction.guild)
-	end
-
-	local channel, response = lobbyPreProcess(interaction)
+return function (interaction, subcommand)
+	local channel, response = lobbyPreProcess(interaction, lobbiesInfoResponse)
 	if response then return channel, response end
 
-	return subcommands[subcommand](interaction, channel, argument)
+	return subcommands[subcommand](interaction, channel)
 end

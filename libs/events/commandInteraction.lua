@@ -7,11 +7,11 @@ local errorResponse = require "response/error"
 local insert, concat = table.insert, table.concat
 
 return function (interaction)
-	local strings = {interaction.commandName, interaction.subcommandGroup or interaction.subcommand, interaction.subcommandGroup and interaction.subcommand}
+	local strings = {interaction.commandName, interaction.subcommandGroup or interaction.subcommand or (interaction.target and tostring(interaction.target)), interaction.subcommandGroup and interaction.subcommand}
 	if interaction.options then
 		for name, option in pairs(interaction.options) do
 			insert(strings, name)
-			insert(strings, option.value)
+			insert(strings, tostring(option.value))
 		end
 	end
 	local commandString = concat(strings, " ")
@@ -33,8 +33,7 @@ return function (interaction)
 			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
 		end
 
-		if reply then
-			reply.ephemeral = true
+		if reply then -- may have created modal instead
         	local ok, msg
 			if interaction.isReplied then
 				ok, msg = interaction:updateReply(reply)
@@ -43,6 +42,10 @@ return function (interaction)
 				ok, msg = interaction:reply(reply)
 				if not ok then error(string.format("failed to reply - %s\n", msg)) end
 			end
+		end
+		if not interaction.isReplied then
+			interaction:reply(errorResponse(true, interaction.locale))
+			error(string.format('failed to produce a reply to command %s', commandString))
 		end
 	else
 		if interaction.isReplied then

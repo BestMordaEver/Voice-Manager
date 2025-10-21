@@ -32,7 +32,7 @@ Different helpful commands for users and administrators]],
 
 	helpLobbyHeader = [[# Lobby commands
 Enter a lobby to create a room. Room is deleted once it's empty]],
-	helpLobbySetup = "Quickly configure several lobbies",
+	helpLobbySetup = "Quickly configure a lobby",
 	helpLobbySSetup = "/lobby setup",
 	helpLobbyView = "Show your lobbies",
 	helpLobbySView = "/lobby view",
@@ -80,7 +80,7 @@ Moderation permissions:
 
 	helpMatchmakingHeader = [[# Matchmaking commands
 Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool]],
-	helpMatchmakingSetup = "Quickly configure several matchmaking lobbies",
+	helpMatchmakingSetup = "Quickly configure a matchmaking lobby",
 	helpMatchmakingSSetup = "/matchmaking setup",
 	helpMatchmakingView = "Show your matchmaking lobbies",
 	helpMatchmakingSView = "/matchmaking view",
@@ -103,7 +103,7 @@ Enter a matchmaking lobby to be moved to a channel in lobby's matchmaking pool]]
 	helpCompanionHeader = [[# Companion commands
 Companion chats are created and deleted along the rooms. By default, chat is visible only when you're in the chat's room.
 Some commands in this category can be used with text-in-voice and don't require companion chat to be enabled.]],
-	helpCompanionSetup = "Quickly configure companion settings for several lobbies",
+	helpCompanionSetup = "Quickly configure companion settings for a lobby",
 	helpCompanionSSetup = "/companion setup",
 	helpCompanionView = "Show all lobies that have companion chats enabled",
 	helpCompanionSView = "/companion view",
@@ -245,6 +245,7 @@ You can create a matchmaking lobby with **/matchmaking add**]],
 	matchmakingField = [[**Target:** %s
 **Mode:** %s
 **Matchmaking pool:** %d channels]],
+	matchmakingViewSelect = "Select a matchmaking lobby",
 
 	matchmakingAddConfirm = "Added new matchmaking lobby %s",
 	matchmakingRemoveConfirm = "Removed matchmaking lobby %s",

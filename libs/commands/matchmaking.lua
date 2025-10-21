@@ -6,11 +6,11 @@ local warningResponse = require "response/warning"
 local matchmakingInfoResponse = require "response/matchmakingInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
-local lobbyPreProcess = require "commands/lobbyPreProcess"
+local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType
 
-local subcommands = {
+return setmetatable({
 	add = function (interaction, channel)
 		if lobbies[channel.id] then
 			return "Already registered", warningResponse(true, interaction.locale, "lobbyDupe")
@@ -22,48 +22,45 @@ local subcommands = {
 		return "New matchmaking lobby added", okResponse(true, interaction.locale, "matchmakingAddConfirm", channel.name)
 	end,
 
-	remove = function (interaction, channel)
-		if lobbies[channel.id] then
-			lobbies[channel.id]:delete()
-		end
-
-		return "Matchmaking lobby removed", okResponse(true, interaction.locale, "matchmakingRemoveConfirm", channel.name)
+	remove = function (interaction, lobby)
+		lobbies[lobby.id]:delete()
+		return "Matchmaking lobby removed", okResponse(true, interaction.locale, "matchmakingRemoveConfirm", lobby.name)
 	end,
 
-	target = function (interaction, channel, target)
-		if target and target ~= channel then
-			if target.type == channelType.voice and not lobbies[target.id] then
-				return "Selected target is not lobby or category", warningResponse(true, interaction.locale, "notLobby")
-			end
-
-			local ok, logMsg, response = checkSetupPermissions(interaction, target)
-			if ok then
-				lobbies[channel.id]:setTarget(target.id)
-				return "Lobby target set", okResponse(true, interaction.locale, "targetConfirm", target.name)
-			end
-
-			return logMsg, response
+	target = function (interaction, lobby)
+		if interaction.commandName == "reset" then
+			lobbies[lobby.id]:setTarget()
+			return "Lobby target reset", okResponse(true, interaction.locale, "targetReset")
 		end
 
-		lobbies[channel.id]:setTarget()
-		return "Lobby target reset", okResponse(true, interaction.locale, "targetReset")
+		local target = interaction.options.target.value
+		if target == lobby then
+			lobbies[lobby.id]:setTarget()
+			return "Lobby target reset", okResponse(true, interaction.locale, "targetReset")
+		end
+
+		if target.type == channelType.voice and not lobbies[target.id] then
+			return "Selected target is not lobby or category", warningResponse(true, interaction.locale, "notLobby")
+		end
+
+		local ok, logMsg, response = checkSetupPermissions(interaction, target)
+		if ok then
+			lobbies[lobby.id]:setTarget(target.id)
+			return "Lobby target set", okResponse(true, interaction.locale, "targetConfirm", target.name)
+		end
+
+		return logMsg, response
 	end,
 
-	mode = function (interaction, channel, mode)
-		if not mode then mode = "random" end
+	mode = function (interaction, lobby)
+		local mode = interaction.commandName == "reset" and "random" or interaction.options.mode.value
 
-		lobbies[channel.id]:setTemplate(mode)
+		lobbies[lobby.id]:setTemplate(mode)
 		return "Matchmaking mode set", okResponse(true, interaction.locale, "modeConfirm", mode)
 	end
-}
-
-return function (interaction, subcommand, argument)
-	if subcommand == "view" then
-		return "Sent lobby info", matchmakingInfoResponse(true, interaction.locale, argument or interaction.guild)
-	end
-
-	local channel, response = lobbyPreProcess(interaction)
+},{__call = function (self, interaction, subcommand)
+	local channel, response = lobbyPreProcess(interaction, matchmakingInfoResponse)
 	if response then return channel, response end
 
-	return subcommands[subcommand](interaction, channel, argument)
-end
+	return self[subcommand](interaction, channel)
+end})

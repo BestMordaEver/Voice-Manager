@@ -26,8 +26,8 @@ ratelimiter("companionName", 2, 600)
 
 local subcommands
 subcommands = {
-	rename = function (interaction, channel)
-		local type, name = interaction.option.option.name, interaction.option.option.option.value
+	rename = function (interaction, channel, name)
+		local type = interaction.subcommandOption
 		local channelData = channels[channel.id]
 		local template = channelData.parent and channelData.parent.template
 		local ratelimit = "channelName"
@@ -100,8 +100,7 @@ subcommands = {
 				return "Not a host", warningResponse(true, interaction.locale, "notHost")
 			end
 
-			local guild = voiceChannel.guild
-			newHost = guild:getMember(newHost)
+			newHost = voiceChannel.guild:getMember(newHost)
 			if newHost.voiceChannel ~= voiceChannel then
 				return "Can't promote person not in a room", warningResponse(true, interaction.locale, "badNewHost")
 			end
@@ -126,20 +125,14 @@ subcommands = {
 		local member = voiceChannel.guild:getMember(user)
 		if member.voiceChannel == voiceChannel then
 			member:setVoiceChannel()
-			return "Kicked member", okResponse(true, interaction.locale, "kickConfirm", user.mentionString)
+			return "Kicked member", okResponse(true, interaction.locale, "kickConfirm", member.mentionString)
 		else
 			return "Can't kick the user from a different room", warningResponse(true, interaction.locale, "kickNotInRoom")
 		end
 	end,
 
-	mute = function (interaction, voiceChannel, scope)
-		local user
-		if interaction.type == interactionType.applicationCommand then
-			scope = scope.name
-			user = interaction.option.option.option and interaction.option.option.option.value
-		end
-
-		local guild, member, roles = voiceChannel.guild
+	mute = function (interaction, voiceChannel, user)
+		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
 		if user then
 			if user == client.user then
 				return "Attempt to mute the bot", warningResponse(true, interaction.locale, "shame")
@@ -176,7 +169,7 @@ subcommands = {
 			else
 				for _, member in pairs(voiceChannel.connectedMembers) do
 					local po = voiceChannel:getPermissionOverwriteFor(member)
-					if not po:getAllowedPermissions():has(permission.speak) and member:hasPermission(permission.speak) then
+					if not po:getAllowedPermissions():has(permission.speak) and member:hasPermission(voiceChannel, permission.speak) then
 						po:allowPermissions(permission.speak)
 					end
 				end
@@ -202,7 +195,7 @@ subcommands = {
 			else
 				for _, member in pairs(voiceChannel.connectedMembers) do
 					local po = voiceChannel:getPermissionOverwriteFor(member)
-					if not po:getAllowedPermissions():has(permission.sendMessages) and member:hasPermission(permission.sendMessages) then
+					if not po:getAllowedPermissions():has(permission.sendMessages) and member:hasPermission(voiceChannel, permission.sendMessages) then
 						po:allowPermissions(permission.sendMessages)
 						if companion then
 							companion:getPermissionOverwriteFor(member):allowPermissions(permission.sendMessages)
@@ -231,14 +224,8 @@ subcommands = {
 		end
 	end,
 
-	unmute = function (interaction, voiceChannel, scope)
-		local user
-		if interaction.type == interactionType.applicationCommand then
-			scope = scope.name
-			user = interaction.option.option.option and interaction.option.option.option.value
-		end
-
-		local guild, member, roles = voiceChannel.guild
+	unmute = function (interaction, voiceChannel, user)
+		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
 		if user then
 			member = guild:getMember(user)
 		else
@@ -286,14 +273,8 @@ subcommands = {
 		end
 	end,
 
-	hide = function (interaction, voiceChannel, scope)
-		local user
-		if interaction.type == interactionType.applicationCommand then
-			scope = scope.name
-			user = interaction.option.option.option and interaction.option.option.option.value
-		end
-
-		local guild, member, roles = voiceChannel.guild
+	hide = function (interaction, voiceChannel, user)
+		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
 		if user then
 			if user == client.user then
 				return "Attempt to hide from bot", warningResponse(true, interaction.locale, "shame")
@@ -353,14 +334,8 @@ subcommands = {
 		end
 	end,
 
-	show = function (interaction, voiceChannel, scope)
-		local user
-		if interaction.type == interactionType.applicationCommand then
-			scope = scope.name
-			user = interaction.option.option.option and interaction.option.option.option.value
-		end
-
-		local guild, member, roles = voiceChannel.guild
+	show = function (interaction, voiceChannel, user)
+		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
 		if user then
 			member = guild:getMember(user)
 		else
@@ -536,7 +511,7 @@ subcommands = {
 
 local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}
 
-return function (interaction, subcommand, argument)
+return function (interaction, subcommand)
 	local member = interaction.member
 	if not member then
 		local guild = interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end)
@@ -551,6 +526,8 @@ return function (interaction, subcommand, argument)
 	if subcommand == "view" then
 		return "Sent room info", roomInfoResponse(true, interaction.locale, voiceChannel)
 	end
+
+	local argument = interaction.option and interaction.option.value
 
 	if noAdmin[subcommand] or member:hasPermission(voiceChannel, permission.administrator) or config.owners[interaction.user.id] then
 		return subcommands[subcommand](interaction, voiceChannel, argument)

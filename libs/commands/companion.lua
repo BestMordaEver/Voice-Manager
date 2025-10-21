@@ -1,6 +1,3 @@
-local localeHandler = require "locale/runtime/localeHandler"
-local client = require "client"
-
 local interactionType = require "discordia".enums.interactionType
 
 local lobbies = require "storage/lobbies"
@@ -10,90 +7,87 @@ local greetingSetupResponse = require "response/greetingSetup"
 local companionsInfoResponse = require "response/companionsInfo"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
-local greetingComponents = require "utils/components".greetingComponents
-local lobbyPreProcess = require "commands/lobbyPreProcess"
+local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
-local subcommands
-subcommands = {
-	enable = function (interaction, channel)
-		lobbies[channel.id]:setCompanionTarget(true)
+return setmetatable({
+	enable = function (interaction, lobby)
+		lobbies[lobby.id]:setCompanionTarget(true)
 		return "Lobby companion enabled", okResponse(true, interaction.locale, "companionEnable")
 	end,
 
-	disable = function (interaction, channel)
-		lobbies[channel.id]:setCompanionTarget(nil)
+	disable = function (interaction, lobby)
+		lobbies[lobby.id]:setCompanionTarget(nil)
 		return "Lobby companion disabled", okResponse(true, interaction.locale, "companionDisable")
 	end,
 
-	category = function (interaction, channel, category)
-		if not category then
-			lobbies[channel.id]:setCompanionTarget(true)
+	category = function (interaction, lobby)
+		if interaction.commandName == "reset" then
+			lobbies[lobby.id]:setCompanionTarget(true)
 			return "Companion target category reset", okResponse(true, interaction.locale, "categoryReset")
 		end
 
+		local category = interaction.options.category.value
 		local ok, logMsg, response = checkSetupPermissions(interaction, category)
 		if ok then
-			lobbies[channel.id]:setCompanionTarget(category.id)
+			lobbies[lobby.id]:setCompanionTarget(category.id)
 			return "Companion target category set", okResponse(true, interaction.locale, "categoryConfirm", category.name)
 		end
 
 		return logMsg, response
 	end,
 
-	name = function (interaction, channel, name)
-		if not name then name = "private-chat" end
+	name = function (interaction, lobby)
+		local name = interaction.commandName == "reset" and "private-chat" or interaction.options.name.value
 
-		lobbies[channel.id]:setCompanionTemplate(name)
+		lobbies[lobby.id]:setCompanionTemplate(name)
 		return "Companion name template set", okResponse(true, interaction.locale, "nameConfirm", name)
 	end,
 
-	greeting = function (interaction, channel, greeting)
-		if interaction.commandName == "reset" then greeting = "" end
+	greeting = function (interaction, lobby)
+		local greeting
+		if interaction.commandName == "reset" then
+			greeting = ""
+		elseif interaction.options and interaction.options.greeting then
+			greeting = interaction.options.greeting.value
+		elseif interaction.type == interactionType.modalSubmit then
+			greeting = interaction.components[1].component.value
+		end
 
 		if greeting then
 			if greeting == "" then
-				lobbies[channel.id]:setGreeting(nil)
+				lobbies[lobby.id]:setGreeting(nil)
 			else
-				lobbies[channel.id]:setGreeting(greeting)
+				lobbies[lobby.id]:setGreeting(greeting)
 			end
 			return "Companion greeting set", okResponse(true, interaction.locale, "greetingConfirm")
 		end
-
-		interaction:createModal(greetingSetupResponse(interaction.locale))
-		return "Sent greeting setup modal"
+p(greetingSetupResponse(interaction.locale, lobby))
+		local ok, msg = interaction:createModal(greetingSetupResponse(interaction.locale, lobby))
+		if ok then
+			return "Sent greeting setup modal"
+		else
+			error(msg)
+		end
 	end,
 
-	greetingwidget = function (interaction, channel)	-- not exposed, access via modalInteraction
-		return subcommands.greeting(interaction, channel, interaction.components[1].components[1].value)
-	end,
-
-	log = function (interaction, channel, logChannel)
-		if logChannel then
-			local ok, logMsg, response = checkSetupPermissions(interaction, logChannel)
-			if ok then
-				lobbies[channel.id]:setCompanionLog(logChannel.id)
-				return "Companion log channel set", okResponse(true, interaction.locale, "logConfirm", logChannel.name)
-			end
-
-			return logMsg, response
+	log = function (interaction, lobby)
+		if interaction.commandName == "reset" then
+			lobbies[lobby.id]:setCompanionLog()
+			return "Companion log channel reset", okResponse(true, interaction.locale, "logReset")
 		end
 
-		lobbies[channel.id]:setCompanionLog()
-		return "Companion log channel reset", okResponse(true, interaction.locale, "logReset")
-	end
-}
+		local logChannel = interaction.options.channel.value
+		local ok, logMsg, response = checkSetupPermissions(interaction, logChannel)
+		if ok then
+			lobbies[lobby.id]:setCompanionLog(logChannel.id)
+			return "Companion log channel set", okResponse(true, interaction.locale, "logConfirm", logChannel.name)
+		end
 
-return function (interaction, subcommand, argument)
-	if subcommand == "view" then
-		return "Sent lobby info", companionsInfoResponse(true, interaction.locale, argument or interaction.guild)
+		return logMsg, response
 	end
-
-	local channel, response
-	if interaction.type == interactionType.modalSubmit then
-		channel = client:getChannel(argument)
-	else
-		channel, response = lobbyPreProcess(interaction)
-	end
+},{__call = function (self, interaction, subcommand)
+	local channel, response = lobbyPreProcess(interaction, companionsInfoResponse)
 	if response then return channel, response end
-	return subcommands[subcommand](interaction, channel, argument)
-end
+
+	return self[subcommand](interaction, channel)
+end})
