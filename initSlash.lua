@@ -158,13 +158,14 @@ local CommandManager = {
 	end
 }
 
-local commandsStructure, debugCommands = require "slash"
+local commands = require "slash/init"
 
 coroutine.wrap(function ()
-	print(CommandManager.overwriteGlobalCommands(commandsStructure))
-	--print(CommandManager.overwriteGuildCommands(guild, commandsStructure))
-	--for _,command in ipairs(debugCommands) do print(CommandManager.createGuildCommand(guild, command)) end
-	--print(CommandManager.getGlobalCommands()[1].version)
+	print(CommandManager.overwriteGlobalCommands(commands[1]))
+	--print(CommandManager.overwriteGlobalCommands({}))
+	--print(CommandManager.overwriteGuildCommands(guild, commands[1]))
+	for _,command in ipairs(commands[2]) do print(CommandManager.createGuildCommand(guild, command)) end
+	--p(CommandManager.getGuildCommands(guild))
 end)()
 
 return CommandManager

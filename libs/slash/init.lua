@@ -72,7 +72,7 @@ local function worker (t)
 	end
 
 	if t.description then
-		local lineName = swap[t.name]
+		local lineName = swap[t.description]
 		t.description_localizations = {}
 		for locName, loc in pairs(locale) do
 			t.description_localizations[locName] = loc[lineName]
@@ -95,4 +95,4 @@ end
 localize(commandsStructure)
 localize(debugCommands)
 
-return commandsStructure, debugCommands
+return {commandsStructure, debugCommands}
