@@ -38,7 +38,7 @@ local greeting = response("greeting", response.colors.fuchsia, function (locale,
 	return {
 		{
 			type = componentType.textDisplay,
-			content = companion.name
+			content = "## "..companion.name
 		},
 		{
 			type = componentType.textDisplay,
