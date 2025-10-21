@@ -134,7 +134,6 @@ local text = {
 	helpLinks = true,
 
 	-- server
-	serverInfoTitle = true,
 	serverInfo = true,
 
 	limitConfirm = true,
@@ -142,7 +141,6 @@ local text = {
 	roleConfirmNoRoles = true,
 
 	-- lobbies
-	lobbiesInfoTitle = true,
 	lobbiesNoInfo = true,
 	lobbiesField = true,
 	lobbyViewSelect = true,
@@ -166,9 +164,9 @@ local text = {
 	positionConfirm = true,
 
 	-- matchmaking
-	matchmakingInfoTitle = true,
 	matchmakingNoInfo = true,
 	matchmakingField = true,
+	matchmakingViewSelect = true,
 
 	matchmakingAddConfirm = true,
 	matchmakingRemoveConfirm = true,
@@ -177,7 +175,6 @@ local text = {
 	modeConfirm = true,
 
 	-- companion
-	companionsInfoTitle = true,
 	companionsNoInfo = true,
 	companionsField = true,
 
@@ -192,7 +189,6 @@ local text = {
 	loggerWarning = true,
 
 	-- room
-	roomInfoTitle = true,
 	roomInfoHost = true,
 	roomInfoVisible = true,
 	roomInfoVisibleExceptions = true,

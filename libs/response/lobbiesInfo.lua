@@ -51,7 +51,6 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 		insert(components, {
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "lobbiesField",
-				client:getChannel(lobbyData.id).name,
 				target and target.name or "default",
 				lobbyData.template or "%nickname's% room",
 				lobbyData.permissions,

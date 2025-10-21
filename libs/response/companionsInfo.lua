@@ -66,7 +66,7 @@ local companionsInfo = response("companionsInfo", response.colors.blurple, funct
 			type = componentType.row,
 			components = {{
 				type = componentType.stringSelect,
-				custom_id = "lobby_view",
+				custom_id = "companion_view",
 				options = options,
 				placeholder = localeHandler(locale, "lobbyViewSelect")
 			}}

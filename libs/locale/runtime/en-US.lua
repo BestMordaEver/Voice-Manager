@@ -197,7 +197,6 @@ If category is selected, prints users in the channels in the category]],
 [Support Server](https://discord.gg/tqj6jvT)]],
 
 	-- server
-	serverInfoTitle = "Server info | %s",
 	serverInfo = [[**Permissions:** %s
 **Managed roles:** %s
 **Lobbies:** %d
@@ -210,11 +209,9 @@ If category is selected, prints users in the channels in the category]],
 	roleConfirmNoRoles = "The default @everyone is in use",
 
 	-- lobbies
-	lobbiesInfoTitle = "# Lobbies info | %s",
 	lobbiesNoInfo = [[There are no registered lobbies
 You can add a lobby with **/lobby add**]],
-	lobbiesField = [[## %s
-**Target category:** %s
+	lobbiesField = [[**Target category:** %s
 **Name template:** %s
 **Permissions:** %s
 **Managed roles:** %s
@@ -243,7 +240,6 @@ You can add a lobby with **/lobby add**]],
 	positionConfirm = "Bot will now create channels in",
 
 	-- matchmaking
-	matchmakingInfoTitle = "Matchmaking info | %s",
 	matchmakingNoInfo = [[There are no registered matchmaking lobbies
 You can create a matchmaking lobby with **/matchmaking add**]],
 	matchmakingField = [[**Target:** %s
@@ -257,9 +253,8 @@ You can create a matchmaking lobby with **/matchmaking add**]],
 	modeConfirm = "Changed matchmaking mode to %s",
 
 	-- companion
-	companionsInfoTitle = "Companion settings | %s",
 	companionsNoInfo = [[There are no lobbies with enabled companion channels
-You can enable companion channels with **/lobby companion enable**]],
+You can enable companion channels with **/companion enable**]],
 	companionsField = [[**Category:** %s
 **Name:** %s
 **Logging:** %s
@@ -277,7 +272,6 @@ You can enable companion channels with **/lobby companion enable**]],
 	loggerWarning = "\n\n*This text chat will be logged*",
 
 	-- room
-	roomInfoTitle = "Room info | %s",
 	roomInfoHost = "**Host: %s**",
 	roomInfoVisible = "👁 Visibility - **public**",
 	roomInfoVisibleExceptions = "Hidden from: ",
