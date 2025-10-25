@@ -521,7 +521,6 @@ subcommands = {
 	end,
 
 	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
-		interaction:deferUpdate()
 		local action, scope = interaction.customId:match("room_widget_([^_]+)_?([^_]*)$")
 		return subcommands[action](interaction, voiceChannel, scope)
 	end
@@ -530,6 +529,8 @@ subcommands = {
 local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}
 
 return function (interaction, subcommand)
+	if subcommand == "widget" then interaction:deferUpdate() end
+
 	local member = interaction.member
 	if not member then
 		local guild = interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end)
