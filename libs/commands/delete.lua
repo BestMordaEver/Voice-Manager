@@ -1,24 +1,16 @@
 local client = require "client"
-local localeHandler = require "locale/runtime/localeHandler"
 
 local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
+local deleteResponse = require "response/delete"
+local response = require "response/response"
 
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local truePositionSort = require "utils/truePositionSort"
-local buttons = require "utils/components".deleteButtons
 
 local interactionType = require "discordia".enums.interactionType
 
-local insert, modf = table.insert, math.modf
-
---[[
-delete components follow two structures
-components[<rownumber>].components[1].options[<optionnumber>] - select menus
-components[#components].components[<buttonnumber>] -- buttons
-]]
-
-return function (interaction, action, argument)
+return function (interaction, action)
 	if interaction.type == interactionType.applicationCommand then	-- slash command
 		local options = interaction.options
 		local type = options.type.value
@@ -32,7 +24,6 @@ return function (interaction, action, argument)
 			return logMsg, response
 		end
 
-		---@diagnostic disable-next-line: undefined-field
 		local channels = table.sorted((category or interaction.guild)[type == "text" and "textChannels" or "voiceChannels"]:toArray(function(channel)
 			if name and not channel.name:match(name:demagic()) then
 				return false
@@ -48,68 +39,42 @@ return function (interaction, action, argument)
 		end), truePositionSort)
 
 		if #channels == 0 then return "No channels to delete", warningResponse(true, interaction.locale, "deleteNone") end
+		table.move({}, 1, #channels - amount, amount + 1, channels)
 
-		local channels = table.move(channels, 1, amount, 1, {})
-
-		local storage, components = {}, {}
-		for i=1,#channels do
-			local row, part = modf((i+24)/25)
-			if part == 0 then
-				storage[row] = {}
-				insert(components, {type = 1, components = {{type = 3, custom_id = "delete_row_"..row, min_values = 0, options = {}}}})
-			end
-			local channel = channels[i]
-
-			insert(components[row].components[1].options, {
-				label = channel.name,
-				value = channel.id,
-				description = channel.category and localeHandler(interaction.locale, "inCategory", channel.category.name),
-				default = true
-			})
-			storage[row][channel.id] = true
-		end
-
-		for _, row in pairs(components) do
-			row.components[1].max_values = #row.components[1].options
-		end
-
-		insert(components, buttons)
-
-		return "Deletion list is formed", {content = localeHandler(interaction.locale, "deleteForm", #channels), components = components}
+		return "Deletion list is formed", deleteResponse(true, interaction.locale, channels)
 
 	else	-- sent from component, absolute anarchy
 		-- no perm check, since component is on ephemeral message, that was sent to permed user
 
-		local components = interaction.message.components
+		local components = interaction.message.components[1].components
+		local argument = tonumber(interaction.customId:match("[^_]+$"))
 
 		if action == "key" then    -- delete provides four keys that need to be armed
 			components[#components].components[argument].style = 3
-			interaction:update {content = interaction.message.content, components = components}
-			return "Key is armed"
+			return "Key is armed", response:generic(true, components)
 
 		elseif action == "nuke" then   -- nuke will go off only when all keys are armed
 			local buttons, ready = components[#components].components, true
 			for i=1,4 do if buttons[i].style ~= 3 then ready = false end end
 
-			if ready then
-				interaction:update {content = localeHandler(interaction.locale, "deleteProcessing"), components = {}}
-
-				local count = 0
-				for i=1,#components-1 do
-					for _, option in ipairs(components[i].components[1].options) do
-						if option.default then
-							local channel = client:getChannel(option.value)
-							if channel and channel:delete() then count = count + 1 end
-						end
-					end
-				end
-
-				interaction:followup(okResponse(true, interaction.locale, "deleteConfirm", count))
-				return "Deleted the channels"
-			else
+			if not ready then
 				interaction:reply(warningResponse(true, interaction.locale, "deleteNotArmed"))
 				return "Not all keys are armed"
 			end
+
+			interaction:update(deleteResponse(true, interaction.locale))
+
+			local count = 0
+			for i=2,#components-1 do
+				for _, option in ipairs(components[i].components[1].options) do
+					if option.default then
+						local channel = client:getChannel(option.value)
+						if channel and channel:delete() then count = count + 1 end
+					end
+				end
+			end
+
+			return "Deleted the channels", okResponse(true, interaction.locale, "deleteConfirm", count)
 
 		elseif action == "row" then    -- user edited delete list
 			local row = {}
@@ -121,8 +86,7 @@ return function (interaction, action, argument)
 				option.default = row[option.value]
 			end
 
-			interaction:update {content = interaction.message.content, components = components}
-			return "Changes saved"
+			return "Changes saved", response:generic(true, components)
 		end
 	end
 end

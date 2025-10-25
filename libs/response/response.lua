@@ -19,7 +19,7 @@ local wrapper = {
 local defaultWrapper = function (self, ...)
 	return {
 		v2_components = true,
-		components = self.factory()
+		components = self.factory(...)
 	}
 end
 
@@ -44,6 +44,19 @@ return setmetatable({}, {
 			self.types[name] = setmetatable(response, {__call = factoryCaller or defaultWrapper})
 
 			return response
+		end,
+		generic = function (self, ephemeral, components)
+			return {
+				v2_components = true,
+				components = {
+					{
+						type = componentType.container,
+						accent_color = self.colors.blurple,
+						ephemeral = ephemeral,
+						components = components
+					}
+				}
+			}
 		end
 	},
 
