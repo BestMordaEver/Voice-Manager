@@ -13,10 +13,7 @@ return function (interaction)
 		logger:log(4, "USER %s in DMs: %s component triggered", interaction.user.id, interaction.customId)
 	end
 
-	local command = interaction.customId:match("^[^_]+")
-	local argument = interaction.customId:match("_([^_]+)")
-
-	local res, logMsg, reply = xpcall(commands[command], debug.traceback, interaction, argument)
+	local res, logMsg, reply = xpcall(commands, debug.traceback, interaction)
 
 	if res then
 		if interaction.guild then
@@ -25,8 +22,12 @@ return function (interaction)
 			logger:log(4, "USER %s in DMs: %s", interaction.user.id, logMsg)
 		end
 
-		if reply and not interaction.isReplied then
-			interaction:update(reply)
+		if reply then
+			if interaction.isReplied then
+				interaction:followup(reply)
+			else
+				interaction:update(reply)
+			end
 		elseif not interaction.isReplied then
 			interaction:reply(errorResponse(true, interaction.locale))
 			error(string.format('failed to produce a reply to component %s', interaction.customId))

@@ -12,11 +12,10 @@ local handleTemplate = require "channelUtils/handleTemplate"
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
 local checkHostPermissions = require "channelUtils/checkHostPermissions"
 
-local passwordModal = require "utils/components".passwordModal
+local passwordModal = require "response/passwordModal"
 local ratelimiter = require "utils/ratelimiter"
 
 local permission = require "discordia".enums.permission
-local interactionType = require "discordia".enums.interactionType
 
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
@@ -133,6 +132,11 @@ subcommands = {
 
 	mute = function (interaction, voiceChannel, user)
 		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
+		if not scope then
+			scope = user
+			user = nil
+		end
+
 		if user then
 			if user == client.user then
 				return "Attempt to mute the bot", warningResponse(true, interaction.locale, "shame")
@@ -226,6 +230,11 @@ subcommands = {
 
 	unmute = function (interaction, voiceChannel, user)
 		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
+		if not scope then
+			scope = user
+			user = nil
+		end
+
 		if user then
 			member = guild:getMember(user)
 		else
@@ -275,6 +284,11 @@ subcommands = {
 
 	hide = function (interaction, voiceChannel, user)
 		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
+		if not scope then
+			scope = user
+			user = nil
+		end
+
 		if user then
 			if user == client.user then
 				return "Attempt to hide from bot", warningResponse(true, interaction.locale, "shame")
@@ -336,6 +350,11 @@ subcommands = {
 
 	show = function (interaction, voiceChannel, user)
 		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
+		if not scope then
+			scope = user
+			user = nil
+		end
+
 		if user then
 			member = guild:getMember(user)
 		else
@@ -468,9 +487,13 @@ subcommands = {
 		end
 	end,
 
-	passwordinit = function (interaction)	-- not exposed, access via componentInteraction
-		interaction:createModal("room_passwordcheck", localeHandler(interaction.locale, "passwordEnter"), passwordModal(interaction))
-		return "Created password modal"
+	passwordinit = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
+		local ok, err = interaction:createModal(passwordModal(interaction.locale, voiceChannel))
+		if ok then
+			return "Created password modal"
+		else
+			error(string.format("failed to produce password modal - %s", err))
+		end
 	end,
 
 	passwordcheck = function (interaction, voiceChannel)	-- not exposed, access via modalInteraction
@@ -480,7 +503,7 @@ subcommands = {
 		if not channel then
 			if channelData and channelData.parentType == 3 then voiceChannel:delete() end
 			return "No parent channel", warningResponse(true, interaction.locale, "passwordNoChannel")
-		elseif interaction.components[1].components[1].value == channelData.parent.password then
+		elseif interaction.components[1].component.value == channelData.parent.password then
 			local member = voiceChannel.guild:getMember(interaction.user)
 
 			-- sendMessages is used as an indication of blocklist, to not conflict with password flow
@@ -497,15 +520,10 @@ subcommands = {
 		end
 	end,
 
-	widget = function (interaction, voiceChannel, argument)	-- not exposed, access via componentInteraction
-		local action, scope = argument:match("^(.-)_(.-)$")
-		if not action then action = argument end
-		interaction:deferReply(true)
-
-		local log, response = subcommands[action](interaction, voiceChannel, scope)
-		interaction:updateReply(response)
-
-		return log
+	widget = function (interaction, voiceChannel)	-- not exposed, access via componentInteraction
+		interaction:deferUpdate()
+		local action, scope = interaction.customId:match("room_widget_([^_]+)_?([^_]*)$")
+		return subcommands[action](interaction, voiceChannel, scope)
 	end
 }
 
