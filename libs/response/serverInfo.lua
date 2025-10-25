@@ -19,13 +19,10 @@ local serverInfo = response("serverInfo", response.colors.blurple, function (loc
 	end
 	if #roles == 0 then roles[1] = localeHandler(locale, "none") end
 
-	return {
-		{
-			type = componentType.textDisplay,
-			content = localeHandler(locale, "serverInfoTitle", guild.name)
-		},{
+	return {{
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "serverInfo",
+				guild.name,
 				guildData.permissions,
 				table.concat(roles, " "),
 				#guildData.lobbies,

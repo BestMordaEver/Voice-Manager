@@ -12,7 +12,7 @@ return
 ---@return string? logMessage
 ---@return table? response
 function (interaction, channel)
-	local ok, missingPermissions = checkBotPermissions(channel)
+	local ok, missingPermissions = checkBotPermissions(channel or interaction.guild)
 	if not ok then
 		return false, "Bad bot permissions", warningResponse(true, interaction.locale, "botPermissionsMandatory", table.concat(missingPermissions, " "), missingPermissions)
 	end

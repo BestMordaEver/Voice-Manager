@@ -197,7 +197,8 @@ If category is selected, prints users in the channels in the category]],
 [Support Server](https://discord.gg/tqj6jvT)]],
 
 	-- server
-	serverInfo = [[**Permissions:** %s
+	serverInfo = [[## %s
+**Permissions:** %s
 **Managed roles:** %s
 **Lobbies:** %d
 **Active users:** %d
