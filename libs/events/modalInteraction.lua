@@ -5,7 +5,7 @@ local commands = require "commands/init"
 local errorResponse = require "response/error"
 
 return function (interaction)
-    interaction:deferReply(true)
+	interaction:deferReply(true)
 
 	if interaction.guild then
 		logger:log(4, "GUILD %s USER %s: %s modal submitted", interaction.guild.id, interaction.user.id, interaction.customId)

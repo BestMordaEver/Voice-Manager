@@ -34,7 +34,7 @@ return function (interaction)
 		end
 
 		if reply then -- may have created modal instead
-        	local ok, msg
+			local ok, msg
 			if interaction.isReplied then
 				ok, msg = interaction:updateReply(reply)
 				if not ok then error(string.format("failed to update reply - %s\n", msg)) end
