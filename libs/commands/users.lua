@@ -1,5 +1,4 @@
 local client = require "client"
-local localeHandler = require "locale/runtime/localeHandler"
 
 local lobbies = require "storage/lobbies"
 
@@ -7,7 +6,7 @@ local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
 
 local channelType = require "discordia".enums.channelType
-local insert = table.insert
+local insert, concat = table.insert, table.concat
 
 local modes = {
     username = function (member) return member.user.name end,
@@ -18,44 +17,28 @@ local modes = {
 }
 
 local commands = {
-    print = function (interaction, channels, options)
+    print = function (interaction, channels)
+
+		local options = interaction.options
+        local separator = options.separator and options.separator.value or " "
+        local extractor = modes[options.print_as and options.print_as.value or "mention"]
         local names = {}
-        do
-            local separator, extractor = options.separator and options.separator.value or " ", modes[options.print_as and options.print_as.value or "mention"]
 
-            for _, channel in ipairs(channels) do
-                for _, member in pairs(channel.connectedMembers) do
-                    insert(names, extractor(member))
-                end
+        for _, channel in ipairs(channels) do
+            for _, member in pairs(channel.connectedMembers) do
+                insert(names, extractor(member))
             end
-
-            names = table.concat(names, separator)
-            if #names == 0 then names = localeHandler(interaction.locale, "none") end
         end
 
-        local embeds, index, len = {}, 1, #names
-        if len > 40960 then   -- 4096 chars per embed, 10 embeds per message
-            repeat
-                insert(embeds, {description = names:sub(index, index + 4095)})
-                index = index + 4096
-                if #embeds == 10 then
-                    interaction:followup {ephemeral = true, embeds = embeds}
-                    embeds = {}
-                end
-            until index >= len
-            return "Sent names list", okResponse(true, interaction.locale, "usersSent")
-        end
+		if #names == 0 then
+			return "No users found", warningResponse(true, interaction.locale, "noUsers")
+		end
 
-        repeat
-            insert(embeds, {description = names:sub(index, index + 4095)})
-            index = index + 4096
-        until index >= len
-        return "Sent names list", {embeds = embeds}
-
+        return "Sent names list", {ephemeral = true, file = {"users.txt", concat(names, separator)}}
     end,
 
-    give = function (interaction, channels, options)
-        local role, count = options.role.value, 0
+    give = function (interaction, channels)
+        local role, count = interaction.options.role.value, 0
         for _, channel in ipairs(channels) do
             for _, member in pairs(channel.connectedMembers) do
                 if member:addRole(role) then
@@ -67,8 +50,8 @@ local commands = {
 
     end,
 
-    remove = function (interaction, channels, options)
-        local role, count = options.role.value, 0
+    remove = function (interaction, channels)
+        local role, count = interaction.options.role.value, 0
         for _, channel in ipairs(channels) do
             for _, member in pairs(channel.connectedMembers) do
                 if member:removeRole(role) then
@@ -81,9 +64,8 @@ local commands = {
 }
 
 return function (interaction, subcommand)
-    local channels, options = {}, interaction.option.options
-
-    local channel = options.channel.value
+    local channels = {}
+    local channel = interaction.options.channel.value
     local lobbyData = lobbies[channel.id]
 
     if lobbyData then
@@ -113,5 +95,5 @@ return function (interaction, subcommand)
         return "No channels to query", warningResponse(true, interaction.locale, "noChildChannels")
     end
 
-    return commands[subcommand](interaction, channels, options)
+    return commands[subcommand](interaction, channels)
 end

@@ -275,7 +275,7 @@ local text = {
 
 	-- users
 	noChildChannels = true,
-	usersSent = true,
+	noUsers = true,
 	usersRolesAdded = true,
 	usersRolesRemoved = true,
 

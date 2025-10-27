@@ -361,7 +361,7 @@ https://discord.gg/%s]],
 
 	-- users
 	noChildChannels = "This lobby doesn't have children channels",
-	usersSent = "Sent users list",
+	noUsers = "No users were found",
 	usersRolesAdded = "Given the role to %d users",
 	usersRolesRemoved = "Removed the role from %d users",
 
