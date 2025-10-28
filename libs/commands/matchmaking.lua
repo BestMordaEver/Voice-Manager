@@ -10,7 +10,7 @@ local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
 local channelType = require "discordia".enums.channelType
 
-return setmetatable({
+local commands = {
 	add = function (interaction, channel)
 		if lobbies[channel.id] then
 			return "Already registered", warningResponse(true, interaction.locale, "lobbyDupe")
@@ -58,9 +58,11 @@ return setmetatable({
 		lobbies[lobby.id]:setTemplate(mode)
 		return "Matchmaking mode set", okResponse(true, interaction.locale, "modeConfirm", mode)
 	end
-},{__call = function (self, interaction, subcommand)
+}
+
+return function (interaction, subcommand)
 	local channel, response = lobbyPreProcess(interaction, matchmakingInfoResponse)
 	if response then return channel, response end
 
-	return self[subcommand](interaction, channel)
-end})
+	return commands[subcommand](interaction, channel)
+end

@@ -9,7 +9,7 @@ local companionsInfoResponse = require "response/companionsInfo"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
-return setmetatable({
+local commands = {
 	enable = function (interaction, lobby)
 		lobbies[lobby.id]:setCompanionTarget(true)
 		return "Lobby companion enabled", okResponse(true, interaction.locale, "companionEnable")
@@ -61,7 +61,7 @@ return setmetatable({
 			end
 			return "Companion greeting set", okResponse(true, interaction.locale, "greetingConfirm")
 		end
-p(greetingSetupResponse(interaction.locale, lobby))
+
 		local ok, msg = interaction:createModal(greetingSetupResponse(interaction.locale, lobby))
 		if ok then
 			return "Sent greeting setup modal"
@@ -85,9 +85,11 @@ p(greetingSetupResponse(interaction.locale, lobby))
 
 		return logMsg, response
 	end
-},{__call = function (self, interaction, subcommand)
+}
+
+return function (interaction, subcommand)
 	local channel, response = lobbyPreProcess(interaction, companionsInfoResponse)
 	if response then return channel, response end
 
-	return self[subcommand](interaction, channel)
-end})
+	return commands[subcommand](interaction, channel)
+end
