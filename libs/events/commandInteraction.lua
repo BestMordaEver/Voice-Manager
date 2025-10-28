@@ -7,7 +7,11 @@ local errorResponse = require "response/error"
 local insert, concat = table.insert, table.concat
 
 return function (interaction)
-	local strings = {interaction.commandName, interaction.subcommandGroup or interaction.subcommand or (interaction.target and tostring(interaction.target)), interaction.subcommandGroup and interaction.subcommand}
+	local strings = {
+		interaction.commandName,
+		interaction.subcommand or (interaction.target and tostring(interaction.target)),
+		interaction.subcommandOption
+	}
 	if interaction.options then
 		for name, option in pairs(interaction.options) do
 			insert(strings, name)
