@@ -17,7 +17,7 @@ local function adjust (overwrite, method, channel, ...)
 	if ok then
 		method(overwrite, ...)
 	else
-		for _, perm in pairs(...) do
+		for _, perm in pairs({...}) do
 			if not missingBotPermissions[perm] then
 				method(overwrite, perm)
 			end
