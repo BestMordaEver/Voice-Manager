@@ -426,7 +426,6 @@ https://discord.gg/%s]],
 		"Add this one to the list",
 		"This just keeps happening!",
 		"Further testing required...",
-		("There is exactly 1 in %d chance that you will get this specific message!"):format(#locale.errorReaction),
 	}
 }
 
