@@ -6,6 +6,7 @@ local channels = require "storage/channels"
 local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
 local lobbiesInfoResponse = require "response/lobbiesInfo"
+local regionResponse = require "response/region"
 
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
@@ -134,6 +135,28 @@ local subcommands = {
 
 		lobbies[lobby.id]:setLimit(limit)
 		return "Lobby limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
+	end,
+
+	region = function (interaction, lobby)
+		if interaction.command == "reset" then
+			lobbies[lobby.id]:setRegion(nil)
+			return "Reset voice region", okResponse(true, interaction.locale, "regionReset")
+		end
+
+		if interaction.customId then
+			local id, name = interaction.values[1]
+			for _, region in pairs(interaction.guild:listVoiceRegions()) do
+				if region.id == id then
+					name = region.name
+					break
+				end
+			end
+
+			lobbies[lobby.id]:setRegion(id)
+			return "Voice region set", okResponse(true, interaction.locale, "regionConfirm", name)
+		end
+
+		return "Sent voice region selector", regionResponse(true, interaction)
 	end,
 
 	--[[ TODO

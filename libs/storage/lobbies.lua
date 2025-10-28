@@ -31,6 +31,8 @@ local storageStatements = {
 
 	setLobbyBitrate = {"UPDATE lobbies SET bitrate = ? WHERE id = ?","SET BITRATE %s => LOBBY %s"},
 
+	setLobbyRegion = {"UPDATE lobbies SET region = ? WHERE id = ?","SET REGION %s => LOBBY %s"},
+
 	setLobbyCompanionTemplate = {"UPDATE lobbies SET companionTemplate = ? WHERE id = ?","SET COMPANION TEMPLATE %s => LOBBY %s"},
 
 	setLobbyCompanionTarget = {"UPDATE lobbies SET companionTarget = ? WHERE id = ?","SET COMPANION TARGET %s => LOBBY %s"},
@@ -128,6 +130,12 @@ local lobbyMeta = {
 			emitter:emit("setLobbyBitrate", bitrate, self.id)
 		end,
 
+		setRegion = function (self, region)
+			self.region = region
+			logger:log(6, "GUILD %s LOBBY %s: updated region to %s", self.guild.id, self.id, region)
+			emitter:emit("setLobbyRegion", region, self.id)
+		end,
+
 		setCompanionTarget = function (self, companionTarget)
 			self.companionTarget = companionTarget
 			logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guild.id, self.id, companionTarget)
@@ -170,12 +178,12 @@ setmetatable(lobbies, {
 			id, guild, isMatchmaking,
 			template, companionTemplate,
 			target, companionTarget,
-			cLimit, permissions, capacity, bitrate,
+			cLimit, permissions, capacity, bitrate, region,
 			greeting, companionLog
 		FROM lobbies]]),
 		loadRolesStatement = lobbiesDB:prepare("SELECT id, lobbyID FROM roles WHERE lobbyID = ?"),
 
-		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, limit, permissions, capacity, bitrate, greeting, companionLog, roles)
+		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, limit, permissions, capacity, bitrate, region, greeting, companionLog, roles)
 			local lobby = setmetatable({
 				id = lobbyID,
 				guild = guilds[guildID],
@@ -187,6 +195,7 @@ setmetatable(lobbies, {
 				target = target,
 				capacity = tonumber(capacity),
 				bitrate = tonumber(bitrate),
+				region = region,
 				companionTemplate = companionTemplate,
 				companionTarget = companionTarget == "true" or companionTarget,
 				greeting = greeting,

@@ -79,13 +79,27 @@ local function lobbyJoinCall (member, lobby)
 		end
 	end
 
+	local regionId
+	if lobbyData.region then
+		local flag = false
+		for _, region in pairs(guild:listVoiceRegions()) do
+			if region.id == lobbyData.region then flag = true; break end
+		end
+		if flag then
+			regionId = lobbyData.region
+		else
+			lobbyData:setRegion(nil)
+		end
+	end
+
 	local newChannel, err = guild:createChannel({
 		name = name,
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate or lobby.bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
 		position = needsMove and distance or nil,
-		parent_id = target.id
+		parent_id = target.id,
+		rtc_region = regionId
 	})
 
 	if not newChannel then

@@ -56,6 +56,8 @@ return {
 	lobbyRoleRemoveRoleDesc = "The role to be removed",
 	lobbyLimitDesc = "Limit the amount of rooms bot is permitted to create",
 	lobbyLimitLimitDesc = "The amount of rooms bot will be able to create",
+	lobbyRegion = "region",
+	lobbyRegionDesc = "Select a preferred voice region",
 
 	-- matchmaking
 	matchmakingTarget = "target",
@@ -188,6 +190,7 @@ return {
 	resetLobbyPermissionsDesc = "Disable all room permissions",
 	resetLobbyRoleDesc = "Reset default managed role to @everyone",
 	resetLobbyLimitDesc = "Reset the limit to 500",
+	resetLobbyRegionDesc = "Reset the region to be selected automatically",
 	resetMatchmakingDesc = "Matchmaking lobby settings",
 	resetMatchmakingTargetDesc = "Reset matchmaking target to current category",
 	resetMatchmakingModeDesc = "Reset matchmaking mode to random",

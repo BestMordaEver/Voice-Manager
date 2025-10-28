@@ -128,6 +128,22 @@ return {
 						}
 					}
 				},
+				{
+					name = locale.lobbyRegion,
+					description = locale.resetLobbyRegionDesc,
+					type = commandOptionType.subcommand,
+					options = {
+						{
+							name = locale.lobby,
+							description = locale.lobbyConfigured,
+							type = commandOptionType.channel,
+							required = true,
+							channel_types = {
+								channelType.voice
+							}
+						}
+					}
+				},
 			}
 		},
 		{

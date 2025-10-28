@@ -59,6 +59,18 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 		end
 		if #roles == 0 then roles[1] = localeHandler(locale, "none") end
 
+		local regionId, regionName = lobbyData.region
+		if regionId == nil then
+			regionName = localeHandler(locale, "automatic")
+		else
+			for _, region in pairs(guild:listVoiceRegions()) do
+				if region.id == regionId then
+					regionName = region.name
+					break
+				end
+			end
+		end
+
 		insert(components, {
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "lobbiesField",
@@ -68,6 +80,7 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 				table.concat(roles, " "),
 				lobbyData.capacity or "default",
 				lobbyData.bitrate or "default",
+				regionName,
 				lobbyData.companionTarget and "enabled" or "disabled",
 				#lobbyData.children
 			)

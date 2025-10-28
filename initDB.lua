@@ -30,6 +30,7 @@ CREATE TABLE lobbies(
 	permissions INTEGER DEFAULT 0,
 	capacity INTEGER,
 	bitrate INTEGER,
+	region VARCHAR
 	greeting VARCHAR,
 	companionLog VARCHAR
 );

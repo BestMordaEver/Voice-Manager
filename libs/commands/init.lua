@@ -7,7 +7,7 @@ local function invite ()
 	return "Sent support invite", {content = "https://discord.gg/tqj6jvT"}
 end
 
-local undeferrable = {view = true, greeting = true, widget = true, passwordinit = true, row = true, key = true, nuke = true}
+local undeferrable = {view = true, greeting = true, widget = true, passwordinit = true, row = true, key = true, nuke = true, region = true}
 
 -- all possible bot commands are processed in corresponding files, should return message for logger
 return setmetatable({

@@ -161,6 +161,10 @@ local text = {
 	nameConfirm = true,
 	permissionsConfirm = true,
 	permissionsReset = true,
+	regionSelect = true,
+	regionConfirm = true,
+	regionReset = true,
+	automatic = true,
 	positionConfirm = true,
 
 	-- matchmaking

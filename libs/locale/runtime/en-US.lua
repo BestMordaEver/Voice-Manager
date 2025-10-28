@@ -219,6 +219,7 @@ You can register a lobby with **/lobby add**]],
 **Managed roles:** %s
 **Capacity:** %s
 **Bitrate:** %s
+**Voice region:** %s
 **Companion:** %s
 **Channels:** %d]],
 	lobbyViewSelect = "Select a lobby",
@@ -239,6 +240,10 @@ You can register a lobby with **/lobby add**]],
 	nameConfirm = "Changed name to %s",
 	permissionsConfirm = "New permissions set",
 	permissionsReset = "All permissions are disabled",
+	regionSelect = "Select your preferred voice region",
+	regionConfirm = "Voice region changed to %s",
+	regionReset = "Voice region reset to automatic selection",
+	automatic = "automatic",
 	positionConfirm = "Bot will now create channels in",
 
 	-- matchmaking
