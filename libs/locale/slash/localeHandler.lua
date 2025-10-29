@@ -7,7 +7,7 @@ local handler = {
 local meta = {
 -- [=[
 	__index = function (self, k)
-		return assert(enUS[k], k .. " - not a valid line!")
+		return assert(enUS[k], string.format("%s - not a valid line!", tostring(k)))
 	end,
 --[[]=]
 	__index = function (self, k)
