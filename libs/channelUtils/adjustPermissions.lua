@@ -12,7 +12,7 @@ local function adjust (overwrite, method, channel, ...)
 		end
 	end
 
-	local ok, _, missingBotPermissions = checkBotPermissions(channel)
+	local ok, missingBotPermissions = checkBotPermissions(channel)
 
 	if ok then
 		method(overwrite, ...)
