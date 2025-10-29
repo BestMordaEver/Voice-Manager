@@ -280,6 +280,7 @@ You can enable companions with **/companion enable**]],
 	loggerWarning = "\n\n*This text chat will be logged*",
 
 	-- room
+	roomInfoTite = "## Room info | %s",
 	roomInfoHost = "**Host: %s**",
 	roomInfoVisible = "👁 Visibility - **public**",
 	roomInfoVisibleExceptions = "Hidden from: ",
