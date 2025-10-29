@@ -196,7 +196,7 @@ end
 ---@overload fun(ephemeral : boolean, locale : localeName, page : string) : table
 local help = response("help", response.colors.blurple, function (locale, page)
 	page = page or "help"
-	return translatedHelp[locale][page]
+	return (translatedHelp[locale] or translatedHelp["en-US"])[page]
 end)
 
 return help
