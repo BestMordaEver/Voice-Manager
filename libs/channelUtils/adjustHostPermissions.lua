@@ -27,6 +27,7 @@ return function (channel, newHost, oldHost)
 	end
 
 	if not (channelOK and companionOK) then
-		newHost:send(warningResponse(false, newHost.user.locale, "hostMigrationFail", table.concat(channelMissingPermissions), table.concat(companionMissingPermissions)))
+		newHost:send(warningResponse(false, newHost.user.locale, "hostMigrationFail",
+		table.concat(channelMissingPermissions or {"none"}, " "), table.concat(companionMissingPermissions or {"none"}, " ")))
 	end
 end
