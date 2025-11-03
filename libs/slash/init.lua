@@ -91,7 +91,7 @@ local function localize(commands)
 	end
 end
 
---localize(commandsStructure)
---localize(debugCommands)
+localize(commandsStructure)
+localize(debugCommands)
 
 return {commandsStructure, debugCommands}
