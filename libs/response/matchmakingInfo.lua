@@ -12,6 +12,14 @@ local channelType = enums.channelType
 local localeHandler = require "locale/localeHandler"
 local response = require "response/response"
 
+local modes = {
+	random = "matchmakingModeModeRandom",
+	max = "matchmakingModeModeMax",
+	min = "matchmakingModeModeMin",
+	first = "matchmakingModeModeFirst",
+	last = "matchmakingModeModeLast",
+}
+
 ---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table
 local matchmakingInfo = response("matchmakingInfo", response.colors.blurple, function (locale, target)
 
@@ -72,7 +80,7 @@ local matchmakingInfo = response("matchmakingInfo", response.colors.blurple, fun
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "matchmakingField",
 				target.name,
-				lobbyData.template or "random",
+				localeHandler(locale, modes[lobbyData.template or "random"]),
 				target.type == channelType.category and #target.voiceChannels or #lobbies[target.id].children
 			)
 		})

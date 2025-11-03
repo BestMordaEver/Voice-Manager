@@ -2,6 +2,8 @@ local client = require "client"
 local channels = require "storage/channels"
 local adjustPermissions = require "channelUtils/adjustPermissions"
 
+local localeHandler = require "locale/localeHandler"
+
 local warningResponse = require "response/warning"
 
 return function (channel, newHost, oldHost)
@@ -28,6 +30,7 @@ return function (channel, newHost, oldHost)
 
 	if not (channelOK and companionOK) then
 		newHost:send(warningResponse(false, newHost.user.locale, "hostMigrationFail",
-		table.concat(channelMissingPermissions or {"none"}, " "), table.concat(companionMissingPermissions or {"none"}, " ")))
+		table.concat(channelMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " "),
+		table.concat(companionMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " ")))
 	end
 end

@@ -1,5 +1,6 @@
 local bitfield = require "utils/bitfield"
 local permission = require "discordia".enums.permission
+local localeHandler = require "locale/localeHandler"
 
 local botPermissions
 
@@ -56,6 +57,17 @@ local botPermissionsMT = {
 
 		value = function (self)
 			return self.bitfield.value
+		end,
+
+		toString = function (self, locale)
+			local str = ""
+			for bit, name in pairs(self.perms) do
+				if self.bitfield:has(bit) then
+					str = str .. localeHandler(name, locale) .. " "
+				end
+			end
+			str = str:sub(1,-2)
+			return str == "" and localeHandler(locale, "none") or str
 		end
 	},
 
@@ -66,17 +78,6 @@ local botPermissionsMT = {
 	__sub = function (left, right)
 		return botPermissions((left.bitfield - right.bitfield).value)
 	end,
-
-	__tostring = function (self)
-		local str = ""
-		for bit, name in pairs(self.perms) do
-			if self.bitfield:has(bit) then
-				str = str .. name .. " "
-			end
-		end
-		str = str:sub(1,-2)
-		return str == "" and "nothing" or str
-	end
 }
 
 botPermissions = function (perms)

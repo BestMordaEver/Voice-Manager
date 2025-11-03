@@ -31,7 +31,7 @@ local greeting = response("greeting", response.colors.fuchsia, function (locale,
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = localeHandler(member.user.locale, "roomCommands") .. availableCommands(room),
+		commands = localeHandler(locale, "roomCommands") .. availableCommands(room),
 		buttons = ""
 	}
 
@@ -54,25 +54,25 @@ local greeting = response("greeting", response.colors.fuchsia, function (locale,
 				{
 					type = componentType.button,
 					style = buttonStyle.success,
-					label = "Show",
+					label = localeHandler(locale, "roomButtonsShow"),
 					custom_id = "room_widget_show_both",
 					emoji = {name = "👁"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.success,
-					label = "Unlock",
+					label = localeHandler(locale, "roomButtonsUnlock"),
 					custom_id = "room_widget_unlock",
 					emoji = {name = "🔓"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.success,
-					label = "Unmute voice",
+					label = localeHandler(locale, "roomButtonsUnmuteV"),
 					custom_id = "room_widget_unmute_voice",
 					emoji = {name = "🔉"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.success,
-					label = "Unmute text",
+					label = localeHandler(locale, "roomButtonsUnmuteT"),
 					custom_id = "room_widget_unmute_text",
 					emoji = {name = "🖊"}
 				}
@@ -84,25 +84,25 @@ local greeting = response("greeting", response.colors.fuchsia, function (locale,
 				{
 					type = componentType.button,
 					style = buttonStyle.secondary,
-					label = "Hide",
+					label = localeHandler(locale, "roomButtonsHide"),
 					custom_id = "room_widget_hide_both",
 					emoji = {name = "🥷"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.secondary,
-					label = "Lock",
+					label = localeHandler(locale, "roomButtonsLock"),
 					custom_id = "room_widget_lock",
 					emoji = {name = "🔒"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.secondary,
-					label = "Mute voice",
+					label = localeHandler(locale, "roomButtonsMuteV"),
 					custom_id = "room_widget_mute_voice",
 					emoji = {name = "🔇"}
 				},{
 					type = componentType.button,
 					style = buttonStyle.secondary,
-					label = "Mute text",
+					label = localeHandler(locale, "roomButtonsMuteT"),
 					custom_id = "room_widget_mute_text",
 					emoji = {name = "📵"}
 				}

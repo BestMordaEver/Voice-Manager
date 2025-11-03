@@ -10,7 +10,7 @@ local passwordModal = response:newCustomType("passwordModal",
 function (locale)
 	return {{
 		type = componentType.label,
-		label = localeHandler(locale, "password"),
+		label = localeHandler(locale, "passwordLabel"),
 		component = {
 			type = componentType.textInput,
 			custom_id = "password",

@@ -74,14 +74,14 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 		insert(components, {
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "lobbiesField",
-				target and target.name or "default",
+				target and target.name or localeHandler(locale, "default"),
 				lobbyData.template or "%nickname's% room",
-				lobbyData.permissions,
+				lobbyData.permissions:toString(locale),
 				table.concat(roles, " "),
-				lobbyData.capacity or "default",
-				lobbyData.bitrate or "default",
+				lobbyData.capacity or localeHandler(locale, "default"),
+				lobbyData.bitrate or localeHandler(locale, "default"),
 				regionName,
-				lobbyData.companionTarget and "enabled" or "disabled",
+				lobbyData.companionTarget and localeHandler(locale, "enabled") or localeHandler(locale, "disabled"),
 				#lobbyData.children
 			)
 		})

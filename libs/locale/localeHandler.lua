@@ -2,6 +2,10 @@
 local handler = setmetatable({
 	["en-US"] = require "locale/en-US",
 }, {
+	__index = function (self, k)
+		return assert(self["en-US"][k], string.format("%s - not a valid line!", tostring(k)))
+	end,
+
 	__call = function (self, locale, line, ...)
 		locale = self[locale]
 		if not locale or not locale[line] then locale = self["en-US"] end

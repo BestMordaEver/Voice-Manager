@@ -28,7 +28,10 @@ local region = response("region", response.colors.blurple, function (interaction
 		insert(options, {
 			label = region.name,
 			value = region.id,
-			description = ("%s %s %s"):format(region.optimal and "optimal" or "", region.deprecated and "deprecated" or "", region.custom and "custom" or "")
+			description = ("%s %s %s"):format(
+				region.optimal and localeHandler(interaction.locale, "optimal") or "",
+				region.deprecated and localeHandler(interaction.locale, "deprecated") or "",
+				region.custom and localeHandler(interaction.locale, "custom") or "")
 		})
 	end
 

@@ -53,7 +53,7 @@ local companionsInfo = response("companionsInfo", response.colors.blurple, funct
 		insert(components, {
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "companionsField",
-				target and target.name or "default",
+				target and target.name or localeHandler(locale, "default"),
 				lobbyData.companionTemplate or "private-chat",
 				logChannel and logChannel.name or localeHandler(locale, "none"),
 				lobbyData.greeting or localeHandler(locale, "none")

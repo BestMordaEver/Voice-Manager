@@ -243,6 +243,9 @@ You can register a lobby with **/lobby add**]],
 	regionConfirm = "Voice region changed to %s",
 	regionReset = "Voice region reset to automatic selection",
 	automatic = "automatic",
+	optimal = "optimal",
+	deprecated = "deprecated",
+	custom = "custom",
 	positionConfirm = "Bot will now create channels in",
 
 	-- matchmaking

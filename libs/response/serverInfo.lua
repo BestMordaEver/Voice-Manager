@@ -23,7 +23,7 @@ local serverInfo = response("serverInfo", response.colors.blurple, function (loc
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "serverInfo",
 				guild.name,
-				guildData.permissions,
+				guildData.permissions:toString(locale),
 				table.concat(roles, " "),
 				#guildData.lobbies,
 				guildData:users(),
