@@ -191,8 +191,16 @@ end
 local function matchmakingJoin (member, lobby)
 	logger:log(4, "GUILD %s mLOBBY %s USER %s: joined", lobby.guild.id, lobby.id, member.user.id)
 
-	local target = client:getChannel(lobbies[lobby.id].target) or lobby.category
-	if not target then return end
+	local target
+	repeat
+		target = client:getChannel(lobbies[lobby.id].target) or lobby.category or lobby.guild
+
+		if target.type == channelType.voice and not lobbies[target.id] then
+			lobbies[lobby.id]:setTarget()
+		else
+			break
+		end
+	until false
 
 	local children
 
@@ -207,7 +215,9 @@ local function matchmakingJoin (member, lobby)
 	else
 		-- otherwise matchmake in the available channels of category
 		children = target.voiceChannels:toArray("position", function (channel)
-			return (channel ~= lobby) and (channel.userLimit == 0 or #channel.connectedMembers < channel.userLimit) and member:hasPermission(channel, permission.connect)
+			return channel ~= lobby and lobby.category == channel.category and
+				(channel.userLimit == 0 or #channel.connectedMembers < channel.userLimit) and
+				member:hasPermission(channel, permission.connect)
 		end)
 	end
 

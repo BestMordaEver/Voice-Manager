@@ -14,7 +14,8 @@ local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table
 local matchmakingInfo = response("matchmakingInfo", response.colors.blurple, function (locale, target)
-		local components = {
+
+	local components = {
 		{
 			type = componentType.textDisplay,
 			content = string.format("## %s", target.name)
@@ -50,12 +51,22 @@ local matchmakingInfo = response("matchmakingInfo", response.colors.blurple, fun
 
 	if isChannel then
 		local lobbyData = lobbies[target.id]
-		local target = client:getChannel(lobbyData.target) or client:getChannel(lobbyData.id).category or
-			{
-				name = target.name,
-				type = channelType.category,
-				voiceChannels = target.voiceChannels:toArray(function (vc) return not vc.category end)
-			}
+		local target
+
+		repeat
+			target = client:getChannel(lobbyData.target) or client:getChannel(lobbyData.id).category or
+				{
+					name = target.name,
+					type = channelType.category,
+					voiceChannels = target.voiceChannels:toArray(function (vc) return not vc.category end)
+				}
+
+			if target.type == channelType.voice and not lobbies[target.id] then
+				lobbyData:setTarget()
+			else
+				break
+			end
+		until false
 
 		insert(components, {
 			type = componentType.textDisplay,
