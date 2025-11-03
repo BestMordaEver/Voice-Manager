@@ -14,7 +14,7 @@ return
 function (interaction, channel)
 	local ok, missingPermissions = checkBotPermissions(channel or interaction.guild)
 	if not ok then
-		return false, "Bad bot permissions", warningResponse(true, interaction.locale, "botPermissionsMandatory", table.concat(missingPermissions, " "), missingPermissions)
+		return false, "Bad bot permissions", warningResponse(true, interaction.locale, "botPermissionsMandatory", table.concat(missingPermissions, " "))
 	end
 
 	if config.owners[interaction.user.id] then return true end

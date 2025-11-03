@@ -1,6 +1,5 @@
----@type {textLine : string|table}
-local locale
-locale = {
+---@enum (key) textLine
+local locale = {
 	-- help
 	helpSelectorPlaceholder = "Select a help article",
 	helpSelectorLobby = "Lobby",
