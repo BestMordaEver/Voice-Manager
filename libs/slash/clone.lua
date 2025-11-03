@@ -3,7 +3,6 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
----@module "locale/slash/en-US"
 local locale = require "locale/localeHandler"
 
 return {

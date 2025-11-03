@@ -3,7 +3,7 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
----@module "locale/slash/en-US"
+local lobbySelect = require "slash/lobbySelect"
 local locale = require "locale/localeHandler"
 
 return {
@@ -63,15 +63,7 @@ return {
 				description = locale.companionCategoryDesc,
 				type = commandOptionType.subcommand,
 				options = {
-					{
-						name = locale.lobby,
-						description = locale.lobbyConfigured,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					},
+					lobbySelect,
 					{
 						name = locale.category,
 						description = locale.companionCategoryCategoryDesc,
@@ -88,15 +80,7 @@ return {
 				description = locale.companionNameDesc,
 				type = commandOptionType.subcommand,
 				options = {
-					{
-						name = locale.lobby,
-						description = locale.lobbyConfigured,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					},
+					lobbySelect,
 					{
 						name = locale.name,
 						description = locale.companionNameNameDesc,
@@ -110,15 +94,7 @@ return {
 				description = locale.companionGreetingDesc,
 				type = commandOptionType.subcommand,
 				options = {
-					{
-						name = locale.lobby,
-						description = locale.lobbyConfigured,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					},
+					lobbySelect,
 					{
 						name = locale.companionGreeting,
 						description = locale.companionGreetingGreetingDesc,
@@ -131,15 +107,7 @@ return {
 				description = locale.companionLogDesc,
 				type = commandOptionType.subcommand,
 				options = {
-					{
-						name = locale.lobby,
-						description = locale.lobbyConfigured,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					},
+					lobbySelect,
 					{
 						name = locale.channel,
 						description = locale.companionLogChannelDesc,

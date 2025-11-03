@@ -3,7 +3,6 @@ local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
 local permissionList = require "slash/permissionList"
----@module "locale/slash/en-US"
 local locale = require "locale/localeHandler"
 
 return {

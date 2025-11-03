@@ -3,8 +3,13 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
----@module "locale/slash/en-US"
 local locale = require "locale/localeHandler"
+
+local channel_types = {
+	channelType.voice,
+	channelType.stageVoice,
+	channelType.category
+}
 
 return {
 	name = locale.users,
@@ -21,11 +26,7 @@ return {
 					description = locale.usersPrintChannelDesc,
 					type = commandOptionType.channel,
 					required = true,
-					channel_types = {
-						channelType.voice,
-						channelType.stageVoice,
-						channelType.category
-					}
+					channel_types = channel_types
 				},
 				{
 					name = locale.usersPrintPrint_as,
@@ -71,11 +72,7 @@ return {
 					description = locale.usersGiveChannelDesc,
 					type = commandOptionType.channel,
 					required = true,
-					channel_types = {
-						channelType.voice,
-						channelType.stageVoice,
-						channelType.category
-					}
+					channel_types = channel_types
 				},
 				{
 					name = locale.role,

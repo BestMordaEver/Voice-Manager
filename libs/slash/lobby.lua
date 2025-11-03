@@ -4,7 +4,7 @@ local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
 local permissionList = require "slash/permissionList"
----@module "locale/slash/en-US"
+local lobbySelect = require "slash/lobbySelect"
 local locale = require "locale/localeHandler"
 
 return {
@@ -64,15 +64,7 @@ return {
 			description = locale.lobbyNameDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.name,
 					description = locale.lobbyNameNameDesc,
@@ -86,15 +78,7 @@ return {
 			description = locale.lobbyCategoryDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.category,
 					description = locale.lobbyCategoryCategoryDesc,
@@ -111,15 +95,7 @@ return {
 			description = locale.lobbyBitrateDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.bitrate,
 					description = locale.lobbyBitrateBitrateDesc,
@@ -135,15 +111,7 @@ return {
 			description = locale.lobbyCapacityDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.lobbyCapacity,
 					description = locale.lobbyCapacityCapacityDesc,
@@ -159,15 +127,7 @@ return {
 			description = locale.lobbyPermissionsDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				table.unpack(permissionList)
 			}
 		},
@@ -181,15 +141,7 @@ return {
 					description = locale.lobbyRoleAddDesc,
 					type = commandOptionType.subcommand,
 					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						},
+						lobbySelect,
 						{
 							name = locale.role,
 							description = locale.lobbyRoleAddRoleDesc,
@@ -203,15 +155,7 @@ return {
 					description = locale.lobbyRoleRemoveDesc,
 					type = commandOptionType.subcommand,
 					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						},
+						lobbySelect,
 						{
 							name = locale.role,
 							description = locale.lobbyRoleRemoveRoleDesc,
@@ -227,15 +171,7 @@ return {
 			description = locale.lobbyLimitDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.limit,
 					description = locale.lobbyLimitLimitDesc,
@@ -251,15 +187,7 @@ return {
 			description = locale.lobbyRegionDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				}
+				lobbySelect
 			}
 		},
 	}

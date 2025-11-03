@@ -3,7 +3,7 @@ local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
----@module "locale/slash/en-US"
+local lobbySelect = require "slash/lobbySelect"
 local locale = require "locale/localeHandler"
 
 return {
@@ -63,15 +63,7 @@ return {
 			description = locale.matchmakingTargetDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.matchmakingTarget,
 					description = locale.matchmakingTargetTargetDesc,
@@ -88,15 +80,7 @@ return {
 			description = locale.matchmakingModeDesc,
 			type = commandOptionType.subcommand,
 			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyConfigured,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				},
+				lobbySelect,
 				{
 					name = locale.matchmakingMode,
 					description = locale.matchmakingModeModeDesc,

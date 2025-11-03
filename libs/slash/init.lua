@@ -2,7 +2,6 @@ local enums = require "discordia".enums
 local commandType = enums.applicationCommandType
 local commandOptionType = enums.applicationCommandOptionType
 
----@module "locale/slash/en-US"
 local locale = require "locale/localeHandler"
 
 local commandsStructure = {
@@ -92,7 +91,7 @@ local function localize(commands)
 	end
 end
 
-localize(commandsStructure)
-localize(debugCommands)
+--localize(commandsStructure)
+--localize(debugCommands)
 
 return {commandsStructure, debugCommands}

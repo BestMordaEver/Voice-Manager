@@ -1,9 +1,8 @@
 local enums = require "discordia".enums
-local channelType = enums.channelType
 local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
----@module "locale/slash/en-US"
+local lobbySelect = {require "slash/lobbySelect"}
 local locale = require "locale/localeHandler"
 
 return {
@@ -20,129 +19,49 @@ return {
 					name = locale.name,
 					description = locale.resetLobbyNameDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.category,
 					description = locale.resetLobbyCategoryDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.bitrate,
 					description = locale.resetLobbyBitrateDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.lobbyCapacity,
 					description = locale.resetLobbyCapacityDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.lobbyPermissions,
 					description = locale.resetLobbyPermissionsDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.role,
 					description = locale.resetLobbyRoleDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.limit,
 					description = locale.resetLobbyLimitDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.lobbyRegion,
 					description = locale.resetLobbyRegionDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 			}
 		},
@@ -155,33 +74,13 @@ return {
 					name = locale.matchmakingTarget,
 					description = locale.resetMatchmakingTargetDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.matchmakingMode,
 					description = locale.resetMatchmakingModeDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				}
 			}
 		},
@@ -194,65 +93,25 @@ return {
 					name = locale.category,
 					description = locale.resetCompanionCategoryDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.name,
 					description = locale.resetCompanionNameDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.companionGreeting,
 					description = locale.resetCompanionGreetingDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				},
 				{
 					name = locale.companionLog,
 					description = locale.resetCompanionLogDesc,
 					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.lobby,
-							description = locale.lobbyConfigured,
-							type = commandOptionType.channel,
-							required = true,
-							channel_types = {
-								channelType.voice
-							}
-						}
-					}
+					options = lobbySelect
 				}
 			}
 		},
