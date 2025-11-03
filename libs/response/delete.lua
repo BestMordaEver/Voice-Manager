@@ -3,7 +3,7 @@ local componentType = enums.componentType
 local buttonStyle = enums.buttonStyle
 
 local response = require "response/response"
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 
 local insert, modf, fmod = table.insert, math.modf, math.fmod
 

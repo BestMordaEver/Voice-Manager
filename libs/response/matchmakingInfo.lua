@@ -9,7 +9,7 @@ local enums = require "discordia".enums
 local componentType = enums.componentType
 local channelType = enums.channelType
 
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName, target : Guild | GuildVoiceChannel) : table

@@ -1,5 +1,5 @@
 local client = require "client"
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 
 local channels = require "storage/channels"
 

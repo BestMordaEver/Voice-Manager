@@ -1,7 +1,7 @@
 local guilds = require "storage/guilds"
 
 local componentType = require "discordia".enums.componentType
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, locale : localeName, guild : Guild) : table

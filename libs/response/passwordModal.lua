@@ -3,7 +3,7 @@ local componentType = enums.componentType
 local inputStyle = enums.inputStyle
 
 local response = require "response/response"
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 
 ---@overload fun(locale : localeName, channel : GuildVoiceChannel) : table
 local passwordModal = response:newCustomType("passwordModal",

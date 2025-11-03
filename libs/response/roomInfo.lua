@@ -9,10 +9,9 @@ local permission = enums.permission
 local overwriteType = enums.overwriteType
 
 local componentType = require "discordia".enums.componentType
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 local response = require "response/response"
 
-local insert = table.insert
 local format = string.format
 
 local lines = {

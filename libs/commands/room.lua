@@ -1,9 +1,9 @@
 local client = require "client"
-local localeHandler = require "locale/runtime/localeHandler"
 local config = require "config"
 
 local channels = require "storage/channels"
 
+local localeHandler = require "locale/localeHandler"
 local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
 local roomInfoResponse = require "response/roomInfo"

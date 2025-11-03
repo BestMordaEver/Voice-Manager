@@ -3,7 +3,7 @@ local client = require "client"
 local insert = table.insert
 
 local componentType = require "discordia".enums.componentType
-local localeHandler = require "locale/runtime/localeHandler"
+local localeHandler = require "locale/localeHandler"
 local response = require "response/response"
 
 ---@overload fun(ephemeral : boolean, interaction : SlashInteraction) : table

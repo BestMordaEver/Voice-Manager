@@ -3,7 +3,7 @@ local commandType = enums.applicationCommandType
 local commandOptionType = enums.applicationCommandOptionType
 
 ---@module "locale/slash/en-US"
-local locale = require "locale/slash/localeHandler"
+local locale = require "locale/localeHandler"
 
 local commandsStructure = {
 	require "slash/help",
