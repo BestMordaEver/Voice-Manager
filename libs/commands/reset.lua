@@ -1,11 +1,3 @@
-local config = require "config"
-
-local lobbies = require "storage/lobbies"
-
-local warningResponse = require "response/warning"
-
-local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
-
 local commands = {
 	lobby = require "commands/lobby",
 	matchmaking = require "commands/matchmaking",
