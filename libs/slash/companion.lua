@@ -30,33 +30,13 @@ return {
 				name = locale.enable,
 				description = locale.companionEnableDesc,
 				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = locale.lobby,
-						description = locale.companionEnableLobbyDesc,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					}
-				}
+				options = {lobbySelect}
 			},
 			{
 				name = locale.disable,
 				description = locale.companionDisableDesc,
 				type = commandOptionType.subcommand,
-				options = {
-					{
-						name = locale.lobby,
-						description = locale.companionEnableLobbyDesc,
-						type = commandOptionType.channel,
-						required = true,
-						channel_types = {
-							channelType.voice
-						}
-					}
-				}
+				options = {lobbySelect}
 			},
 			{
 				name = locale.category,
