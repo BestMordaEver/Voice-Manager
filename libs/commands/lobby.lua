@@ -12,6 +12,8 @@ local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
+local commandNames = require "namespaces/commands"
+
 local tierRate = {[0] = 96,128,256,384}
 local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"}
 
@@ -33,7 +35,7 @@ local subcommands = {
 	end,
 
 	category = function (interaction, lobby)
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setTarget()
 			return "Lobby target category reset", okResponse(true, interaction.locale, "categoryReset")
 		end
@@ -48,13 +50,13 @@ local subcommands = {
 	end,
 
 	name = function (interaction, lobby)
-		local name = interaction.commandName == "reset" and "%nickname's% room" or interaction.options.name.value
+		local name = interaction.commandName == commandNames.reset and "%nickname's% room" or interaction.options.name.value
 		lobbies[lobby.id]:setTemplate(name)
 		return "Lobby name template set", okResponse(true, interaction.locale, "nameConfirm", name)
 	end,
 
 	capacity = function (interaction, lobby)
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setCapacity()
 			return "Lobby capacity reset", okResponse(true, interaction.locale, "capacityReset")
 		end
@@ -65,7 +67,7 @@ local subcommands = {
 	end,
 
 	bitrate = function (interaction, lobby)
-		local bitrate = interaction.commandName == "reset" and 64 or interaction.options.bitrate.value
+		local bitrate = interaction.commandName == commandNames.reset and 64 or interaction.options.bitrate.value
 		local tier = lobby.guild.premiumTier
 
 		for _,feature in ipairs(interaction.guild.features) do
@@ -83,7 +85,7 @@ local subcommands = {
 	permissions = function (interaction, lobby)
 		local lobbyData = lobbies[lobby.id]
 
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbyData:setPermissions(botPermissions())
 			return "Lobby permissions reset", okResponse(true, interaction.locale, "permissionsReset")
 		end
@@ -103,7 +105,7 @@ local subcommands = {
 	role = function (interaction, lobby)
 		local lobbyData = lobbies[lobby.id]
 
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbyData:removeRoles()
 		else
 			local role = interaction.options.role.value

@@ -8,6 +8,8 @@ local matchmakingInfoResponse = require "response/matchmakingInfo"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
+local commandNames = require "namespaces/commands"
+
 local channelType = require "discordia".enums.channelType
 
 local commands = {
@@ -28,7 +30,7 @@ local commands = {
 	end,
 
 	target = function (interaction, lobby)
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setTarget()
 			return "Lobby target reset", okResponse(true, interaction.locale, "targetReset")
 		end
@@ -53,7 +55,7 @@ local commands = {
 	end,
 
 	mode = function (interaction, lobby)
-		local mode = interaction.commandName == "reset" and "random" or interaction.options.mode.value
+		local mode = interaction.commandName == commandNames.reset and "random" or interaction.options.mode.value
 
 		lobbies[lobby.id]:setTemplate(mode)
 		return "Matchmaking mode set", okResponse(true, interaction.locale, "modeConfirm", mode)

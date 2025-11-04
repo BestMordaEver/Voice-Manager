@@ -9,6 +9,8 @@ local companionsInfoResponse = require "response/companionsInfo"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 local lobbyPreProcess = require "channelUtils/lobbyPreProcess"
 
+local commandNames = require "namespaces/commands"
+
 local commands = {
 	enable = function (interaction, lobby)
 		lobbies[lobby.id]:setCompanionTarget(true)
@@ -21,7 +23,7 @@ local commands = {
 	end,
 
 	category = function (interaction, lobby)
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setCompanionTarget(true)
 			return "Companion target category reset", okResponse(true, interaction.locale, "categoryReset")
 		end
@@ -37,7 +39,7 @@ local commands = {
 	end,
 
 	name = function (interaction, lobby)
-		local name = interaction.commandName == "reset" and "private-chat" or string.discordify(interaction.options.name.value)
+		local name = interaction.commandName == commandNames.reset and "private-chat" or string.discordify(interaction.options.name.value)
 
 		lobbies[lobby.id]:setCompanionTemplate(name)
 		return "Companion name template set", okResponse(true, interaction.locale, "nameConfirm", name)
@@ -45,7 +47,7 @@ local commands = {
 
 	greeting = function (interaction, lobby)
 		local greeting
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			greeting = ""
 		elseif interaction.options and interaction.options.greeting then
 			greeting = interaction.options.greeting.value
@@ -71,7 +73,7 @@ local commands = {
 	end,
 
 	log = function (interaction, lobby)
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setCompanionLog()
 			return "Companion log channel reset", okResponse(true, interaction.locale, "logReset")
 		end

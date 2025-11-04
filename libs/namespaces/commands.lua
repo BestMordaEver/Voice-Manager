@@ -12,7 +12,6 @@ local commands = {
 	room = "room",
 	server = "server",
 	shutdown = "shutdown",
-	invite = "invite",
 	support = "support",
 	users = "users",
 	Invite = "Invite"

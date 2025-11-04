@@ -3,7 +3,7 @@ local interactionType = enums.interactionType
 local commandType = enums.applicationCommandType
 local commandsNamespace = require "namespaces/commands"
 
-local function invite ()
+local function support ()
 	return "Sent support invite", {content = "https://discord.gg/tqj6jvT"}
 end
 
@@ -23,8 +23,7 @@ return setmetatable({
 	[commandsNamespace.users] = require "commands/users",
 	[commandsNamespace.ping] = require "commands/ping",
 	[commandsNamespace.shutdown] = require "commands/shutdown",
-	[commandsNamespace.support] = invite,
-	[commandsNamespace.invite] = invite,
+	[commandsNamespace.support] = support,
 	[commandsNamespace.exec] = require "commands/exec"
 },{__call = function (self, interaction)
 	if interaction.type == interactionType.applicationCommand then

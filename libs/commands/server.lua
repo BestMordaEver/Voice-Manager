@@ -8,11 +8,13 @@ local serverInfoResponse = require "response/serverInfo"
 local botPermissions = require "utils/botPermissions"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
+local commandNames = require "namespaces/commands"
+
 local subcommands = {
 	role = function (interaction)
 		local guildData = guilds[interaction.guild.id]
 
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			guildData:removeRoles()
 		else
 			local role = interaction.option.value
@@ -41,7 +43,7 @@ local subcommands = {
 	end,
 
 	limit = function (interaction)
-		local limit = interaction.commandName == "reset" and 500 or interaction.option.value
+		local limit = interaction.commandName == commandNames.reset and 500 or interaction.option.value
 
 		guilds[interaction.guild.id]:setLimit(limit)
 		return "Server limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
@@ -50,7 +52,7 @@ local subcommands = {
 	permissions = function (interaction)
 		local guildData = guilds[interaction.guild.id]
 
-		if interaction.commandName == "reset" then
+		if interaction.commandName == commandNames.reset then
 			guildData:setPermissions(botPermissions())
 			return "Server permissions reset", okResponse(true, interaction.locale, "permissionsReset")
 		end
