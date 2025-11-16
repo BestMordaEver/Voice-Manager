@@ -133,14 +133,14 @@ local subcommands = {
 	end,
 
 	limit = function (interaction, lobby)
-		local limit = interaction.command == "reset" and 500 or interaction.options.limit.value
+		local limit = interaction.commandName == commandNames.reset and 500 or interaction.options.limit.value
 
 		lobbies[lobby.id]:setLimit(limit)
 		return "Lobby limit set", okResponse(true, interaction.locale, "limitConfirm", limit)
 	end,
 
 	region = function (interaction, lobby)
-		if interaction.command == "reset" then
+		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setRegion(nil)
 			return "Reset voice region", okResponse(true, interaction.locale, "regionReset")
 		end
