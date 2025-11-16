@@ -31,7 +31,7 @@ local greeting = response("greeting", response.colors.fuchsia, function (locale,
 		tag = member.user.tag,
 		["nickname's"] = nickname .. (nickname:sub(-1,-1) == "s" and "'" or "'s"),
 		["name's"] = uname .. (uname:sub(-1,-1) == "s" and "'" or "'s"),
-		commands = localeHandler(locale, "roomCommands") .. availableCommands(room),
+		commands = localeHandler(locale, "roomInfoCommands") .. availableCommands(room),
 		buttons = ""
 	}
 
