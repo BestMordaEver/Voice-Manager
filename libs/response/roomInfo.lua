@@ -57,8 +57,6 @@ local lines = {
 	}
 }
 
-local header = "**%s**"
-local headerAndNL = "**%s**\n%s"
 local function liner (locale, channel, rolePO, type, perm)
 	local row = {
 		type = componentType.textDisplay
@@ -66,37 +64,48 @@ local function liner (locale, channel, rolePO, type, perm)
 
 	if rolePO:getDeniedPermissions():has(perm) then
 		local line
-		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getAllowedPermissions():has(perm) end)
+		local POs = channel.permissionOverwrites:toArray(function (po) return
+			po.type == overwriteType.member and
+			po:getObject() ~= channel.guild.me and
+			po:getAllowedPermissions():has(perm)
+		end)
+
 		if #POs ~= 0 then
 			local mentions = {}
 			table.insert(mentions, localeHandler(locale, lines[type][perm].deniedExceptions))
 			for _, po in pairs(POs) do
 				table.insert(mentions, po:getObject().user.mentionString)
 			end
-			line = table.concat(line, " ")
+			line = table.concat(mentions, " ")
 		end
 
 		row.content = #POs == 0 and
-			format(header, localeHandler(locale, lines[type][perm].denied))
+			localeHandler(locale, lines[type][perm].denied)
 		or
-			format(headerAndNL, localeHandler(locale, lines[type][perm].denied), line)
+			(localeHandler(locale, lines[type][perm].denied) .. "\n" .. line)
 	else
 		local line
-		local POs = channel.permissionOverwrites:toArray(function (po) return po.type == overwriteType.member and po:getDeniedPermissions():has(perm) end)
+		local POs = channel.permissionOverwrites:toArray(function (po) return
+			po.type == overwriteType.member and
+			-- po:getObject() ~= channel.guild.me and	-- this would be bad
+			po:getDeniedPermissions():has(perm)
+		end)
+
 		if #POs ~= 0 then
 			local mentions = {}
 			table.insert(mentions, locale(mentions, lines[type][perm].allowedExceptions))
 			for _, po in pairs(POs) do
 				table.insert(mentions, po:getObject().user.mentionString)
 			end
-			line = table.concat(line, " ")
+			line = table.concat(mentions, " ")
 		end
 
 		row.content = #POs == 0 and
-			format(header, localeHandler(locale, lines[type][perm].allowed))
+			localeHandler(locale, lines[type][perm].allowed)
 		or
-			format(headerAndNL, localeHandler(locale, lines[type][perm].allowed), line)
+			(localeHandler(locale, lines[type][perm].allowed) .. "\n" .. line)
 	end
+
 	return row
 end
 
@@ -110,25 +119,24 @@ local roomInfo = response("roomInfo", response.colors.blurple, function (locale,
 	local components = {
 		{
 			type = componentType.textDisplay,
-			content = localeHandler(locale, "roomInfoTitle")
+			content = localeHandler(locale, "roomInfoTitle", room.name)
 		},
 		{
 			type = componentType.textDisplay,
 			content = localeHandler(locale, "roomInfoHost", client:getUser(channels[room.id].host).mentionString)
 		},
-		{
-			type = componentType.textDisplay,
-			content = table.concat({
-				liner(locale, room, roomPO, "voice", permission.readMessages),
-				liner(locale, room, roomPO, "voice", permission.connect),
-				liner(locale, room, roomPO, "voice", permission.speak),
-				liner(locale, room, roomPO, "voice", permission.sendMessages),
-				companion and liner(locale, companion, chatPO, "text", permission.readMessages),
-				companion and liner(locale, companion, chatPO, "text", permission.sendMessages),
-				localeHandler(locale, "roomInfoCommands", availableCommands(room))
-			}, "\n")
-		}
+		liner(locale, room, roomPO, "voice", permission.readMessages),
+		liner(locale, room, roomPO, "voice", permission.connect),
+		liner(locale, room, roomPO, "voice", permission.speak),
+		liner(locale, room, roomPO, "voice", permission.sendMessages),
+		companion and liner(locale, companion, chatPO, "text", permission.readMessages),
+		companion and liner(locale, companion, chatPO, "text", permission.sendMessages)
 	}
+
+	table.insert(components, {
+		type = componentType.textDisplay,
+		content = localeHandler(locale, "roomInfoCommands", availableCommands(room))
+	})
 
 	return components
 end)

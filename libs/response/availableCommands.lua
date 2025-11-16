@@ -44,5 +44,7 @@ return function (room)
 		end
 	end
 
+	if #commandsStrings == 0 then commandsStrings[1] = localeHandler(locale, "none") end
+
 	return table.concat(commandsStrings," ")
 end
