@@ -34,7 +34,7 @@ local subcommands = {
 		return "Lobby removed", okResponse(true, interaction.locale, "removeConfirm", lobby.name)
 	end,
 
-	category = function (interaction, lobby)
+	category = function (interaction, lobby)	-- target?
 		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setTarget()
 			return "Lobby target category reset", okResponse(true, interaction.locale, "categoryReset")
@@ -161,20 +161,36 @@ local subcommands = {
 		return "Sent voice region selector", regionResponse(true, interaction)
 	end,
 
-	--[[ TODO
-	position = function (interaction, lobby)
-		local order, type
-		if interaction.name == "lobby" then
-			order = interaction.option.options.order.value
-			type = interaction.option.options.position.value
-		else -- reset
-			order = "desc"
-			type = "bottom"
+	gaps = function (interaction, lobby)
+		local val
+		if interaction.commandName == commandNames.reset then
+			val = false
+		else
+			val = interaction.options.fill.value
 		end
 
-		lobbies[lobby.id]:setPosition(order, type)
-		return "Lobby target position set", okResponse(true, interaction.locale, "positionConfirm")
-	end, --]]
+		lobbies[lobby.id]:setGaps(val)
+
+		if val then
+			return "Enabled gap filling in lobby", okResponse(true, interaction.locale, "gapsFilling")
+		else
+			return "Disabled gap filling in lobby", okResponse(true, interaction.locale, "gapsLeaving")
+		end
+	end,
+
+	position = function (interaction, lobby)
+		local position = interaction.commandName == commandNames.reset and "below" or interaction.options.position.value
+
+		lobbies[lobby.id]:setPosition(position)
+		return "Lobby target position set", okResponse(true, interaction.locale, "positionConfirm", position)
+	end,
+
+	order = function (interaction, lobby)
+		local order = interaction.commandName == commandNames.reset and "descending" or interaction.options.order.value
+
+		lobbies[lobby.id]:setOrder(order)
+		return "Lobby channel growth ordering set", okResponse(true, interaction.locale, "orderConfirm", order)
+	end,
 }
 
 return function (interaction, subcommand)

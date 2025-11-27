@@ -33,6 +33,12 @@ local storageStatements = {
 
 	setLobbyRegion = {"UPDATE lobbies SET region = ? WHERE id = ?","SET REGION %s => LOBBY %s"},
 
+	setLobbyGaps = {"UPDATE lobbies SET gaps = ? WHERE id = ?","SET GAPS %s => LOBBY %s"},
+
+	setLobbyPosition = {"UPDATE lobbies SET position = ? WHERE id = ?","SET POSITION %s => LOBBY %s"},
+
+	setLobbyOrder = {"UPDATE lobbies SET cOrder = ? WHERE id = ?","SET ORDER %s => LOBBY %s"},
+
 	setLobbyCompanionTemplate = {"UPDATE lobbies SET companionTemplate = ? WHERE id = ?","SET COMPANION TEMPLATE %s => LOBBY %s"},
 
 	setLobbyCompanionTarget = {"UPDATE lobbies SET companionTarget = ? WHERE id = ?","SET COMPANION TARGET %s => LOBBY %s"},
@@ -136,6 +142,24 @@ local lobbyMeta = {
 			emitter:emit("setLobbyRegion", region, self.id)
 		end,
 
+		setGaps = function (self, gaps)
+			self.gaps = gaps
+			logger:log(6, "GUILD %s LOBBY %s: updated gaps to %s", self.guild.id, self.id, gaps)
+			emitter:emit("setLobbyGaps", gaps and 1 or 0, self.id)
+		end,
+
+		setPosition = function (self, position)
+			self.position = position
+			logger:log(6, "GUILD %s LOBBY %s: updated position to %s", self.guild.id, self.id, position)
+			emitter:emit("setLobbyPosition", position, self.id)
+		end,
+
+		setOrder = function (self, order)
+			self.order = order
+			logger:log(6, "GUILD %s LOBBY %s: updated order to %s", self.guild.id, self.id, order)
+			emitter:emit("setLobbyOrder", order, self.id)
+		end,
+
 		setCompanionTarget = function (self, companionTarget)
 			self.companionTarget = companionTarget
 			logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guild.id, self.id, companionTarget)
@@ -179,11 +203,16 @@ setmetatable(lobbies, {
 			template, companionTemplate,
 			target, companionTarget,
 			cLimit, permissions, capacity, bitrate, region,
+			gaps, position, cOrder,
 			greeting, companionLog
 		FROM lobbies]]),
 		loadRolesStatement = lobbiesDB:prepare("SELECT id, lobbyID FROM roles WHERE lobbyID = ?"),
 
-		add = function (self, lobbyID, guildID, isMatchmaking, template, companionTemplate, target, companionTarget, limit, permissions, capacity, bitrate, region, greeting, companionLog, roles)
+		add = function (self, lobbyID, guildID, isMatchmaking,
+			template, companionTemplate, target, companionTarget,
+			limit, permissions, capacity, bitrate, region,
+			gaps, position, order,
+			greeting, companionLog, roles)
 			local lobby = setmetatable({
 				id = lobbyID,
 				guild = guilds[guildID],
@@ -196,6 +225,9 @@ setmetatable(lobbies, {
 				capacity = tonumber(capacity),
 				bitrate = tonumber(bitrate),
 				region = region,
+				gaps = tonumber(gaps) == 1,
+				position = position or "bottom",
+				order = order or "descending",
 				companionTemplate = companionTemplate,
 				companionTarget = companionTarget == "true" or companionTarget,
 				greeting = greeting,

@@ -31,6 +31,9 @@ CREATE TABLE lobbies(
 	capacity INTEGER,
 	bitrate INTEGER,
 	region VARCHAR,
+	gaps BOOL DEFAULT 0,
+	position VARCHAR DEFAULT 'below',
+	cOrder VARCHAR DEFAULT 'descending',
 	greeting VARCHAR,
 	companionLog VARCHAR
 );

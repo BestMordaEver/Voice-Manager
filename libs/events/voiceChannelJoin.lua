@@ -53,29 +53,43 @@ local function lobbyJoinCall (member, lobby)
 	local name = lobbyData.template or "%nickname's% room"
 	-- potential position may change in process of name generation, so rather than query lobby for position several times, reservation is made and used throughout
 	local position = lobbyData:attachChild(true)
-	local needsMove
 
 	if name:match("%%.-%%") then
-		needsMove = name:match("%%counter%%") and true
 		name = handleTemplate(name, member, position):match("^%s*(.-)%s*$")
 		if name == "" then name = handleTemplate("%nickname's% room", member) end
 	end
 
-	-- determine channel position if %counter% is detected
-	local distance = 0
-	if needsMove then
-		local children = lobbyData.children
-		repeat
-			distance = distance + 1
-			if not (children[position + distance] == nil or client:getChannel(children[position + distance].id)) then
-				children:drain(position + distance)
-			end
-		until children[position + distance] ~= nil or position + distance > children.max
+	-- determine channel position
+	local disPosition = 1
+	local children = lobbyData.children
+	local hasChildren = #children ~= 1
+	local targetPosition
 
-		if position + distance > children.max then
-			needsMove = nil
+	if target.connectedMembers then	-- target is a channel
+		targetPosition = target.position
+		target = target.category or target.guild
+	end
+
+	if hasChildren then
+		disPosition = 0
+		repeat
+			disPosition = disPosition + 1
+			if children[position + disPosition] and not client:getChannel(children[position + disPosition].id) then
+				children:drain(position + disPosition)
+			end
+		until children[position + disPosition] ~= nil or position + disPosition > children.max
+	end
+
+	if position + disPosition <= children.max then
+		disPosition = client:getChannel(lobbyData.children[position + disPosition].id).position - (lobbyData.order == "descending" and 0 or 1)
+	else
+		if hasChildren then
+			disPosition = client:getChannel(children[#children-1].id).position - (lobbyData.order == "descending" and 0 or 1)
 		else
-			distance = client:getChannel(lobbyData.children[position + distance].id).position - 1
+			disPosition = targetPosition and
+				targetPosition - (lobbyData.position == "below" and 0 or 1)
+			or
+				lobbyData.position == "above" and -1 or nil
 		end
 	end
 
@@ -97,8 +111,8 @@ local function lobbyJoinCall (member, lobby)
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate or lobby.bitrate,
 		user_limit = lobbyData.capacity or lobby.userLimit,
-		position = needsMove and distance or nil,
-		parent_id = target.id,
+		position = disPosition,
+		parent_id = target and target.id,
 		rtc_region = regionId
 	})
 
@@ -114,6 +128,7 @@ local function lobbyJoinCall (member, lobby)
 	local timer = mutex:unlockAfter(10000)
 
 	member:setVoiceChannel(newChannel.id)
+	newChannel:moveDown(0)	-- normalizing channel positions
 
 	local companion
 	if lobbyData.companionTarget then
@@ -156,15 +171,14 @@ local function lobbyJoinCall (member, lobby)
 	adjustHostPermissions(newChannel, member)
 
 	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
-	if lobbyData.greeting or lobbyData.companionLog then 
-		distance, err = (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel))
+	if lobbyData.greeting or lobbyData.companionLog then
+		local ok, err = (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel))
+		if not ok then logger:log(4, "GUILD %s LOBBY %s USER %s: couldn't send greeting - %s", guild.id, lobby.id, member.user.id, err) end
 	end
 
 	mutex:unlock()
 	Timer.clearTimeout(timer)
 	queue[newChannel.id] = nil
-
-	if not distance then logger:log(4, "GUILD %s LOBBY %s USER %s: couldn't send greeting - %s", guild.id, lobby.id, member.user.id, err) end
 end
 
 

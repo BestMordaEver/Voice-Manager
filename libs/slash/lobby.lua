@@ -190,5 +190,67 @@ return {
 				lobbySelect
 			}
 		},
+		{
+			name = locale.lobbyGaps,
+			description = locale.lobbyGapsDesc,
+			type = commandOptionType.subcommand,
+			options = {
+				lobbySelect,
+				{
+					name = locale.lobbyGapsFill,
+					description = locale.lobbyGapsFillDesc,
+					type = commandOptionType.boolean,
+					required = true
+				}
+			}
+		},
+		{
+			name = locale.lobbyPosition,
+			description = locale.lobbyPositionDesc,
+			type = commandOptionType.subcommand,
+			options = {
+				lobbySelect,
+				{
+					name = locale.lobbyPosition,
+					description = locale.lobbyPositionPositionDesc,
+					type = commandOptionType.string,
+					required = true,
+					choices = {
+						{
+							name = locale.lobbyPositionAbove,
+							value = "above"
+						},
+						{
+							name = locale.lobbyPositionBelow,
+							value = "below"
+						}
+					}
+				}
+			}
+		},
+		{
+			name = locale.lobbyOrder,
+			description = locale.lobbyOrderDesc,
+			type = commandOptionType.subcommand,
+			options = {
+				lobbySelect,
+				{
+					name = locale.lobbyOrder,
+					description = locale.lobbyOrderOrderDesc,
+					type = commandOptionType.string,
+					required = true,
+					choices = {
+						{
+							name = locale.lobbyOrderAscending,
+							value = "ascending"
+						},
+						{
+							name = locale.lobbyOrderDescending,
+							value = "descending"
+						}
+					}
+				}
+			}
+		},
 	}
 }

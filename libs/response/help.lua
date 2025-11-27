@@ -41,6 +41,9 @@ local function footer (components, locale)
 						label = localeHandler(locale, "helpSelectorLobby"),
 						value = "lobby"
 					},{
+						label = localeHandler(locale, "helpSelectorLobbyPlacement"),
+						value = "lobbyplacement"
+					},{
 						label = localeHandler(locale, "helpSelectorLobbyMore"),
 						value = "lobbymore"
 					},{
@@ -91,11 +94,19 @@ local function helpFactory (locale)
 	helpLiner(helpLobby, locale, "helpLobbyView")
 	helpLiner(helpLobby, locale, "helpLobbyAdd")
 	helpLiner(helpLobby, locale, "helpLobbyRemove")
-	helpLiner(helpLobby, locale, "helpLobbyCategory")
 	helpLiner(helpLobby, locale, "helpLobbyCapacity")
 	helpLiner(helpLobby, locale, "helpLobbyLimit")
 	helpLiner(helpLobby, locale, "helpLobbyBitrate")
+	helpLiner(helpLobby, locale, "helpLobbyRegion")
 	footer(helpLobby, locale)
+
+	local helpLobbyPlacement = {}
+	helpLiner(helpLobbyPlacement, locale, "helpLobbyCategory")
+	helpLiner(helpLobbyPlacement, locale, "helpLobbyTarget")
+	helpLiner(helpLobbyPlacement, locale, "helpLobbyGaps")
+	helpLiner(helpLobbyPlacement, locale, "helpLobbyPosition")
+	helpLiner(helpLobbyPlacement, locale, "helpLobbyOrder")
+	footer(helpLobbyPlacement, locale)
 
 	local helpLobbyMore = {}
 	helpLiner(helpLobbyMore, locale, "helpLobbyName")
@@ -179,6 +190,7 @@ local function helpFactory (locale)
 	return {
 		help = helpContents,
 		lobby = helpLobby,
+		lobbyplacement = helpLobbyPlacement,
 		lobbymore = helpLobbyMore,
 		matchmaking = helpMatchmaking,
 		companion = helpCompanion,

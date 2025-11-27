@@ -63,6 +63,24 @@ return {
 					type = commandOptionType.subcommand,
 					options = lobbySelect
 				},
+				{
+					name = locale.lobbyGaps,
+					description = locale.resetLobbyGapsDesc,
+					type = commandOptionType.subcommand,
+					options = lobbySelect
+				},
+				{
+					name = locale.lobbyPosition,
+					description = locale.resetLobbyPositionDesc,
+					type = commandOptionType.subcommand,
+					options = lobbySelect
+				},
+				{
+					name = locale.lobbyOrder,
+					description = locale.resetLobbyOrderDesc,
+					type = commandOptionType.subcommand,
+					options = lobbySelect
+				},
 			}
 		},
 		{
