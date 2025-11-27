@@ -63,7 +63,7 @@ local botPermissionsMT = {
 			local str = ""
 			for bit, name in pairs(self.perms) do
 				if self.bitfield:has(bit) then
-					str = str .. localeHandler(name, locale) .. " "
+					str = str .. localeHandler(locale, name) .. " "
 				end
 			end
 			str = str:sub(1,-2)

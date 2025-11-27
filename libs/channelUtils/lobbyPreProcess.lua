@@ -7,6 +7,17 @@ local warningResponse = require "response/warning"
 local checkSetupPermissions = require "channelUtils/checkSetupPermissions"
 
 return function (interaction, infoResponse)
+	local lobby
+	if interaction.type == interactionType.applicationCommand then
+		lobby = interaction.options.lobby and interaction.options.lobby.value
+	else
+		lobby = client:getChannel(interaction.values[1])
+	end
+
+	if lobby and not lobbies[lobby.id] then
+		return "Not a lobby", warningResponse(true, interaction.locale, "notLobby")
+	end
+
 	if interaction.subcommand == "view" or (interaction.customId and interaction.customId:match("view")) then
 		return "Sent lobby info", infoResponse(true, interaction.locale,
 		interaction.type == interactionType.applicationCommand and
@@ -23,10 +34,6 @@ return function (interaction, infoResponse)
 	local ok, logMsg, response = checkSetupPermissions(interaction, channel)
 	if not ok then
 		return logMsg, response
-	end
-
-	if not (interaction.subcommand == "add" or lobbies[channel.id]) then
-		return "Not a lobby", warningResponse(true, interaction.locale, "notLobby")
 	end
 
 	return channel
