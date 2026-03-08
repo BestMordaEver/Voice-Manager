@@ -340,8 +340,8 @@ return function (member, channel)
 		local mutex = queue[channel.id]
 		local timer
 		if mutex then
-			mutex:lock()
 			timer = mutex:unlockAfter(10000)
+			mutex:lock()
 		end
 
 		local lobbyData = lobbies[channel.id]
