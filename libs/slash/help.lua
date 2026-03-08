@@ -14,8 +14,12 @@ return {
 					name = locale.lobby,
 					value = "lobby"
 				},{
-					name = locale.helpChoiceLobby,
+					name = locale.helpChoiceLobby1,
 					value = "lobbymore"
+				},
+				{
+					name = locale.helpChoiceLobby2,
+					value = "lobbyplacement"
 				},
 				{
 					name = locale.matchmaking,
