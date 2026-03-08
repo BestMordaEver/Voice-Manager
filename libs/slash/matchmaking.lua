@@ -59,13 +59,13 @@ return {
 			}
 		},
 		{
-			name = locale.matchmakingTarget,
+			name = locale.target,
 			description = locale.matchmakingTargetDesc,
 			type = commandOptionType.subcommand,
 			options = {
 				lobbySelect,
 				{
-					name = locale.matchmakingTarget,
+					name = locale.target,
 					description = locale.matchmakingTargetTargetDesc,
 					type = commandOptionType.channel,
 					required = true,

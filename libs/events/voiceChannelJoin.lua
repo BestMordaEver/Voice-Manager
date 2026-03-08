@@ -52,7 +52,10 @@ local function lobbyJoinCall (member, lobby)
 	-- determine new channel name
 	local name = lobbyData.template or "%nickname's% room"
 	-- potential position may change in process of name generation, so rather than query lobby for position several times, reservation is made and used throughout
-	local position = lobbyData:attachChild(true)
+	local position = lobbyData.gaps and
+		lobbyData:attachChild(true)
+	or
+		lobbyData:attachChild(true, lobbyData.children.max + 1)
 
 	if name:match("%%.-%%") then
 		name = handleTemplate(name, member, position):match("^%s*(.-)%s*$")
@@ -60,37 +63,48 @@ local function lobbyJoinCall (member, lobby)
 	end
 
 	-- determine channel position
-	local disPosition = 1
 	local children = lobbyData.children
-	local hasChildren = #children ~= 1
-	local targetPosition
+	local targetPosition, disPosition, edge
 
 	if target.connectedMembers then	-- target is a channel
 		targetPosition = target.position
-		target = target.category or target.guild
+		target = target.category
 	end
 
-	if hasChildren then
-		disPosition = 0
-		repeat
-			disPosition = disPosition + 1
-			if children[position + disPosition] and not client:getChannel(children[position + disPosition].id) then
-				children:drain(position + disPosition)
+	local probe = 1
+
+	while probe <= children.max do	-- probe right to find a gap
+		if children[probe] and probe ~= position then	-- a child!
+			local channel = client:getChannel(children[probe].id)
+			if channel then	-- a valid channel!
+				edge = channel
+				if probe > position then break end
+			else	-- a dead child!
+				local channelData = children:drain(probe)
+				if type(channelData) == "table" and channelData.delete then
+					channelData:delete()
+					probe = probe - 1	-- step back to recheck this position
+				end
 			end
-		until children[position + disPosition] ~= nil or position + disPosition > children.max
+		else	-- found a gap!
+			if lobbyData.gaps and edge then break end
+		end
+
+		probe = probe + 1
 	end
 
-	if position + disPosition <= children.max then
-		disPosition = client:getChannel(lobbyData.children[position + disPosition].id).position - (lobbyData.order == "descending" and 0 or 1)
-	else
-		if hasChildren then
-			disPosition = client:getChannel(children[#children-1].id).position - (lobbyData.order == "descending" and 0 or 1)
+	if #children == 1 then	-- first child, attach to target
+		if targetPosition then
+			disPosition = targetPosition - (lobbyData.position == "below" and 0 or 1)	-- attach to target channel
 		else
-			disPosition = targetPosition and
-				targetPosition - (lobbyData.position == "below" and 0 or 1)
-			or
-				lobbyData.position == "above" and -1 or nil
+			disPosition = lobbyData.position == "above" and 0 or nil	-- attach to target category
 		end
+	else	-- found child
+		local ascensionStep = (lobbyData.order == "descending" and 0 or 1)
+		if channels[edge.id].position > position then	-- edge is on the right of the gap, invert direction
+			ascensionStep = ascensionStep == 0 and 1 or 0
+		end
+		disPosition = edge.position - ascensionStep
 	end
 
 	local regionId
@@ -106,7 +120,7 @@ local function lobbyJoinCall (member, lobby)
 		end
 	end
 
-	local newChannel, err = guild:createChannel({
+	local newChannel, err = guild:createChannel {
 		name = name,
 		type = channelType.voice,
 		bitrate = lobbyData.bitrate or lobby.bitrate,
@@ -114,7 +128,7 @@ local function lobbyJoinCall (member, lobby)
 		position = disPosition,
 		parent_id = target and target.id,
 		rtc_region = regionId
-	})
+	}
 
 	if not newChannel then
 		lobbyData:detachChild(position)

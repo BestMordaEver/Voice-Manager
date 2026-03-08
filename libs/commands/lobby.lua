@@ -34,7 +34,7 @@ local subcommands = {
 		return "Lobby removed", okResponse(true, interaction.locale, "removeConfirm", lobby.name)
 	end,
 
-	category = function (interaction, lobby)	-- target?
+	category = function (interaction, lobby)
 		if interaction.commandName == commandNames.reset then
 			lobbies[lobby.id]:setTarget()
 			return "Lobby target category reset", okResponse(true, interaction.locale, "categoryReset")
@@ -45,6 +45,21 @@ local subcommands = {
 		if ok then
 			lobbies[lobby.id]:setTarget(category.id)
 			return "Lobby target category set", okResponse(true, interaction.locale, "categoryConfirm", category.name)
+		end
+		return logMsg, response
+	end,
+
+	target = function (interaction, lobby)
+		if interaction.commandName == commandNames.reset then
+			lobbies[lobby.id]:setTarget()
+			return "Lobby target reset", okResponse(true, interaction.locale, "categoryReset")
+		end
+
+		local target = interaction.options.target.value
+		local ok, logMsg, response = checkSetupPermissions(interaction, target)
+		if ok then
+			lobbies[lobby.id]:setTarget(target.id)
+			return "Lobby target set", okResponse(true, interaction.locale, "categoryConfirm", target.name)
 		end
 		return logMsg, response
 	end,

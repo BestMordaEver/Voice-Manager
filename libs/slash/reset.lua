@@ -28,6 +28,12 @@ return {
 					options = lobbySelect
 				},
 				{
+					name = locale.target,
+					description = locale.resetLobbyTargetDesc,
+					type = commandOptionType.subcommand,
+					options = lobbySelect
+				},
+				{
 					name = locale.bitrate,
 					description = locale.resetLobbyBitrateDesc,
 					type = commandOptionType.subcommand,
@@ -89,7 +95,7 @@ return {
 			type = commandOptionType.subcommandGroup,
 			options = {
 				{
-					name = locale.matchmakingTarget,
+					name = locale.target,
 					description = locale.resetMatchmakingTargetDesc,
 					type = commandOptionType.subcommand,
 					options = lobbySelect

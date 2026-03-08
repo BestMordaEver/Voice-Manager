@@ -91,6 +91,23 @@ return {
 			}
 		},
 		{
+			name = locale.target,
+			description = locale.lobbyCategoryDesc,
+			type = commandOptionType.subcommand,
+			options = {
+				lobbySelect,
+				{
+					name = locale.target,
+					description = locale.lobbyTargetTargetDesc,
+					type = commandOptionType.channel,
+					required = true,
+					channel_types = {
+						channelType.voice
+					}
+				}
+			}
+		},
+		{
 			name = locale.bitrate,
 			description = locale.lobbyBitrateDesc,
 			type = commandOptionType.subcommand,
