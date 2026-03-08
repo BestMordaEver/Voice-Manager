@@ -5,13 +5,13 @@ local lobbiesData = sqlite.open("lobbiesData.db")
 local channelsData = sqlite.open("channelsData.db")
 
 guildsData:exec([[
-CREATE TABLE guilds(
+CREATE TABLE IF NOT EXISTS guilds(
 	id VARCHAR PRIMARY KEY,
 	cLimit INTEGER DEFAULT 500,
 	permissions INTEGER DEFAULT 0
 );
 
-CREATE TABLE roles(
+CREATE TABLE IF NOT EXISTS roles(
 	id VARCHAR,
 	guildID VARCHAR NOT NULL,
 	FOREIGN KEY(guildID) REFERENCES guilds(id)
@@ -38,14 +38,14 @@ CREATE TABLE lobbies(
 	companionLog VARCHAR
 );
 
-CREATE TABLE roles(
+CREATE TABLE IF NOT EXISTS roles(
 	id VARCHAR,
 	lobbyID VARCHAR NOT NULL,
 	FOREIGN KEY(lobbyID) REFERENCES lobbies(id)
 )]])
 
 channelsData:exec([[
-CREATE TABLE channels(
+CREATE TABLE IF NOT EXISTS channels(
 	id VARCHAR PRIMARY KEY,
 	parentType BOOL,
 	host VARCHAR NOT NULL,
