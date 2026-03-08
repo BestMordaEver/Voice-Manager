@@ -97,6 +97,7 @@ local lobbyInfo = response("lobbyInfo", response.colors.blurple, function (local
 					value = lobby.id
 				})
 			end
+			if #options >= 25 then break end
 		end
 
 		insert(components, {
