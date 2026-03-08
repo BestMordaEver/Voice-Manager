@@ -10,6 +10,8 @@ return function (interaction, infoResponse)
 	local lobby
 	if interaction.type == interactionType.applicationCommand then
 		lobby = interaction.options.lobby and interaction.options.lobby.value
+	elseif interaction.type == interactionType.modalSubmit then
+		lobby = client:getChannel(interaction.customId:match("%d+"))
 	else
 		lobby = client:getChannel(interaction.values[1])
 	end
