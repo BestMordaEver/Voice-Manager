@@ -74,7 +74,7 @@ local function lobbyJoinCall (member, lobby)
 	local probe = 1
 
 	while probe <= children.max do	-- probe right to find a gap
-		if children[probe] and probe ~= position then	-- a child!
+		if children[probe] and children[probe] ~= true then		-- a child!
 			local channel = client:getChannel(children[probe].id)
 			if channel then	-- a valid channel!
 				edge = channel
