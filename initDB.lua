@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS roles(
 )]])
 
 lobbiesData:exec([[
-CREATE TABLE lobbies(
+CREATE TABLE IF NOT EXISTS lobbies(
 	id VARCHAR PRIMARY KEY,
 	guild VARCHAR NOT NULL,
 	isMatchmaking BOOL DEFAULT 0,
