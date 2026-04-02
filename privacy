@@ -10,7 +10,7 @@ When you interact with us or the bot, we may collect information from you with t
 Information storage  
 Some of the collected information about users and their actions within Discord may be stored for different purposes. Primarily, we may store information about various system entities like servers, channels etc., and bot settings as configured by users. Additionaly, we may temporarily store information about different user interactions, that are deemed relevant to ensuring the service. This information is stored for a short period of time that it's needed (from several seconds to several days) and then discarded
 
-Privacy in public spaces
+Privacy in public spaces  
 One of the utilities provided by the Voice Manager is chat logging. The finalized logs are stored solely inside Discord. Participants of the logged chat are always warned about the fact. Responsibility about the safety of logs lies solely on the administrators and moderators, that use the utility.
 
 Control over your data  
