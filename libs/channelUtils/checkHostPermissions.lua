@@ -24,8 +24,9 @@ return function (member, channel, permissionName)
 
 	if permissions:has(permissionName) then return true end
 
-	for _, subpermissions in pairs(requiredPerms) do
-		for permission, _ in pairs(subpermissions) do
+	local subpermissions = requiredPerms[permissionName]
+	if subpermissions then
+		for permission in pairs(subpermissions) do
 			if permissions:has(permission) then return true end
 		end
 	end
