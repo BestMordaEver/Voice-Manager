@@ -16,16 +16,17 @@ local storageStatements = {
 }
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageCall(channelsDB:prepare(statement[1]), statement[2]))
+	emitter:on(name, storageCall(channelsDB:prepare(statement[1]), statement[2], channelsDB))
 end
 
-local channels = {}
+local channels = {n = 0}
 local channelMeta = {
 	__index = {
 		delete = function (self)
 			if channels[self.id] then
 				if self.parent and self.parent.detachChild then self.parent:detachChild(self.position) end
 				channels[self.id] = nil
+				channels.n = channels.n - 1
 				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end
 			emitter:emit("removeChannel", self.id)
@@ -71,7 +72,6 @@ setmetatable(channels, {
 					password = password
 				}, channelMeta)
 				if parent.attachChild then parent:attachChild(self[channelID], tonumber(position)) end
-
 				logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
 			else
 				self[channelID] = setmetatable({
@@ -85,6 +85,7 @@ setmetatable(channels, {
 				}, channelMeta)
 				logger:log(6, "ORPHAN ROOM %s: added", channelID)
 			end
+			self.n = self.n + 1
 			return self[channelID]
 		end,
 
@@ -122,11 +123,14 @@ setmetatable(channels, {
 			return p
 		end
 	},
-	__len = function (self)
-		local count = 0
-		for v,_ in pairs(self) do count = count + 1 end
-		return count
+	__pairs = function (self)
+		return function (t, index)
+			local k, v = next(t, index)
+			while k == "n" do k, v = next(t, k) end
+			return k, v
+		end, self
 	end,
+	__len = function (self) return self.n end,
 	__tostring = function () return "ChannelStorage" end
 })
 

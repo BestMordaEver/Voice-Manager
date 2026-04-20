@@ -2,6 +2,8 @@
 *.txt
 *.log
 *.db
+*.db-wal
+*.db-shm
 *.dll
 token.lua
 dbedit.lua

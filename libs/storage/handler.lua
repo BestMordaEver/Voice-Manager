@@ -89,6 +89,8 @@ local load = function ()
 		data.guilds[rawData[1]] = guilds:add(unpack(rawData, 1, #columns + (rolesData and 1 or 0)))	-- many fields may be null, unpack would halt on them
 		rawData = guilds.loadGuildsStatement:step()
 	end
+	guilds.loadRolesStatement:close()
+	guilds.loadGuildsStatement:close()
 	guilds.loadRolesStatement = nil
 	guilds.loadGuildsStatement = nil
 
@@ -110,6 +112,8 @@ local load = function ()
 		data.lobbies[lobby.guild.id][lobby.id] = lobby
 		rawData = lobbies.loadLobbiesStatement:step()
 	end
+	lobbies.loadRolesStatement:close()
+	lobbies.loadLobbiesStatement:close()
 	lobbies.loadRolesStatement = nil
 	lobbies.loadLobbiesStatement = nil
 
@@ -120,6 +124,7 @@ local load = function ()
 		data.channels[channel.parentType][channel.parentID or channel.parent.id][channel.id] = channel
 		rawData = channels.loadStatement:step()
 	end
+	channels.loadStatement:close()
 	channels.loadStatement = nil
 end
 

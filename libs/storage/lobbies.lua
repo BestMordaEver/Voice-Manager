@@ -50,7 +50,7 @@ local storageStatements = {
 
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageCall(lobbiesDB:prepare(statement[1]), statement[2]))
+	emitter:on(name, storageCall(lobbiesDB:prepare(statement[1]), statement[2], lobbiesDB))
 end
 
 local set = require "utils/set"
@@ -58,7 +58,7 @@ local hollowArray = require "utils/hollowArray"
 local botPermissions = require "utils/botPermissions"
 local Mutex = discordia.Mutex
 
-local lobbies = {}
+local lobbies = {n = 0}
 local guilds = require "storage/guilds"
 
 local lobbyMeta = {
@@ -66,6 +66,7 @@ local lobbyMeta = {
 		delete = function (self)
 			if lobbies[self.id] then
 				lobbies[self.id] = nil
+				lobbies.n = lobbies.n - 1
 				local lobby = client:getChannel(self.id)
 				if lobby and self.guild then
 					self.guild.lobbies:remove(self)
@@ -100,46 +101,10 @@ local lobbyMeta = {
 			emitter:emit("removeLobbyRoles", self.id)
 		end,
 
-		setLimit = function (self, limit)
-			self.limit = limit
-			logger:log(6, "GUILD %s LOBBY %s: updated limit to %d", self.guild.id, self.id, limit)
-			emitter:emit("setLobbyLimit", limit, self.id)
-		end,
-
 		setPermissions = function (self, permissions)
 			self.permissions = permissions
 			logger:log(6, "GUILD %s LOBBY %s: udated permissions to %s", self.guild.id, self.id, permissions)
 			emitter:emit("setLobbyPermissions", permissions.bitfield.value, self.id)
-		end,
-
-		setTemplate = function (self, template)
-			self.template = template
-			logger:log(6, "GUILD %s LOBBY %s: updated template to %s", self.guild.id, self.id, template)
-			emitter:emit("setLobbyTemplate", template, self.id)
-		end,
-
-		setTarget = function (self, target)
-			self.target = target
-			logger:log(6, "GUILD %s LOBBY %s: updated target to %s", self.guild.id, self.id, target)
-			emitter:emit("setLobbyTarget", target, self.id)
-		end,
-
-		setCapacity = function (self, capacity)
-			self.capacity = capacity
-			logger:log(6, "GUILD %s LOBBY %s: updated capacity to %s", self.guild.id, self.id, capacity)
-			emitter:emit("setLobbyCapacity", capacity, self.id)
-		end,
-
-		setBitrate = function (self, bitrate)
-			self.bitrate = bitrate
-			logger:log(6, "GUILD %s LOBBY %s: updated bitrate to %s", self.guild.id, self.id, bitrate)
-			emitter:emit("setLobbyBitrate", bitrate, self.id)
-		end,
-
-		setRegion = function (self, region)
-			self.region = region
-			logger:log(6, "GUILD %s LOBBY %s: updated region to %s", self.guild.id, self.id, region)
-			emitter:emit("setLobbyRegion", region, self.id)
 		end,
 
 		setGaps = function (self, gaps)
@@ -148,40 +113,10 @@ local lobbyMeta = {
 			emitter:emit("setLobbyGaps", gaps and 1 or 0, self.id)
 		end,
 
-		setPosition = function (self, position)
-			self.position = position
-			logger:log(6, "GUILD %s LOBBY %s: updated position to %s", self.guild.id, self.id, position)
-			emitter:emit("setLobbyPosition", position, self.id)
-		end,
-
-		setOrder = function (self, order)
-			self.order = order
-			logger:log(6, "GUILD %s LOBBY %s: updated order to %s", self.guild.id, self.id, order)
-			emitter:emit("setLobbyOrder", order, self.id)
-		end,
-
 		setCompanionTarget = function (self, companionTarget)
 			self.companionTarget = companionTarget
 			logger:log(6, "GUILD %s LOBBY %s: updated companion target to %s", self.guild.id, self.id, companionTarget)
 			emitter:emit("setLobbyCompanionTarget", tostring(companionTarget), self.id)
-		end,
-
-		setCompanionTemplate = function (self, companionTemplate)
-			self.companionTemplate = companionTemplate
-			logger:log(6, "GUILD %s LOBBY %s: updated companion template to %s", self.guild.id, self.id, companionTemplate)
-			emitter:emit("setLobbyCompanionTemplate", companionTemplate, self.id)
-		end,
-
-		setGreeting = function (self, greeting)
-			self.greeting = greeting
-			logger:log(6, "GUILD %s LOBBY %s: updated greeting to %s", self.guild.id, self.id, greeting)
-			emitter:emit("setLobbyGreeting", greeting, self.id)
-		end,
-
-		setCompanionLog = function (self, companionLog)
-			self.companionLog = companionLog
-			logger:log(6, "GUILD %s LOBBY %s: updated companion log channel to %s", self.guild.id, self.id, companionLog)
-			emitter:emit("setLobbyCompanionLog", companionLog, self.id)
 		end,
 
 		-- shortcut, returns filled position
@@ -195,6 +130,30 @@ local lobbyMeta = {
 	},
 	__tostring = function (self) return string.format("LobbyData: %s", self.id) end
 }
+
+-- generate simple setters to avoid repetition
+local simpleSetters = {
+	{field = "limit",             event = "setLobbyLimit",             label = "limit"},
+	{field = "template",          event = "setLobbyTemplate",          label = "template"},
+	{field = "target",            event = "setLobbyTarget",            label = "target"},
+	{field = "capacity",          event = "setLobbyCapacity",          label = "capacity"},
+	{field = "bitrate",           event = "setLobbyBitrate",           label = "bitrate"},
+	{field = "region",            event = "setLobbyRegion",            label = "region"},
+	{field = "position",          event = "setLobbyPosition",          label = "position"},
+	{field = "order",             event = "setLobbyOrder",             label = "order"},
+	{field = "companionTemplate", event = "setLobbyCompanionTemplate", label = "companion template"},
+	{field = "greeting",          event = "setLobbyGreeting",          label = "greeting"},
+	{field = "companionLog",      event = "setLobbyCompanionLog",      label = "companion log channel"},
+}
+
+for _, s in ipairs(simpleSetters) do
+	local methodName = "set" .. s.field:sub(1,1):upper() .. s.field:sub(2)
+	lobbyMeta.__index[methodName] = function (self, value)
+		self[s.field] = value
+		logger:log(6, "GUILD %s LOBBY %s: updated %s to %s", self.guild.id, self.id, s.label, value)
+		emitter:emit(s.event, value, self.id)
+	end
+end
 
 setmetatable(lobbies, {
 	__index = {
@@ -238,6 +197,7 @@ setmetatable(lobbies, {
 
 			if lobby.guild then lobby.guild.lobbies:add(lobby) end
 			self[lobbyID] = lobby
+			self.n = self.n + 1
 
 			logger:log(6, "GUILD %s LOBBY %s: added", guildID, lobbyID)
 			return lobby
@@ -256,11 +216,14 @@ setmetatable(lobbies, {
 			end
 		end
 	},
-	__len = function (self)
-		local count = 0
-		for _,_ in pairs(self) do count = count + 1 end
-		return count
+	__pairs = function (self)
+		return function (t, index)
+			local k, v = next(t, index)
+			while k == "n" do k, v = next(t, k) end
+			return k, v
+		end, self
 	end,
+	__len = function (self) return self.n end,
 	__tostring = function () return "LobbyStorage" end
 })
 

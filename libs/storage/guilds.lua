@@ -23,7 +23,7 @@ local storageStatements = {
 
 
 for name, statement in pairs(storageStatements) do
-	emitter:on(name, storageCall(guildsDB:prepare(statement[1]), statement[2]))
+	emitter:on(name, storageCall(guildsDB:prepare(statement[1]), statement[2], guildsDB))
 end
 
 local set = require "utils/set"

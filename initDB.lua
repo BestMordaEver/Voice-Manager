@@ -4,6 +4,10 @@ local guildsData = sqlite.open("guildsData.db")
 local lobbiesData = sqlite.open("lobbiesData.db")
 local channelsData = sqlite.open("channelsData.db")
 
+guildsData:exec("PRAGMA journal_mode=WAL")
+lobbiesData:exec("PRAGMA journal_mode=WAL")
+channelsData:exec("PRAGMA journal_mode=WAL")
+
 guildsData:exec([[
 CREATE TABLE IF NOT EXISTS guilds(
 	id VARCHAR PRIMARY KEY,
@@ -15,7 +19,10 @@ CREATE TABLE IF NOT EXISTS roles(
 	id VARCHAR,
 	guildID VARCHAR NOT NULL,
 	FOREIGN KEY(guildID) REFERENCES guilds(id)
-)]])
+);
+
+CREATE INDEX IF NOT EXISTS idx_roles_guildID ON roles(guildID)
+]])
 
 lobbiesData:exec([[
 CREATE TABLE IF NOT EXISTS lobbies(
@@ -42,7 +49,10 @@ CREATE TABLE IF NOT EXISTS roles(
 	id VARCHAR,
 	lobbyID VARCHAR NOT NULL,
 	FOREIGN KEY(lobbyID) REFERENCES lobbies(id)
-)]])
+);
+
+CREATE INDEX IF NOT EXISTS idx_roles_lobbyID ON roles(lobbyID)
+]])
 
 channelsData:exec([[
 CREATE TABLE IF NOT EXISTS channels(

@@ -3,26 +3,29 @@ local config = require "config"
 local client = require "client"
 local logger = require "logger"
 
--- no statement is to be used by two threads at the same time
+-- one mutex per database connection
 local Mutex = require "discordia".Mutex
 
-local mutexes = {}
+local dbMutexes = setmetatable({}, {
+	__index = function (self, db)
+		self[db] = Mutex()
+		return self[db]
+	end
+})
 local pcallFunc = function (statement, ...) statement:reset():bind(...):step() end
 
 -- all statements come through this logic
-return function (statement, logMsg)
+return function (statement, logMsg, db)
 	-- setup
 	-- prepare log messages
 	local success, failure = logMsg..": completed", logMsg..": failed"
 
-	-- create mutex for statement
-	mutexes[statement] = Mutex()
-
 	-- the actual logic
 	return function (...)
-		mutexes[statement]:lock()
+		local mutex = dbMutexes[db]
+		mutex:lock()
 		local ok, msg = xpcall(pcallFunc, debug.traceback, statement, ...)
-		mutexes[statement]:unlock()
+		mutex:unlock()
 
 		if ok then
 			logger:log(5, success, ...)
