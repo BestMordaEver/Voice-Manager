@@ -1,7 +1,6 @@
-local enums = require "discordia".enums
-local commandOptionType = enums.applicationCommandOptionType
-local contextType = enums.interactionContextType
+local contextType = require "discordia".enums.interactionContextType
 
+local B = require "slash/builders"
 local permissionList = require "slash/permissionList"
 local locale = require "locale/localeHandler"
 
@@ -10,64 +9,25 @@ return {
 	description = locale.serverDesc,
 	contexts = {contextType.guild},
 	options = {
-		{
-			name = locale.view,
-			description = locale.serverViewDesc,
-			type = commandOptionType.subcommand
-		},
-		{
-			name = locale.limit,
-			description = locale.lobbyLimitDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.limit,
-					description = locale.lobbyLimitLimitDesc,
-					type = commandOptionType.integer,
-					required = true,
-					min_value = 0,
-					max_value = 500
-				}
-			}
-		},
-		{
-			name = locale.lobbyPermissions,
-			description = locale.serverPermissionsDesc,
-			type = commandOptionType.subcommand,
-			options = permissionList
-		},
-		{
-			name = locale.role,
-			description = locale.lobbyRoleDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.add,
-					description = locale.lobbyRoleAddDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.role,
-							description = locale.lobbyRoleAddRoleDesc,
-							type = commandOptionType.role,
-							required = true
-						}
-					}
-				},
-				{
-					name = locale.remove,
-					description = locale.lobbyRoleRemoveDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.role,
-							description = locale.lobbyRoleRemoveRoleDesc,
-							type = commandOptionType.role,
-							required = true
-						}
-					}
-				}
-			}
-		}
+		B.subcommand(locale.view, locale.serverViewDesc),
+
+		B.subcommand(locale.limit, locale.lobbyLimitDesc, {
+			B.integer(
+				locale.limit,
+				locale.lobbyLimitLimitDesc,
+				{required = true, min_value = 0, max_value = 500}
+			)
+		}),
+
+		B.subcommand(locale.lobbyPermissions, locale.serverPermissionsDesc, permissionList),
+
+		B.group(locale.role, locale.lobbyRoleDesc, {
+			B.subcommand(locale.add, locale.lobbyRoleAddDesc, {
+				B.role(locale.role, locale.lobbyRoleAddRoleDesc, {required = true})
+			}),
+			B.subcommand(locale.remove, locale.lobbyRoleRemoveDesc, {
+				B.role(locale.role, locale.lobbyRoleRemoveRoleDesc, {required = true})
+			}),
+		}),
 	}
 }

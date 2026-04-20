@@ -1,7 +1,7 @@
 local enums = require "discordia".enums
 local commandType = enums.applicationCommandType
-local commandOptionType = enums.applicationCommandOptionType
 
+local B = require "slash/builders"
 local locale = require "locale/localeHandler"
 
 local commandsStructure = {
@@ -42,12 +42,7 @@ local debugCommands = {
 		name = locale.exec,
 		description = locale.execDesc,
 		options = {
-			{
-				name = locale.execCode,
-				description = locale.execCodeDesc,
-				type = commandOptionType.string,
-				required = true
-			}
+			B.string(locale.execCode, locale.execCodeDesc, {required = true})
 		}
 	},
 	{

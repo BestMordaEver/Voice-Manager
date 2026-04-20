@@ -1,335 +1,105 @@
-local commandOptionType = require "discordia".enums.applicationCommandOptionType
-
+local B = require "slash/builders"
 local locale = require "locale/localeHandler"
+
+local function voiceTextBothGroup(name, desc, voiceDesc, textDesc, bothDesc, userDesc, bothUserDesc)
+	return B.group(name, desc, {
+		B.subcommand(locale.voice,        voiceDesc, { B.user(locale.roomHostUser, userDesc) }),
+		B.subcommand(locale.text,         textDesc,  { B.user(locale.roomHostUser, userDesc) }),
+		B.subcommand(locale.roomMuteBoth, bothDesc,  { B.user(locale.roomHostUser, bothUserDesc or userDesc) }),
+	})
+end
 
 return {
 	name = locale.room,
 	description = locale.roomDesc,
 	options = {
-		{
-			name = locale.view,
-			description = locale.roomViewDesc,
-			type = commandOptionType.subcommand
-		},
-		{
-			name = locale.roomHost,
-			description = locale.roomHostDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.roomHostUser,
-					description = locale.roomHostUserDesc,
-					type = commandOptionType.user
-				}
-			}
-		},
-		{
-			name = locale.roomInvite,
-			description = locale.roomInviteDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.roomHostUser,
-					description = locale.roomInviteUserDesc,
-					type = commandOptionType.user
-				}
-			}
-		},
-		{
-			name = locale.rename,
-			description = locale.roomRenameDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.voice,
-					description = locale.roomRenameVoiceDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.name,
-							description = locale.roomRenameVoiceNameDesc,
-							type = commandOptionType.string,
-							required = true
-						}
-					}
-				},
-				{
-					name = locale.text,
-					description = locale.roomRenameTextDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.name,
-							description = locale.roomRenameTextNameDesc,
-							type = commandOptionType.string,
-							required = true
-						}
-					}
-				}
-			}
-		},
-		{
-			name = locale.resize,
-			description = locale.roomResizeDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.lobbyCapacity,
-					description = locale.roomResizeCapacityDesc,
-					type = commandOptionType.integer,
-					min_value = 0,
-					max_value = 99,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.bitrate,
-			description = locale.roomBitrateDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.bitrate,
-					description = locale.roomBitrateBitrateDesc,
-					type = commandOptionType.integer,
-					min_value = 8,
-					max_value = 384,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.kick,
-			description = locale.roomKickDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.roomHostUser,
-					description = locale.roomKickUserDesc,
-					type = commandOptionType.user,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.mute,
-			description = locale.roomMuteDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.voice,
-					description = locale.roomMuteVoiceDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomMuteBothUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.text,
-					description = locale.roomMuteTextDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomMuteBothUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.roomMuteBoth,
-					description = locale.roomMuteBothDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomMuteBothUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				}
-			}
-		},
-		{
-			name = locale.roomUnmute,
-			description = locale.roomUnmuteDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.voice,
-					description = locale.roomUnmuteVoiceDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomUnmuteTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.text,
-					description = locale.roomUnmuteTextDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomUnmuteTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.roomMuteBoth,
-					description = locale.roomUnmuteBothDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomUnmuteTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				}
-			}
-		},
-		{
-			name = locale.hide,
-			description = locale.roomHideDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.voice,
-					description = locale.roomHideVoiceDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomHideTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.text,
-					description = locale.roomHideTextDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomHideTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.roomMuteBoth,
-					description = locale.roomHideBothDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomHideBothUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				}
-			}
-		},
-		{
-			name = locale.roomShow,
-			description = locale.roomShowDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.voice,
-					description = locale.roomShowVoiceDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomShowTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.text,
-					description = locale.roomShowTextDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomShowTextUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				},
-				{
-					name = locale.roomMuteBoth,
-					description = locale.roomShowBothDesc,
-					type = commandOptionType.subcommand,
-					options = {
-						{
-							name = locale.roomHostUser,
-							description = locale.roomShowBothUserDesc,
-							type = commandOptionType.user
-						}
-					}
-				}
-			}
-		},
-		{
-			name = locale.roomBlock,
-			description = locale.roomBlockDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.roomHostUser,
-					description = locale.roomBlockUserDesc,
-					type = commandOptionType.user,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.roomAllow,
-			description = locale.roomAllowDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.roomHostUser,
-					description = locale.roomAllowUserDesc,
-					type = commandOptionType.user,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.lock,
-			description = locale.roomLockDesc,
-			type = commandOptionType.subcommand
-		},
-		{
-			name = locale.roomUnlock,
-			description = locale.roomUnlockDesc,
-			type = commandOptionType.subcommand
-		},
-		{
-			name = locale.password,
-			description = locale.roomPasswordDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.password,
-					description = locale.roomPasswordPasswordDesc,
-					type = commandOptionType.string
-				}
-			}
-		}
+		B.subcommand(locale.view, locale.roomViewDesc),
+
+		B.subcommand(locale.roomHost, locale.roomHostDesc, {
+			B.user(locale.roomHostUser, locale.roomHostUserDesc)
+		}),
+
+		B.subcommand(locale.roomInvite, locale.roomInviteDesc, {
+			B.user(locale.roomHostUser, locale.roomInviteUserDesc)
+		}),
+
+		B.group(locale.rename, locale.roomRenameDesc, {
+			B.subcommand(locale.voice, locale.roomRenameVoiceDesc, {
+				B.string(locale.name, locale.roomRenameVoiceNameDesc, {required = true})
+			}),
+			B.subcommand(locale.text, locale.roomRenameTextDesc, {
+				B.string(locale.name, locale.roomRenameTextNameDesc, {required = true})
+			}),
+		}),
+
+		B.subcommand(locale.resize, locale.roomResizeDesc, {
+			B.integer(
+				locale.lobbyCapacity,
+				locale.roomResizeCapacityDesc,
+				{required = true, min_value = 0, max_value = 99}
+			)
+		}),
+
+		B.subcommand(locale.bitrate, locale.roomBitrateDesc, {
+			B.integer(
+				locale.bitrate,
+				locale.roomBitrateBitrateDesc,
+				{required = true, min_value = 8, max_value = 384}
+			)
+		}),
+
+		B.subcommand(locale.kick, locale.roomKickDesc, {
+			B.user(locale.roomHostUser, locale.roomKickUserDesc, {required = true})
+		}),
+
+		voiceTextBothGroup(
+			locale.mute,
+			locale.roomMuteDesc,
+			locale.roomMuteVoiceDesc,
+			locale.roomMuteTextDesc,
+			locale.roomMuteBothDesc,
+			locale.roomMuteBothUserDesc
+		),
+		voiceTextBothGroup(
+			locale.roomUnmute,
+			locale.roomUnmuteDesc,
+			locale.roomUnmuteVoiceDesc,
+			locale.roomUnmuteTextDesc,
+			locale.roomUnmuteBothDesc,
+			locale.roomUnmuteTextUserDesc
+		),
+		voiceTextBothGroup(
+			locale.hide,
+			locale.roomHideDesc,
+			locale.roomHideVoiceDesc,
+			locale.roomHideTextDesc,
+			locale.roomHideBothDesc,
+			locale.roomHideTextUserDesc,
+			locale.roomHideBothUserDesc
+		),
+		voiceTextBothGroup(
+			locale.roomShow,
+			locale.roomShowDesc,
+			locale.roomShowVoiceDesc,
+			locale.roomShowTextDesc,
+			locale.roomShowBothDesc,
+			locale.roomShowTextUserDesc,
+			locale.roomShowBothUserDesc
+		),
+
+		B.subcommand(locale.roomBlock, locale.roomBlockDesc, {
+			B.user(locale.roomHostUser, locale.roomBlockUserDesc, {required = true})
+		}),
+
+		B.subcommand(locale.roomAllow, locale.roomAllowDesc, {
+			B.user(locale.roomHostUser, locale.roomAllowUserDesc, {required = true})
+		}),
+
+		B.subcommand(locale.lock, locale.roomLockDesc),
+		B.subcommand(locale.roomUnlock, locale.roomUnlockDesc),
+
+		B.subcommand(locale.password, locale.roomPasswordDesc, {
+			B.string(locale.password, locale.roomPasswordPasswordDesc)
+		}),
 	}
 }

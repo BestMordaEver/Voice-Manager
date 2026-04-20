@@ -1,8 +1,8 @@
 local enums = require "discordia".enums
 local channelType = enums.channelType
-local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+local B = require "slash/builders"
 local locale = require "locale/localeHandler"
 
 return {
@@ -10,28 +10,22 @@ return {
 	description = locale.cloneDesc,
 	contexts = {contextType.guild},
 	options = {
-		{
-			name = locale.cloneSource,
-			description = locale.cloneSourceDesc,
-			type = commandOptionType.channel,
-			required = true,
-			channel_types = {
-				channelType.text,
-				channelType.voice
-			}
-		},
-		{
-			name = locale.cloneAmount,
-			description = locale.cloneAmountDesc,
-			type = commandOptionType.integer,
-			required = true,
-			min_value = 1,
-			max_value = 50
-		},
-		{
-			name = locale.name,
-			description = locale.cloneNameDesc,
-			type = commandOptionType.string
-		}
+		B.channel(
+			locale.cloneSource,
+			locale.cloneSourceDesc,
+			{channelType.text, channelType.voice},
+			{required = true}
+		),
+
+		B.integer(
+			locale.cloneAmount,
+			locale.cloneAmountDesc,
+			{required = true, min_value = 1, max_value = 50}
+		),
+
+		B.string(
+			locale.name,
+			locale.cloneNameDesc
+		),
 	}
 }

@@ -1,7 +1,6 @@
-local enums = require "discordia".enums
-local commandOptionType = enums.applicationCommandOptionType
-local contextType = enums.interactionContextType
+local contextType = require "discordia".enums.interactionContextType
 
+local B = require "slash/builders"
 local lobbySelect = {require "slash/lobbySelect"}
 local locale = require "locale/localeHandler"
 
@@ -10,156 +9,37 @@ return {
 	description = locale.resetDesc,
 	contexts = {contextType.guild},
 	options = {
-		{
-			name = locale.lobby,
-			description = locale.resetLobbyDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.name,
-					description = locale.resetLobbyNameDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.category,
-					description = locale.resetLobbyCategoryDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.target,
-					description = locale.resetLobbyTargetDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.bitrate,
-					description = locale.resetLobbyBitrateDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyCapacity,
-					description = locale.resetLobbyCapacityDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyPermissions,
-					description = locale.resetLobbyPermissionsDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.role,
-					description = locale.resetLobbyRoleDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.limit,
-					description = locale.resetLobbyLimitDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyRegion,
-					description = locale.resetLobbyRegionDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyGaps,
-					description = locale.resetLobbyGapsDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyPosition,
-					description = locale.resetLobbyPositionDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.lobbyOrder,
-					description = locale.resetLobbyOrderDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-			}
-		},
-		{
-			name = locale.matchmaking,
-			description = locale.resetMatchmakingDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.target,
-					description = locale.resetMatchmakingTargetDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.matchmakingMode,
-					description = locale.resetMatchmakingModeDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				}
-			}
-		},
-		{
-			name = locale.companion,
-			description = locale.resetCompanionDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.category,
-					description = locale.resetCompanionCategoryDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.name,
-					description = locale.resetCompanionNameDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.companionGreeting,
-					description = locale.resetCompanionGreetingDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				},
-				{
-					name = locale.companionLog,
-					description = locale.resetCompanionLogDesc,
-					type = commandOptionType.subcommand,
-					options = lobbySelect
-				}
-			}
-		},
-		{
-			name = locale.server,
-			description = locale.resetServerDesc,
-			type = commandOptionType.subcommandGroup,
-			options = {
-				{
-					name = locale.limit,
-					description = locale.resetServerLimitDesc,
-					type = commandOptionType.subcommand
-				},
-				{
-					name = locale.lobbyPermissions,
-					description = locale.resetServerPermissionsDesc,
-					type = commandOptionType.subcommand
-				},
-				{
-					name = locale.role,
-					description = locale.resetLobbyRoleDesc,
-					type = commandOptionType.subcommand
-				}
-			}
-		}
+		B.group(locale.lobby, locale.resetLobbyDesc, {
+			B.subcommand(locale.name,             locale.resetLobbyNameDesc,        lobbySelect),
+			B.subcommand(locale.category,         locale.resetLobbyCategoryDesc,    lobbySelect),
+			B.subcommand(locale.target,           locale.resetLobbyTargetDesc,      lobbySelect),
+			B.subcommand(locale.bitrate,          locale.resetLobbyBitrateDesc,     lobbySelect),
+			B.subcommand(locale.lobbyCapacity,    locale.resetLobbyCapacityDesc,    lobbySelect),
+			B.subcommand(locale.lobbyPermissions, locale.resetLobbyPermissionsDesc, lobbySelect),
+			B.subcommand(locale.role,             locale.resetLobbyRoleDesc,        lobbySelect),
+			B.subcommand(locale.limit,            locale.resetLobbyLimitDesc,       lobbySelect),
+			B.subcommand(locale.lobbyRegion,      locale.resetLobbyRegionDesc,      lobbySelect),
+			B.subcommand(locale.lobbyGaps,        locale.resetLobbyGapsDesc,        lobbySelect),
+			B.subcommand(locale.lobbyPosition,    locale.resetLobbyPositionDesc,    lobbySelect),
+			B.subcommand(locale.lobbyOrder,       locale.resetLobbyOrderDesc,       lobbySelect),
+		}),
+
+		B.group(locale.matchmaking, locale.resetMatchmakingDesc, {
+			B.subcommand(locale.target,          locale.resetMatchmakingTargetDesc, lobbySelect),
+			B.subcommand(locale.matchmakingMode, locale.resetMatchmakingModeDesc,  lobbySelect),
+		}),
+
+		B.group(locale.companion, locale.resetCompanionDesc, {
+			B.subcommand(locale.category,         locale.resetCompanionCategoryDesc, lobbySelect),
+			B.subcommand(locale.name,             locale.resetCompanionNameDesc,     lobbySelect),
+			B.subcommand(locale.companionGreeting, locale.resetCompanionGreetingDesc, lobbySelect),
+			B.subcommand(locale.companionLog,     locale.resetCompanionLogDesc,      lobbySelect),
+		}),
+
+		B.group(locale.server, locale.resetServerDesc, {
+			B.subcommand(locale.limit,            locale.resetServerLimitDesc),
+			B.subcommand(locale.lobbyPermissions, locale.resetServerPermissionsDesc),
+			B.subcommand(locale.role,             locale.resetLobbyRoleDesc),
+		}),
 	}
 }

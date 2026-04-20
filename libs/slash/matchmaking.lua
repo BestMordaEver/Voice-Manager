@@ -1,8 +1,8 @@
 local enums = require "discordia".enums
 local channelType = enums.channelType
-local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+local B = require "slash/builders"
 local lobbySelect = require "slash/lobbySelect"
 local locale = require "locale/localeHandler"
 
@@ -11,105 +11,40 @@ return {
 	description = locale.matchmakingDesc,
 	contexts = {contextType.guild},
 	options = {
-		{
-			name = locale.view,
-			description = locale.matchmakingViewDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyViewLobbyDesc,
-					type = commandOptionType.channel,
-					channel_types = {
-						channelType.voice
-					}
+		B.subcommand(locale.view, locale.matchmakingViewDesc, {
+			B.channel(locale.lobby, locale.lobbyViewLobbyDesc, {channelType.voice})
+		}),
+
+		B.subcommand(locale.add, locale.matchmakingAddDesc, {
+			B.channel(locale.channel, locale.lobbyAddChannelDesc, {channelType.voice}, {required = true})
+		}),
+
+		B.subcommand(locale.remove, locale.matchmakingRemoveDesc, {
+			B.channel(locale.lobby, locale.matchmakingRemoveLobbyDesc, {channelType.voice}, {required = true})
+		}),
+
+		B.subcommand(locale.target, locale.matchmakingTargetDesc, {
+			lobbySelect,
+			B.channel(
+				locale.target,
+				locale.matchmakingTargetTargetDesc,
+				{channelType.voice, channelType.category},
+				{required = true}
+			)
+		}),
+
+		B.subcommand(locale.matchmakingMode, locale.matchmakingModeDesc, {
+			lobbySelect,
+			B.string(locale.matchmakingMode, locale.matchmakingModeModeDesc, {
+				required = true,
+				choices = {
+					{name = locale.matchmakingModeModeRandom, value = "random"},
+					{name = locale.matchmakingModeModeMax,    value = "max"},
+					{name = locale.matchmakingModeModeMin,    value = "min"},
+					{name = locale.matchmakingModeModeFirst,  value = "first"},
+					{name = locale.matchmakingModeModeLast,   value = "last"},
 				}
-			}
-		},
-		{
-			name = locale.add,
-			description = locale.matchmakingAddDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.channel,
-					description = locale.lobbyAddChannelDesc,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				}
-			}
-		},
-		{
-			name = locale.remove,
-			description = locale.matchmakingRemoveDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.lobby,
-					description = locale.matchmakingRemoveLobbyDesc,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice
-					}
-				}
-			}
-		},
-		{
-			name = locale.target,
-			description = locale.matchmakingTargetDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.target,
-					description = locale.matchmakingTargetTargetDesc,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.voice, channelType.category
-					}
-				}
-			}
-		},
-		{
-			name = locale.matchmakingMode,
-			description = locale.matchmakingModeDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.matchmakingMode,
-					description = locale.matchmakingModeModeDesc,
-					type = commandOptionType.string,
-					required = true,
-					choices = {
-						{
-							name = locale.matchmakingModeModeRandom,
-							value = "random"
-						},
-						{
-							name = locale.matchmakingModeModeMax,
-							value = "max"
-						},
-						{
-							name = locale.matchmakingModeModeMin,
-							value = "min"
-						},
-						{
-							name = locale.matchmakingModeModeFirst,
-							value = "first"
-						},
-						{
-							name = locale.matchmakingModeModeLast,
-							value = "last"
-						}
-					}
-				}
-			}
-		}
+			})
+		}),
 	}
 }

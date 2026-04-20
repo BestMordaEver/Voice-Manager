@@ -1,15 +1,11 @@
-local enums = require "discordia".enums
-local channelType = enums.channelType
-local commandOptionType = enums.applicationCommandOptionType
+local channelType = require "discordia".enums.channelType
 
+local B = require "slash/builders"
 local locale = require "locale/localeHandler"
 
-return {
-	name = locale.lobby,
-	description = locale.lobbyConfigured,
-	type = commandOptionType.channel,
-	required = true,
-	channel_types = {
-		channelType.voice
-	}
-}
+return B.channel(
+	locale.lobby,
+	locale.lobbyConfigured,
+	{channelType.voice},
+	{required = true}
+)

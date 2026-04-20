@@ -1,8 +1,8 @@
 local enums = require "discordia".enums
 local channelType = enums.channelType
-local commandOptionType = enums.applicationCommandOptionType
 local contextType = enums.interactionContextType
 
+local B = require "slash/builders"
 local lobbySelect = require "slash/lobbySelect"
 local locale = require "locale/localeHandler"
 
@@ -11,93 +11,41 @@ return {
 	description = locale.companionDesc,
 	contexts = {contextType.guild},
 	options = {
-		{
-			name = locale.view,
-			description = locale.companionViewDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				{
-					name = locale.lobby,
-					description = locale.lobbyViewLobbyDesc,
-					type = commandOptionType.channel,
-					channel_types = {
-						channelType.voice
-					}
-				}
-			}
-		},
-		{
-			name = locale.enable,
-			description = locale.companionEnableDesc,
-			type = commandOptionType.subcommand,
-			options = {lobbySelect}
-		},
-		{
-			name = locale.disable,
-			description = locale.companionDisableDesc,
-			type = commandOptionType.subcommand,
-			options = {lobbySelect}
-		},
-		{
-			name = locale.category,
-			description = locale.companionCategoryDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.category,
-					description = locale.companionCategoryCategoryDesc,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.category
-					}
-				}
-			}
-		},
-		{
-			name = locale.name,
-			description = locale.companionNameDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.name,
-					description = locale.companionNameNameDesc,
-					type = commandOptionType.string,
-					required = true
-				}
-			}
-		},
-		{
-			name = locale.companionGreeting,
-			description = locale.companionGreetingDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.companionGreeting,
-					description = locale.companionGreetingGreetingDesc,
-					type = commandOptionType.string
-				}
-			}
-		},
-		{
-			name = locale.companionLog,
-			description = locale.companionLogDesc,
-			type = commandOptionType.subcommand,
-			options = {
-				lobbySelect,
-				{
-					name = locale.channel,
-					description = locale.companionLogChannelDesc,
-					type = commandOptionType.channel,
-					required = true,
-					channel_types = {
-						channelType.text
-					}
-				}
-			}
-		},
+		B.subcommand(locale.view, locale.companionViewDesc, {
+			B.channel(locale.lobby, locale.lobbyViewLobbyDesc, {channelType.voice})
+		}),
+
+		B.subcommand(locale.enable, locale.companionEnableDesc, {lobbySelect}),
+		B.subcommand(locale.disable, locale.companionDisableDesc, {lobbySelect}),
+
+		B.subcommand(locale.category, locale.companionCategoryDesc, {
+			lobbySelect,
+			B.channel(
+				locale.category,
+				locale.companionCategoryCategoryDesc,
+				{channelType.category},
+				{required = true}
+			)
+		}),
+
+		B.subcommand(locale.name, locale.companionNameDesc, {
+			lobbySelect,
+			B.string(locale.name, locale.companionNameNameDesc, {required = true})
+		}),
+
+		B.subcommand(locale.companionGreeting, locale.companionGreetingDesc, {
+			lobbySelect,
+			B.string(locale.companionGreeting, locale.companionGreetingGreetingDesc)
+		}),
+
+		B.subcommand(locale.companionLog, locale.companionLogDesc, {
+			lobbySelect,
+			B.channel(
+				locale.channel,
+				locale.companionLogChannelDesc,
+				{channelType.text},
+				{required = true}
+			)
+		}),
 	}
 }
