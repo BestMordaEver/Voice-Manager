@@ -93,7 +93,7 @@ local function liner (locale, channel, rolePO, type, perm)
 
 		if #POs ~= 0 then
 			local mentions = {}
-			table.insert(mentions, locale(mentions, lines[type][perm].allowedExceptions))
+			table.insert(mentions, localeHandler(locale, lines[type][perm].allowedExceptions))
 			for _, po in pairs(POs) do
 				table.insert(mentions, po:getObject().user.mentionString)
 			end
