@@ -13,7 +13,7 @@ return function (channel, newHost, oldHost)
 	if not channelData then return end
 
 	local lobbyData = channelData.parent
-	if not lobbyData and not lobbyData.permissions then return end
+	if not lobbyData or not lobbyData.permissions then return end
 
 	local permissions = lobbyData.permissions:toDiscordia()
 	if #permissions == 0 then return end
