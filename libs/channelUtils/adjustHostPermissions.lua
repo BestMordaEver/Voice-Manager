@@ -19,18 +19,22 @@ return function (channel, newHost, oldHost)
 	if #permissions == 0 then return end
 
 	local channelOK, channelMissingPermissions = adjustPermissions.allow(newHost, channel, table.unpack(permissions))
-	if oldHost then adjustPermissions.clear(oldHost, channel, table.unpack(permissions)) end
+	if oldHost then
+		adjustPermissions.clear(oldHost, channel, table.unpack(permissions))
+	end
 
 	local companionOK, companionMissingPermissions = true
 	local companion = client:getChannel(channelData.companion)
 	if companion then
 		companionOK, companionMissingPermissions = adjustPermissions.allow(newHost, companion, table.unpack(permissions))
-		if oldHost then adjustPermissions.clear(oldHost, companion, table.unpack(permissions)) end
+		if oldHost then
+			adjustPermissions.clear(oldHost, companion, table.unpack(permissions))
+		end
 	end
 
 	if not (channelOK and companionOK) then
-		newHost:send(warningResponse(false, newHost.user.locale, "hostMigrationFail",
-		table.concat(channelMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " "),
-		table.concat(companionMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " ")))
+		return warningResponse(false, newHost.user.locale, "hostMigrationFail",
+			table.concat(channelMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " "),
+			table.concat(companionMissingPermissions or {localeHandler(newHost.user.locale, "none")}, " "))
 	end
 end

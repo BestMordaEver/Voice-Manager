@@ -3,22 +3,31 @@ local permission = require "discordia".enums.permission
 
 local function adjust (overwrite, method, channel, ...)
 	local permissions = {...}
-	for index, perm in pairs(permissions) do
-		if perm == permission.manageRoles then
-			if not channel.guild.me:getPermissions():has(permission.administrator) then
-				permissions[index] = nil
+	if not channel.guild.me:getPermissions():has(permission.administrator) then
+		local filteredPermissions = {}
+		for _, perm in pairs(permissions) do
+			if perm ~= permission.manageRoles then
+				table.insert(filteredPermissions, perm)
 			end
-			break
 		end
+
+		permissions = filteredPermissions
 	end
 
 	local ok, missingBotPermissions = checkBotPermissions(channel)
 
 	if ok then
-		method(overwrite, ...)
+		if permissions[1] then
+			method(overwrite, table.unpack(permissions))
+		end
 	else
-		for _, perm in pairs({...}) do
-			if not missingBotPermissions[perm] then
+		local missingPermissionSet = {}
+		for _, perm in pairs(missingBotPermissions or {}) do
+			missingPermissionSet[permission[perm] or perm] = true
+		end
+
+		for _, perm in pairs(permissions) do
+			if not missingPermissionSet[perm] then
 				method(overwrite, perm)
 			end
 		end

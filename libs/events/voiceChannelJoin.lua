@@ -182,7 +182,11 @@ local function lobbyJoinCall (member, lobby)
 		end end
 	end
 
-	adjustHostPermissions(newChannel, member)
+	err = adjustHostPermissions(newChannel, member)
+	if err then
+		logger:log(4, "GUILD %s LOBBY %s USER %s: failed to grant all permissions", guild.id, lobby.id, member.user.id)
+		member:send(err)
+	end
 
 	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
 	if lobbyData.greeting or lobbyData.companionLog then

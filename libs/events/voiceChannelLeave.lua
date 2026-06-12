@@ -86,11 +86,15 @@ local function memberLeft (channel, member)
 
 	if not newHost then return end
 
-	channelData:setHost(newHost.user.id)
 	logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", guild.id, channel.id, member.user.id, newHost.user.id)
+	channelData:setHost(newHost.user.id)
 
 	if channelData.parent then
-		adjustHostPermissions(channel, newHost, member)
+		local err = adjustHostPermissions(channel, newHost, member)
+		if err then
+			logger:log(4, "GUILD %s ROOM %s: permission migration failed", guild.id, channel.id)
+			newHost:send(err)
+		end
 	end
 end
 

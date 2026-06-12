@@ -1,5 +1,6 @@
 local client = require "client"
 local config = require "config"
+local logger = require "logger"
 
 local channels = require "storage/channels"
 
@@ -92,26 +93,30 @@ subcommands = {
 
 	host = function (interaction, voiceChannel, newHost)
 		local channelData = channels[voiceChannel.id]
-		local host = client:getUser(channelData.host)
 
 		if newHost then
-			if interaction.user ~= host then
+			if interaction.user.id ~= channelData.host then
 				return "Not a host", warningResponse(true, interaction.locale, "notHost")
 			end
 
 			newHost = voiceChannel.guild:getMember(newHost)
-			if newHost.voiceChannel ~= voiceChannel then
+			if not newHost or newHost.voiceChannel ~= voiceChannel then
 				return "Can't promote person not in a room", warningResponse(true, interaction.locale, "badNewHost")
 			end
 
 			channelData:setHost(newHost.user.id)
 
 			if channelData.parent then
-				adjustHostPermissions(voiceChannel, newHost, interaction.member)
+				local err = adjustHostPermissions(voiceChannel, newHost, interaction.member)
+				if err then
+					logger:log(4, "GUILD %s ROOM %s: permission migration failed", voiceChannel.guild.id, voiceChannel.id)
+					newHost:send(err)
+				end
 			end
 
 			return "Promoted a new host", okResponse(true, interaction.locale, "hostConfirm", newHost.user.mentionString)
 		else
+			local host = client:getUser(channelData.host)
 			if host then
 				return "Pinged the host", okResponse(true, interaction.locale, "hostIdentify", host.mentionString)
 			else
@@ -122,7 +127,7 @@ subcommands = {
 
 	kick = function (interaction, voiceChannel, user)
 		local member = voiceChannel.guild:getMember(user)
-		if member.voiceChannel == voiceChannel then
+		if member and member.voiceChannel == voiceChannel then
 			member:setVoiceChannel()
 			return "Kicked member", okResponse(true, interaction.locale, "kickConfirm", member.mentionString)
 		else
@@ -533,7 +538,10 @@ return function (interaction, subcommand)
 
 	local member = interaction.member
 	if not member then
-		local guild = interaction.user.mutualGuilds:find(function (guild) return guild:getMember(interaction.user).voiceChannel end)
+		local guild = interaction.user.mutualGuilds:find(function (guild)
+			local guildMember = guild:getMember(interaction.user)
+			return guildMember and guildMember.voiceChannel
+		end)
 		if guild then member = guild:getMember(interaction.user) end
 	end
 
