@@ -382,7 +382,7 @@ subcommands = {
 			local companion = client:getChannel(channels[voiceChannel.id].companion)
 			if companion then
 				if user then
-					voiceChannel:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
+					companion:getPermissionOverwriteFor(member):allowPermissions(permission.readMessages)
 				else
 					if #roles == 0 then
 						companion:getPermissionOverwriteFor(guild.defaultRole):allowPermissions(permission.readMessages)
