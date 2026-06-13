@@ -37,15 +37,5 @@ return {
 			lobbySelect,
 			B.string(locale.companionGreeting, locale.companionGreetingGreetingDesc)
 		}),
-
-		B.subcommand(locale.companionLog, locale.companionLogDesc, {
-			lobbySelect,
-			B.channel(
-				locale.channel,
-				locale.companionLogChannelDesc,
-				{channelType.text},
-				{required = true}
-			)
-		}),
 	}
 }

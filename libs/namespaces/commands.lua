@@ -6,6 +6,7 @@ local commands = {
 	exec = "exec",
 	help = "help",
 	lobby = "lobby",
+	logging = "logging",
 	matchmaking = "matchmaking",
 	ping = "ping",
 	reset = "reset",

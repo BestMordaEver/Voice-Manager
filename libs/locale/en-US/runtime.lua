@@ -2,6 +2,7 @@
 local runtime = {
 	-- server
 	serverInfo = [[## %s
+**Log time zone:** UTC%s%02d:%02d
 **Permissions:** %s
 **Managed roles:** %s
 **Lobbies:** %d
@@ -12,6 +13,9 @@ local runtime = {
 	limitConfirm = "Limit is set to %d",
 	roleConfirm = "Updated role list: %s",
 	roleConfirmNoRoles = "The default @everyone is in use",
+	timezoneConfirm = "Transcript time zone is set to UTC%s",
+	timezoneReset = "Transcript timestamps are reset to UTC",
+	timezoneInvalid = "Invalid UTC offset. Use values like **+02**, **-05:00**, or **+05:30**",
 
 	-- lobbies
 	lobbiesNoInfo = [[There are no registered lobbies
@@ -85,8 +89,19 @@ You can enable companions with **/companion enable**]],
 	roomCommands = "Available commands: ",
 	logConfirm = "Chat logs will be sent to %s",
 	logReset = "Disabled the chatlogs",
-	logName = "**%s** room of **%s** lobby\n",
+	logName = "**%s** room of **%s** lobby\nDownload all attached transcript files into the same folder to view archived media offline.\n",
 	loggerWarning = "\n\n*This text chat will be logged*",
+
+	-- logging
+	loggingNoInfo = [[There are no lobbies with logging enabled
+You can enable logging with **/logging enable**]],
+	loggingOffsetField = "**Transcript time zone:** UTC%s",
+	loggingField = "**Log channel:** %s",
+	loggingEnableConfirm = "Logging enabled. Transcripts will be sent to %s",
+	loggingDisableConfirm = "Logging disabled for this lobby",
+	loggingChannelConfirm = "Transcripts will be sent to %s",
+	loggingOffsetConfirm = "Transcript time zone is set to UTC%s",
+	loggingOffsetInvalid = "Invalid UTC offset. Use values like **+02**, **-05:00**, or **+05:30**",
 
 	-- room
 	roomInfoTitle = "## Room info | %s",

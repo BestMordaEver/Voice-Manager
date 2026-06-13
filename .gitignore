@@ -5,6 +5,7 @@
 *.db-wal
 *.db-shm
 *.dll
+transcripts/
 token.lua
 dbedit.lua
 testSuite.lua

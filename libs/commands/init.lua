@@ -15,6 +15,7 @@ return setmetatable({
 	[commandsNamespace.reset] = require "commands/reset",
 	[commandsNamespace.server] = require "commands/server",
 	[commandsNamespace.lobby] = require "commands/lobby",
+	[commandsNamespace.logging] = require "commands/logging",
 	[commandsNamespace.companion] = require "commands/companion",
 	[commandsNamespace.matchmaking] = require "commands/matchmaking",
 	[commandsNamespace.room] = require "commands/room",

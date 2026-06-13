@@ -90,6 +90,18 @@ local slash = {
 	companionLogDesc = "Enable chat logging. Logs will be sent as files to a channel of your choosing",
 	companionLogChannelDesc = "A channel where logs will be sent",
 
+	-- logging
+	logging = "logging",
+	loggingOffset = "offset",
+	loggingDesc = "Configure transcript logging for lobbies",
+	loggingViewDesc = "Show lobbies with logging enabled and the transcript time zone",
+	loggingEnableDesc = "Enable logging for a lobby and choose where transcripts are sent",
+	loggingDisableDesc = "Disable logging for a lobby",
+	loggingChannelDesc = "Change the channel where a lobby's transcripts are sent",
+	loggingChannelChannelDesc = "A channel where transcripts will be sent",
+	loggingOffsetDesc = "Set the UTC offset used in exported transcript timestamps",
+	loggingOffsetOffsetDesc = "Examples: +02, -05:00, +05:30 (UTC offset)",
+
 	-- permissionList (descriptions only; base names are in shared)
 	moderateDesc = "Access to all moderation tools",
 	manageDesc = "Access to all room settings",
@@ -163,6 +175,9 @@ local slash = {
 	-- server
 	serverDesc = "Configure global server settings",
 	serverViewDesc = "Show server settings",
+	timezone = "timezone",
+	serverTimezoneDesc = "Configure the time zone offset used in exported chat transcripts",
+	serverTimezoneOffsetDesc = "UTC offset like +02, -05:00, or +05:30",
 	serverPermissionsDesc = "Give users ability to access room commands in normal channels",
 
 	-- reset
@@ -191,6 +206,7 @@ local slash = {
 	resetCompanionLogDesc = "Disable companion logging",
 	resetServerDesc = "Server settings",
 	resetServerLimitDesc = "Reset limit to 500",
+	resetServerTimezoneDesc = "Reset transcript timestamps to UTC",
 	resetServerPermissionsDesc = "Disable all permissions",
 
 	-- clone

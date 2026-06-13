@@ -53,6 +53,9 @@ local function footer (components, locale)
 						label = localeHandler(locale, "helpSelectorCompanion"),
 						value = "companion"
 					},{
+						label = localeHandler(locale, "helpSelectorLogging"),
+						value = "logging"
+					},{
 						label = localeHandler(locale, "helpSelectorRoom"),
 						value = "room"
 					},{
@@ -81,6 +84,7 @@ local function helpFactory (locale)
 	helpLiner(helpContents, locale, "helpContentsLobby")
 	helpLiner(helpContents, locale, "helpContentsMatchmaking")
 	helpLiner(helpContents, locale, "helpContentsCompanion")
+	helpLiner(helpContents, locale, "helpContentsLogging")
 	helpLiner(helpContents, locale, "helpContentsRoom")
 	helpLiner(helpContents, locale, "helpContentsServer")
 	helpLiner(helpContents, locale, "helpContentsOther")
@@ -136,8 +140,17 @@ local function helpFactory (locale)
 	helpLiner(helpCompanion, locale, "helpCompanionCategory")
 	helpLiner(helpCompanion, locale, "helpCompanionName")
 	helpLiner(helpCompanion, locale, "helpCompanionGreeting")
-	helpLiner(helpCompanion, locale, "helpCompanionLog")
 	footer(helpCompanion, locale)
+
+	local helpLogging = {{
+		type = componentType.textDisplay,
+		content = localeHandler(locale, "helpLoggingHeader")
+	}}
+	helpLiner(helpLogging, locale, "helpLoggingView")
+	helpLiner(helpLogging, locale, "helpLoggingEnable")
+	helpLiner(helpLogging, locale, "helpLoggingChannel")
+	helpLiner(helpLogging, locale, "helpLoggingOffset")
+	footer(helpLogging, locale)
 
 	local helpRoom = {{
 		type = componentType.textDisplay,
@@ -194,6 +207,7 @@ local function helpFactory (locale)
 		lobbymore = helpLobbyMore,
 		matchmaking = helpMatchmaking,
 		companion = helpCompanion,
+		logging = helpLogging,
 		room = helpRoom,
 		roommore = helpRoomMore,
 		server = helpServer,

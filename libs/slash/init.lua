@@ -9,6 +9,7 @@ local commandsStructure = {
 	require "slash/lobby",
 	require "slash/matchmaking",
 	require "slash/companion",
+	require "slash/logging",
 	require "slash/room",
 	require "slash/server",
 	require "slash/reset",

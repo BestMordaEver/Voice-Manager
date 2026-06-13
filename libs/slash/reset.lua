@@ -33,7 +33,6 @@ return {
 			B.subcommand(locale.category,         locale.resetCompanionCategoryDesc, lobbySelect),
 			B.subcommand(locale.name,             locale.resetCompanionNameDesc,     lobbySelect),
 			B.subcommand(locale.companionGreeting, locale.resetCompanionGreetingDesc, lobbySelect),
-			B.subcommand(locale.companionLog,     locale.resetCompanionLogDesc,      lobbySelect),
 		}),
 
 		B.group(locale.server, locale.resetServerDesc, {

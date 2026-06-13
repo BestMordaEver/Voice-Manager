@@ -70,22 +70,6 @@ local commands = {
 		else
 			error(msg)
 		end
-	end,
-
-	log = function (interaction, lobby)
-		if interaction.commandName == commandNames.reset then
-			lobbies[lobby.id]:setCompanionLog()
-			return "Companion log channel reset", okResponse(true, interaction.locale, "logReset")
-		end
-
-		local logChannel = interaction.options.channel.value
-		local ok, logMsg, response = checkSetupPermissions(interaction, logChannel)
-		if ok then
-			lobbies[lobby.id]:setCompanionLog(logChannel.id)
-			return "Companion log channel set", okResponse(true, interaction.locale, "logConfirm", logChannel.name)
-		end
-
-		return logMsg, response
 	end
 }
 

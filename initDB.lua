@@ -12,7 +12,8 @@ guildsData:exec([[
 CREATE TABLE IF NOT EXISTS guilds(
 	id VARCHAR PRIMARY KEY,
 	cLimit INTEGER DEFAULT 500,
-	permissions INTEGER DEFAULT 0
+	permissions INTEGER DEFAULT 0,
+	logTimeOffset INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS roles(
@@ -23,6 +24,8 @@ CREATE TABLE IF NOT EXISTS roles(
 
 CREATE INDEX IF NOT EXISTS idx_roles_guildID ON roles(guildID)
 ]])
+
+pcall(function () guildsData:exec("ALTER TABLE guilds ADD COLUMN logTimeOffset INTEGER DEFAULT 0") end)
 
 lobbiesData:exec([[
 CREATE TABLE IF NOT EXISTS lobbies(

@@ -1,5 +1,5 @@
 local client = require "client"
-local Overseer = require "utils/logWriter"
+local Overseer = require "overseer"
 
 local guilds = require "storage/guilds"
 local lobbies = require "storage/lobbies"
@@ -29,7 +29,7 @@ local function loadChannels (parent, parentType)
 					-- required for position tracking
 					if parentType == 0 then parent:attachChild(channelData, channelData.position) end
 					-- continue logger if needed
-					if parent.companionLog then Overseer.resume(companion) end
+					if parent.companionLog then Overseer.resume(channel, companion, channelData.host) end
 					-- load in password checker channels
 					loadChannels(channelData, 3)
 				else

@@ -5,6 +5,8 @@ local emitter = require "discordia".Emitter()
 local storageCall = require "storage/storageCall"
 local guildsDB = require "sqlite3".open("guildsData.db")
 
+pcall(function () guildsDB:exec("ALTER TABLE guilds ADD COLUMN logTimeOffset INTEGER DEFAULT 0") end)
+
 local storageStatements = {
 	addGuild = {"INSERT INTO guilds(id) VALUES(?)", "ADD GUILD %s"},
 
@@ -18,7 +20,9 @@ local storageStatements = {
 
 	setGuildLimit = {"UPDATE guilds SET cLimit = ? WHERE id = ?", "SET LIMIT %s => GUILD %s"},
 
-	setGuildPermissions = {"UPDATE guilds SET permissions = ? WHERE id = ?", "SET PERMISSIONS %s => GUILD %s"}
+	setGuildPermissions = {"UPDATE guilds SET permissions = ? WHERE id = ?", "SET PERMISSIONS %s => GUILD %s"},
+
+	setGuildLogTimeOffset = {"UPDATE guilds SET logTimeOffset = ? WHERE id = ?", "SET LOG TIME OFFSET %s => GUILD %s"}
 }
 
 
@@ -71,6 +75,12 @@ local guildMeta = {
 			emitter:emit("setGuildPermissions", permissions.bitfield.value, self.id)
 		end,
 
+		setLogTimeOffset = function (self, offsetMinutes)
+			self.logTimeOffset = offsetMinutes
+			logger:log(6, "GUILD %s: updated log time offset to %d minutes", self.id, offsetMinutes)
+			emitter:emit("setGuildLogTimeOffset", offsetMinutes, self.id)
+		end,
+
 		channels = function (self)
 			local count = 0
 			for lobbyData, _ in pairs(self.lobbies) do
@@ -97,15 +107,16 @@ local guildMeta = {
 
 setmetatable(guilds, {
 	__index = {
-		loadGuildsStatement = guildsDB:prepare("SELECT id, cLimit, permissions FROM guilds"),
+		loadGuildsStatement = guildsDB:prepare("SELECT id, cLimit, permissions, logTimeOffset FROM guilds"),
 		loadRolesStatement = guildsDB:prepare("SELECT id, guildID FROM roles WHERE guildID = ?"),
 
-		add = function (self, guildID, limit, permissions, roles)
+		add = function (self, guildID, limit, permissions, logTimeOffset, roles)
 			self[guildID] = setmetatable({
 				id = guildID,
 				roles = set(roles),
 				limit = tonumber(limit) or 500,
 				permissions = botPermissions(tonumber(permissions) or 0),
+				logTimeOffset = tonumber(logTimeOffset) or 0,
 				lobbies = set()
 			}, guildMeta)
 			logger:log(6, "GUILD %s: added", guildID)

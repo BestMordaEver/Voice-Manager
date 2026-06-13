@@ -14,6 +14,7 @@ local passwordResponse = require "response/password"
 
 local matchmakers = require "utils/matchmakers"
 
+
 local Mutex = discordia.Mutex
 local enums = discordia.enums
 local permission = enums.permission
@@ -22,7 +23,7 @@ local channelType = enums.channelType
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
 local handleTemplate = require "channelUtils/handleTemplate"
 
-local Overseer = require "utils/logWriter"
+local Overseer = require "overseer"
 local ratelimiter = require "utils/ratelimiter"
 
 local queue = {}
@@ -188,7 +189,7 @@ local function lobbyJoinCall (member, lobby)
 		member:send(err)
 	end
 
-	if lobbyData.companionLog then Overseer.track(companion or newChannel) end
+	if lobbyData.companionLog then Overseer.track(newChannel, companion, member) end
 	if lobbyData.greeting or lobbyData.companionLog then
 		local ok, err = (companion or newChannel):send(greetingResponse(false, member.user.locale, newChannel))
 		if not ok then logger:log(4, "GUILD %s LOBBY %s USER %s: couldn't send greeting - %s", guild.id, lobby.id, member.user.id, err) end
@@ -197,6 +198,7 @@ local function lobbyJoinCall (member, lobby)
 	mutex:unlock()
 	Timer.clearTimeout(timer)
 	queue[newChannel.id] = nil
+
 end
 
 

@@ -6,6 +6,7 @@ local help = {
 	helpSelectorLobbyMore = "Lobby names and permissions",
 	helpSelectorMatchmaking = "Matchmaking",
 	helpSelectorCompanion = "Companion",
+	helpSelectorLogging = "Logging",
 	helpSelectorRoom = "Room management",
 	helpSelectorRoomMore = "Room moderation",
 	helpSelectorServer = "Server",
@@ -20,6 +21,9 @@ Setup and configure matchmaking in lobbies or normal channels]],
 	helpContentsCompanion = [[**Companion commands**
 Configure companion chats (see **Lobby commands** first)]],
 	helpSContentsCompanion = "/companion",
+	helpContentsLogging = [[**Logging commands**
+Archive companion chats as transcripts]],
+	helpSContentsLogging = "/logging",
 	helpContentsRoom = [[**Room commands**
 User commands for room configuration and moderation]],
 	helpSContentsRoom = "/room",
@@ -132,8 +136,17 @@ You can put different **%patterns%** in the greeting to customize it.
 **%nickname%**, **%name%**, **%tag%**, **%nickname's%**, **%name's%** - similar to **/lobby name**
 **%buttons%** - blank, attaches privacy controls to the greeting message]],
 	helpSCompanionGreeting = "/companion greeting",
-	helpCompanionLog = "Enable chat logging. Logs will be sent as files to a channel of your choosing. Users will be notified about chat logging with a generic greeting message in chat.",
-	helpSCompanionLog = "/companion log",
+
+	helpLoggingHeader = [[# Logging commands
+Companion chats can be archived as self-contained HTML transcripts that are uploaded to a channel of your choosing when a room is deleted.]],
+	helpLoggingView = "Show lobbies with logging enabled and the current transcript time zone",
+	helpSLoggingView = "/logging view",
+	helpLoggingEnable = "Enable logging for a lobby and pick the channel transcripts are sent to. Users are notified about logging with a generic greeting message in chat.",
+	helpSLoggingEnable = "/logging enable|disable",
+	helpLoggingChannel = "Change the channel where a lobby's transcripts are sent",
+	helpSLoggingChannel = "/logging channel",
+	helpLoggingOffset = "Set the UTC offset used for timestamps in exported transcripts",
+	helpSLoggingOffset = "/logging offset",
 
 	helpRoomHeader = [[# Room commands
 Most room commands are used by a room host - the user who created the room. Those commands can be enabled by administrator.]],
