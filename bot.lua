@@ -88,6 +88,11 @@ client:once(safeEvent("ready", function ()
 
 	if config.sendStats then clock:on(safeEvent("hour", require "events/stats")) end
 
+	if config.telemetry then
+		require "telemetry/init".initialize()
+		clock:on(safeEvent("min", require "events/telemetry"))
+	end
+
 	storage.stats.lobbies = #lobbies
 	storage.stats.channels = #channels
 	storage.stats.users = channels:users()

@@ -31,5 +31,15 @@ return {
 		return dead
 	end,
 
+	-- read-only view of the watchdog credits per shard (3 = healthy, missed
+	-- heartbeats decrement it, < 0 triggers a reboot); used for telemetry
+	peek = function ()
+		local snapshot = {}
+		for shard, counter in pairs(shards) do
+			snapshot[shard] = counter
+		end
+		return snapshot
+	end,
+
 	kill = shutdown
 }

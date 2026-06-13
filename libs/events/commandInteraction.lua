@@ -1,10 +1,13 @@
 local logger = require "logger"
+local uv = require "uv"
 
 local commands = require "commands/init"
+local metrics = require "telemetry/metrics"
 
 local errorResponse = require "response/error"
 
 local insert, concat = table.insert, table.concat
+local hrtime = uv.hrtime
 
 return function (interaction)
 	local strings = {
@@ -27,7 +30,16 @@ return function (interaction)
 	end
 
 	-- call the command, log it, and all in protected call
+	local start = hrtime()
 	local res, logMsg, reply = xpcall(commands, debug.traceback, interaction)
+
+	-- record slash command usage for telemetry
+	metrics.counter("voicemanager_commands_total", 1,
+		{command = interaction.commandName, outcome = res and "success" or "error"})
+	metrics.counter("voicemanager_command_duration_ms_sum", (hrtime() - start) / 1e6,
+		{command = interaction.commandName})
+	metrics.counter("voicemanager_command_duration_ms_count", 1,
+		{command = interaction.commandName})
 
 	-- notify user if failed
 	if res then

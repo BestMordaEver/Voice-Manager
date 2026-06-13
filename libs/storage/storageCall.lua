@@ -3,6 +3,8 @@ local config = require "config"
 local client = require "client"
 local logger = require "logger"
 
+local metrics = require "telemetry/metrics"
+
 -- one mutex per database connection
 local Mutex = require "discordia".Mutex
 
@@ -26,6 +28,8 @@ return function (statement, logMsg, db)
 		mutex:lock()
 		local ok, msg = xpcall(pcallFunc, debug.traceback, statement, ...)
 		mutex:unlock()
+
+		metrics.counter("voicemanager_db_writes_total", 1, {outcome = ok and "success" or "error"})
 
 		if ok then
 			logger:log(5, success, ...)

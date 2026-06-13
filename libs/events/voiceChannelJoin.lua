@@ -14,6 +14,7 @@ local passwordResponse = require "response/password"
 
 local matchmakers = require "utils/matchmakers"
 
+local metrics = require "telemetry/metrics"
 
 local Mutex = discordia.Mutex
 local enums = discordia.enums
@@ -39,11 +40,13 @@ local function lobbyJoinCall (member, lobby)
 
 	if lobbyData.limit <= #lobbyData.children then
 		logger:log(4, "GUILD %s LOBBY %s USER %s: lobby room limit reached", lobby.guild.id, lobby.id, member.user.id)
+		metrics.counter("voicemanager_lobby_joins_total", 1, {outcome = "room_limit"})
 		return
 	end
 
 	if guildData.limit <= guildData:channels() then
 		logger:log(4, "GUILD %s LOBBY %s USER %s: guild room limit reached", lobby.guild.id, lobby.id, member.user.id)
+		metrics.counter("voicemanager_lobby_joins_total", 1, {outcome = "guild_limit"})
 		return
 	end
 
@@ -134,6 +137,7 @@ local function lobbyJoinCall (member, lobby)
 	if not newChannel then
 		lobbyData:detachChild(position)
 		logger:log(2, "GUILD %s LOBBY %s USER %s: couldn't create new room - %s", guild.id, lobby.id, member.user.id, err)
+		metrics.counter("voicemanager_lobby_joins_total", 1, {outcome = "create_failed"})
 		return
 	end
 
@@ -199,6 +203,7 @@ local function lobbyJoinCall (member, lobby)
 	Timer.clearTimeout(timer)
 	queue[newChannel.id] = nil
 
+	metrics.counter("voicemanager_lobby_joins_total", 1, {outcome = "created"})
 end
 
 
@@ -209,6 +214,7 @@ local function lobbyJoin (member, lobby)
 	if limit == -1 then
 		member:setVoiceChannel()
 		member.user:send(warningResponse(false, member.user.locale, "wait", retryIn))
+		metrics.counter("voicemanager_lobby_joins_total", 1, {outcome = "ratelimited"})
 		return
 	end
 

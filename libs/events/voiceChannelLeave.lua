@@ -4,11 +4,16 @@ local logger = require "logger"
 
 local channels = require "storage/channels"
 
+local metrics = require "telemetry/metrics"
+
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
 
 local enums = require "discordia".enums
 local permission = enums.permission
 local overwriteType = enums.overwriteType
+
+-- room lifetime buckets in seconds: 30s, 1m, 5m, 15m, 30m, 1h, 2h, 4h, 8h
+local LIFETIME_BUCKETS = {30, 60, 300, 900, 1800, 3600, 7200, 14400, 28800}
 
 
 
@@ -16,6 +21,10 @@ local function roomEmpty (channel)
 	local channelData = channels[channel.id]
 	local parent = channelData and channelData.parent
 	local guild = channel.guild
+
+	-- the room's snowflake encodes its creation time, so lifetime needs no state
+	metrics.observe("voicemanager_room_lifetime_seconds",
+		os.time() - channel.createdAt, LIFETIME_BUCKETS)
 
 	if parent and parent.mutex then
 		parent.mutex:lock()
