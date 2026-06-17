@@ -85,11 +85,25 @@ local function declareMetrics ()
 	metrics.declare("discordia_http_requests_total", "counter", "REST requests, by method and outcome")
 	metrics.declare("discordia_http_request_duration_ms_sum", "counter", "Cumulative REST request time in ms")
 	metrics.declare("discordia_http_request_duration_ms_count", "counter", "Number of REST requests measured")
+	metrics.declare("discordia_http_errors_total", "counter", "Failed REST requests, by method and Discord error code (e.g. 50013 Missing Permissions, 50001 Missing Access; 'network' for transport failures)")
 	metrics.declare("discordia_http_ratelimited_total", "counter", "REST requests that hit a 429 and were retried")
 	metrics.declare("discordia_http_badgateway_total", "counter", "REST requests that hit a 502 and were retried")
 	metrics.declare("discordia_gateway_events_total", "counter", "Shard lifecycle events, by type")
 	metrics.declare("discordia_shard_latency_ms", "gauge", "Websocket heartbeat round trip per shard")
 	metrics.declare("discordia_cache_objects", "gauge", "Cached library objects, by type")
+end
+
+-- maps a failed request's error into a low-cardinality label. API:commit formats
+-- HTTP failures as "HTTP Error <discord code> : <message>" (the code is Discord's
+-- JSON error code, e.g. 50013 Missing Permissions, 50001 Missing Access), while
+-- transport-level failures (pcall on the socket) come through as a raw error
+-- string with no such prefix.
+local function classifyHttpError (err)
+	if type(err) ~= "string" then return "unknown" end
+	local code = err:match("^HTTP Error (%d+)")
+	if code then return code end
+	if err:find("^HTTP Error") then return "http_error" end -- non-JSON HTTP failure (e.g. 502)
+	return "network"
 end
 
 -- times every REST call and records its outcome (failures carry an error).
@@ -111,6 +125,11 @@ local function instrumentHTTP ()
 			{method = method, outcome = err and "failure" or "success"})
 		metrics.counter("discordia_http_request_duration_ms_sum", elapsed, {method = method})
 		metrics.counter("discordia_http_request_duration_ms_count", 1, {method = method})
+
+		if err then
+			metrics.counter("discordia_http_errors_total", 1,
+				{method = method, code = classifyHttpError(err)})
+		end
 
 		return data, err
 	end
