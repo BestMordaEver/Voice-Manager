@@ -2,13 +2,6 @@ return {
 	INLINE_PREVIEW_BYTES = 256 * 1024,
 	DEFAULT_UPLOAD_BUDGET = 7 * 1024 * 1024,
 	TRANSCRIPTS_DIR = "./transcripts",
-	DISCORD_ATTACHMENT_HOSTS = {
-		["cdn.discordapp.com"] = true,
-		["media.discordapp.net"] = true,
-		["cdn.discordapp.net"] = true,
-		["cdn.discord.com"] = true,
-		["media.discord.com"] = true,
-	},
 	imageExtensions = {
 		png = true,
 		jpg = true,

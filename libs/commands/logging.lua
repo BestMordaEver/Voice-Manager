@@ -1,5 +1,6 @@
 local lobbies = require "storage/lobbies"
 local guilds = require "storage/guilds"
+local Overseer = require "overseer"
 
 local okResponse = require "response/ok"
 local warningResponse = require "response/warning"
@@ -23,6 +24,12 @@ local commands = {
 	end,
 
 	disable = function (interaction, lobby)
+		local lobbyData = lobbies[lobby.id]
+		for _, channelData in pairs(lobbyData.children) do
+			if type(channelData) == "table" and channelData.id then
+				Overseer.stop(channelData.id)
+			end
+		end
 		lobbies[lobby.id]:setCompanionLog()
 		return "Logging disabled", okResponse(true, interaction.locale, "loggingDisableConfirm")
 	end,

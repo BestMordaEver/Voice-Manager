@@ -115,7 +115,9 @@ function helpers.sanitizeFilename(name)
 end
 
 function helpers.extname(name)
-	return name and name:match("%.([^.]+)$") and name:match("%.([^.]+)$"):lower() or nil
+	if not name then return nil end
+	local ext = name:match("%.([^.]+)$")
+	return ext and ext:lower() or nil
 end
 
 function helpers.guessMimeType(name, fallback)
@@ -168,11 +170,6 @@ function helpers.headerMap(response)
 		headers[header[1]:lower()] = header[2]
 	end
 	return headers
-end
-
-function helpers.isDiscordAttachmentUrl(url)
-	local host = url and url:match("^https?://([^/%?]+)")
-	return host and config.DISCORD_ATTACHMENT_HOSTS[host:lower()] or false
 end
 
 function helpers.getUserAvatarURL(user)

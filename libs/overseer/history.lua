@@ -130,13 +130,22 @@ local function addEntry(session, entry)
 	helpers.insert(session.entries, entry)
 end
 
+local function addNotice(session, action, text)
+	addEntry(session, {
+		type = "notice",
+		action = action,
+		text = text,
+		timestamp = os.time(),
+	})
+end
+
 local function recordMessage(session, message, action)
 	local snapshot = captureSnapshot(session, message)
 	addEntry(session, {
 		type = "message",
 		action = action,
 		timestamp = action == "create" and snapshot.createdAt or snapshot.editedAt or os.time(),
-		message = helpers.clone(snapshot),
+		message = snapshot,
 	})
 end
 
@@ -225,6 +234,39 @@ local function recordInteraction(session, interaction, action)
 	})
 end
 
+local function recordCommand(session, interaction)
+	local source = safeSource(session, interaction.channel)
+	local commandParts = {interaction.commandName}
+	if interaction.subcommand then helpers.insert(commandParts, interaction.subcommand) end
+	if interaction.subcommandOption then helpers.insert(commandParts, interaction.subcommandOption) end
+
+	addEntry(session, {
+		type = "interaction",
+		action = "command",
+		timestamp = os.time(),
+		user = snapshotUser(session, interaction.user),
+		messageID = interaction.commandType == 3 and interaction.target and interaction.target.id or nil,
+		customID = helpers.concat(commandParts, " "),
+		commandType = interaction.commandType,
+		sourceChannelID = source.id,
+		sourceChannelName = source.name,
+		sourceKind = source.kind,
+	})
+end
+
+local function recordVoice(session, channel, member, action)
+	local source = safeSource(session, channel)
+	addEntry(session, {
+		type = "voice",
+		action = action,
+		timestamp = os.time(),
+		user = snapshotUser(session, member and member.user),
+		sourceChannelID = source.id,
+		sourceChannelName = source.name,
+		sourceKind = source.kind,
+	})
+end
+
 local function hydrateChannelHistory(session, channel)
 	if not channel then return end
 	local message = channel:getFirstMessage()
@@ -250,11 +292,45 @@ function history.track(roomChannel, companionChannel, host)
 	return getOrCreateSession(roomChannel, companionChannel, host)
 end
 
-function history.resume(roomChannel, companionChannel, host)
+function history.resume(roomChannel, companionChannel, host, reason)
 	local session = getOrCreateSession(roomChannel, companionChannel, host)
 	hydrateChannelHistory(session, roomChannel)
 	hydrateChannelHistory(session, companionChannel)
+	if reason == "restored" then
+		addNotice(session, "restored", "Logger session was restored from active room state. Earlier edits/deletes/reactions may be missing.")
+	end
 	return session
+end
+
+function history.ensure(roomChannel, companionChannel, host, reason)
+	local existing = sessions[roomChannel.id]
+	if existing then
+		getOrCreateSession(roomChannel, companionChannel, host)
+		return existing, false
+	end
+
+	local session = history.resume(roomChannel, companionChannel, host)
+	if reason == "subscribe" then
+		addNotice(session, "late_start", "Transcript collection started after /room subscribe. Earlier events may be missing.")
+	elseif reason == "log" then
+		addNotice(session, "late_start", "Transcript collection started after /room log. Earlier events may be missing.")
+	end
+
+	return session, true
+end
+
+function history.discard(room)
+	local session = history.take(room)
+	if not session then return nil end
+	helpers.removeTree(session.tempDir)
+	return session
+end
+
+function history.markRoomDeleted(room)
+	local roomID = type(room) == "table" and room.id or room
+	local session = sessions[roomID]
+	if not session then return end
+	addNotice(session, "room_deleted", "Room deletion detected. Finalizing transcript upload.")
 end
 
 function history.take(room)
@@ -273,6 +349,21 @@ function history.take(room)
 	for channelID in pairs(session.sources) do
 		channelToSession[channelID] = nil
 	end
+	return session
+end
+
+function history.peek(room)
+	local roomID = type(room) == "table" and room.id or room
+	local session = sessions[roomID]
+	if not session then return nil end
+
+	if type(room) == "table" then
+		session.roomName = room.name
+		session.guildName = room.guild.name
+		local guildData = guilds[room.guild.id]
+		session.logTimeOffset = guildData and guildData.logTimeOffset or 0
+	end
+
 	return session
 end
 
@@ -355,6 +446,28 @@ history.events = {
 		end
 	end,
 
+	commandInteraction = function(interaction)
+		if interaction.channel then
+			local sessionID = channelToSession[interaction.channel.id]
+			local session = sessionID and sessions[sessionID] or nil
+			if session then recordCommand(session, interaction) end
+		end
+	end,
+
+	voiceChannelJoin = function(member, channel)
+		if not channel then return end
+		local sessionID = channelToSession[channel.id]
+		local session = sessionID and sessions[sessionID] or nil
+		if session then recordVoice(session, channel, member, "join") end
+	end,
+
+	voiceChannelLeave = function(member, channel)
+		if not channel then return end
+		local sessionID = channelToSession[channel.id]
+		local session = sessionID and sessions[sessionID] or nil
+		if session then recordVoice(session, channel, member, "leave") end
+	end,
+
 	channelUpdate = function(channel)
 		local sessionID = channelToSession[channel.id]
 		local session = sessionID and sessions[sessionID] or nil
@@ -385,6 +498,9 @@ function history.hasLoggableContent(session)
 	if not session then return false end
 	local botID = client.user and tostring(client.user.id) or nil
 	for _, entry in ipairs(session.entries) do
+		if entry.type == "notice" then
+			return true
+		end
 		local author = entry.type == "message" and entry.message and entry.message.author
 		local isBotGreeting = botID and author and tostring(author.id) == botID
 		if not isBotGreeting then
@@ -410,6 +526,28 @@ function history.stats()
 		snapshots = snapshots,
 		diskBytes = helpers.directorySize(config.TRANSCRIPTS_DIR),
 	}
+end
+
+-- sweep sessions whose guild or room channel no longer exists
+-- (bot was kicked, guild deleted, channel manually removed)
+-- returns the number of dead sessions discarded
+function history.sweepDeadSessions()
+	local dead = {}
+	for roomID, session in pairs(sessions) do
+		local guild = client:getGuild(session.guildID)
+		if not guild then
+			helpers.insert(dead, {id = roomID, reason = "guild_gone"})
+		else
+			local channel = guild:getChannel(roomID)
+			if not channel then
+				helpers.insert(dead, {id = roomID, reason = "channel_deleted"})
+			end
+		end
+	end
+	for _, item in ipairs(dead) do
+		history.discard(item.id)
+	end
+	return #dead
 end
 
 return history

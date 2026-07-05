@@ -66,4 +66,15 @@ CREATE TABLE IF NOT EXISTS channels(
 	position INTEGER NOT NULL,
 	companion VARCHAR,
 	password VARCHAR
-)]])
+);
+
+CREATE TABLE IF NOT EXISTS subscribers(
+	channelID VARCHAR NOT NULL,
+	userID VARCHAR NOT NULL,
+	PRIMARY KEY(channelID, userID),
+	FOREIGN KEY(channelID) REFERENCES channels(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_channelID ON subscribers(channelID);
+CREATE INDEX IF NOT EXISTS idx_subscribers_userID ON subscribers(userID)
+]])

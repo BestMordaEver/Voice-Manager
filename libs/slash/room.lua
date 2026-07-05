@@ -101,5 +101,8 @@ return {
 		B.subcommand(locale.password, locale.roomPasswordDesc, {
 			B.string(locale.password, locale.roomPasswordPasswordDesc)
 		}),
+
+		B.subcommand(locale.roomSubscribe, locale.roomSubscribeDesc),
+		B.subcommand(locale.roomLog, locale.roomLogDesc),
 	}
 }

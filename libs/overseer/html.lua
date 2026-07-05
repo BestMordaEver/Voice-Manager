@@ -2,10 +2,8 @@ local json = require "json"
 
 local helpers = require "overseer/helpers"
 local static = require "overseer/htmlStatic"
-local template = require "overseer/template"
 
 local f = string.format
-local strings = template.STRINGS
 local copy = static.copy
 
 local function encodeJson(value)
@@ -188,7 +186,7 @@ local function renderAttachmentDetails(asset)
 	if asset.spoiler then
 		helpers.insert(items, {label = 'Spoiler', value = 'Yes'})
 	end
-	return renderTechnicalPanel(copy.fileDetails, items, nil, 'meta-inline')
+	return renderTechnicalPanel(copy.fileDetails, items, nil, 'meta-inline meta-wide')
 end
 
 local function renderAttachmentPreview(asset, title)
@@ -308,8 +306,14 @@ local function renderComponent(component)
 		for _, nested in ipairs(component.components) do
 			helpers.insert(row, renderComponent(nested))
 		end
+		if component.accessory then
+			helpers.insert(row, renderComponent(component.accessory))
+		end
 		helpers.insert(row, '</div>')
 		return helpers.concat(row)
+	end
+	if component.accessory then
+		return renderComponent(component.accessory)
 	end
 	if component.style or component.label or component.custom_id or component.customId then
 		return f('<span class="component-pill %s">%s</span>', componentStyle(component.style), helpers.escapeHtml(componentLabel(component)))
@@ -317,7 +321,7 @@ local function renderComponent(component)
 	if component.options then
 		return f('<span class="component-pill secondary">%s (%d options)</span>', helpers.escapeHtml(component.placeholder or componentLabel(component)), #component.options)
 	end
-	return renderTechnicalPanel(copy.rawComponent, nil, f('<pre class="raw-block">%s</pre>', helpers.escapeHtml(encodeJson(component))), 'meta-inline')
+	return renderTechnicalPanel(copy.rawComponent, nil, f('<pre class="raw-block">%s</pre>', helpers.escapeHtml(encodeJson(component))), 'meta-inline meta-wide')
 end
 
 local function renderComponents(components)
@@ -363,7 +367,7 @@ local function renderMessageDetails(entry, message, session)
 	if message.attachments and message.attachments[1] then
 		helpers.insert(items, {label = 'Attachment count', value = helpers.escapeHtml(#message.attachments)})
 	end
-	return renderTechnicalPanel(copy.messageDetails, items, nil, nil)
+	return renderTechnicalPanel(copy.messageDetails, items, nil, "meta-inline")
 end
 
 local function truncatePreview(text, limit)
@@ -451,10 +455,11 @@ local function renderMessageEntry(entry, session, messageIndex, locationIndex, c
 		}, nil, 'meta-inline')
 		return renderRow{
 			entryClass = 'entry-' .. entry.action,
-			id = entry.messageID,
+			id = entry.action == 'create' and entry.messageID or nil,
 			titleOverride = copy.unavailableMessage,
 			badge = actionLabel(entry.action),
 			badgeClass = actionClass(entry.action),
+			referenceBar = entry.action ~= 'create' and entry.messageID and renderReferenceBar(entry.messageID, messageIndex, nil, locationIndex, currentFile) or '',
 			timestamp = helpers.formatTimestamp(entry.timestamp, session.logTimeOffset),
 			sourceKind = entry.sourceKind,
 			sourceName = entry.sourceChannelName,
@@ -473,9 +478,11 @@ local function renderMessageEntry(entry, session, messageIndex, locationIndex, c
 	local badge = entry.action ~= 'create' and actionLabel(entry.action) or nil
 	return renderRow{
 		entryClass = 'entry-' .. entry.action,
-		id = message.id,
+		id = entry.action == 'create' and message.id or nil,
 		ephemeral = message.ephemeral,
-		referenceBar = message.referencedMessageID and renderReferenceBar(message.referencedMessageID, messageIndex, message.referencedAuthor, locationIndex, currentFile) or '',
+		referenceBar = (entry.action ~= 'create' and message.id and renderReferenceBar(message.id, messageIndex, nil, locationIndex, currentFile))
+			or (message.referencedMessageID and renderReferenceBar(message.referencedMessageID, messageIndex, message.referencedAuthor, locationIndex, currentFile))
+			or '',
 		user = message.author,
 		badge = badge,
 		badgeClass = badge and actionClass(entry.action) or nil,
@@ -521,7 +528,9 @@ local function renderInteractionEntry(entry, session, messageIndex, locationInde
 		{label = 'Logged at', value = helpers.escapeHtml(helpers.formatTimestamp(entry.timestamp, session.logTimeOffset))},
 	}, nil, 'meta-inline')
 
-	local label = entry.action == 'modal' and copy.modalInteraction or copy.componentInteraction
+	local label = entry.action == 'modal' and copy.modalInteraction
+		or entry.action == 'command' and copy.commandInteraction
+		or copy.componentInteraction
 	return renderRow{
 		entryClass = 'entry-event',
 		user = entry.user,
@@ -530,6 +539,43 @@ local function renderInteractionEntry(entry, session, messageIndex, locationInde
 		timestamp = helpers.formatTimestamp(entry.timestamp, session.logTimeOffset),
 		sourceKind = entry.sourceKind,
 		sourceName = entry.sourceChannelName,
+		meta = details,
+	}
+end
+
+local function renderVoiceEntry(entry, session)
+	local details = renderTechnicalPanel(copy.voiceDetails, {
+		{label = 'User ID', value = helpers.escapeHtml(entry.user.id)},
+		{label = 'Channel', value = helpers.escapeHtml(entry.sourceChannelName or copy.deletedChannel)},
+		{label = 'Surface', value = helpers.escapeHtml(entry.sourceKind or 'room')},
+		{label = 'Logged at', value = helpers.escapeHtml(helpers.formatTimestamp(entry.timestamp, session.logTimeOffset))},
+	}, nil, 'meta-inline')
+
+	local verb = entry.action == 'join' and copy.voiceJoin or copy.voiceLeave
+	return renderRow{
+		entryClass = 'entry-event',
+		user = entry.user,
+		inline = helpers.escapeHtml(verb),
+		timestamp = helpers.formatTimestamp(entry.timestamp, session.logTimeOffset),
+		sourceKind = entry.sourceKind,
+		sourceName = entry.sourceChannelName,
+		meta = details,
+	}
+end
+
+local function renderNoticeEntry(entry, session)
+	local details = renderTechnicalPanel(copy.noticeDetails, {
+		{label = 'Logged at', value = helpers.escapeHtml(helpers.formatTimestamp(entry.timestamp, session.logTimeOffset))},
+		{label = 'Action', value = helpers.escapeHtml(entry.action or 'notice')},
+	}, nil, 'meta-inline')
+
+	return renderRow{
+		entryClass = 'entry-event',
+		titleOverride = copy.noticeTitle,
+		inline = helpers.escapeHtml(entry.text or copy.noticeTitle),
+		timestamp = helpers.formatTimestamp(entry.timestamp, session.logTimeOffset),
+		sourceKind = 'room',
+		sourceName = session.roomName,
 		meta = details,
 	}
 end
@@ -564,6 +610,8 @@ local function renderEntry(entry, session, messageIndex, locationIndex, currentF
 	if entry.type == 'reaction' then return renderReactionEntry(entry, session, messageIndex, locationIndex, currentFile) end
 	if entry.type == 'interaction' then return renderInteractionEntry(entry, session, messageIndex, locationIndex, currentFile) end
 	if entry.type == 'channel' then return renderChannelEntry(entry, session) end
+	if entry.type == 'voice' then return renderVoiceEntry(entry, session) end
+	if entry.type == 'notice' then return renderNoticeEntry(entry, session) end
 	return ''
 end
 

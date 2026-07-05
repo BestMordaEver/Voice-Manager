@@ -29,7 +29,9 @@ local function loadChannels (parent, parentType)
 					-- required for position tracking
 					if parentType == 0 then parent:attachChild(channelData, channelData.position) end
 					-- continue logger if needed
-					if parent.companionLog then Overseer.resume(channel, companion, channelData.host) end
+					if parent.companionLog or (channelData.logSubscribers and next(channelData.logSubscribers)) then
+						Overseer.resume(channel, companion, channelData.host, "restored")
+					end
 					-- load in password checker channels
 					loadChannels(channelData, 3)
 				else
@@ -126,6 +128,19 @@ local load = function ()
 	end
 	channels.loadStatement:close()
 	channels.loadStatement = nil
+
+	rawData = channels.loadSubscribersStatement:step({},{})
+	while rawData do
+		local channelID, userID = rawData[1], rawData[2]
+		local channel = channels[channelID]
+		if channel then
+			channel.logSubscribers = channel.logSubscribers or {}
+			channel.logSubscribers[userID] = true
+		end
+		rawData = channels.loadSubscribersStatement:step()
+	end
+	channels.loadSubscribersStatement:close()
+	channels.loadSubscribersStatement = nil
 end
 
 local cleanup = function ()

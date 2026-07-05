@@ -124,6 +124,8 @@ local slash = {
 	roomBlock = "block",
 	roomAllow = "allow",
 	roomUnlock = "unlock",
+	roomSubscribe = "subscribe",
+	roomLog = "log",
 	roomDesc = "Configure room settings",
 	roomViewDesc = "Show room settings",
 	roomHostDesc = "Ping current room host and transfer room ownership",
@@ -169,6 +171,8 @@ local slash = {
 	roomAllowUserDesc = "User that you want to allow to join",
 	roomLockDesc = "Set the room to invite only mode",
 	roomUnlockDesc = "Make the room public",
+	roomSubscribeDesc = "Receive this room transcript in DMs when the room gets deleted",
+	roomLogDesc = "Send the current room transcript to your DMs",
 	roomPasswordDesc = "Set up a channel password",
 	roomPasswordPasswordDesc = "Password that users will have to enter upon connection",
 

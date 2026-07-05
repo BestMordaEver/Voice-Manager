@@ -1,8 +1,7 @@
-local client = require "client"
-
 local base64 = require "base64"
 local fs = require "fs"
 local http = require "coro-http"
+local uv = require "uv"
 
 local config = require "overseer/config"
 local helpers = require "overseer/helpers"
@@ -14,6 +13,24 @@ local request = http.request
 local writeFileSync = fs.writeFileSync
 
 local f = string.format
+
+-- cross-session download cache: URL -> {bytes, contentType}
+-- bounded FIFO cache; only items under 512 KB are stored so an attacker
+-- cannot accumulate unlimited memory via large CDN attachments
+local downloadCache = {}
+local cacheQueue = {}
+local CACHE_MAX = 200
+local CACHE_MAX_BYTES = 512 * 1024
+
+local function cachePut(url, bytes, contentType)
+	if #bytes > CACHE_MAX_BYTES then return end
+	if #cacheQueue >= CACHE_MAX then
+		local oldUrl = table.remove(cacheQueue, 1)
+		downloadCache[oldUrl] = nil
+	end
+	cacheQueue[#cacheQueue + 1] = url
+	downloadCache[url] = {bytes = bytes, contentType = contentType}
+end
 
 local function extensionForMimeType(mimeType)
 	if type(mimeType) ~= "string" then return nil end
@@ -34,17 +51,34 @@ end
 
 local function downloadBytes(url)
 	if not url then return nil, nil, "missing url" end
-	local attempts = {}
-	local authHeaders = helpers.isDiscordAttachmentUrl(url) and {{"Authorization", client._api._token}} or nil
-	helpers.insert(attempts, {url = url, headers = authHeaders})
-	if authHeaders then helpers.insert(attempts, {url = url}) end
 
-	for _, attempt in ipairs(attempts) do
-		local ok, response, body = pcall(request, "GET", attempt.url, attempt.headers)
-		if ok and response and response.code and response.code < 300 and type(body) == "string" then
-			local headers = helpers.headerMap(response)
-			return body, headers["content-type"], nil
-		end
+	local cached = downloadCache[url]
+	if cached then
+		return cached.bytes, cached.contentType, nil
+	end
+
+	local timedOut = false
+	local timer
+	timer = uv.new_timer()
+	timer:start(30000, 0, function()
+		timedOut = true
+	end)
+
+	local ok, response, body = pcall(request, "GET", url)
+
+	if timer then
+		timer:close()
+	end
+
+	if timedOut then
+		return nil, nil, "timeout"
+	end
+
+	if ok and response and response.code and response.code < 300 and type(body) == "string" then
+		local headers = helpers.headerMap(response)
+		local contentType = headers["content-type"]
+		cachePut(url, body, contentType)
+		return body, contentType, nil
 	end
 
 	return nil, nil, "download failed"

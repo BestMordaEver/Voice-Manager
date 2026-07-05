@@ -10,6 +10,12 @@ local storageStatements = {
 
 	removeChannel = {"DELETE FROM channels WHERE id = ?", "DELETE CHANNEL %s"},
 
+	addChannelLogSubscriber = {"INSERT OR IGNORE INTO subscribers(channelID, userID) VALUES(?, ?)", "ADD LOG SUBSCRIBER %s => ROOM %s"},
+
+	removeChannelLogSubscriber = {"DELETE FROM subscribers WHERE channelID = ? AND userID = ?", "DELETE LOG SUBSCRIBER %s => ROOM %s"},
+
+	removesubscribers = {"DELETE FROM subscribers WHERE channelID = ?", "DELETE LOG SUBSCRIBERS => ROOM %s"},
+
 	setChannelHost = {"UPDATE channels SET host = ? WHERE id = ?", "SET HOST %s => CHANNEL %s"},
 
 	setChannelPassword = {"UPDATE channels SET password = ? WHERE id = ?", "SET PASSWORD %s => CHANNEL %s"}
@@ -29,6 +35,7 @@ local channelMeta = {
 				channels.n = channels.n - 1
 				logger:log(6, "GUILD %s ROOM %s: deleted", self.guildID, self.id)
 			end
+			emitter:emit("removesubscribers", self.id)
 			emitter:emit("removeChannel", self.id)
 		end,
 
@@ -47,7 +54,26 @@ local channelMeta = {
 			self.password = password
 			logger:log(6, "GUILD %s ROOM %s: updated password to %s", self.guildID, self.id, password)
 			emitter:emit("setChannelPassword", password, self.id)	-- yes, password is saved as plaintext without any safety
-		end	-- if you don't understand why this is sufficient data protection, i recommend you review the use case
+		end,	-- if you don't understand why this is sufficient data protection, i recommend you review the use case
+
+		addLogSubscriber = function (self, userID)
+			if not userID then return end
+			self.logSubscribers = self.logSubscribers or {}
+			self.logSubscribers[userID] = true
+			logger:log(6, "GUILD %s ROOM %s: added log subscriber %s", self.guildID, self.id, userID)
+			emitter:emit("addChannelLogSubscriber", self.id, userID)
+		end,
+
+		removeLogSubscriber = function (self, userID)
+			if not (userID and self.logSubscribers and self.logSubscribers[userID]) then return end
+			self.logSubscribers[userID] = nil
+			logger:log(6, "GUILD %s ROOM %s: removed log subscriber %s", self.guildID, self.id, userID)
+			emitter:emit("removeChannelLogSubscriber", self.id, userID)
+		end,
+
+		hasLogSubscribers = function (self)
+			return self.logSubscribers and next(self.logSubscribers) ~= nil
+		end
 	},
 	__tostring = function (self) return string.format("ChannelData: %s", self.id) end
 }
@@ -57,6 +83,7 @@ local parents = {[0] = require "storage/lobbies", require "storage/guilds", nil 
 setmetatable(channels, {
 	__index = {
 		loadStatement = channelsDB:prepare("SELECT id, parentType, host, parent, position, companion, password FROM channels"),
+		loadSubscribersStatement = channelsDB:prepare("SELECT channelID, userID FROM subscribers"),
 
 		add = function (self, channelID, parentType, host, parentID, position, companion, password)
 			local parent = parents[tonumber(parentType)][parentID]
@@ -69,7 +96,8 @@ setmetatable(channels, {
 					parent = parent,
 					position = tonumber(position),
 					companion = companion,
-					password = password
+					password = password,
+					logSubscribers = {}
 				}, channelMeta)
 				if parent.attachChild then parent:attachChild(self[channelID], tonumber(position)) end
 				logger:log(6, "GUILD %s ROOM %s: added", self[channelID].guildID, channelID)
@@ -81,7 +109,8 @@ setmetatable(channels, {
 					host = host,
 					position = tonumber(position),
 					companion = companion,
-					password = password
+					password = password,
+					logSubscribers = {}
 				}, channelMeta)
 				logger:log(6, "ORPHAN ROOM %s: added", channelID)
 			end

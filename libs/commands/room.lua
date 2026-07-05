@@ -3,6 +3,7 @@ local config = require "config"
 local logger = require "logger"
 
 local channels = require "storage/channels"
+local Overseer = require "overseer"
 
 local localeHandler = require "locale/localeHandler"
 local okResponse = require "response/ok"
@@ -23,6 +24,34 @@ local tierLocale = {[0] = "bitrateOOB","bitrateOOB1","bitrateOOB2","bitrateOOB3"
 
 ratelimiter("channelName", 2, 600)
 ratelimiter("companionName", 2, 600)
+
+local function transcriptTitle(locale, voiceChannel, channelData)
+	local parentName = localeHandler(locale, "noParent")
+	if channelData and channelData.parent and channelData.parent.id then
+		local parentChannel = client:getChannel(channelData.parent.id)
+		if parentChannel then parentName = parentChannel.name end
+	end
+
+	return localeHandler(locale, "logName", voiceChannel.name, parentName)
+end
+
+local function sendTranscript(target, transcript, title)
+	for index, payload in ipairs(transcript.payloads or {}) do
+		local ok, err = target:send{
+			content = index == 1 and title or nil,
+			files = payload.files,
+		}
+		if not ok then return false, err, index end
+	end
+
+	return true
+end
+
+local function ensureTranscriptSession(voiceChannel, channelData, interaction, reason)
+	local companion = client:getChannel(channelData.companion)
+	local _, started = Overseer.ensure(voiceChannel, companion, interaction.user, reason)
+	return started
+end
 
 local subcommands
 subcommands = {
@@ -482,6 +511,40 @@ subcommands = {
 		return "Sent invite to mentioned user", okResponse(true, interaction.locale, "inviteConfirm", user.mentionString)
 	end,
 
+	subscribe = function (interaction, voiceChannel)
+		local channelData = channels[voiceChannel.id]
+		channelData:addLogSubscriber(interaction.user.id)
+		local started = ensureTranscriptSession(voiceChannel, channelData, interaction, "subscribe")
+
+		return "Subscribed user to transcript delivery", okResponse(true, interaction.locale, started and "roomSubscribeConfirmStarted" or "roomSubscribeConfirm")
+	end,
+
+	log = function (interaction, voiceChannel)
+		local channelData = channels[voiceChannel.id]
+		local started = ensureTranscriptSession(voiceChannel, channelData, interaction, "log")
+		local transcript = Overseer.preview(voiceChannel)
+		if started then Overseer.stop(voiceChannel) end
+
+		if not (transcript and transcript.payloads and transcript.payloads[1]) then
+			return "No loggable transcript content", warningResponse(true, interaction.locale, started and "roomLogEmptyStarted" or "roomLogEmpty")
+		end
+
+		local dm = interaction.user:getPrivateChannel()
+		if not dm then
+			return "Unable to DM transcript to user", warningResponse(true, interaction.locale, "roomLogNoDM")
+		end
+
+		local title = transcriptTitle(interaction.locale, voiceChannel, channelData)
+		local ok, err, batch = sendTranscript(dm, transcript, title)
+
+		if not ok then
+			logger:log(2, "GUILD %s ROOM %s USER %s: failed to deliver transcript batch %d - %s", voiceChannel.guild.id, voiceChannel.id, interaction.user.id, batch or -1, err)
+			return "Failed to send transcript to user DMs", warningResponse(true, interaction.locale, "roomLogSendError")
+		end
+
+		return "Sent room transcript to requester", okResponse(true, interaction.locale, started and "roomLogConfirmStarted" or "roomLogConfirm")
+	end,
+
 	password = function (interaction, voiceChannel, password)
 		channels[voiceChannel.id]:setPassword(password)
 
@@ -531,7 +594,14 @@ subcommands = {
 	end
 }
 
-local noAdmin = {host = true, invite = true, passwordinit = true, passwordcheck = true}
+local noAdmin = {
+	host = true,
+	invite = true,
+	passwordinit = true,
+	passwordcheck = true,
+	subscribe = true,
+	log = true,
+}
 
 return function (interaction, subcommand)
 	if subcommand == "widget" then interaction:deferUpdate() end

@@ -119,7 +119,7 @@ Companion chats are created and deleted along the rooms. By default, a chat is v
 Some commands in this category can be used with text-in-voice and don't require companion chats to be enabled.]],
 	helpCompanionSetup = "Quickly configure companion settings for a lobby",
 	helpSCompanionSetup = "/companion setup",
-	helpCompanionView = "Show all lobies that have companion chats enabled",
+	helpCompanionView = "Show all lobbies that have companion chats enabled",
 	helpSCompanionView = "/companion view",
 	helpCompanionEnable = "Enable or disable the companion chat for a lobby",
 	helpSCompanionEnable = "/companion enable|disable",
@@ -138,7 +138,7 @@ You can put different **%patterns%** in the greeting to customize it.
 	helpSCompanionGreeting = "/companion greeting",
 
 	helpLoggingHeader = [[# Logging commands
-Companion chats can be archived as self-contained HTML transcripts that are uploaded to a channel of your choosing when a room is deleted.]],
+Text chats can be archived as transcripts that are uploaded to a channel of your choosing when a room is deleted.]],
 	helpLoggingView = "Show lobbies with logging enabled and the current transcript time zone",
 	helpSLoggingView = "/logging view",
 	helpLoggingEnable = "Enable logging for a lobby and pick the channel transcripts are sent to. Users are notified about logging with a generic greeting message in chat.",
@@ -177,6 +177,10 @@ Most room commands are used by a room host - the user who created the room. Thos
 	helpSRoomHideVoice = "/room hide|show voice",
 	helpRoomHideText = "Hide or show the companion text channel",
 	helpSRoomHideText = "/room hide|show text",
+	helpRoomSubscribe = "Receive this room transcript in DMs when the room is deleted",
+	helpSRoomSubscribe = "/room subscribe",
+	helpRoomLog = "Send the current room transcript to your DMs right now",
+	helpSRoomLog = "/room log",
 	helpRoomPassword = "Users will have to enter a password before connecting to the channel, unless they were invited or allowed in with **/room allow**",
 	helpSRoomPassword = "/room password",
 

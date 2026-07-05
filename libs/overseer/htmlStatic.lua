@@ -23,8 +23,11 @@ return {
 		messageDetails = "Message details",
 		reactionDetails = "Reaction details",
 		interactionDetails = "Interaction details",
+		voiceDetails = "Voice event details",
+		noticeDetails = "Notice details",
 		channelDetails = "Channel details",
 		channelEventTitle = "Channel",
+		noticeTitle = "Notice",
 		noCategory = "No category",
 		unavailableMessage = "Unavailable message",
 		noMessageMetadata = "Message metadata was not cached before it changed.",
@@ -33,6 +36,9 @@ return {
 		interactionTitle = "Interaction",
 		modalInteraction = "Modal interaction",
 		componentInteraction = "Component interaction",
+		commandInteraction = "Command interaction",
+		voiceJoin = "Joined the voice channel",
+		voiceLeave = "Left the voice channel",
 		ephemeralLabel = "Ephemeral",
 		noPreview = "No preview available",
 		referenceUnavailable = "Original message unavailable",
@@ -446,6 +452,9 @@ return {
 			border-radius: 999px;
 			background: rgba(255, 255, 255, 0.06);
 			border: 1px solid rgba(255, 255, 255, 0.08);
+			max-width: 100%;
+			white-space: normal;
+			overflow-wrap: anywhere;
 		}
 		.component-pill.primary { background: rgba(95, 122, 245, 0.16); border-color: rgba(95, 122, 245, 0.22); }
 		.component-pill.secondary { background: rgba(255, 255, 255, 0.06); }
@@ -470,9 +479,12 @@ return {
 			line-height: 1.5;
 			white-space: nowrap;
 		}
-		.meta-trigger:hover, .meta:focus-within .meta-trigger {
+		.meta-trigger:hover, .meta-trigger:focus-visible {
 			color: var(--ink);
 			border-color: var(--line-strong);
+		}
+		.meta-trigger:focus {
+			outline: none;
 		}
 		.meta-popover {
 			position: absolute;
@@ -492,7 +504,7 @@ return {
 			transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
 			pointer-events: none;
 		}
-		.meta:hover .meta-popover, .meta:focus-within .meta-popover {
+		.meta:hover > .meta-popover, .meta:focus-within > .meta-popover {
 			opacity: 1;
 			visibility: visible;
 			transform: translateY(0);
@@ -504,8 +516,10 @@ return {
 		}
 		.meta-wide .meta-popover {
 			min-width: 340px;
-			max-width: 600px;
+			max-width: min(600px, calc(100vw - 2rem));
 			width: max-content;
+			left: 0;
+			right: auto;
 		}
 		.entry-body > .meta {
 			justify-self: start;
@@ -517,7 +531,7 @@ return {
 			cursor: help;
 			line-height: inherit;
 		}
-		.source-meta .meta-trigger:hover, .source-meta:focus-within .meta-trigger {
+		.source-meta .meta-trigger:hover, .source-meta .meta-trigger:focus-visible {
 			border-color: transparent;
 		}
 		.meta-popover-title {
@@ -589,6 +603,11 @@ return {
 			.meta-popover {
 				min-width: 200px;
 				max-width: 78vw;
+			}
+			.meta-wide .meta-popover {
+				min-width: min(340px, calc(100vw - 1.4rem));
+				max-width: calc(100vw - 1.4rem);
+				width: calc(100vw - 1.4rem);
 			}
 		}
 		</style>]],

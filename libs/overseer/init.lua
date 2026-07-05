@@ -6,7 +6,9 @@ local history = require "overseer/history"
 local payloads = require "overseer/payloads"
 local safeEvent = require "utils/safeEvent"
 
+local logger = require "logger"
 local metrics = require "telemetry/metrics"
+local timer = require "timer"
 
 local hrtime = require "uv".hrtime
 
@@ -22,8 +24,28 @@ local Overseer = {
 	events = history.events,
 	track = history.track,
 	resume = history.resume,
+	ensure = history.ensure,
+	stop = history.discard,
+	markRoomDeleted = history.markRoomDeleted,
 	stats = history.stats,
+	sweep = history.sweepDeadSessions,
 }
+
+Overseer.preview = function(room)
+	local session = history.peek(room)
+	if not session then return nil end
+
+	if not history.hasLoggableContent(session) then
+		return nil
+	end
+
+	local batches, entryCount, pageCount = payloads.buildPayloads(session)
+	return {
+		payloads = batches,
+		entryCount = entryCount,
+		pageCount = pageCount,
+	}
+end
 
 Overseer.finalize = function(room)
 	local session = history.take(room)
@@ -40,6 +62,13 @@ Overseer.finalize = function(room)
 	local start = hrtime()
 	local batches, entryCount, pageCount = payloads.buildPayloads(session)
 	metrics.observe("voicemanager_overseer_finalize_duration_ms", (hrtime() - start) / 1e6, DURATION_BUCKETS)
+
+	-- free the in-memory base64 data URIs now that the HTML payloads are built;
+	-- they can be multiple MB each and are not needed after this point
+	for _, asset in ipairs(session.assetOrder or {}) do
+		asset.dataURI = nil
+		asset.inlinePreview = nil
+	end
 
 	local totalBytes = 0
 	for _, batch in ipairs(batches) do
@@ -66,5 +95,14 @@ for name, event in pairs(Overseer.events) do
 	end)
 	emitter:onSync(safeEvent(name, event))
 end
+
+-- sweep dead sessions every 5 minutes to reclaim memory from guilds the bot
+-- was removed from or channels that were manually deleted
+timer.setInterval(300000, function()
+	local count = history.sweepDeadSessions()
+	if count > 0 then
+		logger:log(3, "overseer: swept %d dead session(s)", count)
+	end
+end)
 
 return Overseer
