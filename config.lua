@@ -11,5 +11,5 @@ return {
 	dailyreboot = false,						-- bot will reboot whenever there are no active users, once per day
 	sendStats = true,							-- send stats to bot list sites (top.gg and the likes)
 	telemetry = true,							-- collect metrics and push them to a local vmagent / VictoriaMetrics
-	vmagent = "http://127.0.0.1:8429"			-- vmagent endpoint that accepts Prometheus import (/api/v1/import/prometheus)
+	vmagent = "http://127.0.0.1:8429/vmagent"	-- vmagent endpoint (include -http.pathPrefix if any)
 }
