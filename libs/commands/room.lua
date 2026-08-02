@@ -165,6 +165,7 @@ subcommands = {
 	end,
 
 	mute = function (interaction, voiceChannel, user)
+		local channelData = channels[voiceChannel.id]
 		local scope, guild, member, roles = interaction.subcommandOption, voiceChannel.guild
 		if not scope then
 			scope = user
@@ -177,14 +178,14 @@ subcommands = {
 			end
 			member = guild:getMember(user)
 		else
-			roles = channels[voiceChannel.id].parent and channels[voiceChannel.id].parent.roles or {}
+			roles = channelData and channelData.parent and channelData.parent.roles or {}
 		end
 
 		if scope == "voice" or scope == "both" then
 			if user then
 				voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.speak)
 
-				if member.voiceChannel == voiceChannel then
+				if member.voiceChannel == voiceChannel and #voiceChannel.connectedMembers > 1 then
 					local silentRoom
 					if guild.afkChannel then
 						silentRoom = guild.afkChannel
@@ -220,12 +221,12 @@ subcommands = {
 			end
 		end
 
-		local companion = client:getChannel(channels[voiceChannel.id].companion)
+		local companion = channelData and client:getChannel(channelData.companion)
 		if scope == "text" or scope == "both" then
 			if user then
 				voiceChannel:getPermissionOverwriteFor(member):denyPermissions(permission.sendMessages)
 
-				if channels[voiceChannel.id].companion then
+				if channelData and channelData.companion then
 					if companion then
 						companion:getPermissionOverwriteFor(member):denyPermissions(permission.sendMessages)
 					end
