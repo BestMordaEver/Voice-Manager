@@ -8,6 +8,7 @@ local channels = require "storage/channels"
 
 local Overseer = require "overseer"
 local metrics = require "telemetry/metrics"
+local presenceTracker = require "utils/presenceTracker"
 
 local function transcriptTitle(channel, channelData)
 	local parentName = localeHandler(channel.guild.preferred_locale, "noParent")
@@ -40,6 +41,7 @@ return function (channel) -- and make sure there are no traces!
 		lobbyData:delete()
 	end
 	if channelData then
+		presenceTracker.unmarkTracked(channel.guild.id, channelData.host)
 		local companion = client:getChannel(channelData.companion)
 		local subscribers = channelData.logSubscribers
 		local hasSubscribers = subscribers and next(subscribers) ~= nil

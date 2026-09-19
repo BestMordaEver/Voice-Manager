@@ -43,6 +43,12 @@ package.loaded.client = client
 package.loaded.clock = clock
 package.loaded.logger = discordia.Logger(6, '%F %T')
 
+-- only members who are active room hosts get their presence cached/fetched
+local presenceTracker = require "utils/presenceTracker"
+client._options.presenceFilter = function (userId, guildId)
+	return presenceTracker.isTracked(guildId, userId)
+end
+
 local config = require "config"
 
 local storage = require "storage/handler"
@@ -101,6 +107,8 @@ client:once(safeEvent("ready", function ()
 	guilds:cleanup()
 	lobbies:cleanup()
 	channels:cleanup()
+
+	presenceTracker.restore(channels)
 end))
 
 -- bot starts working here

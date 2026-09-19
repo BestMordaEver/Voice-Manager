@@ -7,6 +7,7 @@ local channels = require "storage/channels"
 local metrics = require "telemetry/metrics"
 
 local adjustHostPermissions = require "channelUtils/adjustHostPermissions"
+local presenceTracker = require "utils/presenceTracker"
 
 local enums = require "discordia".enums
 local permission = enums.permission
@@ -91,12 +92,22 @@ local function memberLeft (channel, member)
 
 	if channelData.host ~= member.user.id then return end
 
+	-- host transfer: the old host stops being tracked, the new one takes over
+	presenceTracker.unmarkTracked(guild.id, member.user.id)
+
 	local newHost = channel.connectedMembers:random()
 
 	if not newHost then return end
 
 	logger:log(4, "GUILD %s ROOM %s: migrating host from %s to %s", guild.id, channel.id, member.user.id, newHost.user.id)
 	channelData:setHost(newHost.user.id)
+
+	local parentData = channelData.parent
+	if channelData.parentType == 0 and parentData and
+		((parentData.template and parentData.template:match("%%game%(?.-%)?%%")) or
+		 (parentData.companionTemplate and parentData.companionTemplate:match("%%game%(?.-%)?%%"))) then
+		presenceTracker.markTracked(guild.id, newHost.user.id)
+	end
 
 	if channelData.parent then
 		local err = adjustHostPermissions(channel, newHost, member)

@@ -26,6 +26,7 @@ local handleTemplate = require "channelUtils/handleTemplate"
 
 local Overseer = require "overseer"
 local ratelimiter = require "utils/ratelimiter"
+local presenceTracker = require "utils/presenceTracker"
 
 local queue = {}
 
@@ -60,6 +61,13 @@ local function lobbyJoinCall (member, lobby)
 		lobbyData:attachChild(true)
 	or
 		lobbyData:attachChild(true, lobbyData.children.max + 1)
+
+	local needsGame = (lobbyData.template and lobbyData.template:match("%%game%(?.-%)?%%")) or
+		(lobbyData.companionTemplate and lobbyData.companionTemplate:match("%%game%(?.-%)?%%"))
+
+	if needsGame then
+		presenceTracker.fetchPresence(member)
+	end
 
 	if name:match("%%.-%%") then
 		name = handleTemplate(name, member, position):match("^%s*(.-)%s*$")
@@ -172,6 +180,9 @@ local function lobbyJoinCall (member, lobby)
 	-- save channel data, attach to parent
 	channels:store(newChannel.id, 0, member.user.id, lobby.id, position, companion and companion.id or nil)
 	lobbyData:attachChild(channels[newChannel.id], position)
+	if needsGame then
+		presenceTracker.markTracked(member.guild.id, member.user.id)
+	end
 
 	newChannel:getPermissionOverwriteFor(guild.me):allowPermissions(permission.connect, permission.readMessages)
 
